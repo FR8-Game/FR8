@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 namespace FR8.Player
 {
@@ -17,13 +18,14 @@ namespace FR8.Player
         [SerializeField] private float controllerSensitivity = 0.4f;
 
         [Space]
-        [SerializeField] private float cameraFieldOfView = 90.0f;
-        [SerializeField] private float cameraHeight = 1.8f;
+        [SerializeField] private float cameraFieldOfView = 70.0f;
+        [SerializeField] private float cameraOffset = -0.1f;
+        [SerializeField] private float playerHeight = 1.7f;
 
         private new Camera camera;
 
         private Vector2 cameraRotation;
-        private bool jump;
+        private new Rigidbody rigidbody;
 
         private InputActionReference moveInput;
         private InputActionReference jumpInput;
@@ -84,7 +86,14 @@ namespace FR8.Player
             }
 
             playerGroundedMovement = gameObject.GetOrAddComponent<PlayerGroundedMovement>();
+            playerGroundedMovement.PlayerHeight = playerHeight;
+            
             playerNoClip = gameObject.GetOrAddComponent<PlayerNoClip>();
+        }
+
+        private void Start()
+        {
+            rigidbody = GetComponent<Rigidbody>();
         }
 
         #endregion
@@ -105,8 +114,6 @@ namespace FR8.Player
         private void LateUpdate()
         {
             UpdateCamera();
-
-            if (jumpInput.action.WasPerformedThisFrame()) jump = true;
         }
 
         private void FixedUpdate()
@@ -149,7 +156,7 @@ namespace FR8.Player
 
         public void MoveCamera()
         {
-            camera.transform.position = transform.position + Vector3.up * cameraHeight;
+            camera.transform.position = transform.position + Vector3.up * (playerHeight + cameraOffset);
             camera.transform.rotation = Quaternion.Euler(-cameraRotation.y, cameraRotation.x, 0.0f);
         }
 

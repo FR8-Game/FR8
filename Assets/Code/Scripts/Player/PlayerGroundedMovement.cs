@@ -8,17 +8,20 @@ namespace FR8.Player
     {
         [Header("Physics")]
         [SerializeField] private float mass = 80.0f;
-        [SerializeField] private float radius = 0.4f;
-        
+
+        [SerializeField] private float radius = 0.25f;
+
         [Header("Movement")]
         [SerializeField] private float moveSpeed = 8.0f;
-
         [SerializeField] private float accelerationTime = 0.12f;
+
         [Range(0.0f, 1.0f)]
-        [SerializeField]  private float airMovePenalty = 0.8f;
+        [SerializeField] private float airMovePenalty = 0.8f;
         [SerializeField] private float jumpHeight = 2.5f;
-        [SerializeField] private float stepHeight = 0.2f;
-        
+        [SerializeField] private float stepHeight = 0.5f;
+        [Range(90.0f, 0.0f)]
+        [SerializeField] private float maxWalkableSlope = 40.0f;
+
         [Space]
         [SerializeField] private float groundSpring = 500.0f;
         [SerializeField] private float groundDamping = 25.0f;
@@ -26,21 +29,20 @@ namespace FR8.Player
         [Space]
         [SerializeField] private float downGravityScale = 3.0f;
         [SerializeField] private float upGravityScale = 2.0f;
-        
+
         private new Rigidbody rigidbody;
         private new CapsuleCollider collider;
-        
+
         public Vector2 MoveInput { get; set; }
         public bool JumpTrigger { get; set; }
         public bool JumpInput { get; set; }
+        public float PlayerHeight { get; set; }
 
-        
         public bool IsOnGround { get; private set; }
         public RaycastHit GroundHit { get; private set; }
-        
-        public Vector3 LocalVelocity => IsOnGround || !GroundHit.rigidbody ? rigidbody.velocity : rigidbody.velocity - GroundHit.rigidbody.velocity;
-        public Vector3 Gravity => Physics.gravity * (LocalVelocity.y > 0.0f && JumpInput ? upGravityScale : downGravityScale);
 
+        public Vector3 LocalVelocity => IsOnGround && GroundHit.rigidbody ? rigidbody.velocity - GroundHit.rigidbody.GetPointVelocity(transform.position) : rigidbody.velocity;
+        public Vector3 Gravity => Physics.gravity * (LocalVelocity.y > 0.0f && JumpInput ? upGravityScale : downGravityScale);
 
         #region Initalization
 
@@ -69,13 +71,13 @@ namespace FR8.Player
             rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
             rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
-            var groundOffset = stepHeight - radius * 0.5f;
-            
+            var groundOffset = stepHeight;
+
             collider = gameObject.GetOrAddComponent<CapsuleCollider>();
             collider.enabled = true;
-            collider.height = 2.0f - groundOffset;
+            collider.height = PlayerHeight - groundOffset;
             collider.radius = radius;
-            collider.center = Vector3.up * (1.0f + groundOffset / 2.0f);
+            collider.center = Vector3.up * (PlayerHeight + groundOffset) / 2.0f;
             if (Application.isPlaying)
             {
                 var mat = new PhysicMaterial("[PROC] Player Physics Material");
@@ -94,7 +96,7 @@ namespace FR8.Player
         #endregion
 
         #region Loop
-        
+
         private void FixedUpdate()
         {
             CheckForGround();
@@ -102,30 +104,30 @@ namespace FR8.Player
             Jump();
             ApplyGravity();
         }
-        
+
         #endregion
 
         #region Physics
 
         private void CheckForGround()
         {
-            const float distance = 1.0f;
-
-            var ray = new Ray(transform.position + Vector3.up, Vector3.down);
-            if (Physics.SphereCast(ray, radius, out var hit, distance))
-            {
-                GroundHit = hit;
-                IsOnGround = true;
-
-                var contraction = 1.0f - GroundHit.distance / distance;
-
-                var spring = contraction * groundSpring - LocalVelocity.y * groundDamping;
-                var force = Vector3.up * spring;
-                rigidbody.AddForce(force, ForceMode.Acceleration);
-                return;
-            }
-
+            var distance = 1.0f - radius;
             IsOnGround = false;
+            
+            var ray = new Ray(transform.position + Vector3.up, Vector3.down);
+            if (!Physics.SphereCast(ray, radius, out var hit, distance)) return;
+
+            var groundAngle = Mathf.Acos(Mathf.Min(hit.normal.y, 1.0f)) * Mathf.Rad2Deg;
+            if (groundAngle > maxWalkableSlope) return;
+            
+            GroundHit = hit;
+            IsOnGround = true;
+
+            var contraction = 1.0f - GroundHit.distance / distance;
+
+            var spring = contraction * groundSpring - LocalVelocity.y * groundDamping;
+            var force = Vector3.up * spring;
+            rigidbody.AddForce(force, ForceMode.Acceleration);
         }
 
         private void Move()
