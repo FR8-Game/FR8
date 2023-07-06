@@ -1,15 +1,15 @@
-using System;
 using UnityEngine;
 
 namespace FR8.Player
 {
     [SelectionBase, DisallowMultipleComponent]
-    public sealed class PlayerGroundedMovement : MonoBehaviour
+    public sealed class PlayerGroundedMovement : PlayerMovementModule
     {
         [Header("Physics")]
         [SerializeField] private float mass = 80.0f;
-
+        [SerializeField] private float playerHeight = 1.7f;
         [SerializeField] private float radius = 0.25f;
+        [SerializeField] private float cameraOffset = -0.1f;
 
         [Header("Movement")]
         [SerializeField] private float moveSpeed = 8.0f;
@@ -30,54 +30,45 @@ namespace FR8.Player
         [SerializeField] private float downGravityScale = 3.0f;
         [SerializeField] private float upGravityScale = 2.0f;
 
-        private new Rigidbody rigidbody;
         private new CapsuleCollider collider;
+        private bool jumpTrigger;
+        private float cameraYaw;
 
-        public Vector2 MoveInput { get; set; }
-        public bool JumpTrigger { get; set; }
-        public bool JumpInput { get; set; }
-        public float PlayerHeight { get; set; }
-
+        public Vector3 MoveInput => Controller.Move;
+        public bool JumpInput => Controller.Jump;
+        
+        public Vector3 Up => -Gravity.normalized;
         public bool IsOnGround { get; private set; }
         public RaycastHit GroundHit { get; private set; }
 
-        public Vector3 LocalVelocity => IsOnGround && GroundHit.rigidbody ? rigidbody.velocity - GroundHit.rigidbody.GetPointVelocity(transform.position) : rigidbody.velocity;
-        public Vector3 Gravity => Physics.gravity * (LocalVelocity.y > 0.0f && JumpInput ? upGravityScale : downGravityScale);
+        public Vector3 LocalVelocity => IsOnGround && GroundHit.rigidbody ? Rigidbody.velocity - GroundHit.rigidbody.GetPointVelocity(transform.position) : Rigidbody.velocity;
+        public Vector3 Gravity => GetGlobalGravity() * (LocalVelocity.y > 0.0f && JumpInput ? upGravityScale : downGravityScale);
+
+        private Vector3 GetGlobalGravity() => Physics.gravity;
 
         #region Initalization
 
         private void OnEnable()
         {
             Configure();
-        }
-
-        private void OnDisable()
-        {
-            collider.enabled = false;
-        }
-
-        private void OnValidate()
-        {
-            Configure();
+            Controller.CameraOffset = Vector3.up * (playerHeight - cameraOffset);
         }
 
         public void Configure()
         {
-            rigidbody = GetComponent<Rigidbody>();
-            rigidbody.mass = mass;
-            rigidbody.useGravity = true;
-            rigidbody.detectCollisions = true;
-            rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
-            rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-            rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            Rigidbody.mass = mass;
+            Rigidbody.detectCollisions = true;
+            Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+            Rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+            Rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
             var groundOffset = stepHeight;
 
             collider = gameObject.GetOrAddComponent<CapsuleCollider>();
             collider.enabled = true;
-            collider.height = PlayerHeight - groundOffset;
+            collider.height = playerHeight - groundOffset;
             collider.radius = radius;
-            collider.center = Vector3.up * (PlayerHeight + groundOffset) / 2.0f;
+            collider.center = Vector3.up * (playerHeight + groundOffset) / 2.0f;
             if (Application.isPlaying)
             {
                 var mat = new PhysicMaterial("[PROC] Player Physics Material");
@@ -97,6 +88,26 @@ namespace FR8.Player
 
         #region Loop
 
+        private void Update()
+        {
+            if (Controller.JumpTriggered) jumpTrigger = true;
+
+            var lookDelta = Controller.LookFrameDelta;
+            
+            var right = Vector3.Cross(transform.forward, Up).normalized;
+            var forward = Vector3.Cross(Up, right).normalized;
+            var baseOrientation = Quaternion.LookRotation(forward, Up);
+            
+            baseOrientation = baseOrientation * Quaternion.Euler(0.0f, lookDelta.x, 0.0f);
+            cameraYaw += lookDelta.y;
+            cameraYaw = Mathf.Clamp(cameraYaw, -90.0f, 90.0f);
+            
+            var cameraOrientation = baseOrientation * Quaternion.Euler(-cameraYaw, 0.0f, 0.0f);
+
+            transform.rotation = baseOrientation;
+            Controller.GlobalCameraOrientation = cameraOrientation;
+        }
+
         private void FixedUpdate()
         {
             CheckForGround();
@@ -114,10 +125,10 @@ namespace FR8.Player
             var distance = 1.0f - radius;
             IsOnGround = false;
             
-            var ray = new Ray(transform.position + Vector3.up, Vector3.down);
+            var ray = new Ray(transform.position + Up, -Up);
             if (!Physics.SphereCast(ray, radius, out var hit, distance)) return;
 
-            var groundAngle = Mathf.Acos(Mathf.Min(hit.normal.y, 1.0f)) * Mathf.Rad2Deg;
+            var groundAngle = Mathf.Acos(Mathf.Min(transform.InverseTransformDirection(hit.normal).y, 1.0f)) * Mathf.Rad2Deg;
             if (groundAngle > maxWalkableSlope) return;
             
             GroundHit = hit;
@@ -125,45 +136,45 @@ namespace FR8.Player
 
             var contraction = 1.0f - GroundHit.distance / distance;
 
-            var spring = contraction * groundSpring - LocalVelocity.y * groundDamping;
-            var force = Vector3.up * spring;
-            rigidbody.AddForce(force, ForceMode.Acceleration);
+            var spring = contraction * groundSpring - Vector3.Dot(Up, LocalVelocity) * groundDamping;
+            var force = Up * spring;
+            Rigidbody.AddForce(force, ForceMode.Acceleration);
         }
 
         private void Move()
         {
-            var input = Vector2.ClampMagnitude(MoveInput, 1.0f);
-            var target = transform.TransformDirection(input.x, 0.0f, input.y) * moveSpeed;
+            var input = MoveInput;
+            var target = transform.TransformDirection(input.x, 0.0f, input.z) * moveSpeed;
 
             var difference = target - LocalVelocity;
-            difference.y = 0.0f;
+            difference -= Up * Vector3.Dot(Up, difference);
 
             var acceleration = 1.0f / accelerationTime;
             if (!IsOnGround) acceleration *= 1.0f - airMovePenalty;
 
             var force = Vector3.ClampMagnitude(difference, moveSpeed) * acceleration;
-            rigidbody.AddForce(force, ForceMode.Acceleration);
+            Rigidbody.AddForce(force, ForceMode.Acceleration);
         }
 
         private void Jump()
         {
-            var jump = JumpTrigger;
-            JumpTrigger = false;
+            var jump = jumpTrigger;
+            jumpTrigger = false;
 
             if (!IsOnGround) return;
             if (!jump) return;
 
-            var power = Mathf.Sqrt(Mathf.Max(2.0f * -Physics.gravity.y * upGravityScale * jumpHeight, 0.0f)) - LocalVelocity.y;
-            var force = Vector3.up * power;
+            var power = Mathf.Sqrt(Mathf.Max(2.0f * -Vector3.Dot(Up, Physics.gravity) * upGravityScale * jumpHeight, 0.0f)) - LocalVelocity.y;
+            var force = Up * power;
 
-            rigidbody.AddForce(force, ForceMode.VelocityChange);
+            Rigidbody.AddForce(force, ForceMode.VelocityChange);
         }
 
         private void ApplyGravity()
         {
-            if (!rigidbody.useGravity) return;
+            if (!Rigidbody.useGravity) return;
 
-            rigidbody.AddForce(Gravity - Physics.gravity, ForceMode.Acceleration);
+            Rigidbody.AddForce(Gravity - Physics.gravity, ForceMode.Acceleration);
         }
 
         #endregion

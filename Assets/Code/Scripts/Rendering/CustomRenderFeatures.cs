@@ -1,6 +1,6 @@
 using UnityEngine.Rendering.Universal;
 
-namespace Bosch.FX.PostProcess
+namespace FR8.Rendering
 {
     public sealed class CustomRenderFeatures : ScriptableRendererFeature
     {

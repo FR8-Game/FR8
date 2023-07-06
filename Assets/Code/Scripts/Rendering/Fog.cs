@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace Bosch.FX.PostProcess
+namespace FR8.Rendering
 {
     [VolumeComponentMenuForRenderPipeline("Custom/Fog", typeof(UniversalRenderPipeline))]
     public sealed class Fog : VolumeComponent, IPostProcessComponent
