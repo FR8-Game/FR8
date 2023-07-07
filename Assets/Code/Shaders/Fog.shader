@@ -33,12 +33,12 @@ Shader "Hidden/Fog"
                 float4 vertex : SV_POSITION;
             };
 
-            Varyings vert (Attributes v)
+            Varyings vert (Attributes input)
             {
                 Varyings o = (Varyings)0;
                 
-                o.vertex = TransformObjectToHClip(v.vertex);
-                o.uv = v.uv;
+                o.vertex = TransformObjectToHClip(input.vertex);
+                o.uv = input.uv;
                 return o;
             }
 
@@ -58,8 +58,7 @@ Shader "Hidden/Fog"
                 float fog = pow(2.71, dist / 1000.0 * _Value) - 1.0;
                 fog = clamp(fog, 0.0, 1.0);
 
-                float isSkybox = (dist / _ProjectionParams.z) > _FarPlane;
-                col = lerp(col, _Color, fog * !isSkybox);
+                col = lerp(col, _Color, fog);
                 return float4(col, 1.0);
             }
             ENDHLSL

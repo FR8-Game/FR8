@@ -1,9 +1,11 @@
+using FR8.Environment;
+using FR8.Player.Submodules;
 using UnityEngine;
 
 namespace FR8.Player
 {
     [SelectionBase, DisallowMultipleComponent]
-    public sealed class PlayerGroundedMovement : PlayerMovementModule
+    public sealed class PlayerGroundedAvatar : PlayerAvatar
     {
         [Header("Physics")]
         [SerializeField] private float mass = 80.0f;
@@ -30,28 +32,40 @@ namespace FR8.Player
         [SerializeField] private float downGravityScale = 3.0f;
         [SerializeField] private float upGravityScale = 2.0f;
 
-        private new CapsuleCollider collider;
-        private bool jumpTrigger;
-        private float cameraYaw;
+        [Header("Camera")]
+        [SerializeField] private DiscreteFirstPersonCamera cameraController;
 
-        public Vector3 MoveInput => Controller.Move;
-        public bool JumpInput => Controller.Jump;
+        private bool jumpTrigger;
+        private Vector3 globalGravity;
         
-        public Vector3 Up => -Gravity.normalized;
+        public Vector3 Up { get; private set; }
         public bool IsOnGround { get; private set; }
         public RaycastHit GroundHit { get; private set; }
 
         public Vector3 LocalVelocity => IsOnGround && GroundHit.rigidbody ? Rigidbody.velocity - GroundHit.rigidbody.GetPointVelocity(transform.position) : Rigidbody.velocity;
-        public Vector3 Gravity => GetGlobalGravity() * (LocalVelocity.y > 0.0f && JumpInput ? upGravityScale : downGravityScale);
-
-        private Vector3 GetGlobalGravity() => Physics.gravity;
-
+        public Vector3 Gravity => globalGravity * (LocalVelocity.y > 0.0f && Controller.Jump ? upGravityScale : downGravityScale);
+        
         #region Initalization
+
+        protected override void Awake()
+        {
+            base.Awake();
+            cameraController.Initialize(Controller, transform);
+        }
 
         private void OnEnable()
         {
             Configure();
-            Controller.CameraOffset = Vector3.up * (playerHeight - cameraOffset);
+            cameraController.OnEnable();
+
+            Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+        }
+
+        private void OnDisable()
+        {
+            cameraController.OnDisable();
+            
+            Rigidbody.constraints = RigidbodyConstraints.None;
         }
 
         public void Configure()
@@ -64,7 +78,7 @@ namespace FR8.Player
 
             var groundOffset = stepHeight;
 
-            collider = gameObject.GetOrAddComponent<CapsuleCollider>();
+            var collider = gameObject.GetOrAddComponent<CapsuleCollider>();
             collider.enabled = true;
             collider.height = playerHeight - groundOffset;
             collider.radius = radius;
@@ -91,25 +105,25 @@ namespace FR8.Player
         private void Update()
         {
             if (Controller.JumpTriggered) jumpTrigger = true;
-
-            var lookDelta = Controller.LookFrameDelta;
             
-            var right = Vector3.Cross(transform.forward, Up).normalized;
-            var forward = Vector3.Cross(Up, right).normalized;
-            var baseOrientation = Quaternion.LookRotation(forward, Up);
+            var right = Vector3.Cross(cameraController.Camera.transform.forward, Up).normalized;
+            var fwd = Vector3.Cross(Up, right).normalized;
+            var baseOrientation = Quaternion.LookRotation(fwd, Up);
+            Controller.transform.rotation = baseOrientation;
             
-            baseOrientation = baseOrientation * Quaternion.Euler(0.0f, lookDelta.x, 0.0f);
-            cameraYaw += lookDelta.y;
-            cameraYaw = Mathf.Clamp(cameraYaw, -90.0f, 90.0f);
-            
-            var cameraOrientation = baseOrientation * Quaternion.Euler(-cameraYaw, 0.0f, 0.0f);
-
-            transform.rotation = baseOrientation;
-            Controller.GlobalCameraOrientation = cameraOrientation;
+            cameraController.Update();
         }
 
         private void FixedUpdate()
         {
+            if (!GravZone.IsGravityAffected(Rigidbody, out globalGravity))
+            {
+                Controller.SetAvatar<PlayerZeroGMovement>();
+                return;
+            }
+
+            Up = -globalGravity.normalized;
+            
             CheckForGround();
             Move();
             Jump();
@@ -143,7 +157,7 @@ namespace FR8.Player
 
         private void Move()
         {
-            var input = MoveInput;
+            var input = Controller.Move;
             var target = transform.TransformDirection(input.x, 0.0f, input.z) * moveSpeed;
 
             var difference = target - LocalVelocity;
@@ -164,7 +178,7 @@ namespace FR8.Player
             if (!IsOnGround) return;
             if (!jump) return;
 
-            var power = Mathf.Sqrt(Mathf.Max(2.0f * -Vector3.Dot(Up, Physics.gravity) * upGravityScale * jumpHeight, 0.0f)) - LocalVelocity.y;
+            var power = Mathf.Sqrt(Mathf.Max(2.0f * 9.81f * upGravityScale * (jumpHeight - stepHeight), 0.0f)) - LocalVelocity.y;
             var force = Up * power;
 
             Rigidbody.AddForce(force, ForceMode.VelocityChange);
@@ -174,7 +188,7 @@ namespace FR8.Player
         {
             if (!Rigidbody.useGravity) return;
 
-            Rigidbody.AddForce(Gravity - Physics.gravity, ForceMode.Acceleration);
+            Rigidbody.AddForce(Gravity - globalGravity, ForceMode.Acceleration);
         }
 
         #endregion

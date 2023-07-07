@@ -4,33 +4,26 @@ using UnityEngine.InputSystem;
 namespace FR8.Player
 {
     [SelectionBase, DisallowMultipleComponent]
-    [RequireComponent(typeof(Rigidbody), typeof(PlayerGroundedMovement))]
-    [RequireComponent(typeof(PlayerMovementController))]
     public sealed class PlayerController : MonoBehaviour
     {
         [Header("Input")]
         [SerializeField] private InputActionAsset inputMap;
-        
+
         [Header("Camera")]
         [Range(0.0f, 1.0f)]
         [SerializeField] private float mouseSensitivity = 0.3f;
+
         [Range(0.0f, 1.0f)]
         [SerializeField] private float controllerSensitivity = 0.4f;
-        
-        [Space]
-        [SerializeField] private float cameraFieldOfView = 70.0f;
-
-        private new Camera camera;
 
         private InputActionReference moveInput;
         private InputActionReference jumpInput;
         private InputActionReference lookAction;
         private InputActionReference flyAction;
         private InputActionReference crouchAction;
-        
-        public Rigidbody Rigidbody { get; private set; }
-        public Vector3 CameraOffset { get; set; }
-        public Quaternion GlobalCameraOrientation { get; set; } = Quaternion.identity;
+
+        private PlayerAvatar[] avatars;
+        private PlayerAvatar currentAvatar;
 
         public Vector3 Move
         {
@@ -41,14 +34,16 @@ namespace FR8.Player
                 return new Vector3(xz.x, y, xz.y);
             }
         }
+
         public bool JumpTriggered => jumpInput.action?.WasPressedThisFrame() ?? false;
         public bool Jump => jumpInput.Switch();
+
         public Vector2 LookFrameDelta
         {
             get
             {
                 var delta = Vector2.zero;
-                
+
                 delta += lookAction.action?.ReadValue<Vector2>() * controllerSensitivity * Time.deltaTime ?? Vector2.zero;
                 var mouse = Mouse.current;
                 if (mouse != null)
@@ -68,75 +63,45 @@ namespace FR8.Player
             // Local Functions
             InputActionReference bind(string name) => InputActionReference.Create(inputMap.FindAction(name));
 
-            // Configure Object
-            Configure();
-
             // Setup input
             inputMap.Enable();
             moveInput = bind("Move");
             jumpInput = bind("Jump");
             lookAction = bind("Look");
             crouchAction = bind("Crouch");
-        }
 
-        private void OnEnable()
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-        }
-
-        private void OnDisable()
-        {
-            Cursor.lockState = CursorLockMode.None;
-        }
-
-        private void OnValidate()
-        {
-            Configure();
-        }
-
-        public void Configure()
-        {
-            camera = Camera.main;
-            if (camera)
+            // Configure Avatars
+            avatars = new PlayerAvatar[transform.childCount];
+            for (var i = 0; i < avatars.Length; i++)
             {
-                GlobalCameraOrientation = camera.transform.rotation;
-                camera.fieldOfView = cameraFieldOfView;
-                camera.nearClipPlane = 0.05f;
-                camera.farClipPlane = 1000.0f;
+                avatars[i] = transform.GetChild(i).GetComponent<PlayerAvatar>();
+                avatars[i].gameObject.SetActive(false);
+            }
+
+            SetAvatar(0);
+        }
+
+        public void SetAvatar<T>() where T : PlayerAvatar
+        {
+            for (var i = 0; i < avatars.Length; i++)
+            {
+                if (avatars[i].GetType() != typeof(T)) continue;
+                SetAvatar(i);
+                break;
             }
         }
 
-        private void Start()
+        public void SetAvatar(int index)
         {
-            Rigidbody = GetComponent<Rigidbody>();
-        }
+            for (var i = 0; i < avatars.Length; i++)
+            {
+                if (i == index) continue;
+                avatars[i].gameObject.SetActive(false);
+            }
 
-        #endregion
-
-        #region Loop
-        
-        private void FixedUpdate()
-        {
-            MoveCamera();
-        }
-        
-        private void LateUpdate()
-        {
-            MoveCamera();
-        }
-
-        #endregion
-
-        #region Managment
-
-        #endregion
-
-        #region Camera
-
-        public void MoveCamera()
-        {
-            camera.transform.position = transform.position + transform.rotation * CameraOffset;
-            camera.transform.rotation = GlobalCameraOrientation;
+            if (index < 0 || index >= avatars.Length) return;
+            currentAvatar = avatars[index];
+            currentAvatar.gameObject.SetActive(true);
         }
 
         #endregion
