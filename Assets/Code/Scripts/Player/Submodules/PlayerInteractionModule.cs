@@ -38,7 +38,7 @@ namespace FR8.Player.Submodules
 
         private void OnDisable()
         {
-            if (lookingAt != null) SelectionOutlinePass.RemovePersistant(lookingAt.gameObject);
+            if (lookingAt?.gameObject) SelectionOutlinePass.RemovePersistant(lookingAt.gameObject);
         }
 
         public void FixedUpdate()
