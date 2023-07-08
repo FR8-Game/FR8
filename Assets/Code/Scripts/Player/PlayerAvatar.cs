@@ -11,6 +11,11 @@ namespace FR8.Player
 
         protected virtual void Awake()
         {
+            Configure();
+        }
+
+        protected virtual void Configure()
+        {
             Controller = transform.parent.gameObject.GetOrAddComponent<PlayerController>();
             Rigidbody = Controller.gameObject.GetOrAddComponent<Rigidbody>();
         }

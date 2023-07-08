@@ -19,8 +19,11 @@ namespace FR8.Player
         private InputActionReference moveInput;
         private InputActionReference jumpInput;
         private InputActionReference lookAction;
-        private InputActionReference flyAction;
         private InputActionReference crouchAction;
+        private InputActionReference nudgeAction;
+        private InputActionReference pressAction;
+        private InputActionReference freeCamAction;
+        private InputActionReference grabCamAction;
 
         private PlayerAvatar[] avatars;
         private PlayerAvatar currentAvatar;
@@ -34,28 +37,30 @@ namespace FR8.Player
                 return new Vector3(xz.x, y, xz.y);
             }
         }
-
-        public bool JumpTriggered => jumpInput.action?.WasPressedThisFrame() ?? false;
+        public bool JumpTriggered => jumpInput.action?.WasPerformedThisFrame() ?? false;
         public bool Jump => jumpInput.Switch();
+        public Vector2 LookFrameDelta => GetLookFrameDelta(false);
 
-        public Vector2 LookFrameDelta
+        public int Nudge => Mathf.Clamp(Mathf.RoundToInt(nudgeAction.action?.ReadValue<float>() ?? 0.0f), -1, 1);
+        public bool Press => pressAction.action?.WasPerformedThisFrame() ?? false;
+        public bool Drag => pressAction.Switch();
+        public bool FreeCam => freeCamAction.action?.WasPerformedThisFrame() ?? false;
+        public bool GrabCam => grabCamAction.Switch();
+
+        public Vector2 GetLookFrameDelta(bool forceMouseDelta)
         {
-            get
+            var delta = Vector2.zero;
+
+            delta += lookAction.action?.ReadValue<Vector2>() * controllerSensitivity * Time.deltaTime ?? Vector2.zero;
+            var mouse = Mouse.current;
+            if (mouse != null && (Cursor.lockState == CursorLockMode.Locked || forceMouseDelta))
             {
-                var delta = Vector2.zero;
-
-                delta += lookAction.action?.ReadValue<Vector2>() * controllerSensitivity * Time.deltaTime ?? Vector2.zero;
-                var mouse = Mouse.current;
-                if (mouse != null)
-                {
-                    delta += mouse.delta.ReadValue() * mouseSensitivity;
-                }
-
-                return delta;
+                delta += mouse.delta.ReadValue() * mouseSensitivity;
             }
+
+            return delta;
         }
-
-
+        
         #region Initalization
 
         private void Awake()
@@ -69,6 +74,10 @@ namespace FR8.Player
             jumpInput = bind("Jump");
             lookAction = bind("Look");
             crouchAction = bind("Crouch");
+            nudgeAction = bind("Nudge");
+            pressAction = bind("Press");
+            freeCamAction = bind("FreeCam");
+            grabCamAction = bind("GrabCam");
 
             // Configure Avatars
             avatars = new PlayerAvatar[transform.childCount];

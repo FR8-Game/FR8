@@ -1,4 +1,3 @@
-using FR8.Environment;
 using FR8.Player.Submodules;
 using UnityEngine;
 
@@ -36,14 +35,13 @@ namespace FR8.Player
         [SerializeField] private DiscreteFirstPersonCamera cameraController;
 
         private bool jumpTrigger;
-        private Vector3 globalGravity;
-        
-        public Vector3 Up { get; private set; }
+
+        public Vector3 Up => -Gravity.normalized;
         public bool IsOnGround { get; private set; }
         public RaycastHit GroundHit { get; private set; }
 
         public Vector3 LocalVelocity => IsOnGround && GroundHit.rigidbody ? Rigidbody.velocity - GroundHit.rigidbody.GetPointVelocity(transform.position) : Rigidbody.velocity;
-        public Vector3 Gravity => globalGravity * (LocalVelocity.y > 0.0f && Controller.Jump ? upGravityScale : downGravityScale);
+        public Vector3 Gravity => new Vector3(0.0f, -9.81f, 0.0f) * (LocalVelocity.y > 0.0f && Controller.Jump ? upGravityScale : downGravityScale);
         
         #region Initalization
 
@@ -51,6 +49,11 @@ namespace FR8.Player
         {
             base.Awake();
             cameraController.Initialize(Controller, transform);
+        }
+
+        private void OnValidate()
+        {
+            Configure();
         }
 
         private void OnEnable()
@@ -68,9 +71,12 @@ namespace FR8.Player
             Rigidbody.constraints = RigidbodyConstraints.None;
         }
 
-        public void Configure()
+        protected override void Configure()
         {
+            base.Configure();
+            
             Rigidbody.mass = mass;
+            Rigidbody.useGravity = false;
             Rigidbody.detectCollisions = true;
             Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
             Rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
@@ -116,14 +122,6 @@ namespace FR8.Player
 
         private void FixedUpdate()
         {
-            if (!GravZone.IsGravityAffected(Rigidbody, out globalGravity))
-            {
-                Controller.SetAvatar<PlayerZeroGMovement>();
-                return;
-            }
-
-            Up = -globalGravity.normalized;
-            
             CheckForGround();
             Move();
             Jump();
@@ -140,19 +138,24 @@ namespace FR8.Player
             IsOnGround = false;
             
             var ray = new Ray(transform.position + Up, -Up);
-            if (!Physics.SphereCast(ray, radius, out var hit, distance)) return;
 
-            var groundAngle = Mathf.Acos(Mathf.Min(transform.InverseTransformDirection(hit.normal).y, 1.0f)) * Mathf.Rad2Deg;
-            if (groundAngle > maxWalkableSlope) return;
+            var res = Physics.SphereCastAll(ray, radius, distance);
+            foreach (var hit in res)
+            {
+                if (hit.transform.IsChildOf(Controller.transform)) continue;
+                
+                var groundAngle = Mathf.Acos(Mathf.Min(transform.InverseTransformDirection(hit.normal).y, 1.0f)) * Mathf.Rad2Deg;
+                if (groundAngle > maxWalkableSlope) continue;
             
-            GroundHit = hit;
-            IsOnGround = true;
+                GroundHit = hit;
+                IsOnGround = true;
 
-            var contraction = 1.0f - GroundHit.distance / distance;
+                var contraction = 1.0f - GroundHit.distance / distance;
 
-            var spring = contraction * groundSpring - Vector3.Dot(Up, LocalVelocity) * groundDamping;
-            var force = Up * spring;
-            Rigidbody.AddForce(force, ForceMode.Acceleration);
+                var spring = contraction * groundSpring - Vector3.Dot(Up, LocalVelocity) * groundDamping;
+                var force = Up * spring;
+                Rigidbody.AddForce(force, ForceMode.Acceleration);
+            }            
         }
 
         private void Move()
@@ -186,9 +189,7 @@ namespace FR8.Player
 
         private void ApplyGravity()
         {
-            if (!Rigidbody.useGravity) return;
-
-            Rigidbody.AddForce(Gravity - globalGravity, ForceMode.Acceleration);
+            Rigidbody.AddForce(Gravity, ForceMode.Acceleration);
         }
 
         #endregion
