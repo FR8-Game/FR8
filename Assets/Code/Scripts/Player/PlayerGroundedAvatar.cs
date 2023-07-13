@@ -8,27 +8,32 @@ namespace FR8.Player
     {
         [Header("Physics")]
         [SerializeField] private float mass = 80.0f;
+
         [SerializeField] private float playerHeight = 1.7f;
         [SerializeField] private float radius = 0.25f;
-        [SerializeField] private float cameraOffset = -0.1f;
 
         [Header("Movement")]
         [SerializeField] private float moveSpeed = 8.0f;
+
         [SerializeField] private float accelerationTime = 0.12f;
 
         [Range(0.0f, 1.0f)]
         [SerializeField] private float airMovePenalty = 0.8f;
+
         [SerializeField] private float jumpHeight = 2.5f;
         [SerializeField] private float stepHeight = 0.5f;
+
         [Range(90.0f, 0.0f)]
         [SerializeField] private float maxWalkableSlope = 40.0f;
 
         [Space]
         [SerializeField] private float groundSpring = 500.0f;
+
         [SerializeField] private float groundDamping = 25.0f;
 
         [Space]
         [SerializeField] private float downGravityScale = 3.0f;
+
         [SerializeField] private float upGravityScale = 2.0f;
 
         [Header("Camera")]
@@ -42,7 +47,7 @@ namespace FR8.Player
 
         public Vector3 LocalVelocity => IsOnGround && GroundHit.rigidbody ? Rigidbody.velocity - GroundHit.rigidbody.GetPointVelocity(transform.position) : Rigidbody.velocity;
         public Vector3 Gravity => new Vector3(0.0f, -9.81f, 0.0f) * (LocalVelocity.y > 0.0f && Controller.Jump ? upGravityScale : downGravityScale);
-        
+
         #region Initalization
 
         protected override void Awake()
@@ -67,14 +72,14 @@ namespace FR8.Player
         private void OnDisable()
         {
             cameraController.OnDisable();
-            
+
             Rigidbody.constraints = RigidbodyConstraints.None;
         }
 
         protected override void Configure()
         {
             base.Configure();
-            
+
             Rigidbody.mass = mass;
             Rigidbody.useGravity = false;
             Rigidbody.detectCollisions = true;
@@ -111,12 +116,12 @@ namespace FR8.Player
         private void Update()
         {
             if (Controller.JumpTriggered) jumpTrigger = true;
-            
+
             var right = Vector3.Cross(cameraController.Camera.transform.forward, Up).normalized;
             var fwd = Vector3.Cross(Up, right).normalized;
             var baseOrientation = Quaternion.LookRotation(fwd, Up);
             Controller.transform.rotation = baseOrientation;
-            
+
             cameraController.Update();
         }
 
@@ -136,26 +141,39 @@ namespace FR8.Player
         {
             var distance = 1.0f - radius;
             IsOnGround = false;
-            
+
             var ray = new Ray(transform.position + Up, -Up);
 
             var res = Physics.SphereCastAll(ray, radius, distance);
+            if (res.Length == 0) return;
+
+            RaycastHit? bestHit = null;
             foreach (var hit in res)
             {
+                // --- Validation Checks ---
+                // Check that the hit object is not ourselves
                 if (hit.transform.IsChildOf(Controller.transform)) continue;
-                
+
+                // Check the angle of the ground is not too steep to stand on
                 var groundAngle = Mathf.Acos(Mathf.Min(transform.InverseTransformDirection(hit.normal).y, 1.0f)) * Mathf.Rad2Deg;
                 if (groundAngle > maxWalkableSlope) continue;
-            
-                GroundHit = hit;
-                IsOnGround = true;
 
-                var contraction = 1.0f - GroundHit.distance / distance;
+                // Discard result if bestHit is closer.
+                if (bestHit.HasValue && bestHit.Value.distance < hit.distance) continue;
 
-                var spring = contraction * groundSpring - Vector3.Dot(Up, LocalVelocity) * groundDamping;
-                var force = Up * spring;
-                Rigidbody.AddForce(force, ForceMode.Acceleration);
-            }            
+                bestHit = hit;
+            }
+
+            if (!bestHit.HasValue) return;
+
+            GroundHit = bestHit.Value;
+            IsOnGround = true;
+
+            var contraction = 1.0f - GroundHit.distance / distance;
+
+            var spring = contraction * groundSpring - Vector3.Dot(Up, LocalVelocity) * groundDamping;
+            var force = Up * spring;
+            Rigidbody.AddForce(force, ForceMode.Acceleration);
         }
 
         private void Move()
