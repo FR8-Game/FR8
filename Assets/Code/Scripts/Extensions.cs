@@ -62,5 +62,16 @@ namespace FR8
         {
             foreach (var signal in signals) signal.RaiseEvent += callback;
         }
+
+        public static void Raise(this List<Signal> signals)
+        {
+            foreach (var signal in signals) Signal.Raise(signal);
+        }
+
+        public static T GetCachedComponent<T>(this Component component, ref T cache) where T : UnityEngine.Object
+        {
+            if (cache) return cache;
+            return cache = component.GetComponent<T>();
+        }
     }
 }

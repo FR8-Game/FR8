@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FR8.Signals;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ namespace FR8.Dialogue
     {
         [SerializeField] private List<DialogueEntry> list;
         [SerializeField] private List<Signal> listeningSignals;
-        
+
         private void OnEnable()
         {
             if (!Application.isPlaying) return;

@@ -18,6 +18,8 @@ namespace FR8.Dialogue
         [Space]
         [SerializeField] private InputAction skipDialogueAction;
 
+        private bool skip;
+        private bool canSkip;
         private Animator animator;
         private Image headshotDisplay;
         private TMP_Text headerDisplay;
@@ -50,6 +52,12 @@ namespace FR8.Dialogue
             all.Remove(this);
         }
 
+        private void Update()
+        {
+            if (!canSkip) skip = false;
+            else if (skipDialogueAction.WasPerformedThisFrame()) skip = true;
+        }
+
         public static void QueueDialogue(DialogueEntry entry)
         {
             foreach (var e in all)
@@ -61,8 +69,7 @@ namespace FR8.Dialogue
         private void Queue(DialogueEntry entry)
         {
             queue.Enqueue(entry);
-            Debug.Log($"Queue.Count: {queue.Count}");
-            if (!routineActive) StartCoroutine(ShowRoutine());
+            if (!routineActive) StartCoroutine(RunQueueRoutine());
         }
 
         private void SoftPlayAnimation(string animation, string fallback, int layer = 0, Action<string> play = null)
@@ -73,29 +80,41 @@ namespace FR8.Dialogue
             play(animator.HasState(layer, hash) ? animation : fallback);
         }
 
-        private IEnumerator ShowRoutine()
+        private IEnumerator RunQueueRoutine()
         {
             routineActive = true;
 
             while (queue.Count > 0)
             {
                 var entry = queue.Dequeue();
-
-                UpdateVisuals(entry);
-                SoftPlayAnimation(entry.animateInOverride, "In");
-                yield return StartCoroutine(Typewriter(entry));
-                SoftPlayAnimation(entry.animateOutOverride, "Out");
-                yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
+                if (entry == null) continue;
+                
+                yield return StartCoroutine(ShowEntryRoutine(entry));
             }
 
             routineActive = false;
         }
 
+        private IEnumerator ShowEntryRoutine(DialogueEntry entry)
+        {
+            UpdateVisuals(entry);
+            SoftPlayAnimation(entry.animateInOverride, "In");
+            yield return StartCoroutine(Typewriter(entry));
+            SoftPlayAnimation(entry.animateOutOverride, "Out");
+            yield return StartCoroutine(PostDelay());
+        }
+        
         private IEnumerator Typewriter(DialogueEntry entry)
         {
+            canSkip = true;
+            
             for (var i = 0; i < entry.body.Length; i++)
             {
-                if (skipDialogueAction.WasPerformedThisFrame()) i = entry.body.Length - 1;
+                if (skip)
+                {
+                    i = entry.body.Length - 1;
+                    skip = false;
+                }
 
                 bodyDisplay.maxVisibleCharacters = i + 1;
                 
@@ -109,14 +128,44 @@ namespace FR8.Dialogue
                 yield return new WaitForSeconds(delay / entry.printSpeedMultiplier);
             }
 
-            yield return new WaitForSeconds(additionalDelay);
+            var timer = 0.0f;
+            while (timer < additionalDelay)
+            {
+                if (skip)
+                {
+                    skip = false;
+                    break;
+                }
+                
+                timer += Time.deltaTime;
+                yield return null;
+            }
+
+            canSkip = false;
+        }
+
+        private IEnumerator PostDelay()
+        {
+            var time = 0.0f;
+            var totalTime = animator.GetCurrentAnimatorStateInfo(0).length;
+            while (time < totalTime)
+            {
+                if (skip) yield break;
+                
+                time += Time.deltaTime;
+                yield return null;
+            }
         }
 
         private void UpdateVisuals(DialogueEntry entry)
         {
-            headerDisplay.text = entry.source.title;
-            bodyDisplay.text = entry.body;
-            headshotDisplay.sprite = entry.source.headshot;
+            if (headerDisplay) headerDisplay.text = entry.source.title;
+            if (bodyDisplay) bodyDisplay.text = entry.body;
+            if (headshotDisplay) headshotDisplay.sprite = entry.source.headshot;
+            
+            if (!headerDisplay) Debug.LogError("DialogueListener is missing a Header Display", this);
+            if (!bodyDisplay) Debug.LogError("DialogueListener is missing a Body Display", this);
+            if (!headshotDisplay) Debug.LogError("DialogueListener is missing a Headshot Display", this);
         }
     }
 }

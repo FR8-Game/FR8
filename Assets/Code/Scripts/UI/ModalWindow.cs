@@ -10,7 +10,7 @@ namespace FR8.UI
     [DisallowMultipleComponent]
     public sealed class ModalWindow : MonoBehaviour
     {
-        [SerializeField] private Button buttonPrefab;
+        [SerializeField] private UnityEngine.UI.Button buttonPrefab;
 
         private Transform buttonContainer;
         private TMP_Text title;

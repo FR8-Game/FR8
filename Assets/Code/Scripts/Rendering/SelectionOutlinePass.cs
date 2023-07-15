@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.RendererUtils;
 using UnityEngine.Rendering.Universal;
 
 namespace FR8.Rendering
@@ -11,7 +12,8 @@ namespace FR8.Rendering
         private static readonly int IntermediateTarget = Shader.PropertyToID("_CameraColorAttachmentB");
         private static readonly int FinalTarget = Shader.PropertyToID("_CameraColorAttachmentA");
 
-        private Material renderMaterial;
+        private Material whiteMaterial;
+        private Material blackMaterial;
         private Material blitMaterial;
 
         public static List<Renderer> ThisFrame { get; } = new();
@@ -19,9 +21,12 @@ namespace FR8.Rendering
 
         public SelectionOutlinePass()
         {
-            renderMaterial = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+            whiteMaterial = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+            blackMaterial = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
             blitMaterial = new Material(Shader.Find("Hidden/OutlineBlit"));
             renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
+            
+            blackMaterial.SetColor("_BaseColor", Color.black);
         }
 
         public static void RenderThisFrame(GameObject gameObject) => ThisFrame.AddRange(gameObject.GetComponentsInChildren<Renderer>());
@@ -49,8 +54,12 @@ namespace FR8.Rendering
             cmd.SetRenderTarget(OutlineTargetList);
             cmd.ClearRenderTarget(true, true, Color.clear);
 
-            foreach (var r in ThisFrame) cmd.DrawRenderer(r, renderMaterial, 0, 0);
-            foreach (var r in Persistant) cmd.DrawRenderer(r, renderMaterial, 0, 0);
+            var renderListDesc = new RendererListDesc(new ShaderTagId("Unlit"), renderingData.cullResults, renderingData.cameraData.camera);
+            var renderList = context.CreateRendererList(renderListDesc);
+            cmd.DrawRendererList(renderList);
+            
+            foreach (var r in ThisFrame) cmd.DrawRenderer(r, whiteMaterial, 0, 0);
+            foreach (var r in Persistant) cmd.DrawRenderer(r, whiteMaterial, 0, 0);
 
             cmd.Blit(FinalTarget, IntermediateTarget, blitMaterial);
             cmd.Blit(IntermediateTarget, FinalTarget, blitMaterial);

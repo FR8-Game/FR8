@@ -7,7 +7,7 @@ namespace FR8.UI
 {
     public static class UIUtility
     {
-        public static Button ButtonPrefab { get; set; }
+        public static UnityEngine.UI.Button ButtonPrefab { get; set; }
         
         public static void Button(Transform parent, string name, UnityAction callback)
         {
