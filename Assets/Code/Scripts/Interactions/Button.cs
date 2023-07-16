@@ -1,29 +1,27 @@
-using System;
 using System.Collections.Generic;
-using FR8.Interactions;
 using FR8.Signals;
 using UnityEngine;
 
-namespace FR8
+namespace FR8.Interactions
 {
     [SelectionBase, DisallowMultipleComponent]
-    public sealed class Button : MonoBehaviour, IDriver
+    public class Button : MonoBehaviour, IDriver
     {
         [SerializeField] private string displayName = "Button";
         [SerializeField] private List<Signal> pressSignalList;
 
         public float Output => 0.0f;
-
+        public virtual bool CanInteract => true;
         public bool Limited => true;
-        public string DisplayName => displayName;
-        public string DisplayValue => "Press";
+        public virtual string DisplayName => displayName;
+        public virtual string DisplayValue => "Press";
 
         public void Nudge(int direction)
         {
             Press();
         }
 
-        public void Press()
+        public virtual void Press()
         {
             pressSignalList.Raise();
         }

@@ -1,6 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Security;
 using FR8.Signals;
+using FR8.Utility;
 using UnityEngine;
 
 namespace FR8.Dialogue
@@ -20,6 +21,28 @@ namespace FR8.Dialogue
         public void Queue()
         {
             foreach (var e in list) DialogueListener.QueueDialogue(e);
+        }
+
+        public static DialogueChain CreateFromString(string[] list, string headerSeparator, DialogueSource[] sourceList)
+        {
+            var instance = CreateInstance<DialogueChain>();
+
+            foreach (var text in list)
+            {
+                var entry = new DialogueEntry();
+                
+                var splitPoint = text.IndexOf(headerSeparator);
+                var header = text[..splitPoint];
+                var body = text[splitPoint..];
+                
+                var source = sourceList[Search.FuzzySearch(i => sourceList[i].title, sourceList.Length, header)];
+                entry.source = source;
+                entry.body = body;
+                
+                instance.list.Add(entry);
+            }
+
+            return instance;
         }
     }
 }

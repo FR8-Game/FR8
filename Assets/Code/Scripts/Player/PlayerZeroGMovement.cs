@@ -48,14 +48,7 @@ namespace FR8.Player
         }
 
         private void FixedUpdate()
-        {
-            if (GravZone.IsGravityAffected(Rigidbody, out var gravity))
-            {
-                Controller.SetAvatar<PlayerGroundedAvatar>();
-                Rigidbody.AddForce(-gravity, ForceMode.Acceleration);
-                return;
-            }
-            
+        {   
             Move();
             Rotate();
         }

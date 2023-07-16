@@ -4,6 +4,7 @@ using FR8.Rendering;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Object = UnityEngine.Object;
 
 namespace FR8.Player.Submodules
 {
@@ -38,7 +39,7 @@ namespace FR8.Player.Submodules
 
         private void OnDisable()
         {
-            if (lookingAt?.gameObject) SelectionOutlinePass.RemovePersistant(lookingAt.gameObject);
+            if ((Object)lookingAt) SelectionOutlinePass.RemovePersistant(lookingAt.gameObject);
         }
 
         public void FixedUpdate()
@@ -63,26 +64,33 @@ namespace FR8.Player.Submodules
                 return;
             }
 
-            readoutText.text = $"{lookingAt.DisplayName}\n<size=66%>{lookingAt.DisplayValue}";
+            var alpha = $"<alpha={(lookingAt.CanInteract ? "#FF" : "#80")}>";
+            readoutText.text = $"{alpha}{lookingAt.DisplayName}\n<size=66%>{lookingAt.DisplayValue}";
 
-            if (controller.Drag)
+            if (lookingAt.CanInteract)
             {
-                if (dragging) lookingAt.ContinueDrag(ray);
-                else lookingAt.BeginDrag(ray);
+                if (controller.Drag)
+                {
+                    if (dragging) lookingAt.ContinueDrag(ray);
+                    else lookingAt.BeginDrag(ray);
+                }
+
+                if (nudge != 0)
+                {
+                    lookingAt.Nudge(nudge);
+                    nudge = 0;
+                }
+
+                if (press)
+                {
+                    lookingAt.Press();
+                    press = false;
+                }
             }
+
+            nudge = 0;
+            press = false;
             dragging = controller.Drag;
-            
-            if (nudge != 0)
-            {
-                lookingAt.Nudge(nudge);
-                nudge = 0;
-            }
-
-            if (press)
-            {
-                lookingAt.Press();
-                press = false;
-            }
         }
 
         private IDriver GetLookingAt()

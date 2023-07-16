@@ -1,12 +1,8 @@
-using System;
-using FR8.UI;
-using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
+using Button = FR8.Interactions.Button;
 
-namespace FR8
+namespace FR8.UI
 {
     [SelectionBase]
     [DisallowMultipleComponent]

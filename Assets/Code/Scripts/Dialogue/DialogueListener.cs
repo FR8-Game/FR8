@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace FR8.Dialogue
@@ -29,7 +28,10 @@ namespace FR8.Dialogue
         private readonly Queue<DialogueEntry> queue = new();
 
         private static readonly HashSet<DialogueListener> all = new();
+        private static int dialogueListenersActive;
 
+        public static bool IsDialogueListenerActive => dialogueListenersActive > 0;
+        
         private void Awake()
         {
             animator = GetComponentInChildren<Animator>();
@@ -50,6 +52,10 @@ namespace FR8.Dialogue
         private void OnDisable()
         {
             all.Remove(this);
+
+            if (routineActive) dialogueListenersActive--;
+            routineActive = false;
+            queue.Clear();
         }
 
         private void Update()
@@ -83,6 +89,7 @@ namespace FR8.Dialogue
         private IEnumerator RunQueueRoutine()
         {
             routineActive = true;
+            dialogueListenersActive++;
 
             while (queue.Count > 0)
             {
@@ -93,6 +100,7 @@ namespace FR8.Dialogue
             }
 
             routineActive = false;
+            dialogueListenersActive--;
         }
 
         private IEnumerator ShowEntryRoutine(DialogueEntry entry)
@@ -112,8 +120,9 @@ namespace FR8.Dialogue
             {
                 if (skip)
                 {
-                    i = entry.body.Length - 1;
+                    bodyDisplay.maxVisibleCharacters = entry.body.Length + 1;
                     skip = false;
+                    break;
                 }
 
                 bodyDisplay.maxVisibleCharacters = i + 1;

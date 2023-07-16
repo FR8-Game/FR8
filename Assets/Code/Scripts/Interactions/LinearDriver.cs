@@ -34,6 +34,8 @@ namespace FR8.Interactions
             get => forceStep ? Mathf.Round(value * step) / step : value;
             set => this.value = value;
         }
+
+        public bool CanInteract => true;
         public abstract bool Limited { get; }
         public virtual string DisplayName => displayName;
         public virtual string DisplayValue => string.Format(displayTemplate, Mathf.LerpUnclamped(displayRange.x, displayRange.y, Output));

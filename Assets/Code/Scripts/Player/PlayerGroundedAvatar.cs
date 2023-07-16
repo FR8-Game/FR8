@@ -53,7 +53,7 @@ namespace FR8.Player
         protected override void Awake()
         {
             base.Awake();
-            cameraController.Initialize(Controller, transform);
+            cameraController.Initialize(() => Controller, transform);
         }
 
         private void OnValidate()
@@ -120,7 +120,7 @@ namespace FR8.Player
             var right = Vector3.Cross(cameraController.Camera.transform.forward, Up).normalized;
             var fwd = Vector3.Cross(Up, right).normalized;
             var baseOrientation = Quaternion.LookRotation(fwd, Up);
-            Controller.transform.rotation = baseOrientation;
+            transform.rotation = baseOrientation;
 
             cameraController.Update();
         }
@@ -152,7 +152,7 @@ namespace FR8.Player
             {
                 // --- Validation Checks ---
                 // Check that the hit object is not ourselves
-                if (hit.transform.IsChildOf(Controller.transform)) continue;
+                if (hit.transform.IsChildOf(transform)) continue;
 
                 // Check the angle of the ground is not too steep to stand on
                 var groundAngle = Mathf.Acos(Mathf.Min(transform.InverseTransformDirection(hit.normal).y, 1.0f)) * Mathf.Rad2Deg;

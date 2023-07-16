@@ -5,6 +5,7 @@ namespace FR8.Interactions
     public interface IDriver : IBehaviour
     {
         float Output { get; }
+        bool CanInteract { get; }
         bool Limited { get; }
         string DisplayName { get; }
         string DisplayValue { get; }

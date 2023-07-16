@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8266726128216843699}
   - component: {fileID: 6394128087836156411}
   - component: {fileID: 6783170715577434548}
+  - component: {fileID: 1335888862}
   m_Layer: 0
   m_Name: Grounded Controller
   m_TagString: Untagged
@@ -91,6 +92,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionDistance: 2.5
   readoutText: {fileID: 1921352481845593271}
+--- !u!54 &1335888862
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2050345455342946461}
+  serializedVersion: 2
+  m_Mass: 80
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 1
+  m_Constraints: 112
+  m_CollisionDetection: 2
 --- !u!1 &4313947242455073423
 GameObject:
   m_ObjectHideFlags: 0
@@ -223,7 +240,6 @@ GameObject:
   - component: {fileID: 6066431375291976692}
   - component: {fileID: 6066431375291976694}
   - component: {fileID: 4642511556847101946}
-  - component: {fileID: 2624869684709925793}
   m_Layer: 0
   m_Name: PFB_Player
   m_TagString: Untagged
@@ -262,6 +278,8 @@ MonoBehaviour:
   inputMap: {fileID: -944628639613478452, guid: badd88ac4cdc31941ad634977f07e0fd, type: 3}
   mouseSensitivity: 0.3
   controllerSensitivity: 0.4
+  rollSensitivity: 90
+  newAvatar: {fileID: 0}
 --- !u!114 &4642511556847101946
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -275,22 +293,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   range: 50
---- !u!54 &2624869684709925793
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6066431375291976688}
-  serializedVersion: 2
-  m_Mass: 80
-  m_Drag: 0
-  m_AngularDrag: 0
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 1
-  m_Constraints: 112
-  m_CollisionDetection: 2
 --- !u!1 &6125957971899221248
 GameObject:
   m_ObjectHideFlags: 0

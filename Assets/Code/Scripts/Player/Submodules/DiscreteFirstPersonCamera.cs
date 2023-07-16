@@ -10,16 +10,16 @@ namespace FR8.Player.Submodules
         private const float YawRange = 180.0f - GimbalLockOffset;
         
         [SerializeField] private float fieldOfView = 70.0f;
-        [SerializeField] private Vector3 cameraOffset = new Vector3(0.0f, 1.6f, 0.0f);
+        [SerializeField] private Vector3 cameraOffset = new(0.0f, 1.6f, 0.0f);
         
-        private PlayerController controller;
+        private Func<PlayerController> controller;
         private Transform parent;
         private float yaw;
         private bool cameraLocked;
         
         public Camera Camera { get; private set; }
         
-        public void Initialize(PlayerController controller, Transform parent)
+        public void Initialize(Func<PlayerController> controller, Transform parent)
         {
             this.controller = controller;
             this.parent = parent;
@@ -49,6 +49,9 @@ namespace FR8.Player.Submodules
 
         public void Update()
         {
+            var controller = this.controller();
+            if (!controller) return;
+            
             // Check if cursor is free, or camera has been grabbed.
             if (controller.FreeCam) cameraLocked = !cameraLocked;
 
