@@ -9,8 +9,6 @@ namespace FR8.Rendering
     public sealed class SelectionOutlinePass : ScriptableRenderPass
     {
         private static readonly int OutlineTargetList = Shader.PropertyToID("_OutlineTarget");
-        private static readonly int IntermediateTarget = Shader.PropertyToID("_CameraColorAttachmentB");
-        private static readonly int FinalTarget = Shader.PropertyToID("_CameraColorAttachmentA");
 
         private Material whiteMaterial;
         private Material blackMaterial;
@@ -21,12 +19,7 @@ namespace FR8.Rendering
 
         public SelectionOutlinePass()
         {
-            whiteMaterial = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
-            blackMaterial = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
-            blitMaterial = new Material(Shader.Find("Hidden/OutlineBlit"));
             renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
-            
-            blackMaterial.SetColor("_BaseColor", Color.black);
         }
 
         public static void RenderThisFrame(GameObject gameObject) => ThisFrame.AddRange(gameObject.GetComponentsInChildren<Renderer>());
@@ -43,10 +36,18 @@ namespace FR8.Rendering
 
             var desc = renderingData.cameraData.cameraTargetDescriptor;
             cmd.GetTemporaryRT(OutlineTargetList, desc, FilterMode.Bilinear);
+            
+            if (!whiteMaterial) whiteMaterial = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+            if (!blackMaterial) blackMaterial = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+            if (!blitMaterial) blitMaterial = new Material(Shader.Find("Hidden/OutlineBlit"));
         }
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
+            if (!whiteMaterial || !blackMaterial || !blitMaterial) return;
+            
+            blackMaterial.SetColor("_BaseColor", Color.black);
+
             var cmd = CommandBufferPool.Get("Selection Outline");
             cmd.Clear();
             cmd.BeginSample("Selection Outline");
@@ -60,9 +61,9 @@ namespace FR8.Rendering
             
             foreach (var r in ThisFrame) cmd.DrawRenderer(r, whiteMaterial, 0, 0);
             foreach (var r in Persistant) cmd.DrawRenderer(r, whiteMaterial, 0, 0);
-
-            cmd.Blit(FinalTarget, IntermediateTarget, blitMaterial);
-            cmd.Blit(IntermediateTarget, FinalTarget, blitMaterial);
+            
+            cmd.SetRenderTarget(renderingData.cameraData.renderer.cameraColorTarget);
+            cmd.DrawProcedural(Matrix4x4.identity, blitMaterial, 0, MeshTopology.Triangles, 3);
 
             cmd.EndSample("Selection Outline");
             context.ExecuteCommandBuffer(cmd);
