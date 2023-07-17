@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Cursor = FR8.Utility.Cursor;
 
 namespace FR8.Player.Submodules
 {
@@ -16,6 +17,8 @@ namespace FR8.Player.Submodules
         private Transform parent;
         private float yaw;
         private bool cameraLocked;
+
+        private int cursorLockID;
         
         public Camera Camera { get; private set; }
         
@@ -38,13 +41,13 @@ namespace FR8.Player.Submodules
 
             var dot = Mathf.Acos(Vector3.Dot(fwd, parent.forward.normalized)) * Mathf.Rad2Deg;
             yaw = dot;
-            
-            Cursor.lockState = CursorLockMode.Locked;
+
+            Cursor.Push(CursorLockMode.Locked, ref cursorLockID);
         }
 
         public void OnDisable()
         {
-            Cursor.lockState = CursorLockMode.None;
+            Cursor.Pop(ref cursorLockID);
         }
 
         public void Update()
@@ -57,11 +60,11 @@ namespace FR8.Player.Submodules
 
             if (controller.GrabCam)
             {
-                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.Change(cursorLockID, CursorLockMode.Locked);
             }
             else
             {
-                Cursor.lockState = cameraLocked ? CursorLockMode.Locked : CursorLockMode.Confined;
+                Cursor.Change(cursorLockID, cameraLocked ? CursorLockMode.Locked : CursorLockMode.Confined);
             }
 
             // Get delta rotation input from controller
