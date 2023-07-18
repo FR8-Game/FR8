@@ -1,4 +1,3 @@
-using FR8.Environment;
 using UnityEngine;
 
 namespace FR8.Player
@@ -41,8 +40,10 @@ namespace FR8.Player
             Configure();
         }
 
-        private void Configure()
+        protected override void Configure()
         {
+            base.Configure();
+            
             collider = gameObject.GetOrAddComponent<SphereCollider>();
             collider.radius = collisionRadius;
         }

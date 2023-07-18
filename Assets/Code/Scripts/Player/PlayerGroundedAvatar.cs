@@ -41,7 +41,6 @@ namespace FR8.Player
 
         private bool jumpTrigger;
 
-        public Vector3 Up => -Gravity.normalized;
         public bool IsOnGround { get; private set; }
         public RaycastHit GroundHit { get; private set; }
 
@@ -116,12 +115,6 @@ namespace FR8.Player
         private void Update()
         {
             if (Controller.JumpTriggered) jumpTrigger = true;
-
-            var right = Vector3.Cross(cameraController.Camera.transform.forward, Up).normalized;
-            var fwd = Vector3.Cross(Up, right).normalized;
-            var baseOrientation = Quaternion.LookRotation(fwd, Up);
-            transform.rotation = baseOrientation;
-
             cameraController.Update();
         }
 
@@ -142,9 +135,9 @@ namespace FR8.Player
             var distance = 1.0f - radius;
             IsOnGround = false;
 
-            var ray = new Ray(transform.position + Up, -Up);
+            var ray = new Ray(Rigidbody.position + Vector3.up, Vector3.down);
 
-            var res = Physics.SphereCastAll(ray, radius, distance);
+            var res = Physics.SphereCastAll(ray, radius * 0.75f, distance);
             if (res.Length == 0) return;
 
             RaycastHit? bestHit = null;
@@ -171,8 +164,8 @@ namespace FR8.Player
 
             var contraction = 1.0f - GroundHit.distance / distance;
 
-            var spring = contraction * groundSpring - Vector3.Dot(Up, LocalVelocity) * groundDamping;
-            var force = Up * spring;
+            var spring = contraction * groundSpring - LocalVelocity.y * groundDamping;
+            var force = Vector3.up * spring;
             Rigidbody.AddForce(force, ForceMode.Acceleration);
         }
 
@@ -182,7 +175,7 @@ namespace FR8.Player
             var target = transform.TransformDirection(input.x, 0.0f, input.z) * moveSpeed;
 
             var difference = target - LocalVelocity;
-            difference -= Up * Vector3.Dot(Up, difference);
+            difference.y = 0.0f;
 
             var acceleration = 1.0f / accelerationTime;
             if (!IsOnGround) acceleration *= 1.0f - airMovePenalty;
@@ -200,7 +193,7 @@ namespace FR8.Player
             if (!jump) return;
 
             var power = Mathf.Sqrt(Mathf.Max(2.0f * 9.81f * upGravityScale * (jumpHeight - stepHeight), 0.0f)) - LocalVelocity.y;
-            var force = Up * power;
+            var force = Vector3.up * power;
 
             Rigidbody.AddForce(force, ForceMode.VelocityChange);
         }
