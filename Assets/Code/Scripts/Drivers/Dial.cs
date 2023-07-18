@@ -50,7 +50,7 @@ namespace FR8.Drivers
             return Vector3.Dot(transform.forward, v);
         }
         
-        public override void BeginDrag(Ray ray)
+        public override void OnBeginDrag(Ray ray)
         {
             lastDragPosition = dragMode switch
             {
@@ -60,7 +60,7 @@ namespace FR8.Drivers
             };
         }
 
-        public override void ContinueDrag(Ray ray)
+        public override void OnContinueDrag(Ray ray, ref float value)
         {
             switch (dragMode)
             {
@@ -68,13 +68,13 @@ namespace FR8.Drivers
                     var angle = GetAngleFromDragPoint(ray);
                     var deltaAngle = Mathf.DeltaAngle(angle, lastDragPosition);
                     lastDragPosition = angle;
-                    Value += deltaAngle / 360.0f;
+                    value += deltaAngle / 360.0f;
                     break;
                 case DragMode.Joystick:
                     var position = GetPositionFromRay(ray);
                     var delta = position - lastDragPosition;
                     lastDragPosition = position;
-                    Value += delta;
+                    value += delta;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

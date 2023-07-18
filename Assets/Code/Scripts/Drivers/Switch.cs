@@ -22,7 +22,7 @@ namespace FR8.Drivers
             Value = 1.0f - Value;
         }
 
-        public override void BeginDrag(Ray ray) { }
-        public override void ContinueDrag(Ray ray) { }
+        public override void OnBeginDrag(Ray ray) {}
+        public override void OnContinueDrag(Ray ray, ref float value) {}
     }
 }

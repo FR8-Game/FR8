@@ -25,14 +25,14 @@ namespace FR8.Drivers
             return lastRayPoint;
         }
         
-        public override void BeginDrag(Ray ray)
+        public override void OnBeginDrag(Ray ray)
         {
             var point = GetPointFromRay(ray);
             var v = point - transform.position;
             lastDragPosition = Vector3.Dot(transform.forward, v);
         }
 
-        public override void ContinueDrag(Ray ray)
+        public override void OnContinueDrag(Ray ray, ref float value)
         {
             var point = GetPointFromRay(ray);
             var v = point - transform.position;
@@ -42,7 +42,7 @@ namespace FR8.Drivers
 
             var sensitivity = (slidePoseA - slidePoseB).magnitude;
             
-            Value += delta / sensitivity;
+            value += delta / sensitivity;
         }
 
         public override void DisplaySmoothedValue(float smoothedValue)

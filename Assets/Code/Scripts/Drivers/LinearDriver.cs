@@ -1,6 +1,5 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 
 namespace FR8.Drivers
 {
@@ -21,7 +20,7 @@ namespace FR8.Drivers
         protected DriverGroup driverGroup;
 
         private float internalValue;
-        
+        private float slidingValue;
         private float displayValue, velocity;
 
         public abstract bool Limited { get; }
@@ -50,9 +49,21 @@ namespace FR8.Drivers
         }
 
         public virtual void Press() { }
-        
-        public abstract void BeginDrag(Ray ray);
-        public abstract void ContinueDrag(Ray ray);
+
+        public void BeginDrag(Ray ray)
+        {
+            slidingValue = Value;
+            OnBeginDrag(ray);
+        }
+
+        public void ContinueDrag(Ray ray)
+        {
+            OnContinueDrag(ray, ref slidingValue);
+            Value = slidingValue;
+        }
+
+        public abstract void OnBeginDrag(Ray ray);
+        public abstract void OnContinueDrag(Ray ray, ref float value);
 
         private void Update()
         {

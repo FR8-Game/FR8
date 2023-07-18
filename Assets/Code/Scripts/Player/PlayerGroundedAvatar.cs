@@ -64,15 +64,11 @@ namespace FR8.Player
         {
             Configure();
             cameraController.OnEnable();
-
-            Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
         }
 
         private void OnDisable()
         {
             cameraController.OnDisable();
-
-            Rigidbody.constraints = RigidbodyConstraints.None;
         }
 
         protected override void Configure()
