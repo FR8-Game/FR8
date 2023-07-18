@@ -1,5 +1,7 @@
 using System;
+using UnityEditor;
 using UnityEngine;
+using Cursor = FR8.Utility.Cursor;
 
 namespace FR8.Player.Submodules
 {
@@ -16,6 +18,8 @@ namespace FR8.Player.Submodules
         private Transform parent;
         private float yaw;
         private bool cameraLocked;
+
+        private int cursorLockID;
         
         public Camera Camera { get; private set; }
         
@@ -30,21 +34,12 @@ namespace FR8.Player.Submodules
         public void OnEnable()
         {
             cameraLocked = true;
-            
-            var up = parent.up;
-            var fwd = parent.forward;
-            var right = Vector3.Cross(up, fwd).normalized;
-            fwd = Vector3.Cross(right, up).normalized;
-
-            var dot = Mathf.Acos(Vector3.Dot(fwd, parent.forward.normalized)) * Mathf.Rad2Deg;
-            yaw = dot;
-            
-            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.Push(CursorLockMode.Locked, ref cursorLockID);
         }
 
         public void OnDisable()
         {
-            Cursor.lockState = CursorLockMode.None;
+            Cursor.Pop(ref cursorLockID);
         }
 
         public void Update()
@@ -57,11 +52,11 @@ namespace FR8.Player.Submodules
 
             if (controller.GrabCam)
             {
-                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.Change(cursorLockID, CursorLockMode.Locked);
             }
             else
             {
-                Cursor.lockState = cameraLocked ? CursorLockMode.Locked : CursorLockMode.Confined;
+                Cursor.Change(cursorLockID, cameraLocked ? CursorLockMode.Locked : CursorLockMode.Confined);
             }
 
             // Get delta rotation input from controller
@@ -70,15 +65,9 @@ namespace FR8.Player.Submodules
             // Apply input and clamp camera's yaw
             yaw = Mathf.Clamp(yaw + delta.y, -YawRange / 2.0f, YawRange / 2.0f);
 
-            // Reconstruct camera's orientation to match with avatar's up vector.
-            var up = parent.up;
-            var fwd = parent.forward;
-            var right = Vector3.Cross(up, fwd).normalized;
-            fwd = Vector3.Cross(right, up).normalized;
-
-            var orientation = Quaternion.LookRotation(fwd, up);
-            orientation *= Quaternion.Euler(0.0f, delta.x, 0.0f) * Quaternion.Euler(-yaw, 0.0f, 0.0f);
-            Camera.transform.rotation = orientation;
+            parent.transform.rotation *= Quaternion.Euler(0.0f, delta.x, 0.0f);
+            var cameraOrientation = parent.transform.rotation * Quaternion.Euler(-yaw, 0.0f, 0.0f);
+            Camera.transform.rotation = cameraOrientation;
 
             // Update additional camera variables.
             Camera.transform.position = parent.position + parent.rotation * cameraOffset;

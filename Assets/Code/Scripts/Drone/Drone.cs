@@ -1,4 +1,3 @@
-using System;
 using FR8.Player;
 using UnityEngine;
 

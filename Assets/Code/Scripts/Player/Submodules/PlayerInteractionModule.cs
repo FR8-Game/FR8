@@ -1,5 +1,5 @@
 using System;
-using FR8.Interactions;
+using FR8.Drivers;
 using FR8.Rendering;
 using TMPro;
 using UnityEngine;
@@ -23,7 +23,7 @@ namespace FR8.Player.Submodules
         private bool dragging;
         private float dragDistance;
 
-        private IDriver lookingAt;
+        private IInteractable lookingAt;
 
         public void Awake()
         {
@@ -93,12 +93,12 @@ namespace FR8.Player.Submodules
             dragging = controller.Drag;
         }
 
-        private IDriver GetLookingAt()
+        private IInteractable GetLookingAt()
         {
             var ray = GetLookingRay();
             if (!Physics.Raycast(ray, out var hit, interactionDistance)) return null;
 
-            return hit.transform.GetComponentInParent<IDriver>();
+            return hit.transform.GetComponentInParent<IInteractable>();
         }
 
         private Ray GetLookingRay()

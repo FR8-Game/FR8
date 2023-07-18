@@ -9,22 +9,21 @@ Shader "Hidden/OutlineBlit"
     {
         Tags
         {
-            "RenderType"="Opaque"
+            "RenderType"="Transparent"
+            "Queue"="Transparent"
         }
 
         Pass
         {
+            Blend One One
+            ZTest Always
+            ZWrite Off
+
             HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/core.hlsl"
-
-            struct Attributes
-            {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
-            };
 
             struct Varyings
             {
@@ -43,11 +42,21 @@ Shader "Hidden/OutlineBlit"
 
             const static int outlineSize = 5;
 
-            Varyings vert(Attributes input)
+            const static float2 vertices[] =
+            {
+                float2(-1.0, -1.0),
+                float2(3.0, -1.0),
+                float2(-1.0, 3.0),
+            };
+
+            Varyings vert(uint id : SV_VertexID)
             {
                 Varyings output;
-                output.vertex = TransformObjectToHClip(input.vertex.xyz);
-                output.uv = input.uv;
+                output.vertex.xy = vertices[id];
+                output.vertex.zw = float2(0.0, 1.0);
+                
+                output.uv = (output.vertex.xy + 1.0) / 2.0;
+                output.uv.y = 1.0 - output.uv.y;
                 return output;
             }
 
