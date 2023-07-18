@@ -1,42 +1,46 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem.Composites;
 
 namespace FR8.Utility
 {
     public static class UITween
     {
-        public static Tween TweenIn => BuildTween(p => p);
-        public static Tween TweenOut => BuildTween(p => 1.0f - p);
-
-        public static Tween BuildTween(Func<float, float> remapping)
+        public static IEnumerator BounceIn(CanvasGroup group, float duration)
         {
-            IEnumerator routine(CanvasGroup group, float duration, Vector2 offset)
-            {
-                var p0 = 0.0f;
-                while (p0 < 1.0f)
-                {
-                    set();
-                    p0 += Time.unscaledDeltaTime / duration;
-                    yield return null;
-                }
-
-                p0 = 1.0f;
-                set();
-                
-                void set()
-                {
-                    var p1 = Smootherstep(remapping(p0));
-                    group.alpha = p1;
-                    ((RectTransform)group.transform).anchoredPosition = offset * (1.0f - p1);   
-                }
-            }
-
-            return routine;
+            return BuildTween(group, duration, _ => Vector2.zero, p => (1.0f - Curves.Bounce(p)) * 30.0f, Curves.Bounce, _ => 1.0f);
         }
 
-        private static float Smootherstep(float x) => x * x * x * (3.0f * x * (2.0f * x - 5.0f) + 10.0f);
+        public static IEnumerator BounceOut(CanvasGroup group, float duration)
+        {
+            return BuildTween(group, duration, _ => Vector2.zero, p => (1.0f - Curves.Bounce(1.0f - p)) * 30.0f, p => Curves.Bounce(1.0f - p), _ => 1.0f);
+        }
 
+        public static IEnumerator BuildTween(CanvasGroup group, float duration, Func<float, Vector2> position, Func<float, float> rotation, Func<float, float> scale, Func<float, float> alpha)
+        {
+            var rectTransform = group.transform as RectTransform;
+
+            var percent = 0.0f;
+            while (percent < 1.0f)
+            {
+                set();
+                percent += Time.unscaledDeltaTime / duration;
+                yield return null;
+            }
+
+            percent = 1.0f;
+            set();
+
+            void set()
+            {
+                rectTransform.anchoredPosition = position(percent);
+                rectTransform.rotation = Quaternion.Euler(0.0f, 0.0f, rotation(percent));
+                rectTransform.localScale = Vector3.one * scale(percent);
+                group.alpha = alpha(percent);
+            }
+        }
+        
         public delegate IEnumerator Tween(CanvasGroup group, float duration, Vector2 offset);
     }
 }

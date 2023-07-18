@@ -60,15 +60,15 @@ namespace FR8.UI
 
         private void Start()
         {
-            StartCoroutine(UITween.TweenIn(window, 0.2f, Vector2.down * 300.0f));
+            StartCoroutine(UITween.BounceIn(window, 0.2f));
         }
 
         private void Hide()
         {
             IEnumerator routine()
             {
-                yield return StartCoroutine(UITween.TweenOut(window, 0.2f, Vector2.down * 300.0f));
-                Destroy(gameObject, 0.2f);
+                yield return StartCoroutine(UITween.BounceOut(window, 0.2f));
+                Destroy(gameObject);
             }
 
             window.interactable = false;
