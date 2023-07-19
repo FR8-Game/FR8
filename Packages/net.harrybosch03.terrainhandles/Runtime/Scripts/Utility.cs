@@ -9,5 +9,11 @@ namespace TerrainHandles
         {
             return new Vector3(callback(v => v.x), callback(v => v.y), callback(v => v.z));
         }
+
+        public static void GetCachedComponent<T>(Component component, ref T cache) where T : UnityEngine.Object
+        {
+            if (cache) return;
+            cache = component.GetComponent<T>();
+        }
     }
 }

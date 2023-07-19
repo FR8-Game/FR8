@@ -1,19 +1,16 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace TerrainHandles.Handles
 {
     [SelectionBase]
     public abstract class TerrainHandle : MonoBehaviour
     {
-        [SerializeField] private int order;
-        [SerializeField] private float bleed;
+        [SerializeField] private OperationType operationType;
 
         protected Matrix4x4 localToWorldMatrix;
         protected Matrix4x4 worldToLocalMatrix;
         
-        public int Order => order;
-        public abstract float AffectedSize { get; }
-
         protected Vector3 Position => localToWorldMatrix.GetColumn(3);
         protected Vector3 Up => localToWorldMatrix.GetColumn(1);
         
@@ -28,17 +25,28 @@ namespace TerrainHandles.Handles
         }
         
         public abstract float Apply(float w, Vector3 point, TerrainData data);
+        public abstract bool IsChunkAffected(Chunk chunk);
 
-        protected float Blend(float a, float b)
+        protected float Blend(float a, float b) => Blend(a, b, operationType);
+        protected float Blend(float a, float b, OperationType operationType)
         {
-            if (bleed == 0.0f) return Mathf.Min(a, b);
-            var h = Mathf.Max(bleed - Mathf.Abs(a - b), 0.0f) / bleed;
-            return Mathf.Min(a, b) - h * h * h * bleed / 6.0f;
+            return operationType switch
+            {
+                OperationType.Add => Mathf.Max(a, b),
+                OperationType.Subtract => Mathf.Min(a, -b),
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
-        private void OnValidate()
+        protected virtual void OnValidate()
         {
             gameObject.name = GetType().Name;
+        }
+
+        public enum OperationType
+        {
+            Add,
+            Subtract,
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -13,10 +14,16 @@ namespace TerrainHandles
         public void Populate()
         {
             Undo.RecordObject(transform, "Terrain Chunks Populate");
-            
-            while(transform.childCount > 0)
+
+            var children = new List<GameObject>();
+            foreach (Transform child in transform)
             {
-                DestroyImmediate(transform.GetChild(0).gameObject);
+                children.Add(child.gameObject);
+            }
+            
+            foreach (var child in children)
+            {
+                DestroyImmediate(child);
             }
 
             var chunkSize = prefab.GenSize;
@@ -31,6 +38,7 @@ namespace TerrainHandles
             while (p.z < chunkCount.z)
             {
                 var chunk = (Chunk)PrefabUtility.InstantiatePrefab(prefab);
+                chunk.name = $"Chunk [{p.x}, {p.y}, {p.z}]";
                 var pos = Utility.ConstructVector(getPosComponent);
 
                 chunk.transform.SetParent(transform);

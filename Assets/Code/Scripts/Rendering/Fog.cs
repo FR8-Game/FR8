@@ -7,10 +7,10 @@ namespace FR8.Rendering
     [VolumeComponentMenuForRenderPipeline("Custom/Fog", typeof(UniversalRenderPipeline))]
     public sealed class Fog : VolumeComponent, IPostProcessComponent
     {
-        public bool IsActive() => active;// && density?.value > 0.0f;
+        public bool IsActive() => active && density?.value > 0.0f;
         public bool IsTileCompatible() => false;
 
-        [Header("Fog Settings")] public FloatParameter density = new(1.0f, true);
+        [Header("Fog Settings")] public FloatParameter density = new(0.0f, true);
         public ColorParameter color = new(Color.gray, true);
     }
 

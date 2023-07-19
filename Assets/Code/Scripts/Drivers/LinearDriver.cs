@@ -3,18 +3,29 @@ using UnityEngine;
 
 namespace FR8.Drivers
 {
+    /// <summary>
+    /// A base classed used to make a interactable control that provides a one dimensional, decimal value like a slider or a dial.
+    /// </summary>
     [SelectionBase, DisallowMultipleComponent]
     public abstract class LinearDriver : MonoBehaviour, IDriver
     {
+        // The Name Used when the player mouses over the object.
         [SerializeField] protected string displayName = "Linear Driver";
+        // The amount of steps used when the player 'nudges' the driver.
         [SerializeField] private float nudgeStep = 8;
+        // The smoothdamp time used to move the driver handle to the current driver value.
         [SerializeField] private float smoothTime = 0.06f;
 
         [Space]
+        // The minimum and maximum values used when displaying the value of this driver.
         [SerializeField] protected Vector2 displayRange = new(0.0f, 100.0f);
+        // The string template used when displaying the value.
+        // The Value can be inserted with {0}
+        // Uses C# Standard Numeric Format Strings - see https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings
         [SerializeField] protected string displayTemplate = "{0:N1}%";
 
         [Space]
+        // An optional text object that will show the display value.
         [SerializeField] protected TMP_Text displayText;
 
         protected DriverGroup driverGroup;

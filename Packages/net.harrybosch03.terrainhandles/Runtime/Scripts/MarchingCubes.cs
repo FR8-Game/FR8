@@ -33,7 +33,7 @@ namespace TerrainHandles
 
         public float Weight(Vector3 p) => weight(p + offset);
 
-        private bool State(float w) => w < threshold == !invert;
+        private bool State(float w) => w > threshold == !invert;
 
         private const int Corners = 8;
         private Vector3 Corner(int i)
@@ -73,7 +73,7 @@ namespace TerrainHandles
             sharedVertexMap.Add(i, vertices.Count - 1);
             indices.Add(vertices.Count - 1);
 
-            CalculateSDFNormal(vert);
+            //CalculateSDFNormal(vert);
         }
 
         private void CalculateSDFNormal(Vector3 p)
@@ -95,10 +95,10 @@ namespace TerrainHandles
             {
                 normal += corners[i] * Weight(p + corners[i] * voxelSize * 0.25f);
             }
-            normals.Add(normal.normalized);
+            normals.Add(-normal.normalized);
         }
 
-        private void Point()
+        private void ProcessGridCoordinate()
         {
             var weights = new float[Corners];
             var config = 0b0u;
@@ -154,7 +154,7 @@ namespace TerrainHandles
                     for (var z = 0; z < zl; z++)
                     {
                         index = new Vector3Int(x, y, z);
-                        Point();
+                        ProcessGridCoordinate();
                     }
                 }
             }
@@ -168,11 +168,13 @@ namespace TerrainHandles
             
             mesh.Clear();
             mesh.SetVertices(vertices);
-            mesh.SetNormals(normals);
+            //mesh.SetNormals(normals);
             mesh.SetIndices(indices, MeshTopology.Triangles, 0);
             mesh.SetUVs(0, uvs);
             mesh.SetColors(colors);
 
+            mesh.RecalculateNormals();
+            
             return mesh;
         }
 

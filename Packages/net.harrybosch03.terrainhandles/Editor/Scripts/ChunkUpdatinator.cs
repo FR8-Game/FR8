@@ -14,7 +14,7 @@ namespace TerrainHandles.Editor
         {
             ObjectChangeEvents.changesPublished += OnChangeEvent;
             EditorApplication.update += Update;
-            Chunk.RegenerateAll();
+            Chunk.RegenerateAllAsync();
         }
 
         private static void Update()
@@ -27,7 +27,7 @@ namespace TerrainHandles.Editor
             
             if (finalUpdate) return;
             
-            Chunk.RegenerateAll();
+            Chunk.RegenerateAllAsync();
             finalUpdate = true;
         }
 
@@ -73,9 +73,11 @@ namespace TerrainHandles.Editor
 
                 switch (instance)
                 {
-                    case TerrainHandle:
+                    case TerrainHandle handle:
+                        Chunk.RegenerateAll(handle.IsChunkAffected);
+                        break;
                     case Chunk:
-                        Chunk.RegenerateAll();
+                        Chunk.RegenerateAllAsync();
                         return;
                     default:
                         instance = c.gameObject;

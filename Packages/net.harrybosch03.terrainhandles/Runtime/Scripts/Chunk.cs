@@ -1,7 +1,10 @@
+using System;
+using System.Collections;
 using System.Diagnostics;
 using System.Threading;
 using UnityEditor;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace TerrainHandles
 {
@@ -15,6 +18,8 @@ namespace TerrainHandles
         private Thread generationThread;
         private MarchingCubes pendingGenerator;
         private bool pendingChanges;
+
+        private Action finishCallback;
 
         public Vector3 GenSize => genSize;
 
@@ -34,7 +39,7 @@ namespace TerrainHandles
             BuildMesh(generator);
         }
 
-        public void GenerateAsync(TerrainData data)
+        public void GenerateAsync(TerrainData data, Action finishCallback)
         {
             if (generationThread != null && generationThread.IsAlive)
             {
@@ -44,6 +49,8 @@ namespace TerrainHandles
          
             generationTimer.Reset();
             generationTimer.Start();
+
+            if (finishCallback != null) this.finishCallback += finishCallback;
             
             pendingGenerator = GetGenerator(data);
             generationThread = pendingGenerator.GenerateAsync(-genSize * 0.5f, genSize * 0.5f, voxelSize);
@@ -56,7 +63,7 @@ namespace TerrainHandles
             gameObject.GetOrAddCachedComponent(ref filter);
             if (!settings) settings = TerrainGenerationSettings.Fallback();
 
-            return new MarchingCubes(data.AtPoint, settings.threshold, transform.position);
+            return new MarchingCubes(data.AtPoint, 0.0001f, transform.position);
         }
         
         private void BuildMesh(MarchingCubes generator)
@@ -65,6 +72,7 @@ namespace TerrainHandles
             EditorUtility.SetDirty(gameObject);
 
             filter.sharedMesh = mesh;
+            if (gameObject.TryGetComponent(out MeshCollider collider)) collider.sharedMesh = mesh;
         }
 
         public void FinalizeGenerateAsync()
@@ -75,13 +83,14 @@ namespace TerrainHandles
             BuildMesh(pendingGenerator);
             
             pendingGenerator = null;
+            finishCallback?.Invoke();
+            finishCallback = null;
 
-            if (pendingChanges)
-            {
-                var data = new TerrainData();
-                GenerateAsync(data);
-                pendingChanges = false;
-            }
+            if (!pendingChanges) return;
+            
+            var data = new TerrainData();
+            GenerateAsync(data, finishCallback);
+            pendingChanges = false;
         }
         
         public static void RegenerateAll()
@@ -89,7 +98,31 @@ namespace TerrainHandles
             var data = new TerrainData();
             foreach (var chunk in data.Chunks)
             {
-                chunk.GenerateAsync(data);
+                chunk.GenerateAsync(data, null);
+            }
+        }
+
+        public static void RegenerateAll(Predicate<Chunk> predicate)
+        {
+            var data = new TerrainData();
+            foreach (var chunk in data.Chunks)
+            {
+                if (!predicate(chunk)) continue;
+                chunk.GenerateAsync(data, null);
+            }
+        }
+
+        public static void RegenerateAllAsync()
+        {
+            var data = new TerrainData();
+            var i = 0;
+
+            recurse();
+            
+            void recurse()
+            {
+                if (i >= data.Chunks.Count) return;
+                data.Chunks[i++].GenerateAsync(data, recurse);
             }
         }
     }

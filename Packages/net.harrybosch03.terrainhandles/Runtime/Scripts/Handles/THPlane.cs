@@ -8,7 +8,7 @@ namespace TerrainHandles.Handles
 
         public override float Apply(float w, Vector3 point, TerrainData data)
         {
-            return Vector3.Dot(point - Position, Up);
+            return Blend(w, Vector3.Dot(Position - point, Up));
         }
     }
 }
