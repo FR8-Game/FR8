@@ -111,12 +111,6 @@
         "com.unity.render-pipelines.core": "12.1.7"
       }
     },
-    "net.harrybosch03.editorhelper": {
-      "version": "file:net.harrybosch03.editorhelper",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
-    },
     "net.harrybosch03.hierarchycolorator": {
       "version": "file:net.harrybosch03.hierarchycolorator",
       "depth": 0,
@@ -127,18 +121,6 @@
       "version": "file:net.harrybosch03.scenequickaccess",
       "depth": 0,
       "source": "embedded",
-      "dependencies": {}
-    },
-    "net.harrybosch03.terrainhandles": {
-      "version": "file:net.harrybosch03.terrainhandles",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
-    },
-    "com.unity.modules.ai": {
-      "version": "1.0.0",
-      "depth": 0,
-      "source": "builtin",
       "dependencies": {}
     },
     "com.unity.modules.animation": {
@@ -158,15 +140,6 @@
       "depth": 0,
       "source": "builtin",
       "dependencies": {}
-    },
-    "com.unity.modules.director": {
-      "version": "1.0.0",
-      "depth": 0,
-      "source": "builtin",
-      "dependencies": {
-        "com.unity.modules.audio": "1.0.0",
-        "com.unity.modules.animation": "1.0.0"
-      }
     },
     "com.unity.modules.imageconversion": {
       "version": "1.0.0",
@@ -204,6 +177,21 @@
       "source": "builtin",
       "dependencies": {
         "com.unity.modules.imageconversion": "1.0.0"
+      }
+    },
+    "com.unity.modules.terrain": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {}
+    },
+    "com.unity.modules.terrainphysics": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {
+        "com.unity.modules.physics": "1.0.0",
+        "com.unity.modules.terrain": "1.0.0"
       }
     },
     "com.unity.modules.ui": {
