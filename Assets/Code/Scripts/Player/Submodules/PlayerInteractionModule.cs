@@ -98,7 +98,7 @@ namespace FR8.Player.Submodules
             var ray = GetLookingRay();
             if (!Physics.Raycast(ray, out var hit, interactionDistance)) return null;
 
-            return hit.transform.GetComponentInParent<IInteractable>();
+            return hit.collider .GetComponentInParent<IInteractable>();
         }
 
         private Ray GetLookingRay()

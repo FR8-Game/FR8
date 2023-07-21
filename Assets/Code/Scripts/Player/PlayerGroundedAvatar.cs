@@ -1,3 +1,4 @@
+using System;
 using FR8.Player.Submodules;
 using UnityEngine;
 
@@ -41,10 +42,14 @@ namespace FR8.Player
 
         private bool jumpTrigger;
 
+        private Rigidbody lastGroundObject;
+        private Vector3 lastGroundPosition;
+        private Quaternion lastGroundRotation;
+
         public bool IsOnGround { get; private set; }
         public RaycastHit GroundHit { get; private set; }
 
-        public Vector3 LocalVelocity => IsOnGround && GroundHit.rigidbody ? Rigidbody.velocity - GroundHit.rigidbody.GetPointVelocity(transform.position) : Rigidbody.velocity;
+        public Vector3 LocalVelocity => Rigidbody.velocity;
         public Vector3 Gravity => new Vector3(0.0f, -9.81f, 0.0f) * (LocalVelocity.y > 0.0f && Controller.Jump ? upGravityScale : downGravityScale);
 
         #region Initalization
@@ -111,6 +116,10 @@ namespace FR8.Player
         private void Update()
         {
             if (Controller.JumpTriggered) jumpTrigger = true;
+        }
+
+        private void LateUpdate()
+        {
             cameraController.Update();
         }
 
@@ -120,6 +129,7 @@ namespace FR8.Player
             Move();
             Jump();
             ApplyGravity();
+            MoveWithGround();
         }
 
         #endregion
@@ -197,6 +207,27 @@ namespace FR8.Player
         private void ApplyGravity()
         {
             Rigidbody.AddForce(Gravity, ForceMode.Acceleration);
+        }
+
+        private void MoveWithGround()
+        {
+            var groundObject = GroundHit.rigidbody;
+
+            if (groundObject && groundObject == lastGroundObject)
+            {
+                var deltaPosition = groundObject.position - lastGroundPosition;
+                var deltaRotation = groundObject.rotation * Quaternion.Inverse(lastGroundRotation);
+
+                Rigidbody.MovePosition(Rigidbody.position + deltaPosition);
+                Rigidbody.MoveRotation(Rigidbody.rotation * deltaRotation);
+            }
+
+            lastGroundObject = groundObject;
+            if (groundObject)
+            {
+                lastGroundPosition = groundObject.position;
+                lastGroundRotation = groundObject.rotation;
+            }
         }
 
         #endregion
