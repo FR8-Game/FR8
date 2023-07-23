@@ -11,10 +11,9 @@ namespace FR8.Player.Submodules
         private const float YawRange = 180.0f - GimbalLockOffset;
         
         [SerializeField] private float fieldOfView = 70.0f;
-        [SerializeField] private Vector3 cameraOffset = new(0.0f, 1.6f, 0.0f);
         
         private Func<PlayerController> controller;
-        private Transform parent;
+        private Transform target;
         private float yaw;
         private bool cameraLocked;
 
@@ -22,10 +21,10 @@ namespace FR8.Player.Submodules
         
         public Camera Camera { get; private set; }
         
-        public void Initialize(Func<PlayerController> controller, Transform parent)
+        public void Initialize(Func<PlayerController> controller, Transform target)
         {
             this.controller = controller;
-            this.parent = parent;
+            this.target = target;
             
             Camera = Camera.main;
         }
@@ -64,12 +63,12 @@ namespace FR8.Player.Submodules
             // Apply input and clamp camera's yaw
             yaw = Mathf.Clamp(yaw + delta.y, -YawRange / 2.0f, YawRange / 2.0f);
 
-            parent.transform.rotation *= Quaternion.Euler(0.0f, delta.x, 0.0f);
-            var cameraOrientation = parent.transform.rotation * Quaternion.Euler(-yaw, 0.0f, 0.0f);
+            target.transform.rotation *= Quaternion.Euler(0.0f, delta.x, 0.0f);
+            var cameraOrientation = target.transform.rotation * Quaternion.Euler(-yaw, 0.0f, 0.0f);
             Camera.transform.rotation = cameraOrientation;
 
             // Update additional camera variables.
-            Camera.transform.position = parent.position + parent.rotation * cameraOffset;
+            Camera.transform.position = target.position;
             Camera.fieldOfView = fieldOfView;
         }
 

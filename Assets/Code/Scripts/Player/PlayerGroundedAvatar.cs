@@ -38,26 +38,33 @@ namespace FR8.Player
         [SerializeField] private float upGravityScale = 2.0f;
 
         [Header("Camera")]
+        [SerializeField] private Vector3 cameraOffset = new(0.0f, 1.6f, 0.0f);
+
         [SerializeField] private DiscreteFirstPersonCamera cameraController;
 
         private bool jumpTrigger;
 
         private Rigidbody lastGroundObject;
-        private Vector3[] lastGroundPositions = new Vector3[2];
-        private Quaternion[] lastGroundRotations = new Quaternion[2];
+        private Vector3 lastGroundLinearVelocity;
+        private Vector3 lastGroundAngularVelocity;
 
+        public Transform CameraTarget { get; private set; }
         public bool IsOnGround { get; private set; }
         public RaycastHit GroundHit { get; private set; }
 
-        public Vector3 LocalVelocity => Rigidbody.velocity;
-        public Vector3 Gravity => new Vector3(0.0f, -9.81f, 0.0f) * (LocalVelocity.y > 0.0f && Controller.Jump ? upGravityScale : downGravityScale);
+        public Vector3 Gravity => new Vector3(0.0f, -9.81f, 0.0f) * (Rigidbody.velocity.y > 0.0f && Controller.Jump ? upGravityScale : downGravityScale);
 
         #region Initalization
 
         protected override void Awake()
         {
+            CameraTarget = new GameObject("Camera Target").transform;
+            CameraTarget.transform.SetParent(transform);
+            CameraTarget.transform.localPosition = cameraOffset;
+            CameraTarget.transform.localRotation = Quaternion.identity;
+
             base.Awake();
-            cameraController.Initialize(() => Controller, transform);
+            cameraController.Initialize(() => Controller, CameraTarget);
         }
 
         private void OnValidate()
@@ -83,8 +90,7 @@ namespace FR8.Player
             Rigidbody.mass = mass;
             Rigidbody.useGravity = false;
             Rigidbody.detectCollisions = true;
-            Rigidbody.inertiaTensor = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
-            Rigidbody.constraints = RigidbodyConstraints.None;
+            Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
             Rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
             Rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
@@ -126,6 +132,10 @@ namespace FR8.Player
 
         private void FixedUpdate()
         {
+            Rigidbody.rotation = Quaternion.Euler(0.0f, CameraTarget.eulerAngles.y, 0.0f);
+            CameraTarget.localRotation = Quaternion.identity;
+            CameraTarget.localPosition = cameraOffset;
+
             CheckForGround();
             Move();
             Jump();
@@ -171,7 +181,7 @@ namespace FR8.Player
 
             var contraction = 1.0f - GroundHit.distance / distance;
 
-            var spring = contraction * groundSpring - LocalVelocity.y * groundDamping;
+            var spring = contraction * groundSpring - Rigidbody.velocity.y * groundDamping;
             var force = Vector3.up * spring;
             Rigidbody.AddForce(force, ForceMode.Acceleration);
         }
@@ -181,7 +191,7 @@ namespace FR8.Player
             var input = Controller.Move;
             var target = transform.TransformDirection(input.x, 0.0f, input.z) * moveSpeed;
 
-            var difference = target - LocalVelocity;
+            var difference = target - Rigidbody.velocity;
             difference.y = 0.0f;
 
             var acceleration = 1.0f / accelerationTime;
@@ -199,7 +209,7 @@ namespace FR8.Player
             if (!IsOnGround) return;
             if (!jump) return;
 
-            var power = Mathf.Sqrt(Mathf.Max(2.0f * 9.81f * upGravityScale * (jumpHeight - stepHeight), 0.0f)) - LocalVelocity.y;
+            var power = Mathf.Sqrt(Mathf.Max(2.0f * 9.81f * upGravityScale * (jumpHeight - stepHeight), 0.0f)) - Rigidbody.velocity.y;
             var force = Vector3.up * power;
 
             Rigidbody.AddForce(force, ForceMode.VelocityChange);
@@ -212,29 +222,25 @@ namespace FR8.Player
 
         private void MoveWithGround()
         {
-            var groundObject = GroundHit.rigidbody;
-
-            if (groundObject && groundObject == lastGroundObject)
+            var groundObject = IsOnGround ? GroundHit.rigidbody : null;
+            if (groundObject)
             {
-                var deltaPosition = groundObject.position - lastGroundPositions[0];
-                var deltaRotation = groundObject.rotation * Quaternion.Inverse(lastGroundRotations[0]);
+                var velocity = groundObject ? groundObject.GetPointVelocity(Rigidbody.position) : Vector3.zero;
 
-                var offset = Rigidbody.position - lastGroundPositions[0];
-                deltaPosition += deltaRotation * offset - offset;
+                if (groundObject == lastGroundObject)
+                {
+                    var acceleration = velocity - lastGroundLinearVelocity;
+                    var torque = groundObject.angularVelocity - lastGroundAngularVelocity;
 
-                Rigidbody.MovePosition(Rigidbody.position + deltaPosition);
-                Rigidbody.MoveRotation(Rigidbody.rotation * deltaRotation);
+                    Rigidbody.AddForce(acceleration, ForceMode.VelocityChange);
+                    Rigidbody.AddTorque(torque, ForceMode.VelocityChange);
+                }
+
+                lastGroundLinearVelocity = groundObject.velocity;
+                lastGroundAngularVelocity = groundObject.angularVelocity;
             }
 
             lastGroundObject = groundObject;
-            if (groundObject)
-            {
-                lastGroundPositions[1] = lastGroundPositions[0];
-                lastGroundRotations[1] = lastGroundRotations[0];
-                
-                lastGroundPositions[0] = groundObject.position;
-                lastGroundRotations[0] = groundObject.rotation;
-            }
         }
 
         #endregion
