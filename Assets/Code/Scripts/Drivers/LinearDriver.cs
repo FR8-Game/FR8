@@ -11,8 +11,6 @@ namespace FR8.Drivers
     {
         // The Name Used when the player mouses over the object.
         [SerializeField] protected string displayName = "Linear Driver";
-        // The amount of steps used when the player 'nudges' the driver.
-        [SerializeField] private float nudgeStep = 8;
         // The smoothdamp time used to move the driver handle to the current driver value.
         [SerializeField] private float smoothTime = 0.06f;
 
@@ -30,7 +28,6 @@ namespace FR8.Drivers
 
         protected DriverGroup driverGroup;
 
-        private float internalValue;
         private float slidingValue;
         private float displayValue, velocity;
 
@@ -40,23 +37,17 @@ namespace FR8.Drivers
         public virtual string DisplayValue => string.Format(displayTemplate, Mathf.LerpUnclamped(displayRange.x, displayRange.y, Value));
         public virtual float Value
         {
-            get => driverGroup ? driverGroup.Value : internalValue;
+            get => driverGroup ? driverGroup.NormalizedValue : 0.0f;
             set
             {
-                var v = Limited ? Mathf.Clamp01(value) : value;
-                
-                if (driverGroup) internalValue = driverGroup.SetValue(v);
-                else
-                {
-                    internalValue = v;
-                    ValueUpdated();
-                }
+                if (driverGroup) driverGroup.SetNormalizedValue(value);
             }
         }
 
         public void Nudge(int direction)
         {
-            Value += direction * 1.0f / nudgeStep;
+            if (!driverGroup) return;
+            driverGroup.Nudge(direction);
         }
 
         public virtual void Press() { }

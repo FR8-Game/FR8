@@ -1,5 +1,6 @@
 using FR8.Drivers;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.Splines;
 
 namespace FR8.Train
@@ -9,9 +10,14 @@ namespace FR8.Train
     [RequireComponent(typeof(Rigidbody))]
     public sealed class TrainMovement : MonoBehaviour
     {
-        [SerializeField] private float acceleration;
+        [SerializeField] private float acceleration = 1.0f;
         [SerializeField] private float drag;
         [SerializeField] private float referenceWeight;
+
+        [Space]
+        [SerializeField] private float brakeConstant = 0.05f;
+        [SerializeField] private float brakeMin = 0.5f;
+        [SerializeField] private float brakeMax = 4.0f;
 
         [Space]
         [SerializeField] private SplineContainer track;
@@ -19,63 +25,87 @@ namespace FR8.Train
 
         [Space]
         [SerializeField] private DriverGroup throttleDriver;
+        [SerializeField] private DriverGroup brakeDriver;
+        [SerializeField] private DriverGroup gearDriver;
 
-        private new Rigidbody rigidbody;
+        public Rigidbody Rigidbody { get; private set; }
 
-        private float Throttle => throttleDriver ? throttleDriver.Value : 0.0f;
+        public float Throttle => throttleDriver ? throttleDriver.Value : 0.0f;
+        public float Brake => brakeDriver ? brakeDriver.Value : 0.0f;
+        public int Gear => gearDriver ? Mathf.RoundToInt(gearDriver.Value) : 0;
 
         private void Awake()
         {
-            rigidbody = GetComponent<Rigidbody>();
+            Rigidbody = GetComponent<Rigidbody>();
         }
 
         private void FixedUpdate()
         {
-            Move();
+            ApplyThrottle();
+            ApplyBrake();
             ApplyDrag();
             ApplyCorrectiveForce();
         }
 
 
-        private void Move()
+        private void ApplyThrottle()
         {
-            rigidbody.AddForce(transform.forward * Throttle * acceleration * referenceWeight);
+            Rigidbody.AddForce(transform.forward * Gear * Throttle * acceleration * referenceWeight);
         }
 
         private void ApplyDrag()
         {
-            var fwdSpeed = Vector3.Dot(transform.forward, rigidbody.velocity);
+            var fwdSpeed = Vector3.Dot(transform.forward, Rigidbody.velocity);
             var drag = -fwdSpeed * Mathf.Abs(fwdSpeed) * this.drag;
 
-            rigidbody.AddForce(transform.forward * drag * referenceWeight);
+            var velocityChange = drag * referenceWeight / Rigidbody.mass * Time.deltaTime;
+            if (-velocityChange > fwdSpeed) velocityChange = -fwdSpeed;
+
+            Rigidbody.AddForce(transform.forward * velocityChange, ForceMode.VelocityChange);
         }
+
+        private void ApplyBrake()
+        {
+            var fwdSpeed = Vector3.Dot(transform.forward, Rigidbody.velocity);
+            var force = -CalculateBrakeForce(fwdSpeed) * Brake * Mathf.Sign(fwdSpeed);
+
+            var velocityChange = force * referenceWeight / Rigidbody.mass * Time.deltaTime;
+            if (-velocityChange > fwdSpeed) velocityChange = -fwdSpeed;
+
+            Rigidbody.AddForce(transform.forward * velocityChange, ForceMode.VelocityChange);
+        }
+        
+        public float CalculateBrakeForce(float speed) => Mathf.Clamp(speed * speed * brakeConstant, brakeMin, brakeMax);
 
         private void ApplyCorrectiveForce()
         {
             var spline = track.Splines[currentSplineIndex];
-            SplineUtility.GetNearestPoint(spline, rigidbody.position, out var nearest, out var t);
+            SplineUtility.GetNearestPoint(spline, Rigidbody.position, out var nearest, out var t);
             nearest = track.transform.TransformPoint(nearest);
 
-            var force = ((Vector3)nearest - rigidbody.position) / Time.deltaTime;
-            
-            Debug.DrawLine(rigidbody.position, nearest);
+            var force = ((Vector3)nearest - Rigidbody.position) / Time.deltaTime;
 
-            var normalVelocity = rigidbody.velocity;
-            normalVelocity -= transform.forward * Vector3.Dot(transform.forward, rigidbody.velocity);
+            Debug.DrawLine(Rigidbody.position, nearest);
+
+            var normalVelocity = Rigidbody.velocity;
+            normalVelocity -= transform.forward * Vector3.Dot(transform.forward, Rigidbody.velocity);
             force -= normalVelocity;
-            
-            rigidbody.AddForce(force, ForceMode.VelocityChange);
-            
+
+            Rigidbody.AddForce(force, ForceMode.VelocityChange);
+
             var tangent = spline.EvaluateTangent(t);
-            transform.rotation = Quaternion.LookRotation(tangent, Vector3.up);
+            Rigidbody.MoveRotation(Quaternion.LookRotation(tangent, Vector3.up));
         }
 
         private void OnValidate()
         {
             if (Application.isPlaying) return;
 
-            rigidbody = GetComponent<Rigidbody>();
-            referenceWeight = rigidbody.mass;
+            Rigidbody = GetComponent<Rigidbody>();
+            referenceWeight = Rigidbody.mass;
+
+            brakeConstant = Mathf.Max(0.0f, brakeConstant);
+            brakeMax = Mathf.Max(0.0f, brakeMax);
         }
     }
 }

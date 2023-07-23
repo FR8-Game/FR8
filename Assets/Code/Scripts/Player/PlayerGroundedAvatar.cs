@@ -43,8 +43,8 @@ namespace FR8.Player
         private bool jumpTrigger;
 
         private Rigidbody lastGroundObject;
-        private Vector3 lastGroundPosition;
-        private Quaternion lastGroundRotation;
+        private Vector3[] lastGroundPositions = new Vector3[2];
+        private Quaternion[] lastGroundRotations = new Quaternion[2];
 
         public bool IsOnGround { get; private set; }
         public RaycastHit GroundHit { get; private set; }
@@ -83,7 +83,8 @@ namespace FR8.Player
             Rigidbody.mass = mass;
             Rigidbody.useGravity = false;
             Rigidbody.detectCollisions = true;
-            Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+            Rigidbody.inertiaTensor = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+            Rigidbody.constraints = RigidbodyConstraints.None;
             Rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
             Rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
@@ -215,8 +216,11 @@ namespace FR8.Player
 
             if (groundObject && groundObject == lastGroundObject)
             {
-                var deltaPosition = groundObject.position - lastGroundPosition;
-                var deltaRotation = groundObject.rotation * Quaternion.Inverse(lastGroundRotation);
+                var deltaPosition = groundObject.position - lastGroundPositions[0];
+                var deltaRotation = groundObject.rotation * Quaternion.Inverse(lastGroundRotations[0]);
+
+                var offset = Rigidbody.position - lastGroundPositions[0];
+                deltaPosition += deltaRotation * offset - offset;
 
                 Rigidbody.MovePosition(Rigidbody.position + deltaPosition);
                 Rigidbody.MoveRotation(Rigidbody.rotation * deltaRotation);
@@ -225,8 +229,11 @@ namespace FR8.Player
             lastGroundObject = groundObject;
             if (groundObject)
             {
-                lastGroundPosition = groundObject.position;
-                lastGroundRotation = groundObject.rotation;
+                lastGroundPositions[1] = lastGroundPositions[0];
+                lastGroundRotations[1] = lastGroundRotations[0];
+                
+                lastGroundPositions[0] = groundObject.position;
+                lastGroundRotations[0] = groundObject.rotation;
             }
         }
 
