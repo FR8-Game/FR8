@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using FR8.Drivables;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace FR8.Drivers
 {
@@ -8,17 +9,12 @@ namespace FR8.Drivers
     public class DriverGroup : MonoBehaviour
     {
         [SerializeField] private float defaultValue;
-        [SerializeField] private int steps = 0;
-        [SerializeField] private bool forceStep = false;
-        [SerializeField] private bool limit = true;
-        [SerializeField] private float min = 0.0f;
-        [SerializeField] private float max = 1.0f;
 
         private List<IDriver> drivers = new();
         private List<IDrivable> drivables = new();
 
-        public float Value => Mathf.Lerp(min, max, NormalizedValue);
-        public float NormalizedValue { get; private set; }
+        public string GroupName => gameObject.name;
+        public float Value { get; private set; }
 
         private void Awake()
         {
@@ -33,18 +29,13 @@ namespace FR8.Drivers
 
         private void Start()
         {
-            SetNormalizedValue(defaultValue);
+            SetValue(defaultValue);
         }
 
         public void SetValue(float newValue)
         {
-            SetNormalizedValue(Mathf.InverseLerp(min, max, newValue));
-        }
-        
-        public void SetNormalizedValue(float newValue)
-        {
-            NormalizedValue = ValidateValue(newValue);
-
+            Value = newValue;
+            
             foreach (var driver in drivers)
             {
                 driver.ValueUpdated();
@@ -52,36 +43,8 @@ namespace FR8.Drivers
 
             foreach (var drivable in drivables)
             {
-                drivable.SetValue(Value);
+                drivable.SetValue(this, Value);
             }
-        }
-
-        public void Nudge(int direction)
-        {
-            if (direction > 1) direction = 1;
-            if (direction < -1) direction = -1;
-
-            var normalizedValue = Mathf.InverseLerp(min, max, Value);
-            var steppedValue = Mathf.RoundToInt(normalizedValue * steps);
-            steppedValue += direction;
-            
-            var newValue = steppedValue / (float)steps;
-            SetNormalizedValue(newValue);
-        }
-
-        private float ValidateValue(float newValue)
-        {
-            if (steps > 0 && forceStep)
-            {
-                newValue = Mathf.Round(newValue * steps) / steps;
-            }
-
-            if (limit)
-            {
-                newValue = Mathf.Clamp01(newValue);
-            }
-
-            return newValue;
         }
     }
 }
