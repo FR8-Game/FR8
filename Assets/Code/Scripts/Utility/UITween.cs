@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem.Composites;
 
 namespace FR8.Utility
 {

@@ -20,6 +20,8 @@ namespace FR8.Player
         [Space]
         [SerializeField] private PlayerAvatar newAvatar;
 
+        private Camera mainCamera;
+        
         private InputActionReference moveInput;
         private InputActionReference jumpInput;
         private InputActionReference lookAction;
@@ -29,8 +31,9 @@ namespace FR8.Player
         private InputActionReference pressAction;
         private InputActionReference freeCamAction;
         private InputActionReference grabCamAction;
+        private InputActionReference zoomCamAction;
 
-        private PlayerAvatar currentAvatar;
+        public PlayerAvatar CurrentAvatar { get; private set; }
 
         public Vector3 Move
         {
@@ -51,9 +54,12 @@ namespace FR8.Player
         public bool Drag => pressAction.Switch();
         public bool FreeCam => freeCamAction.action?.WasPerformedThisFrame() ?? false;
         public bool GrabCam => grabCamAction.Switch();
+        public bool ZoomCam => zoomCamAction.Switch();
 
         public Vector3 GetLookFrameDelta(bool forceMouseDelta)
         {
+            var fovSensitivity = Mathf.Tan(mainCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
+            
             var delta = Vector3.zero;
 
             delta += (Vector3)(lookAction.action?.ReadValue<Vector2>() * controllerSensitivity * Time.deltaTime ?? Vector2.zero);
@@ -65,7 +71,7 @@ namespace FR8.Player
 
             delta.z += (rollAction.action?.ReadValue<float>() ?? 0.0f) * rollSensitivity * Time.deltaTime;
 
-            return delta;
+            return delta * fovSensitivity;
         }
 
         #region Initalization
@@ -86,6 +92,9 @@ namespace FR8.Player
             pressAction = bind("Press");
             freeCamAction = bind("FreeCam");
             grabCamAction = bind("GrabCam");
+            zoomCamAction = bind("ZoomCam");
+            
+            mainCamera = Camera.main;
         }
 
         private void Start()
@@ -96,10 +105,10 @@ namespace FR8.Player
 
         public void SetAvatar(PlayerAvatar newAvatar)
         {
-            if (currentAvatar) currentAvatar.Release();
+            if (CurrentAvatar) CurrentAvatar.Release();
             if (newAvatar) newAvatar.Possess(this);
 
-            currentAvatar = newAvatar;
+            CurrentAvatar = newAvatar;
         }
 
         private void Update()
