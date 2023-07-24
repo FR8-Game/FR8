@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -9,7 +11,7 @@ namespace SceneQuickAccess.Editor
     public class SceneQuickAccessWindow : EditorWindow
     {
         private const int ButtonHeight = 40;
-        
+
         private Vector2 scrollPosition;
 
         private bool refreshScenes;
@@ -43,8 +45,10 @@ namespace SceneQuickAccess.Editor
 
                     if (!GUILayout.Button(content, GUILayout.Height(ButtonHeight))) continue;
 
-                    EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
-                    EditorSceneManager.OpenScene(path);
+                    if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+                    {
+                        EditorSceneManager.OpenScene(path);
+                    }
                 }
             }
 
@@ -66,7 +70,7 @@ namespace SceneQuickAccess.Editor
         {
             if (cache == null) cache = new List<(SceneAsset, string)>();
             else if (!refreshScenes) return cache;
-            
+
             refreshScenes = false;
             scrollPosition = Vector2.zero;
 
