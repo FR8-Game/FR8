@@ -1,4 +1,3 @@
-using System;
 using FR8.Drivers;
 using UnityEngine;
 using UnityEngine.UI;

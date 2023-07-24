@@ -1,5 +1,4 @@
-﻿using System;
-using FR8.Drivers;
+﻿using FR8.Drivers;
 using UnityEngine;
 
 namespace FR8.Drivables
@@ -35,7 +34,7 @@ namespace FR8.Drivables
 
         private void OnValidate()
         {
-            if (!handle) handle = transform.GetChild(0);
+            if (!handle && transform.childCount > 0) handle = transform.GetChild(0);
         }
     }
 }

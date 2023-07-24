@@ -1,19 +1,19 @@
 ﻿using System.Collections.Generic;
 using FR8.Drivables;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace FR8.Drivers
 {
     [SelectionBase, DisallowMultipleComponent]
     public class DriverGroup : MonoBehaviour
     {
+        [SerializeField] private string displayName;
         [SerializeField] private float defaultValue;
 
         private List<IDriver> drivers = new();
         private List<IDrivable> drivables = new();
 
-        public string GroupName => gameObject.name;
+        public string GroupName => string.IsNullOrWhiteSpace(displayName) ? gameObject.name : displayName;
         public float Value { get; private set; }
 
         private void Awake()

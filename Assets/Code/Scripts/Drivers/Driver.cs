@@ -43,7 +43,7 @@ namespace FR8.Drivers
 
         public void BeginDrag(Ray ray)
         {
-            if (dragBehaviour) dragBehaviour.BeginDrag(ray);
+            if (dragBehaviour) dragBehaviour.BeginDrag(Value, ray);
         }
 
         public void ContinueDrag(Ray ray)

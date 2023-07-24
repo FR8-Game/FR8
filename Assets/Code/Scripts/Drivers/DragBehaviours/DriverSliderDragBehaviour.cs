@@ -1,5 +1,5 @@
+using System.Security.Cryptography;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace FR8.Drivers.DragBehaviours
 {
@@ -10,8 +10,9 @@ namespace FR8.Drivers.DragBehaviours
         
         private Vector3 lastDragPosition;
         
-        public override void BeginDrag(Ray ray)
+        public override void BeginDrag(float value, Ray ray)
         {
+            base.BeginDrag(value, ray);
             lastDragPosition = GetDragPoint(ray);
         }
 
@@ -33,12 +34,12 @@ namespace FR8.Drivers.DragBehaviours
             var plane = GetDragPlane(ray);
             if (!plane.Raycast(ray, out var enter)) return default;
 
-            return ray.GetPoint(enter);
+            return transform.InverseTransformPoint(ray.GetPoint(enter));
         }
         
         private Plane GetDragPlane(Ray ray)
         {
-            var dragDirection = transform.TransformDirection(this.dragVector).normalized;
+            var dragDirection = transform.TransformDirection(dragVector).normalized;
             var normal = -ray.direction.normalized;
             normal -= dragDirection * Vector3.Dot(dragDirection, normal);
             normal.Normalize();

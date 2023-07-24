@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace FR8.Drivers.DragBehaviours
 {
@@ -9,8 +8,9 @@ namespace FR8.Drivers.DragBehaviours
         private float lastDragPosition;
         private Vector3 lastRayPosition;
 
-        public override void BeginDrag(Ray ray)
+        public override void BeginDrag(float value, Ray ray)
         {
+            base.BeginDrag(value, ray);
             lastDragPosition = GetAngleFromDragPoint(ray);
         }
 

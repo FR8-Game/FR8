@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.SceneManagement;

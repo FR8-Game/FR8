@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
 using FR8.Drivers;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.Splines;
 
 namespace FR8.Train
@@ -15,15 +12,15 @@ namespace FR8.Train
         [SerializeField] private float acceleration = 4.0f;
         [SerializeField] private float drag;
         [SerializeField] private float referenceWeight;
+        [SerializeField] private float maxSpeed = 80.0f;
+        [SerializeField] private float maxSpeedBlending = 10.0f;
 
         [Space]
         [SerializeField] private float brakeConstant = 4.0f;
 
         [Space]
         [SerializeField] private SplineContainer track;
-
         [SerializeField] private int currentSplineIndex;
-
 
         [Space]
         [SerializeField] private int curveSampleIterations = 5;
@@ -95,7 +92,12 @@ namespace FR8.Train
 
         private void ApplyThrottle()
         {
-            Rigidbody.AddForce(DriverDirection * Gear * Throttle * ToMps(acceleration) * referenceWeight);
+            var force = DriverDirection * Gear * Throttle * ToMps(acceleration);
+            var fwdSpeed = Mathf.Abs(GetForwardSpeed());
+            var slowdown = Mathf.InverseLerp(ToMps(maxSpeed), ToMps(maxSpeed - maxSpeedBlending), fwdSpeed);
+            force *= slowdown;
+            
+            Rigidbody.AddForce(force * referenceWeight);
         }
 
         private void ApplyDrag()
@@ -138,15 +140,25 @@ namespace FR8.Train
             // Lineup rear wheel assembly as best as possible.
             var rearPosition = rearWheelAssembly.position;
             var rearTangent = DriverDirection;
+            var distance = (frontPosition - rearPosition).magnitude;
             for (var i = 0; i < curveSampleIterations; i++)
             {
                 (rearPosition, rearTangent) = pointOnSpline(rearPosition);
+                rearPosition = (rearPosition - frontPosition).normalized * distance + frontPosition;
             }
 
             rearWheelAssembly.rotation = Quaternion.LookRotation(rearTangent, Vector3.up);
 
             var direction = (frontPosition - rearPosition).normalized;
-            Rigidbody.MoveRotation(Quaternion.LookRotation(direction, Vector3.up));
+            var rotation = Quaternion.LookRotation(direction, Vector3.up);
+            (rotation * Quaternion.Inverse(Rigidbody.rotation)).ToAngleAxis(out var angle, out var axis);
+            
+            if (angle > 180.0f) angle -= 360.0f; 
+            axis.Normalize();
+            if (!float.IsFinite(axis.x) || !float.IsFinite(axis.y) || !float.IsFinite(axis.z)) axis = Vector3.zero;
+            
+            var torque = axis * angle * Mathf.Deg2Rad / Time.deltaTime - Rigidbody.angularVelocity;
+            Rigidbody.AddTorque(torque, ForceMode.VelocityChange);
 
             // Local Functions
             (Vector3, Vector3) pointOnSpline(Vector3 position)

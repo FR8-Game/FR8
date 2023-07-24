@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace FR8.Drivers
 {
@@ -11,32 +10,41 @@ namespace FR8.Drivers
             new("On", 1.0f),
         };
 
-        public override string DisplayValue => entries[Index].name;
-        public int Index { get; private set; }
+        private int index;
+        public override string DisplayValue => entries[index].name;
 
-        protected override void Start()
+        public override float Value
         {
-            base.Start();
-            SetIndex(Mathf.RoundToInt(Value));
+            get => base.Value;
+            set
+            {
+                index = GetClosestEntry(value);
+                base.Value = entries[index].value;
+            }
+        }
+
+        private int GetClosestEntry(float value)
+        {
+            var bestIndex = 0;
+            for (var i = 1; i < entries.Length; i++)
+            {
+                var best = entries[bestIndex];
+                var entry = entries[i];
+                var bestDist = Mathf.Abs(value - best.value);
+                var dist = Mathf.Abs(value - entry.value);
+                if (dist > bestDist) continue;
+                bestIndex = i;
+            }
+            return bestIndex;
         }
 
         public override void Nudge(int direction)
         {
-            SetIndex(Index + direction);
+            var newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= entries.Length) return;
+            Value = entries[newIndex].value;
         }
 
-        public override void Press()
-        {
-            SetIndex(Index++);
-        }
-
-        public void SetIndex(int newIndex)
-        {
-            Index = newIndex;
-            Index = Mathf.Clamp(Index, 0, entries.Length - 1);
-            Value = entries[Index].value;
-        }
-        
         [System.Serializable]
         public class Entry
         {

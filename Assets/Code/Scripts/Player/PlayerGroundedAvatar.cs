@@ -1,4 +1,3 @@
-using System;
 using FR8.Player.Submodules;
 using UnityEngine;
 
@@ -44,22 +43,21 @@ namespace FR8.Player
 
         private bool jumpTrigger;
 
-        private Transform lastGroundObject;
-        private Vector3 lastGroundPosition;
+        private Rigidbody lastGroundObject;
+        private Vector3 lastGroundVelocity;
         private Quaternion lastGroundRotation = Quaternion.identity;
 
         public Transform CameraTarget { get; private set; }
         public bool IsOnGround { get; private set; }
         public RaycastHit GroundHit { get; private set; }
-
-        public Vector3 Gravity => new Vector3(0.0f, -9.81f, 0.0f) * (Rigidbody.velocity.y > 0.0f && Controller.Jump ? upGravityScale : downGravityScale);
+        public Vector3 Velocity => IsOnGround && GroundHit.rigidbody ? Rigidbody.velocity - GroundHit.rigidbody.GetPointVelocity(Rigidbody.position) : Rigidbody.velocity;
+        public Vector3 Gravity => new Vector3(0.0f, -9.81f, 0.0f) * (Velocity.y > 0.0f && Controller.Jump ? upGravityScale : downGravityScale);
 
         #region Initalization
 
         protected override void Awake()
         {
-            CameraTarget = new GameObject("Camera Target").transform;
-            CameraTarget.transform.SetParent(transform);
+            CameraTarget = transform.Find("Camera Target");
             CameraTarget.transform.localPosition = cameraOffset;
             CameraTarget.transform.localRotation = Quaternion.identity;
 
@@ -181,7 +179,7 @@ namespace FR8.Player
 
             var contraction = 1.0f - GroundHit.distance / distance;
 
-            var spring = contraction * groundSpring - Rigidbody.velocity.y * groundDamping;
+            var spring = contraction * groundSpring - Velocity.y * groundDamping;
             var force = Vector3.up * spring;
             Rigidbody.AddForce(force, ForceMode.Acceleration);
         }
@@ -191,7 +189,7 @@ namespace FR8.Player
             var input = Controller.Move;
             var target = transform.TransformDirection(input.x, 0.0f, input.z) * moveSpeed;
 
-            var difference = target - Rigidbody.velocity;
+            var difference = target - Velocity;
             difference.y = 0.0f;
 
             var acceleration = 1.0f / accelerationTime;
@@ -209,7 +207,7 @@ namespace FR8.Player
             if (!IsOnGround) return;
             if (!jump) return;
 
-            var power = Mathf.Sqrt(Mathf.Max(2.0f * 9.81f * upGravityScale * (jumpHeight - stepHeight), 0.0f)) - Rigidbody.velocity.y;
+            var power = Mathf.Sqrt(Mathf.Max(2.0f * 9.81f * upGravityScale * (jumpHeight - stepHeight), 0.0f)) - Velocity.y;
             var force = Vector3.up * power;
 
             Rigidbody.AddForce(force, ForceMode.VelocityChange);
@@ -222,23 +220,23 @@ namespace FR8.Player
 
         private void MoveWithGround()
         {
-            var groundObject = GroundHit.transform;
+            var groundObject = GroundHit.rigidbody;
 
             if (groundObject)
             {
+                var velocity = groundObject.GetPointVelocity(Rigidbody.position);
                 if (groundObject == lastGroundObject)
                 {
-                    var deltaPosition = lastGroundObject.position - lastGroundPosition;
-                    var deltaRotation = lastGroundObject.rotation * Quaternion.Inverse(lastGroundRotation);
+                    var deltaVelocity = velocity - lastGroundVelocity;
+                    var deltaRotation = groundObject.rotation * Quaternion.Inverse(lastGroundRotation);
 
-                    var offset = Rigidbody.position - lastGroundPosition;
-                    deltaPosition += deltaRotation * offset - offset;
+                    var force = deltaVelocity / Time.deltaTime;
                     
-                    Rigidbody.MovePosition(Rigidbody.position + deltaPosition);
+                    Rigidbody.AddForce(force, ForceMode.Acceleration);
                     Rigidbody.MoveRotation(Rigidbody.rotation * deltaRotation);
                 }
 
-                lastGroundPosition = groundObject.position;
+                lastGroundVelocity = velocity;
                 lastGroundRotation = groundObject.rotation;
             }
 
