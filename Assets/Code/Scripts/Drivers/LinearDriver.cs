@@ -1,80 +1,51 @@
-using TMPro;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 
 namespace FR8.Drivers
 {
-    [SelectionBase, DisallowMultipleComponent]
-    public abstract class LinearDriver : MonoBehaviour, IDriver
+    public class LinearDriver : Driver
     {
-        [SerializeField] protected string displayName = "Linear Driver";
-        [SerializeField] private float nudgeStep = 8;
-        [SerializeField] private float smoothTime = 0.06f;
-
         [Space]
+        // The minimum and maximum values used when displaying the value of this driver.
         [SerializeField] protected Vector2 displayRange = new(0.0f, 100.0f);
-        [SerializeField] protected string displayTemplate = "{0:N1}%";
-
-        [Space]
-        [SerializeField] protected TMP_Text displayText;
-
-        protected DriverGroup driverGroup;
-
-        private float internalValue;
+        // The string template used when displaying the value.
+        // The Value can be inserted with {0}
+        // Uses C# Standard Numeric Format Strings - see https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings
+        [SerializeField] protected string displayTemplate = "{0:N0}%";
         
-        private float displayValue, velocity;
+        [Space]
+        [SerializeField] private bool clamped = true;
+        [SerializeField] private int steps = 10;
+        [SerializeField] private bool forceStep;
+        [SerializeField] private Vector2 valueRange = Vector2.up;
+        
+        public override string DisplayValue => string.Format(displayTemplate, Mathf.LerpUnclamped(displayRange.x, displayRange.y, Value));
 
-        public abstract bool Limited { get; }
-        public bool CanInteract => true;
-        public virtual string DisplayName => displayName;
-        public virtual string DisplayValue => string.Format(displayTemplate, Mathf.LerpUnclamped(displayRange.x, displayRange.y, Value));
-        public virtual float Value
+        public override float Value
         {
-            get => driverGroup ? driverGroup.Value : internalValue;
+            get => base.Value;
             set
             {
-                var v = Limited ? Mathf.Clamp01(value) : value;
-                
-                if (driverGroup) internalValue = driverGroup.SetValue(v);
-                else
+                var v = value;
+                if (forceStep && steps > 0)
                 {
-                    internalValue = v;
-                    ValueUpdated();
+                    var p = Mathf.InverseLerp(valueRange.x, valueRange.y, v);
+                    p = Mathf.Round(p * steps) / steps;
+                    v = Mathf.Lerp(valueRange.x, valueRange.y, p);
                 }
+
+                if (clamped)
+                {
+                    v = Mathf.Clamp(v, valueRange.x, valueRange.y);
+                }
+                
+                base.Value = v;
             }
         }
 
-        public void Nudge(int direction)
+        public override void Nudge(int direction)
         {
-            Value += direction * 1.0f / nudgeStep;
-        }
-
-        public virtual void Press() { }
-        
-        public abstract void BeginDrag(Ray ray);
-        public abstract void ContinueDrag(Ray ray);
-
-        private void Update()
-        {
-            displayValue = Mathf.SmoothDamp(displayValue, Value, ref velocity, smoothTime);
-            DisplaySmoothedValue(displayValue);
-        }
-        
-        public virtual void ValueUpdated()
-        {
-            if (displayText) displayText.text = DisplayValue;
-        }
-
-        public virtual void DisplaySmoothedValue(float smoothedValue) { }
-
-        public void SetDriverGroup(DriverGroup group)
-        {
-            driverGroup = group;
-        }
-
-        protected virtual void OnValidate()
-        {
-            ValueUpdated();
+            var range = valueRange.y - valueRange.x;
+            Value += direction * range / steps;
         }
     }
 }
