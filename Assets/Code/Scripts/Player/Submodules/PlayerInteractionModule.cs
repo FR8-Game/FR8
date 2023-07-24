@@ -1,5 +1,6 @@
 using System;
 using FR8.Drivers;
+using FR8.Pickups;
 using FR8.Rendering;
 using TMPro;
 using UnityEngine;
@@ -24,6 +25,7 @@ namespace FR8.Player.Submodules
         private float dragDistance;
 
         private IInteractable lookingAt;
+        private PickupObject heldObject;
 
         public void Awake()
         {
@@ -46,6 +48,7 @@ namespace FR8.Player.Submodules
         {
             var ray = GetLookingRay();
             var newLookingAt = dragging ? lookingAt : GetLookingAt();
+            if (heldObject) newLookingAt = heldObject;
 
             if (newLookingAt != lookingAt)
             {
@@ -67,30 +70,60 @@ namespace FR8.Player.Submodules
             var alpha = $"<alpha={(lookingAt.CanInteract ? "#FF" : "#80")}>";
             readoutText.text = $"{alpha}{lookingAt.DisplayName}\n<size=66%>{lookingAt.DisplayValue}";
 
-            if (lookingAt.CanInteract)
+            if (heldObject)
             {
-                if (controller.Drag)
-                {
-                    if (dragging) lookingAt.ContinueDrag(ray);
-                    else lookingAt.BeginDrag(ray);
-                }
-
-                if (nudge != 0)
-                {
-                    lookingAt.Nudge(nudge);
-                    nudge = 0;
-                }
-
                 if (press)
                 {
-                    lookingAt.Press();
+                    heldObject = heldObject.Drop();
                     press = false;
+                }
+            }
+            else if (lookingAt.CanInteract)
+            {
+                switch (lookingAt)
+                {
+                    case IDriver driver:
+                        ProcessDriver(driver, ray);
+                        break;
+                    case PickupObject pickup:
+                        ProcessPickup(pickup);
+                        break;
                 }
             }
 
             nudge = 0;
             press = false;
             dragging = controller.Drag;
+        }
+
+        private void ProcessDriver(IDriver driver, Ray ray)
+        {
+            if (controller.Drag)
+            {
+                if (dragging) driver.ContinueDrag(ray);
+                else driver.BeginDrag(ray);
+            }
+
+            if (nudge != 0)
+            {
+                driver.Nudge(nudge);
+                nudge = 0;
+            }
+
+            if (press)
+            {
+                driver.Press();
+                press = false;
+            }
+        }
+
+        private void ProcessPickup(PickupObject pickup)
+        {
+            if (!press) return;
+
+            heldObject = pickup.Pickup(controller.CurrentAvatar as PlayerGroundedAvatar);
+                
+            press = false;
         }
 
         private IInteractable GetLookingAt()

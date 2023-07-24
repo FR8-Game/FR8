@@ -11,6 +11,8 @@ namespace FR8.Player.Submodules
         private const float YawRange = 180.0f - GimbalLockOffset;
         
         [SerializeField] private float fieldOfView = 70.0f;
+        [SerializeField] private float zoomFieldOfView = 35.0f;
+        [SerializeField] private float fovSmoothTime = 0.2f;
         [SerializeField] private float nearPlane = 0.2f;
         [SerializeField] private float farPlane = 1000.0f;
         
@@ -18,6 +20,8 @@ namespace FR8.Player.Submodules
         private Transform target;
         private float yaw;
         private bool cameraLocked;
+        
+        private float fovVelocity;
 
         private int cursorLockID;
         
@@ -41,7 +45,7 @@ namespace FR8.Player.Submodules
         {
             Cursor.Pop(ref cursorLockID);
         }
-
+        
         public void Update()
         {
             var controller = this.controller();
@@ -70,7 +74,7 @@ namespace FR8.Player.Submodules
 
             // Update additional camera variables.
             Camera.transform.position = target.position;
-            Camera.fieldOfView = fieldOfView;
+            Camera.fieldOfView = Mathf.SmoothDamp(Camera.fieldOfView, controller.ZoomCam ? zoomFieldOfView : fieldOfView, ref fovVelocity, fovSmoothTime);
             Camera.nearClipPlane = nearPlane;
             Camera.farClipPlane = farPlane;
         }

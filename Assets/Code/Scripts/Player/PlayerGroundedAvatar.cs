@@ -47,6 +47,8 @@ namespace FR8.Player
         private Vector3 lastGroundVelocity;
         private Quaternion lastGroundRotation = Quaternion.identity;
 
+        private Pose cameraPose;
+
         public Transform CameraTarget { get; private set; }
         public bool IsOnGround { get; private set; }
         public RaycastHit GroundHit { get; private set; }
@@ -121,10 +123,7 @@ namespace FR8.Player
         private void Update()
         {
             if (Controller.JumpTriggered) jumpTrigger = true;
-        }
 
-        private void LateUpdate()
-        {
             cameraController.Update();
         }
 
@@ -133,12 +132,17 @@ namespace FR8.Player
             Rigidbody.rotation = Quaternion.Euler(0.0f, CameraTarget.eulerAngles.y, 0.0f);
             CameraTarget.localRotation = Quaternion.identity;
             CameraTarget.localPosition = cameraOffset;
-
+            
             CheckForGround();
             Move();
             Jump();
             ApplyGravity();
             MoveWithGround();
+        }
+
+        private void GetCameraPose()
+        {
+            if (!IsOnGround) return;
         }
 
         #endregion
@@ -228,12 +232,12 @@ namespace FR8.Player
                 if (groundObject == lastGroundObject)
                 {
                     var deltaVelocity = velocity - lastGroundVelocity;
-                    var deltaRotation = groundObject.rotation * Quaternion.Inverse(lastGroundRotation);
+                    var deltaRotation = groundObject.angularVelocity * Mathf.Rad2Deg * Time.deltaTime;
 
                     var force = deltaVelocity / Time.deltaTime;
                     
                     Rigidbody.AddForce(force, ForceMode.Acceleration);
-                    Rigidbody.MoveRotation(Rigidbody.rotation * deltaRotation);
+                    Rigidbody.MoveRotation(Rigidbody.rotation * Quaternion.Euler(deltaRotation));
                 }
 
                 lastGroundVelocity = velocity;

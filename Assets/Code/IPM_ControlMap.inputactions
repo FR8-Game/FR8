@@ -94,6 +94,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ZoomCam",
+                    "type": "Button",
+                    "id": "a4e4aa6f-2fdc-4201-a1d8-21b29f0ed69c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -371,6 +380,17 @@
                     "action": "Roll",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "fbfaed3f-0c12-4b44-8085-c419572e2afa",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ZoomCam",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }

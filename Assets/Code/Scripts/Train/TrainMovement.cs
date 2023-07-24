@@ -14,9 +14,18 @@ namespace FR8.Train
         [SerializeField] private float referenceWeight;
         [SerializeField] private float maxSpeed = 80.0f;
         [SerializeField] private float maxSpeedBlending = 10.0f;
+        [SerializeField] private float engineSmoothTime = 1.0f;
 
         [Space]
         [SerializeField] private float brakeConstant = 4.0f;
+
+        [Space]
+        [SerializeField] private float cornerLean = 0.1f;
+
+        [Space]
+        [SerializeField] private float retentionSpring = 100.0f;
+        [SerializeField] private float retentionDamping = 10.0f;
+        [SerializeField] private float retentionTorqueConstant = 1.0f;
 
         [Space]
         [SerializeField] private SplineContainer track;
@@ -32,6 +41,9 @@ namespace FR8.Train
 
         private Transform frontWheelAssembly;
         private Transform rearWheelAssembly;
+
+        private float engineVelocity;
+        private float enginePower;
 
         public Vector3 DriverDirection => frontWheelAssembly ? frontWheelAssembly.transform.forward : transform.forward;
         public Rigidbody Rigidbody { get; private set; }
@@ -92,7 +104,9 @@ namespace FR8.Train
 
         private void ApplyThrottle()
         {
-            var force = DriverDirection * Gear * Throttle * ToMps(acceleration);
+            enginePower = Mathf.SmoothDamp(enginePower, Throttle, ref engineVelocity, engineSmoothTime);
+
+            var force = DriverDirection * Gear * enginePower * ToMps(acceleration);
             var fwdSpeed = Mathf.Abs(GetForwardSpeed());
             var slowdown = Mathf.InverseLerp(ToMps(maxSpeed), ToMps(maxSpeed - maxSpeedBlending), fwdSpeed);
             force *= slowdown;
@@ -129,13 +143,13 @@ namespace FR8.Train
             var (frontPosition, frontTangent) = pointOnSpline(oldFrontPosition);
             frontWheelAssembly.transform.rotation = Quaternion.LookRotation(frontTangent, Vector3.up);
 
-            var force = (frontPosition - oldFrontPosition) / Time.deltaTime;
+            var force = (frontPosition - oldFrontPosition) * retentionSpring;
 
             var normalVelocity = Rigidbody.velocity;
             normalVelocity -= DriverDirection * Vector3.Dot(DriverDirection, Rigidbody.velocity);
-            force -= normalVelocity;
+            force -= normalVelocity * retentionDamping;
 
-            Rigidbody.AddForce(force, ForceMode.VelocityChange);
+            Rigidbody.AddForce(force, ForceMode.Acceleration);
 
             // Lineup rear wheel assembly as best as possible.
             var rearPosition = rearWheelAssembly.position;
@@ -146,19 +160,21 @@ namespace FR8.Train
                 (rearPosition, rearTangent) = pointOnSpline(rearPosition);
                 rearPosition = (rearPosition - frontPosition).normalized * distance + frontPosition;
             }
-
+            
             rearWheelAssembly.rotation = Quaternion.LookRotation(rearTangent, Vector3.up);
 
+            var lean = Mathf.Asin(Vector3.Dot(transform.right, frontTangent)) * cornerLean;
+            
             var direction = (frontPosition - rearPosition).normalized;
-            var rotation = Quaternion.LookRotation(direction, Vector3.up);
+            var rotation = Quaternion.LookRotation(direction, Vector3.up) * Quaternion.Euler(Vector3.forward * lean);
             (rotation * Quaternion.Inverse(Rigidbody.rotation)).ToAngleAxis(out var angle, out var axis);
             
             if (angle > 180.0f) angle -= 360.0f; 
             axis.Normalize();
             if (!float.IsFinite(axis.x) || !float.IsFinite(axis.y) || !float.IsFinite(axis.z)) axis = Vector3.zero;
             
-            var torque = axis * angle * Mathf.Deg2Rad / Time.deltaTime - Rigidbody.angularVelocity;
-            Rigidbody.AddTorque(torque, ForceMode.VelocityChange);
+            var torque = (axis * angle * Mathf.Deg2Rad * retentionSpring - Rigidbody.angularVelocity * retentionDamping) * retentionTorqueConstant;
+            Rigidbody.AddTorque(torque, ForceMode.Acceleration);
 
             // Local Functions
             (Vector3, Vector3) pointOnSpline(Vector3 position)
