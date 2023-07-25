@@ -1,7 +1,12 @@
 ﻿using System.Collections.Generic;
 using FR8.Splines;
 using UnityEngine;
+using System.Linq;
 using Array = FR8.Utility.Array;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace FR8.Track
 {
@@ -22,19 +27,27 @@ namespace FR8.Track
             Bake();
         }
 
-        private void OnDrawGizmosSelected()
+        private void OnDrawGizmos()
         {
+            if (!Selection.gameObjects.FirstOrDefault(e => e.GetComponentInParent<TrackSegment>())) return;
+
             Bake();
+
             Gizmos.color = Color.yellow;
 
             for (var i = 0; i < segments.Count - 1; i++)
             {
                 Gizmos.DrawLine(segments[i], segments[i + 1]);
             }
-            
-            Gizmos.DrawSphere(knots[0].position, 1.0f);
-            Gizmos.DrawSphere(knots[^1].position, 1.0f);
-            
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            Bake();
+
+            Gizmos.DrawWireSphere(knots[0].position, TrackData.MergeDistance);
+            Gizmos.DrawWireSphere(knots[^1].position, TrackData.MergeDistance);
+
             Gizmos.color = new Color(1.0f, 1.0f, 1.0f, 0.4f);
             for (var i = 0; i < knots.Count - 1; i++)
             {
@@ -75,7 +88,7 @@ namespace FR8.Track
                 knots.Add(child);
             }
         }
-        
+
         public Vector3 GetKnot(int index)
         {
             if (closedLoop) return Array.IndexLoop(knots, index).position;
