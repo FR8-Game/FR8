@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace FR8
+namespace FR8.ProcGen
 {
     [SelectionBase]
     [DisallowMultipleComponent]

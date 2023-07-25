@@ -1,5 +1,8 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+using UnityEngine.Windows.WebCam;
 using Button = UnityEngine.UI.Button;
 using Cursor = FR8.Utility.Cursor;
 
@@ -29,7 +32,13 @@ namespace FR8.UI
             UIUtility.ButtonPrefab = buttonPrefab;
 
             UIUtility.Button(transform, "Resume", TogglePause);
+            UIUtility.Button(transform, "Reload Scene", ReloadScene);
             UIUtility.Button(transform, "Quit To Menu", QuitModal);
+        }
+
+        private void OnDestroy()
+        {
+            pauseAction.Dispose();
         }
 
         private void TogglePause()
@@ -57,6 +66,11 @@ namespace FR8.UI
             Pause.Pop();
         }
 
+        private void ReloadScene()
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+        
         private void QuitModal()
         {
             if (modalPrefab) modalPrefab.Create("Quit Game", "Are you sure you want to quit the game?").AddButton("Quit", quit).AddCancelButton();
