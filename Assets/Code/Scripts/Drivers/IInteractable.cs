@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace FR8.Drivers
+﻿namespace FR8.Drivers
 {
     public interface IInteractable : IBehaviour
     {
@@ -8,11 +6,5 @@ namespace FR8.Drivers
         
         string DisplayName { get; }
         string DisplayValue { get; }
-        
-        void Nudge(int direction);
-        void Press();
-
-        void BeginDrag(Ray ray);
-        void ContinueDrag(Ray ray);
     }
 }

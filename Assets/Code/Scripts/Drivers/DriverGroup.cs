@@ -7,15 +7,13 @@ namespace FR8.Drivers
     [SelectionBase, DisallowMultipleComponent]
     public class DriverGroup : MonoBehaviour
     {
+        [SerializeField] private string displayName;
         [SerializeField] private float defaultValue;
-        [SerializeField] private int steps = 0;
-        [SerializeField] private bool limit = true;
-        [SerializeField] private float min = 0.0f;
-        [SerializeField] private float max = 1.0f;
 
         private List<IDriver> drivers = new();
         private List<IDrivable> drivables = new();
 
+        public string GroupName => string.IsNullOrWhiteSpace(displayName) ? gameObject.name : displayName;
         public float Value { get; private set; }
 
         private void Awake()
@@ -34,10 +32,10 @@ namespace FR8.Drivers
             SetValue(defaultValue);
         }
 
-        public float SetValue(float newValue)
+        public void SetValue(float newValue)
         {
-            Value = ValidateValue(newValue);
-
+            Value = newValue;
+            
             foreach (var driver in drivers)
             {
                 driver.ValueUpdated();
@@ -45,25 +43,8 @@ namespace FR8.Drivers
 
             foreach (var drivable in drivables)
             {
-                drivable.SetValue(Value);
+                drivable.SetValue(this, Value);
             }
-            
-            return Value;
-        }
-
-        private float ValidateValue(float newValue)
-        {
-            if (steps > 0)
-            {
-                newValue = Mathf.Round(newValue * steps) / steps;
-            }
-
-            if (limit)
-            {
-                newValue = Mathf.Clamp(newValue, min, max);
-            }
-
-            return newValue;
         }
     }
 }

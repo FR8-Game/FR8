@@ -35,6 +35,7 @@ Shader "Hidden/Fog"
             {
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
+                float3 direction : VAR_DIRECTION;
             };
 
             static const float4 vertices[] =
@@ -58,11 +59,15 @@ Shader "Hidden/Fog"
                 o.vertex = vertices[input.id];
                 o.uv = (o.vertex.xy + 1) / 2;
                 o.uv.y = 1 - o.uv.y;
+                o.direction = mul(UNITY_MATRIX_I_VP, o.vertex);
                 return o;
             }
 
             float3 _Color;
             float _Value;
+
+            TEXTURECUBE(_Noise);
+            SAMPLER(sampler_Noise);
 
             float4 frag(Varyings input) : SV_Target
             {
@@ -73,7 +78,7 @@ Shader "Hidden/Fog"
                 float fog = pow(2.71, dist / 1000.0 * _Value) - 1.0;
                 fog = clamp(fog, 0.0, 1.0);
                 clip(fog);
-
+                
                 return float4(_Color, fog);
             }
             ENDHLSL
