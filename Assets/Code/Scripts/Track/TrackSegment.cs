@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
 using FR8.Splines;
 using UnityEngine;
-using System.Linq;
 using Array = FR8.Utility.Array;
 
 #if UNITY_EDITOR
-using UnityEditor;
 #endif
 
 namespace FR8.Track
@@ -22,6 +21,8 @@ namespace FR8.Track
 
         public List<Transform> Knots => knots;
 
+        public static readonly Spline.SplineProfile SplineProfile = Spline.CatmullRom;
+        
         private void Awake()
         {
             Bake();
@@ -29,8 +30,6 @@ namespace FR8.Track
 
         private void OnDrawGizmos()
         {
-            if (!Selection.gameObjects.FirstOrDefault(e => e.GetComponentInParent<TrackSegment>())) return;
-
             Bake();
 
             Gizmos.color = Color.yellow;
@@ -45,8 +44,10 @@ namespace FR8.Track
         {
             Bake();
 
-            Gizmos.DrawWireSphere(knots[0].position, TrackData.MergeDistance);
-            Gizmos.DrawWireSphere(knots[^1].position, TrackData.MergeDistance);
+            if (knots.Count < 4) return;
+             
+            Gizmos.DrawWireSphere(knots[0].position, 2.0f);
+            Gizmos.DrawWireSphere(knots[^1].position, 2.0f);
 
             Gizmos.color = new Color(1.0f, 1.0f, 1.0f, 0.4f);
             for (var i = 0; i < knots.Count - 1; i++)
@@ -87,6 +88,12 @@ namespace FR8.Track
             {
                 knots.Add(child);
             }
+
+            var junction = transform.parent ? transform.parent.GetComponent<TrackJunction>() : null;
+            if (!junction) return;
+
+            junction.Setup();
+            knots.AddRange(junction.BranchKnots);
         }
 
         public Vector3 GetKnot(int index)
@@ -125,7 +132,7 @@ namespace FR8.Track
             var p2 = GetKnot(i0 + 2);
             var p3 = GetKnot(i0 + 3);
 
-            return Spline.CatmullRom.Evaluate(p0, p1, p2, p3, t - i0);
+            return SplineProfile(p0, p1, p2, p3).EvaluatePoint(t - i0);
         }
 
         public Vector3 ByDistance(float distance)
@@ -142,30 +149,6 @@ namespace FR8.Track
             }
 
             return segments[^1];
-        }
-
-        public Vector3 ClosestPoint(Vector3 point)
-        {
-            var ai = 0;
-            var bi = 0;
-            var d0 = float.MaxValue;
-            for (var i = 0; i < segments.Count; i++)
-            {
-                var d1 = (segments[i] - point).magnitude;
-                if (d1 > d0) continue;
-
-                bi = ai;
-                ai = i;
-                d0 = d1;
-            }
-
-            var a = segments[ai];
-            var b = segments[bi];
-
-            var v0 = (point - a).normalized;
-            var v1 = (b - a).normalized;
-            var p = Vector3.Dot(v0, v1);
-            return Vector3.Lerp(a, b, p);
         }
 
         public void OnValidate()

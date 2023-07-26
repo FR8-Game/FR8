@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using FR8.Utility;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace FR8.Train
 {

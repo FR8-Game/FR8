@@ -1,12 +1,6 @@
-﻿using System;
-using System.Drawing.Drawing2D;
-using FR8.Splines;
-using FR8.Track;
+﻿using FR8.Track;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering.VirtualTexturing;
-using UnityEngine.UIElements;
-using UnityEngine.XR;
 
 namespace FR8Editor.Inspector
 {
@@ -22,7 +16,7 @@ namespace FR8Editor.Inspector
 
             var transform = trackSegment.transform;
 
-            if (GUILayout.Button("Recenter", GUILayout.Height(30)))
+            if (GUILayout.Button("Zero Origin", GUILayout.Height(30)))
             {
                 Undo.RecordObject(transform, "Recenter Track");
                 
@@ -36,7 +30,7 @@ namespace FR8Editor.Inspector
                     center += positions[i] / trackSegment.Knots.Count;
                 }
 
-                transform.position = center;
+                transform.position = Vector3.zero;
                 
                 for (var i = 0; i < trackSegment.Knots.Count; i++)
                 { 
@@ -51,11 +45,13 @@ namespace FR8Editor.Inspector
                     var point = new GameObject($"Handle.{trackSegment.Knots.Count}").transform;
                     point.SetParent(transform);
                     point.SetAsLastSibling();
+                    point.name = $"Knot.{point.GetSiblingIndex()}";
                     point.localPosition = Vector3.zero;
                 }
                 else
                 {
-                    Instantiate(trackSegment.Knots[transform.childCount - 1], transform);
+                    var point = Instantiate(trackSegment.Knots[^1], transform);
+                    point.name = $"Knot.{point.GetSiblingIndex()}";
                 }
 
                 trackSegment.OnValidate();

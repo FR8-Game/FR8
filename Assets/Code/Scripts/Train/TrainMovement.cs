@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using FR8.Track;
 using UnityEngine;
 using UnityEngine.Splines;
 
@@ -20,8 +21,7 @@ namespace FR8.Train
         [SerializeField] protected float retentionTorqueConstant = 4.0f;
 
         [Space]
-        [SerializeField] protected SplineContainer track;
-        [SerializeField] protected int currentSplineIndex;
+        [SerializeField] protected TrackSegment track;
 
         [Space]
         [SerializeField] protected int curveSampleIterations = 15;
@@ -69,7 +69,6 @@ namespace FR8.Train
         {
             // Calculate pose of front wheel assembly
             var oldFrontPosition = frontWheelAssembly.position;
-            var spline = track.Splines[currentSplineIndex];
             var (frontPosition, frontTangent) = pointOnSpline(oldFrontPosition);
             frontTangent.Normalize();
             frontWheelAssembly.transform.rotation = Quaternion.LookRotation(frontTangent, Vector3.up);
@@ -117,6 +116,8 @@ namespace FR8.Train
             // Local Functions
             (Vector3, Vector3) pointOnSpline(Vector3 position)
             {
+                var t = track.ClosestPoint(position);
+                var pointOnSpline = track. 
                 SplineUtility.GetNearestPoint(spline, position, out var pointOnSpline, out var t);
                 pointOnSpline = track.transform.TransformPoint(pointOnSpline);
 

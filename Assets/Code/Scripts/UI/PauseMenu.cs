@@ -1,8 +1,6 @@
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using UnityEngine.Windows.WebCam;
 using Button = UnityEngine.UI.Button;
 using Cursor = FR8.Utility.Cursor;
 
