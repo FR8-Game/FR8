@@ -20,54 +20,22 @@ namespace FR8Editor.Inspector
             {
                 Undo.RecordObject(transform, "Recenter Track");
                 
-                var positions = new Vector3[trackSegment.Knots.Count];
-                var center = Vector3.zero;
                 for (var i = 0; i < trackSegment.Knots.Count; i++)
                 {
-                    var child = trackSegment.Knots[i];
-                    Undo.RecordObject(child, "Recenter Track");
-                    positions[i] = child.position;
-                    center += positions[i] / trackSegment.Knots.Count;
+                    trackSegment.Knots[i] += transform.position;
                 }
 
                 transform.position = Vector3.zero;
-                
-                for (var i = 0; i < trackSegment.Knots.Count; i++)
-                { 
-                    trackSegment.Knots[i].position = positions[i];
-                }
-            }
-            
-            if (GUILayout.Button("Add Point", GUILayout.Height(30)))
-            {
-                if (trackSegment.Knots.Count == 0)
-                {
-                    var point = new GameObject($"Handle.{trackSegment.Knots.Count}").transform;
-                    point.SetParent(transform);
-                    point.SetAsLastSibling();
-                    point.name = $"Knot.{point.GetSiblingIndex()}";
-                    point.localPosition = Vector3.zero;
-                }
-                else
-                {
-                    var point = Instantiate(trackSegment.Knots[^1], transform);
-                    point.name = $"Knot.{point.GetSiblingIndex()}";
-                }
-
-                trackSegment.OnValidate();
             }
         }
 
         private void OnSceneGUI()
         {
-            var trackSegment = (target as TrackSegment);
+            var trackSegment = target as TrackSegment;
 
             for (var i = 0; i < trackSegment.Knots.Count; i++)
             {
-                var child = trackSegment.Knots[i];
-                Undo.RecordObject(child, "Moved Track Segment Handle");
-
-                child.position = Handles.PositionHandle(child.position, Quaternion.identity);
+                trackSegment.Knots[i] = Handles.PositionHandle(trackSegment.Knots[i], Quaternion.identity);
             }
         }
     }

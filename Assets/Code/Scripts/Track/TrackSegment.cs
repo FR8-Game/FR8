@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Runtime.InteropServices.ComTypes;
+﻿using System;
+using System.Collections.Generic;
 using FR8.Splines;
 using UnityEngine;
-using Array = FR8.Utility.Array;
 
 #if UNITY_EDITOR
 #endif
@@ -12,151 +11,141 @@ namespace FR8.Track
     [SelectionBase, DisallowMultipleComponent]
     public class TrackSegment : MonoBehaviour
     {
-        [SerializeField] private bool closedLoop;
+        private const float MergeDistance = 10.0f;
+
+        [SerializeField] private List<Vector3> knots = new();
+        [SerializeField] private List<Connection> startConnections = new();
+        [SerializeField] private List<Connection> endConnections = new();
         [SerializeField] private int resolution = 100;
 
-        private List<Transform> knots = new();
-        private List<Vector3> segments = new();
         private float totalLength;
 
-        public List<Transform> Knots => knots;
+        public List<Vector3> Knots => knots;
 
         public static readonly Spline.SplineProfile SplineProfile = Spline.CatmullRom;
-        
-        private void Awake()
-        {
-            Bake();
-        }
 
         private void OnDrawGizmos()
         {
-            Bake();
-
             Gizmos.color = Color.yellow;
 
-            for (var i = 0; i < segments.Count - 1; i++)
+            for (var i = 0; i < resolution; i++)
             {
-                Gizmos.DrawLine(segments[i], segments[i + 1]);
+                var p0 = i / (float)resolution;
+                var p1 = (i + 1.0f) / resolution;
+
+                Gizmos.color = new Color(p0, 1.0f - p0, 0.0f, 1.0f);
+                Gizmos.DrawLine(SamplePoint(p0), SamplePoint(p1));
+            }
+
+            Gizmos.color = Color.white;
+            for (var i = 1; i < knots.Count - 1; i++)
+            {
+                var knot = knots[i];
+                Gizmos.DrawSphere(knot, 1.0f);
+            }
+
+            Gizmos.DrawCube(knots[0], Vector3.one * 2.0f * 5.0f);
+            Gizmos.DrawSphere(knots[^1], 5.0f);
+
+            Vector3 getOtherKnot(Connection connection, int offset)
+            {
+                return connection.connectedSegment.Knots[connection.type switch
+                {
+                    Connection.ConnectionType.End => ^(1 + offset),
+                    Connection.ConnectionType.Start => offset,
+                    _ => throw new ArgumentOutOfRangeException()
+                }];
             }
         }
 
         private void OnDrawGizmosSelected()
         {
-            Bake();
-
-            if (knots.Count < 4) return;
-             
-            Gizmos.DrawWireSphere(knots[0].position, 2.0f);
-            Gizmos.DrawWireSphere(knots[^1].position, 2.0f);
-
             Gizmos.color = new Color(1.0f, 1.0f, 1.0f, 0.4f);
             for (var i = 0; i < knots.Count - 1; i++)
             {
-                var p0 = knots[i].position;
-                var p1 = knots[i + 1].position;
+                var p0 = Knots[i];
+                var p1 = Knots[i + 1];
 
                 Gizmos.DrawLine(p0, p1);
             }
-
-            if (closedLoop) Gizmos.DrawLine(knots[^1].position, knots[0].position);
         }
 
-        public void Bake()
+        public Vector3 Knot(int i)
         {
-            FindKnots();
-            segments.Clear();
-
-            for (var i = 0; i < resolution; i++)
-            {
-                var p0 = i / (resolution - 1.0f);
-                segments.Add(Sample(p0));
-            }
-
-            if (closedLoop) segments.Add(segments[0]);
-
-            totalLength = 0.0f;
-            for (var i = 0; i < segments.Count - 1; i++)
-            {
-                totalLength += (segments[i] - segments[i + 1]).magnitude;
-            }
+            if (i == 0) return 2.0f * knots[0] - knots[1];
+            if (i == knots.Count + 1) return 2.0f * knots[^1] - knots[^2];
+            return knots[i - 1];
         }
 
-        public void FindKnots()
+        public int KnotCount() => knots.Count + 2;
+
+        public Vector3 SamplePoint(float t) => Sample(t, (spline, t) => spline.EvaluatePoint(t));
+        public Vector3 SampleTangent(float t) => Sample(t, (spline, t) => spline.EvaluateVelocity(t).normalized);
+
+        public T Sample<T>(float t, Func<Spline, float, T> callback) => Sample(Knot, KnotCount(), t, callback);
+
+        private static T Sample<T>(Func<int, Vector3> knots, int knotCount, float t, Func<Spline, float, T> callback)
         {
-            knots.Clear();
-            foreach (Transform child in transform)
-            {
-                knots.Add(child);
-            }
+            if (knotCount < 4) return default;
 
-            var junction = transform.parent ? transform.parent.GetComponent<TrackJunction>() : null;
-            if (!junction) return;
-
-            junction.Setup();
-            knots.AddRange(junction.BranchKnots);
-        }
-
-        public Vector3 GetKnot(int index)
-        {
-            if (closedLoop) return Array.IndexLoop(knots, index).position;
-
-            if (index == 0)
-            {
-                var p0 = knots[0].position;
-                var p1 = knots[1].position;
-                return 2.0f * p0 - p1;
-            }
-
-            if (index == knots.Count + 1)
-            {
-                var p0 = knots[^1].position;
-                var p1 = knots[^2].position;
-                return 2.0f * p0 - p1;
-            }
-
-            return knots[index - 1].position;
-        }
-
-        public Vector3 Sample(float t)
-        {
-            if (knots.Count < 4) return transform.position;
-
-            var knotCount = closedLoop ? knots.Count + 3 : knots.Count + 2;
+            if (t < 0.0f || t > 1.0f) Debug.Log(t);
 
             t *= knotCount - 3;
             var i0 = Mathf.FloorToInt(t);
             if (i0 >= knotCount - 4) i0 = knotCount - 4;
 
-            var p0 = GetKnot(i0);
-            var p1 = GetKnot(i0 + 1);
-            var p2 = GetKnot(i0 + 2);
-            var p3 = GetKnot(i0 + 3);
+            var p0 = knots(i0 + 0);
+            var p1 = knots(i0 + 1);
+            var p2 = knots(i0 + 2);
+            var p3 = knots(i0 + 3);
 
-            return SplineProfile(p0, p1, p2, p3).EvaluatePoint(t - i0);
-        }
-
-        public Vector3 ByDistance(float distance)
-        {
-            distance = (distance % totalLength + totalLength) % totalLength;
-            for (var i = 0; i < segments.Count - 1; i++)
-            {
-                var a = segments[i];
-                var b = segments[i + 1];
-                var segmentLength = (a - b).magnitude;
-                if (distance < segmentLength) return Vector3.Lerp(a, b, distance / segmentLength);
-
-                distance -= segmentLength;
-            }
-
-            return segments[^1];
+            return callback(SplineProfile(p0, p1, p2, p3), t - i0);
         }
 
         public void OnValidate()
         {
             resolution = Mathf.Max(resolution, knots.Count);
-            for (var i = 0; i < knots.Count; i++)
+            for (var i = 0; i < transform.childCount; i++)
             {
-                knots[i].name = $"Knot.{i}";
+                transform.GetChild(i).name = $"Knot.{i}";
+            }
+        }
+
+        public float GetClosestPoint(Vector3 point)
+        {
+            var res0 = 0.5f;
+            for (var i = 0; i < 4; i++)
+            {
+                var res1 = 0.0f;
+                var distance = float.MaxValue;
+                for (var j = 0; j < 10; j++)
+                {
+                    var p0 = j / 9.0f;
+                    var p1 = res0 + (p0 - 0.5f) / Mathf.Pow(10.0f, i);
+
+                    var other = SamplePoint(p1);
+                    var dist2 = (other - point).sqrMagnitude;
+                    if (dist2 > distance) continue;
+
+                    distance = dist2;
+                    res1 = p1;
+                }
+                res0 = res1;
+            }
+
+            return res0;
+        }
+
+        [System.Serializable]
+        public class Connection
+        {
+            public TrackSegment connectedSegment;
+            public ConnectionType type;
+
+            public enum ConnectionType
+            {
+                Start,
+                End,
             }
         }
     }

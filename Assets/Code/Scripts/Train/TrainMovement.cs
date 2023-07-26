@@ -1,7 +1,5 @@
-using System.Text.RegularExpressions;
 using FR8.Track;
 using UnityEngine;
-using UnityEngine.Splines;
 
 namespace FR8.Train
 {
@@ -21,16 +19,13 @@ namespace FR8.Train
         [SerializeField] protected float retentionTorqueConstant = 4.0f;
 
         [Space]
-        [SerializeField] protected TrackSegment track;
+        [SerializeField] protected TrackWalker walker;
 
         [Space]
         [SerializeField] protected int curveSampleIterations = 15;
 
-        private Transform frontWheelAssembly;
-        private Transform rearWheelAssembly;
-
         public Rigidbody Rigidbody { get; private set; }
-        public Vector3 DriverDirection => frontWheelAssembly ? frontWheelAssembly.transform.forward : transform.forward;
+        public Vector3 DriverDirection { get; private set; }
 
         private void Awake()
         {
@@ -44,10 +39,6 @@ namespace FR8.Train
             {
                 referenceWeight = Rigidbody.mass;
             }
-
-            var wheelGroup = Utility.Hierarchy.FindOrCreate(transform, new Regex(@".*wheel.*", RegexOptions.Compiled | RegexOptions.IgnoreCase), "Wheels");
-            frontWheelAssembly = Utility.Hierarchy.FindOrCreate(wheelGroup, new Regex(@".*front.*", RegexOptions.Compiled | RegexOptions.IgnoreCase), "Front Wheel Assembly");
-            rearWheelAssembly = Utility.Hierarchy.FindOrCreate(wheelGroup, new Regex(@".*rear.*", RegexOptions.Compiled | RegexOptions.IgnoreCase), "Rear Wheel Assembly");
         }
 
         protected virtual void FixedUpdate()
@@ -68,40 +59,28 @@ namespace FR8.Train
         private void ApplyCorrectiveForce()
         {
             // Calculate pose of front wheel assembly
-            var oldFrontPosition = frontWheelAssembly.position;
-            var (frontPosition, frontTangent) = pointOnSpline(oldFrontPosition);
-            frontTangent.Normalize();
-            frontWheelAssembly.transform.rotation = Quaternion.LookRotation(frontTangent, Vector3.up);
 
+            var position = walker.Position;
+            var direction = walker.Tangent;
+            
+            direction.Normalize();
+            DriverDirection = direction;
+            
             // Calculate alignment delta as a force
-            var force = (frontPosition - oldFrontPosition) * retentionSpring;
-
+            var force = (position - Rigidbody.position) * retentionSpring;
+            
             // Calculate damping force
             var normalVelocity = Rigidbody.velocity;
-            normalVelocity -= frontTangent * Vector3.Dot(frontTangent, Rigidbody.velocity);
+            normalVelocity -= direction * Vector3.Dot(direction, Rigidbody.velocity);
             force -= normalVelocity * retentionDamping;
-
+            
             // Apply Force
             Rigidbody.AddForce(force, ForceMode.Acceleration);
-
-            // Lineup rear wheel assembly as best as possible.
-            var rearPosition = rearWheelAssembly.position;
-            var rearTangent = DriverDirection;
-            var distance = (frontPosition - rearPosition).magnitude;
-            for (var i = 0; i < curveSampleIterations; i++)
-            {
-                (rearPosition, rearTangent) = pointOnSpline(rearPosition);
-                rearPosition = (rearPosition - frontPosition).normalized * distance + frontPosition;
-            }
             
-            // Rotate Rear Wheel Assembly to align with spline.
-            rearWheelAssembly.rotation = Quaternion.LookRotation(rearTangent, Vector3.up);
-
             // Calculate orientation of train
             var fwdSpeed = Mathf.Abs(GetForwardSpeed());
-            var lean = Mathf.Asin(Vector3.Dot(transform.right, frontTangent)) * cornerLean * fwdSpeed;
+            var lean = Mathf.Asin(Vector3.Dot(transform.right, direction)) * cornerLean * fwdSpeed;
             
-            var direction = (frontPosition - rearPosition).normalized;
             var rotation = Quaternion.LookRotation(direction, Vector3.up) * Quaternion.Euler(Vector3.forward * lean);
             
             // Calculate torque to resolve rotation
@@ -112,18 +91,6 @@ namespace FR8.Train
             
             var torque = (axis * angle * Mathf.Deg2Rad * retentionSpring - Rigidbody.angularVelocity * retentionDamping) * retentionTorqueConstant;
             Rigidbody.AddTorque(torque, ForceMode.Acceleration);
-
-            // Local Functions
-            (Vector3, Vector3) pointOnSpline(Vector3 position)
-            {
-                var t = track.ClosestPoint(position);
-                var pointOnSpline = track. 
-                SplineUtility.GetNearestPoint(spline, position, out var pointOnSpline, out var t);
-                pointOnSpline = track.transform.TransformPoint(pointOnSpline);
-
-                var tangent = track.transform.TransformDirection(spline.EvaluateTangent(t)).normalized;
-                return (pointOnSpline, tangent);
-            }
         }
 
         public float GetForwardSpeed() => Vector3.Dot(DriverDirection, Rigidbody.velocity);
@@ -131,16 +98,6 @@ namespace FR8.Train
         private void OnValidate()
         {
             Configure();
-        }
-
-        private void OnDrawGizmos()
-        {
-            if (!frontWheelAssembly || !rearWheelAssembly) return;
-
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(frontWheelAssembly.position, 1.0f);
-            Gizmos.DrawWireSphere(rearWheelAssembly.position, 1.0f);
-            Gizmos.DrawLine(rearWheelAssembly.position, frontWheelAssembly.position);
         }
 
         protected static float ToMps(float kmph) => kmph / 3.6f;
