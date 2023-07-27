@@ -12,6 +12,7 @@ namespace FR8.Train.Track
     {
         [SerializeField] private List<Vector3> knots = new();
         [SerializeField] private int resolution = 100;
+        [SerializeField] private bool closedLoop;
 
         private float totalLength;
 
@@ -57,23 +58,27 @@ namespace FR8.Train.Track
 
         public Vector3 Knot(int i)
         {
+            if (closedLoop)
+            {
+                return knots[(i % knots.Count + knots.Count) % knots.Count];
+            }
+            
             if (i == 0) return 2.0f * knots[0] - knots[1];
             if (i == knots.Count + 1) return 2.0f * knots[^1] - knots[^2];
             return knots[i - 1];
         }
 
-        public int KnotCount() => knots.Count + 2;
+        public int KnotCount() => closedLoop ? knots.Count + 3 : knots.Count + 2;
 
         public Vector3 SamplePoint(float t) => Sample(t, (spline, t) => spline.EvaluatePoint(t));
         public Vector3 SampleTangent(float t) => Sample(t, (spline, t) => spline.EvaluateVelocity(t).normalized);
 
-        public T Sample<T>(float t, Func<Spline, float, T> callback) => Sample(Knot, KnotCount(), t, callback);
+        public T Sample<T>(float t, Func<Spline, float, T> callback) => Sample(Knot, KnotCount(), closedLoop ? t % 1.0f : Mathf.Clamp01(t), callback);
 
         private static T Sample<T>(Func<int, Vector3> knots, int knotCount, float t, Func<Spline, float, T> callback)
         {
             if (knotCount < 4) return default;
 
-            t = Mathf.Clamp01(t);
             t *= knotCount - 3;
             var i0 = Mathf.FloorToInt(t);
             if (i0 >= knotCount - 4) i0 = knotCount - 4;

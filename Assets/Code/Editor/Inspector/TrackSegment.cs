@@ -33,6 +33,7 @@ namespace FR8Editor.Inspector
         {
             var trackSegment = target as TrackSegment;
 
+            Undo.RecordObject(trackSegment, "Moved Track Segment");
             for (var i = 0; i < trackSegment.Knots.Count; i++)
             {
                 trackSegment.Knots[i] = Handles.PositionHandle(trackSegment.Knots[i], Quaternion.identity);

@@ -1,14 +1,17 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using FR8.Interactions.Drivables;
+using FR8.Interactions.Drivers;
 using FR8.Utility;
 using UnityEngine;
 
 namespace FR8.Train
 {
-    public class CarriageConnector : MonoBehaviour
+    public class CarriageConnector : MonoBehaviour, IDrivable
     {
         [SerializeField] private CarriageConnectorSettings settings;
         [SerializeField] private Transform anchor;
+        [SerializeField] private bool engaged = true;
 
         private new Rigidbody rigidbody;
         private CarriageConnector connection;
@@ -32,6 +35,12 @@ namespace FR8.Train
 
         private void FixedUpdate()
         {
+            if (!engaged)
+            {
+                connection = null;
+                return;
+            }
+            
             if (connection)
             {
                 var displacement = connection.anchor.position - anchor.position;
@@ -51,7 +60,7 @@ namespace FR8.Train
 
                 var direction = connection.transform.position - transform.position;
                 var orientation = Quaternion.LookRotation(direction, rigidbody.transform.up);
-                transform.rotation = orientation;
+                //transform.rotation = orientation;
                 return;
             }
 
@@ -115,6 +124,11 @@ namespace FR8.Train
             Gizmos.DrawWireSphere(anchor.position, settings.forceRange);
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(anchor.position, settings.connectionDistance);
+        }
+
+        public void SetValue(DriverGroup group, float value)
+        {
+            engaged = value > 0.5f;
         }
     }
 }

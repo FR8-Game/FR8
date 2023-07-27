@@ -931,11 +931,11 @@ MonoBehaviour:
   retentionTorqueConstant: 4
   walker:
     currentSegment: {fileID: 0}
-  acceleration: 35
-  maxSpeed: 80
+  acceleration: 25
+  maxSpeed: 120
   maxSpeedBlending: 10
   engineSmoothTime: 1
-  brakeConstant: 4
+  brakeConstant: 30
 --- !u!1 &8669327852029670927
 GameObject:
   m_ObjectHideFlags: 0
@@ -1282,7 +1282,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2de40a509088b6e428ef0e687f8a2358, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: 1.25
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2de40a509088b6e428ef0e687f8a2358, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1318,19 +1318,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8411094509126589061, guid: 2de40a509088b6e428ef0e687f8a2358, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.98387045
+      value: 0.9844703
       objectReference: {fileID: 0}
     - target: {fileID: -8411094509126589061, guid: 2de40a509088b6e428ef0e687f8a2358, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.042956725
+      value: -0.025779238
       objectReference: {fileID: 0}
     - target: {fileID: -8411094509126589061, guid: 2de40a509088b6e428ef0e687f8a2358, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.17348297
+      value: -0.17358875
       objectReference: {fileID: 0}
     - target: {fileID: -8411094509126589061, guid: 2de40a509088b6e428ef0e687f8a2358, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.0075744325
+      value: -0.0045455773
       objectReference: {fileID: 0}
     - target: {fileID: -8411094509126589061, guid: 2de40a509088b6e428ef0e687f8a2358, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1362,19 +1362,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3177075594171693763, guid: 2de40a509088b6e428ef0e687f8a2358, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.98387045
+      value: 0.9844703
       objectReference: {fileID: 0}
     - target: {fileID: 3177075594171693763, guid: 2de40a509088b6e428ef0e687f8a2358, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.042956725
+      value: -0.025779238
       objectReference: {fileID: 0}
     - target: {fileID: 3177075594171693763, guid: 2de40a509088b6e428ef0e687f8a2358, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.17348288
+      value: 0.17358866
       objectReference: {fileID: 0}
     - target: {fileID: 3177075594171693763, guid: 2de40a509088b6e428ef0e687f8a2358, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.007574429
+      value: 0.004545575
       objectReference: {fileID: 0}
     - target: {fileID: 3177075594171693763, guid: 2de40a509088b6e428ef0e687f8a2358, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1818,6 +1818,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   settings: {fileID: 11400000, guid: 9826cd7c0dba1394b8a24b0110955138, type: 2}
   anchor: {fileID: 8853930767191054095}
+  engaged: 1
 --- !u!1 &6823709371480325566 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -6413956847900099605, guid: 2de40a509088b6e428ef0e687f8a2358, type: 3}
