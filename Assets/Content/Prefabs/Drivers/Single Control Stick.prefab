@@ -248,7 +248,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   handle: {fileID: 9047604343581456613}
   valueRange: {x: 0, y: 1}
-  smoothTime: 0.06
+  animationSpring:
+    springConstant: 350
+    dampingConstant: 25
+    clamped: 1
+    range: {x: 0, y: 1}
+    bounce: 0.4
+    currentPosition: 0.5
+    targetPosition: 0.5
+    velocity: 1.8433468e-26
   animatePosition: 0
   slidePoseAPosition: {x: 0, y: 0, z: 0}
   slidePoseBPosition: {x: 0, y: 0, z: 0}

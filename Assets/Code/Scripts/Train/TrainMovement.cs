@@ -1,4 +1,4 @@
-using FR8.Track;
+using FR8.Train.Track;
 using UnityEngine;
 
 namespace FR8.Train
@@ -21,9 +21,7 @@ namespace FR8.Train
         [Space]
         [SerializeField] protected TrackWalker walker;
 
-        [Space]
-        [SerializeField] protected int curveSampleIterations = 15;
-
+        public TrackWalker Walker => walker;
         public Rigidbody Rigidbody { get; private set; }
         public Vector3 DriverDirection { get; private set; }
 
@@ -59,11 +57,14 @@ namespace FR8.Train
         private void ApplyCorrectiveForce()
         {
             // Calculate pose of front wheel assembly
-
+            walker.Walk(Rigidbody.position);
             var position = walker.Position;
             var direction = walker.Tangent;
-            
             direction.Normalize();
+
+            var dot = Vector3.Dot(direction, transform.forward);
+            if (dot < 0.0f) direction = -direction;
+
             DriverDirection = direction;
             
             // Calculate alignment delta as a force
@@ -71,10 +72,10 @@ namespace FR8.Train
             
             // Calculate damping force
             var normalVelocity = Rigidbody.velocity;
-            normalVelocity -= direction * Vector3.Dot(direction, Rigidbody.velocity);
             force -= normalVelocity * retentionDamping;
             
             // Apply Force
+            force -= direction * Vector3.Dot(direction, force);
             Rigidbody.AddForce(force, ForceMode.Acceleration);
             
             // Calculate orientation of train
