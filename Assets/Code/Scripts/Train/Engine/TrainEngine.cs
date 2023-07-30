@@ -1,8 +1,6 @@
-using System;
 using FR8.Interactions.Drivers;
 using FR8.Train.Electrics;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace FR8.Train.Engine
 {
@@ -50,7 +48,7 @@ namespace FR8.Train.Engine
             power -= deltaPower;
             position = power / mass;
 
-            train.Rigidbody.AddForce(train.DriverDirection * deltaPower);
+            train.Rigidbody.AddForce(train.DriverDirection * train.Gear * deltaPower);
         }
 
         private void CalculateForcesAndIntegrate()

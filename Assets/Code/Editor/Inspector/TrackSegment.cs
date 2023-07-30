@@ -14,18 +14,42 @@ namespace FR8Editor.Inspector
             var trackSegment = target as TrackSegment;
             if (!trackSegment) return;
 
-            var transform = trackSegment.transform;
-
             if (GUILayout.Button("Zero Origin", GUILayout.Height(30)))
             {
-                Undo.RecordObject(transform, "Recenter Track");
-                
-                for (var i = 0; i < trackSegment.Knots.Count; i++)
-                {
-                    trackSegment.Knots[i] += transform.position;
-                }
+                ShiftTransform(trackSegment, Vector3.zero, "Zero Track Origin");
+            }
 
-                transform.position = Vector3.zero;
+            if (GUILayout.Button("Center Origin", GUILayout.Height(30)))
+            {
+                if (trackSegment.Knots.Count > 0)
+                {
+                    var bounds = new Bounds(trackSegment.transform.TransformPoint(trackSegment.Knots[0]), Vector3.zero);
+                    for (var i = 1; i < trackSegment.Knots.Count; i++)
+                    {
+                        bounds.Encapsulate(trackSegment.transform.TransformPoint(trackSegment.Knots[i]));
+                    }
+
+                    ShiftTransform(trackSegment, bounds.center, "Center Track Origin");
+                }
+            }
+        }
+
+        private void ShiftTransform(TrackSegment segment, Vector3 newPosition, string undoText)
+        {
+            Undo.RecordObjects(new Object[] { segment.transform, segment }, undoText);
+
+            var worldPoints = new Vector3[segment.Knots.Count];
+
+            for (var i = 0; i < worldPoints.Length; i++)
+            {
+                worldPoints[i] = segment.transform.TransformPoint(segment.Knots[i]);
+            }
+
+            segment.transform.position = newPosition;
+
+            for (var i = 0; i < worldPoints.Length; i++)
+            {
+                segment.Knots[i] = segment.transform.InverseTransformPoint(worldPoints[i]);
             }
         }
 
@@ -36,7 +60,9 @@ namespace FR8Editor.Inspector
             Undo.RecordObject(trackSegment, "Moved Track Segment");
             for (var i = 0; i < trackSegment.Knots.Count; i++)
             {
-                trackSegment.Knots[i] = Handles.PositionHandle(trackSegment.Knots[i], Quaternion.identity);
+                var worldPos = trackSegment.transform.TransformPoint(trackSegment.Knots[i]);
+                worldPos = Handles.PositionHandle(worldPos, Quaternion.identity);
+                trackSegment.Knots[i] = trackSegment.transform.InverseTransformPoint(worldPos);
             }
         }
     }

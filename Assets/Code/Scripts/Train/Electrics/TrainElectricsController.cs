@@ -21,7 +21,7 @@ namespace FR8.Train.Electrics
         {
             electrics = new List<TrainElectrics>(GetComponentsInChildren<TrainElectrics>());
 
-            foreach (var e in electrics) e.SetController(this).OnConnected();
+            foreach (var e in electrics) e.SetController(this).Connected = true;
         }
 
         private void FixedUpdate()
@@ -62,7 +62,7 @@ namespace FR8.Train.Electrics
             }
         }
 
-        public void ConnectFuzeGroup(int fuzeGroup) => UpdateFuzeGroup(fuzeGroup, e => e.OnConnected());
-        public void DisconnectFuzeGroup(int fuzeGroup) => UpdateFuzeGroup(fuzeGroup, e => e.OnDisconnected());
+        public void ConnectFuzeGroup(int fuzeGroup) => UpdateFuzeGroup(fuzeGroup, e => e.Connected = true);
+        public void DisconnectFuzeGroup(int fuzeGroup) => UpdateFuzeGroup(fuzeGroup, e => e.Connected = false);
     }
 }

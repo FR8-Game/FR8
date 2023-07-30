@@ -49,7 +49,7 @@ namespace FR8.Train.Track
                     var r = Quaternion.LookRotation(segment.SampleTangent(p2));
                     var v2 = r * new Vector3(v0.x, v0.y, 0.0f) + t;
 
-                    vertices.Add(v2);
+                    vertices.Add(transform.InverseTransformPoint(v2));
                 }
 
                 foreach (var n in baseMesh.normals)

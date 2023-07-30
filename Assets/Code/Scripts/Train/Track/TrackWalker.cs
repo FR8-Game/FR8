@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace FR8.Train.Track
 {
@@ -6,6 +7,9 @@ namespace FR8.Train.Track
     public class TrackWalker
     {
         [SerializeField] private TrackSegment currentSegment;
+        [SerializeField] private float t;
+
+        public Func<TrackSegment, Vector3, float> sampleMethod = (segment, point) => segment.GetClosestPoint(point);
 
         public TrackSegment CurrentSegment
         {
@@ -17,9 +21,9 @@ namespace FR8.Train.Track
         
         public void Walk(Vector3 newPosition)
         {
-            var closestPoint = currentSegment.GetClosestPoint(newPosition);
-            Position = currentSegment.SamplePoint(closestPoint);
-            Tangent = currentSegment.SampleTangent(closestPoint).normalized;
+            t = sampleMethod(currentSegment, newPosition);
+            Position = currentSegment.SamplePoint(t);
+            Tangent = currentSegment.SampleTangent(t).normalized;
         }
 
         public static implicit operator bool(TrackWalker walker)
