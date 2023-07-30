@@ -928,11 +928,12 @@ MonoBehaviour:
   drag: 0
   referenceWeight: 100000
   cornerLean: 0.6
-  retentionSpring: 100
-  retentionDamping: 10
-  retentionTorqueConstant: 2
+  retentionSpring: 2500
+  retentionDamping: 50
+  retentionTorqueConstant: 1
   walker:
     currentSegment: {fileID: 0}
+    t: 0
   brakeConstant: 30
 --- !u!114 &6888675464939285067
 MonoBehaviour:
@@ -946,10 +947,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c432484cd7fb304fadf5d84ad799439, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fuzeGroup: 0
   mass: 1000
   maxSpeed: 120
   acceleration: 100
-  drag: 7
+  maxSpeedPowerConsumptionMegawatts: 75
 --- !u!114 &1884765813156554468
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -963,6 +965,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   capacityMegaWattHours: 0
+  baselineGeneration: 150
 --- !u!1 &8669327852029670927
 GameObject:
   m_ObjectHideFlags: 0
@@ -1191,6 +1194,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8768518825676168198, guid: 84eb071d1983c9b488da3eaaad026c98, type: 3}
+      propertyPath: forceStep
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 9019526367603299604, guid: 84eb071d1983c9b488da3eaaad026c98, type: 3}
       propertyPath: m_Name
       value: Brake
@@ -1223,6 +1230,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3412095045141690939}
     m_Modifications:
+    - target: {fileID: 4671216957284717833, guid: 96a7328234520fc4291c06828e65678d, type: 3}
+      propertyPath: forceStep
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4920390440366103579, guid: 96a7328234520fc4291c06828e65678d, type: 3}
       propertyPath: m_Name
       value: Throttle

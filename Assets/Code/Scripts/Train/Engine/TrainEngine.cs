@@ -9,14 +9,12 @@ namespace FR8.Train.Engine
     [RequireComponent(typeof(TrainDrive))]
     public sealed class TrainEngine : TrainElectrics
     {
-        [SerializeField] private float mass;
         [SerializeField] private float maxSpeed;
         [SerializeField] private float acceleration;
-        [SerializeField] private float drag;
         [SerializeField] private float maxSpeedPowerConsumptionMegawatts = 75.0f;
 
-        private float position;
         private float velocity;
+        private float force;
         private DriverGroup throttleDriver;
         private TrainDrive train;
 
@@ -33,36 +31,10 @@ namespace FR8.Train.Engine
 
         private void FixedUpdate()
         {
-            CalculateForcesAndIntegrate();
-            TransferPower();
-        }
-
-        private void TransferPower()
-        {
-            var power = position * mass;
-            var trainPower = train.GetForwardSpeed() * train.Rigidbody.mass;
-            
-            var deltaPower = power - trainPower;
-            deltaPower = Mathf.Min(deltaPower, power);
-            
-            power -= deltaPower;
-            position = power / mass;
-
-            train.Rigidbody.AddForce(train.DriverDirection * train.Gear * deltaPower);
-        }
-
-        private void CalculateForcesAndIntegrate()
-        {
-            var maxPower = maxSpeed / 3.6f * train.Rigidbody.mass / mass;
-            
-            var force = 0.0f;
-            
-            force += Throttle * (maxPower - position) * acceleration;
-
-            force -= velocity * drag;
-
-            position += velocity * Time.deltaTime;
-            velocity += force * Time.deltaTime;
+            var fwdSpeed = train.GetForwardSpeed();
+            var maxSpeed = this.maxSpeed / 3.6f;
+            var force = (maxSpeed * train.Gear - fwdSpeed) / maxSpeed * acceleration * Throttle;
+            train.Rigidbody.AddForce(train.DriverDirection * force, ForceMode.Acceleration);
         }
 
         public override float CalculatePowerConsumptionMegawatts() => -Throttle * maxSpeedPowerConsumptionMegawatts;
