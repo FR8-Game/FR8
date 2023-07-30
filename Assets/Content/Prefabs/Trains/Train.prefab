@@ -872,6 +872,8 @@ GameObject:
   - component: {fileID: 8669327851989132187}
   - component: {fileID: 8669327851989132184}
   - component: {fileID: 8669327851989132186}
+  - component: {fileID: 6888675464939285067}
+  - component: {fileID: 1884765813156554468}
   m_Layer: 0
   m_Name: Train
   m_TagString: Untagged
@@ -928,14 +930,39 @@ MonoBehaviour:
   cornerLean: 0.6
   retentionSpring: 100
   retentionDamping: 10
-  retentionTorqueConstant: 4
+  retentionTorqueConstant: 2
   walker:
     currentSegment: {fileID: 0}
-  acceleration: 25
-  maxSpeed: 120
-  maxSpeedBlending: 10
-  engineSmoothTime: 1
   brakeConstant: 30
+--- !u!114 &6888675464939285067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8669327851989132185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c432484cd7fb304fadf5d84ad799439, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mass: 1000
+  maxSpeed: 120
+  acceleration: 100
+  drag: 7
+--- !u!114 &1884765813156554468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8669327851989132185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b2a6bc294147454e99b307823142596, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  capacityMegaWattHours: 0
 --- !u!1 &8669327852029670927
 GameObject:
   m_ObjectHideFlags: 0

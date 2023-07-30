@@ -5,15 +5,8 @@ namespace FR8.Train
 {
     public class TrainDrive : TrainMovement
     {
-        [SerializeField] private float acceleration = 4.0f;
-        [SerializeField] private float maxSpeed = 80.0f;
-        [SerializeField] private float maxSpeedBlending = 10.0f;
-        [SerializeField] private float engineSmoothTime = 1.0f;
-        
-        [Space]
         [SerializeField] private float brakeConstant = 4.0f;
         
-        private DriverGroup throttleDriver;
         private DriverGroup brakeDriver;
         private DriverGroup gearDriver;
         private DriverGroup speedometerDriver;
@@ -21,7 +14,6 @@ namespace FR8.Train
         private float engineVelocity;
         private float enginePower;
         
-        public float Throttle => throttleDriver ? throttleDriver.Value : 0.0f;
         public float Brake => brakeDriver ? brakeDriver.Value : 0.0f;
         public int Gear => gearDriver ? Mathf.RoundToInt(gearDriver.Value) : 0;
 
@@ -29,51 +21,23 @@ namespace FR8.Train
         {
             base.Configure();
             
-            acceleration = Mathf.Max(0.0f, acceleration);
             brakeConstant = Mathf.Max(0.0f, brakeConstant);
+
+            var findDriver = DriverGroup.Find(gameObject);
             
-            var drivers = GetComponentsInChildren<DriverGroup>();
-            foreach (var driver in drivers)
-            {
-                switch (driver.name)
-                {
-                    case "Throttle":
-                        throttleDriver = driver;
-                        break;
-                    case "Brake":
-                        brakeDriver = driver;
-                        break;
-                    case "Gear":
-                        gearDriver = driver;
-                        break;
-                    case "Speedometer":
-                        speedometerDriver = driver;
-                        break;
-                }
-            }
+            brakeDriver = findDriver("Brake");
+            gearDriver = findDriver("Gear");
+            speedometerDriver = findDriver("Speedometer");
         }
 
         protected override void FixedUpdate()
         {
-            ApplyThrottle();
             ApplyBrake();
             base.FixedUpdate();
             
             UpdateDriverGroups();
         }
 
-        private void ApplyThrottle()
-        {
-            enginePower = Mathf.SmoothDamp(enginePower, Throttle, ref engineVelocity, engineSmoothTime);
-
-            var force = DriverDirection * Gear * enginePower * ToMps(acceleration);
-            var fwdSpeed = Mathf.Abs(GetForwardSpeed());
-            var slowdown = Mathf.InverseLerp(ToMps(maxSpeed), ToMps(maxSpeed - maxSpeedBlending), fwdSpeed);
-            force *= slowdown;
-            
-            Rigidbody.AddForce(force * referenceWeight);
-        }
-        
         private void ApplyBrake()
         {
             var fwdSpeed = GetForwardSpeed();
@@ -87,7 +51,7 @@ namespace FR8.Train
         
         public void UpdateDriverGroups()
         {
-            var fwdSpeed = Mathf.Abs(ToKmpH(Vector3.Dot(DriverDirection, Rigidbody.velocity)));
+            var fwdSpeed = Mathf.Abs(ToKmpH(GetForwardSpeed()));
             speedometerDriver.SetValue(fwdSpeed);
         }
     }

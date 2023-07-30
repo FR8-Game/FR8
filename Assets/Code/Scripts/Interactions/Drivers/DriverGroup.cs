@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FR8.Interactions.Drivables;
 using UnityEngine;
 
@@ -35,7 +36,7 @@ namespace FR8.Interactions.Drivers
         public void SetValue(float newValue)
         {
             Value = newValue;
-            
+
             foreach (var driver in drivers)
             {
                 driver.ValueUpdated();
@@ -45,6 +46,20 @@ namespace FR8.Interactions.Drivers
             {
                 drivable.SetValue(this, Value);
             }
+        }
+
+        public static Func<string, DriverGroup> Find(GameObject root)
+        {
+            var drivers = root.GetComponentsInChildren<DriverGroup>();
+            return name =>
+            {
+                foreach (var driver in drivers)
+                {
+                    if (driver.name == name) return driver;
+                }
+
+                throw new NullReferenceException();
+            };
         }
     }
 }
