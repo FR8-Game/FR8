@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Cursor = FR8.Utility.Cursor;
 
 namespace FR8.Player.Submodules
@@ -21,6 +20,9 @@ namespace FR8.Player.Submodules
         private Transform target;
         private float yaw;
         private bool cameraLocked;
+        private bool wasCameraLocked;
+
+        private int lastCursorX, lastCursorY;
 
         private float fovVelocity;
 
@@ -51,22 +53,29 @@ namespace FR8.Player.Submodules
         {
             var controller = this.controller();
             if (!controller) return;
-
+            
             // Check if cursor is free, or camera has been grabbed.
             if (controller.FreeCam) cameraLocked = !cameraLocked;
 
-            if (controller.GrabCam)
-            {
-                Cursor.Change(cursorLockID, CursorLockMode.Locked);
-            }
-            else
+            var cameraLockedThisFrame = cameraLocked || controller.GrabCam;
+            if (cameraLockedThisFrame != wasCameraLocked)
             {
 #if UNITY_EDITOR
-                Cursor.Change(cursorLockID, cameraLocked ? CursorLockMode.Locked : CursorLockMode.None);
+                Cursor.Change(cursorLockID, cameraLockedThisFrame ? CursorLockMode.Locked : CursorLockMode.None);
 #else
-                Cursor.Change(cursorLockID, cameraLocked ? CursorLockMode.Locked : CursorLockMode.Confined);
+            Cursor.Change(cursorLockID, cameraLocked ? CursorLockMode.Locked : CursorLockMode.Confined);
 #endif
+                if (cameraLockedThisFrame)
+                {
+                    (lastCursorX, lastCursorY) = Cursor.GetPosition();
+                }
+                else
+                {
+                    Cursor.SetPosition(lastCursorX, lastCursorY);
+                }
             }
+            
+            wasCameraLocked = cameraLockedThisFrame;
 
             // Get delta rotation input from controller
             var delta = controller.LookFrameDelta;
