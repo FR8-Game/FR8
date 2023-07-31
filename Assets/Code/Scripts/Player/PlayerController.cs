@@ -25,7 +25,6 @@ namespace FR8.Player
         private InputActionReference moveInput;
         private InputActionReference jumpInput;
         private InputActionReference lookAction;
-        private InputActionReference rollAction;
         private InputActionReference crouchAction;
         private InputActionReference nudgeAction;
         private InputActionReference pressAction;
@@ -56,20 +55,18 @@ namespace FR8.Player
         public bool GrabCam => grabCamAction.Switch();
         public bool ZoomCam => zoomCamAction.Switch();
 
-        public Vector3 GetLookFrameDelta(bool forceMouseDelta)
+        public Vector2 GetLookFrameDelta(bool forceMouseDelta)
         {
             var fovSensitivity = Mathf.Tan(mainCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
             
-            var delta = Vector3.zero;
+            var delta = Vector2.zero;
 
-            delta += (Vector3)(lookAction.action?.ReadValue<Vector2>() * controllerSensitivity * Time.deltaTime ?? Vector2.zero);
+            delta += (lookAction.action?.ReadValue<Vector2>() * controllerSensitivity * Time.deltaTime ?? Vector2.zero);
             var mouse = Mouse.current;
             if (mouse != null && (Cursor.lockState == CursorLockMode.Locked || forceMouseDelta))
             {
-                delta += (Vector3)mouse.delta.ReadValue() * mouseSensitivity;
+                delta += mouse.delta.ReadValue() * mouseSensitivity;
             }
-
-            delta.z += (rollAction.action?.ReadValue<float>() ?? 0.0f) * rollSensitivity * Time.deltaTime;
 
             return delta * fovSensitivity;
         }
@@ -86,7 +83,6 @@ namespace FR8.Player
             moveInput = bind("Move");
             jumpInput = bind("Jump");
             lookAction = bind("Look");
-            rollAction = bind("Roll");
             crouchAction = bind("Crouch");
             nudgeAction = bind("Nudge");
             pressAction = bind("Press");

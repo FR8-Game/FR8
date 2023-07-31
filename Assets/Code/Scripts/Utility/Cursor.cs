@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace FR8.Utility
@@ -33,5 +35,21 @@ namespace FR8.Utility
         {
             UnityEngine.Cursor.lockState = LockStack.Count > 0 ? LockStack[^1] : CursorLockMode.None;
         }
+
+        public static (int, int) GetPosition()
+        {
+            GetCursorPos(out var pos);
+            return (pos.X, pos.Y);
+        }
+
+        public static void SetPosition(int x, int y)
+        {
+            SetCursorPos(x, y);
+        }
+        
+        [DllImport("user32.dll")]
+        private static extern bool GetCursorPos(out Point lpPoint);
+        [DllImport("user32.dll")]
+        private static extern bool SetCursorPos(int x, int y);
     }
 }
