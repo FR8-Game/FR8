@@ -34,6 +34,10 @@ namespace FR8.Train.Track
 
             var count = GetCount(segment);
 
+            var rnd = new System.Random(gameObject.GetInstanceID());
+            var vOffset = (float)rnd.NextDouble();
+            vOffset *= 0.01f;
+
             for (var i = 0; i < count; i++)
             {
                 var p0 = i / (float)count;
@@ -49,7 +53,7 @@ namespace FR8.Train.Track
                     var r = Quaternion.LookRotation(segment.SampleTangent(p2));
                     var v2 = r * new Vector3(v0.x, v0.y, 0.0f) + t;
 
-                    vertices.Add(transform.InverseTransformPoint(v2));
+                    vertices.Add(transform.InverseTransformPoint(v2 + Vector3.up * vOffset));
                 }
 
                 foreach (var n in baseMesh.normals)
