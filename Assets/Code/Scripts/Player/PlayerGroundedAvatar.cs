@@ -39,7 +39,7 @@ namespace FR8.Player
         [Header("Camera")]
         [SerializeField] private Vector3 cameraOffset = new(0.0f, 1.6f, 0.0f);
 
-        [SerializeField] private DiscreteFirstPersonCamera cameraController;
+        [SerializeField] private PlayerGroundedCamera cameraController;
 
         private bool jumpTrigger;
 
