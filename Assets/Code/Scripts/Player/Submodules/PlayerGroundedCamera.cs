@@ -1,11 +1,12 @@
 using System;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Cursor = FR8.Utility.Cursor;
 
 namespace FR8.Player.Submodules
 {
     [Serializable]
-    public class DiscreteFirstPersonCamera
+    public class PlayerGroundedCamera
     {
         private const float GimbalLockOffset = 0.1f;
         private const float YawRange = 180.0f - GimbalLockOffset;
