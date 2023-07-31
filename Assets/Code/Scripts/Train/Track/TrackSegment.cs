@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using FR8.Train.Splines;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace FR8.Train.Track
 {
     [SelectionBase, DisallowMultipleComponent]
@@ -52,11 +56,11 @@ namespace FR8.Train.Track
                 if (!trainMetadata.ContainsKey(train)) continue;
 
                 var knotPercent = GetKnotPercent(connection.knotIndex);
-                
+
                 var lastSign = (GetClosestPoint(trainMetadata[train]) - knotPercent) > 0.5f;
                 var sign = (GetClosestPoint(train.Rigidbody.position) - knotPercent) > 0.5f;
                 var switchSign = connection.handleScale > 0.0f;
-                
+
                 if (sign == switchSign && lastSign != switchSign)
                 {
                     train.Walker.CurrentSegment = this;
@@ -66,17 +70,18 @@ namespace FR8.Train.Track
 
         private void OnDrawGizmos()
         {
-            Gizmos.color = Color.yellow;
+            Handles.color = Color.yellow;
 
             for (var i = 0; i < resolution; i++)
             {
                 var p0 = i / (float)resolution;
                 var p1 = (i + 1.0f) / resolution;
 
-                Gizmos.color = new Color(p0, 1.0f - p0, 0.0f, 1.0f);
-                Gizmos.DrawLine(SamplePoint(p0), SamplePoint(p1));
+                Handles.color = new Color(p0, 1.0f - p0, 0.0f, 1.0f);
+                Handles.DrawAAPolyLine(SamplePoint(p0), SamplePoint(p1));
             }
 
+            Handles.color = Color.white;
             Gizmos.color = Color.white;
             for (var i = 1; i < knots.Count - 1; i++)
             {
@@ -90,15 +95,32 @@ namespace FR8.Train.Track
 
         private void OnDrawGizmosSelected()
         {
-            Gizmos.color = new Color(1.0f, 1.0f, 1.0f, 0.4f);
-            for (var i = 0; i < KnotCount() - 1; i++)
+            Handles.color = new Color(1.0f, 1.0f, 1.0f, 0.4f);
+            for (var i = 0; i < KnotCount(); i++)
             {
                 var p0 = Knot(i);
-                var p1 = Knot(i + 1);
 
-                Gizmos.DrawLine(p0, p1);
+                Handles.color = new Color(0.4f, 1.0f, 0.2f, 1.0f);
+                if (Physics.Raycast(p0, Vector3.down, out var hit) && hit.distance > 0.1f)
+                {
+                    Handles.DrawAAPolyLine(p0, hit.point);
+                    Handles.DrawWireArc(hit.point, Vector3.up, Vector3.right, 360.0f, 2.0f);
+                }
+
+                if (Physics.Raycast(p0, Vector3.up, out hit) && hit.distance > 0.1f)
+                {
+                    Handles.DrawAAPolyLine(p0, hit.point);
+                    Handles.DrawWireArc(hit.point, Vector3.up, Vector3.right, 360.0f, 2.0f);
+                }
+
+                if (i == KnotCount() - 1) continue;
+
+                var p1 = Knot(i + 1);
+                Handles.color = new Color(1.0f, 1.0f, 1.0f, 0.4f);
+                Handles.DrawAAPolyLine(p0, p1);
             }
 
+            Gizmos.color = Handles.color;
             if (startConnection)
             {
                 Gizmos.DrawSphere(Knot(0), 0.2f);
@@ -229,11 +251,11 @@ namespace FR8.Train.Track
         {
             return (index - 1.0f) / (KnotCount() - 3.0f);
         }
-        
+
         public int GetKnotIndex(float t)
         {
             t = Mathf.Clamp(t, 0.0f, 0.99999f);
-            
+
             var i = Mathf.FloorToInt(t * (KnotCount() - 2)) + 1;
             return i;
         }
@@ -252,7 +274,7 @@ namespace FR8.Train.Track
             public Vector3 KnotForwardTangent => Knot + Velocity;
             public Vector3 KnotBackTangent => Knot - Velocity;
             public Vector3 Velocity => segment.KnotVelocity(knotIndex) * handleScale;
-            
+
             public void OnValidate()
             {
                 if (segment)
