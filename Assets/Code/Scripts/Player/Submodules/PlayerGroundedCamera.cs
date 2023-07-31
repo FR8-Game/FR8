@@ -63,7 +63,7 @@ namespace FR8.Player.Submodules
 #if UNITY_EDITOR
                 Cursor.Change(cursorLockID, cameraLockedThisFrame ? CursorLockMode.Locked : CursorLockMode.None);
 #else
-            Cursor.Change(cursorLockID, cameraLocked ? CursorLockMode.Locked : CursorLockMode.Confined);
+                Cursor.Change(cursorLockID, cameraLocked ? CursorLockMode.Locked : CursorLockMode.Confined);
 #endif
                 if (cameraLockedThisFrame)
                 {

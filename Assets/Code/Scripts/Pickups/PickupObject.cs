@@ -4,12 +4,15 @@ using UnityEngine;
 
 namespace FR8.Pickups
 {
+    [SelectionBase]
+    [DisallowMultipleComponent]
     [RequireComponent(typeof(Rigidbody))]
     public class PickupObject : MonoBehaviour, IInteractable
     {
         [SerializeField] private string displayName;
-        [SerializeField] private Vector3 holdTranslation;
-        [SerializeField] private Vector3 holdRotation;
+        [SerializeField] private PickupPose pickupPose;
+        [SerializeField] private Vector3 additionalTranslation;
+        [SerializeField] private Vector3 additionalRotation;
 
         private new Rigidbody rigidbody;
         private PlayerGroundedAvatar target;
@@ -17,6 +20,8 @@ namespace FR8.Pickups
         public bool CanInteract => !target;
         public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
         public string DisplayValue => target ? "Drop" : "Pickup";
+        public Vector3 HoldTranslation => (pickupPose ? pickupPose.holdTranslation : Vector3.zero) + additionalTranslation;
+        public Quaternion HoldRotation => Quaternion.Euler(pickupPose ? pickupPose.holdRotation : Vector3.zero) * Quaternion.Euler(additionalRotation);
         
         private void Awake()
         {
@@ -26,8 +31,8 @@ namespace FR8.Pickups
         private void LateUpdate()
         {
             if (!target) return;
-            transform.position = target.CameraTarget.TransformPoint(holdTranslation);
-            transform.rotation = target.CameraTarget.rotation * Quaternion.Euler(holdRotation);
+            transform.position = target.CameraTarget.TransformPoint(HoldTranslation);
+            transform.rotation = target.CameraTarget.rotation * HoldRotation;
         }
 
         public PickupObject Pickup(PlayerGroundedAvatar target)
