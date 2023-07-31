@@ -3,8 +3,6 @@
 using UnityEngine;
 using UnityEditor;
 using System;
-using System.IO;
-using System.Collections.Generic;
 
 namespace Boxophobic.StyledGUI
 {

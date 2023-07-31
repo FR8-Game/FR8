@@ -31,6 +31,8 @@ namespace FR8.Train.Engine
 
         private void FixedUpdate()
         {
+            if (train.Gear == 0) return;
+            
             var fwdSpeed = train.GetForwardSpeed();
             var maxSpeed = this.maxSpeed / 3.6f;
             var force = (maxSpeed * train.Gear - fwdSpeed) / maxSpeed * acceleration * Throttle;

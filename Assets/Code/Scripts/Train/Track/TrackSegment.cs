@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using FR8.Train.Splines;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -23,6 +24,7 @@ namespace FR8.Train.Track
 
         private Dictionary<TrainMovement, Vector3> trainMetadata = new();
 
+        public int Resolution => resolution;
         public List<Vector3> Knots => knots;
 
         public static readonly Spline.SplineProfile SplineProfile = Spline.CatmullRom;
@@ -70,18 +72,18 @@ namespace FR8.Train.Track
 
         private void OnDrawGizmos()
         {
-            Handles.color = Color.yellow;
-
             for (var i = 0; i < resolution; i++)
             {
                 var p0 = i / (float)resolution;
                 var p1 = (i + 1.0f) / resolution;
 
-                Handles.color = new Color(p0, 1.0f - p0, 0.0f, 1.0f);
-                Handles.DrawAAPolyLine(SamplePoint(p0), SamplePoint(p1));
+                var range = p1 - p0;
+                p0 += range * 0.1f;
+                p1 -= range * 0.1f;
+                
+                GizmosDrawLine(SamplePoint(p0), SamplePoint(p1), new Color(1.0f, 0.6f, 0.1f, 1.0f), true);
             }
 
-            Handles.color = Color.white;
             Gizmos.color = Color.white;
             for (var i = 1; i < knots.Count - 1; i++)
             {
@@ -95,32 +97,33 @@ namespace FR8.Train.Track
 
         private void OnDrawGizmosSelected()
         {
-            Handles.color = new Color(1.0f, 1.0f, 1.0f, 0.4f);
-            for (var i = 0; i < KnotCount(); i++)
+            for (var i = 0; i < KnotCount() - 1; i++)
             {
                 var p0 = Knot(i);
-
-                Handles.color = new Color(0.4f, 1.0f, 0.2f, 1.0f);
-                if (Physics.Raycast(p0, Vector3.down, out var hit) && hit.distance > 0.1f)
-                {
-                    Handles.DrawAAPolyLine(p0, hit.point);
-                    Handles.DrawWireArc(hit.point, Vector3.up, Vector3.right, 360.0f, 2.0f);
-                }
-
-                if (Physics.Raycast(p0, Vector3.up, out hit) && hit.distance > 0.1f)
-                {
-                    Handles.DrawAAPolyLine(p0, hit.point);
-                    Handles.DrawWireArc(hit.point, Vector3.up, Vector3.right, 360.0f, 2.0f);
-                }
-
-                if (i == KnotCount() - 1) continue;
-
                 var p1 = Knot(i + 1);
-                Handles.color = new Color(1.0f, 1.0f, 1.0f, 0.4f);
-                Handles.DrawAAPolyLine(p0, p1);
+                GizmosDrawLine(p0, p1, new Color(1.0f, 1.0f, 1.0f, 0.4f), false);
             }
 
-            Gizmos.color = Handles.color;
+            for (var p = 0.0f; p < 1.0f; p += 3.0f / resolution)
+            {
+                var p0 = SamplePoint(p);
+
+                if (Physics.Raycast(p0, Vector3.down, out var hit))
+                {
+                    var radius = Mathf.Min(2.0f, hit.distance * 2.0f);
+                    GizmosDrawLine(p0, hit.point, new Color(0.4f, 1.0f, 0.2f, 1.0f), false);
+                    Handles.DrawWireArc(hit.point, Vector3.up, Vector3.right, 360.0f, radius);
+                }
+
+                if (Physics.Raycast(p0, Vector3.up, out hit))
+                {
+                    var radius = Mathf.Min(2.0f, hit.distance * 20.0f);
+                    GizmosDrawLine(p0, hit.point, new Color(0.4f, 1.0f, 0.2f, 1.0f), false);
+                    Handles.DrawWireArc(hit.point, Vector3.up, Vector3.right, 360.0f, radius);
+                }
+            }
+            
+            Gizmos.color = new Color(1.0f, 1.0f, 1.0f, 0.4f);
             if (startConnection)
             {
                 Gizmos.DrawSphere(Knot(0), 0.2f);
@@ -134,6 +137,29 @@ namespace FR8.Train.Track
                 Gizmos.DrawSphere(Knot(KnotCount() - 2), 0.2f);
                 Gizmos.DrawSphere(Knot(KnotCount() - 3), 0.2f);
             }
+        }
+
+        private void GizmosDrawLine(Vector3 a, Vector3 b, Color color, bool occlude)
+        {
+            const float width = 4.0f;
+            
+#if UNITY_EDITOR
+            Handles.color = color;
+
+            if (occlude)
+            {
+                Handles.zTest = CompareFunction.LessEqual;
+                Handles.DrawAAPolyLine(width, a, b);
+                Handles.color = new Color(1.0f - color.r, 1.0f - color.g, 1.0f - color.b, color.a * 0.1f);
+                Handles.zTest = CompareFunction.Greater;
+                Handles.DrawAAPolyLine(width, a, b);
+            }
+            else
+            {
+                Handles.zTest = CompareFunction.Always;
+                Handles.DrawAAPolyLine(width, a, b);
+            }
+#endif
         }
 
         public Vector3 Knot(int i)
@@ -194,11 +220,6 @@ namespace FR8.Train.Track
         public void OnValidate()
         {
             resolution = Mathf.Max(resolution, knots.Count);
-            for (var i = 0; i < transform.childCount; i++)
-            {
-                transform.GetChild(i).name = $"Knot.{i}";
-            }
-
             startConnection.OnValidate();
             endConnection.OnValidate();
         }

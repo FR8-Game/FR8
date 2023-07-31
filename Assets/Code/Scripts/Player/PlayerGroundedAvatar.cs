@@ -14,8 +14,8 @@ namespace FR8.Player
 
         [Header("Movement")]
         [SerializeField] private float moveSpeed = 8.0f;
-
         [SerializeField] private float accelerationTime = 0.12f;
+        [SerializeField] private float sprintSpeedScalar = 2.0f;
 
         [Range(0.0f, 1.0f)]
         [SerializeField] private float airMovePenalty = 0.8f;
@@ -190,6 +190,9 @@ namespace FR8.Player
 
         private void Move()
         {
+            var moveSpeed = this.moveSpeed;
+            if (Controller.Sprint) moveSpeed *= sprintSpeedScalar;
+
             var input = Controller.Move;
             var target = transform.TransformDirection(input.x, 0.0f, input.z) * moveSpeed;
 
@@ -198,6 +201,7 @@ namespace FR8.Player
 
             var acceleration = 1.0f / accelerationTime;
             if (!IsOnGround) acceleration *= 1.0f - airMovePenalty;
+            if (Controller.Sprint) acceleration *= sprintSpeedScalar;
 
             var force = Vector3.ClampMagnitude(difference, moveSpeed) * acceleration;
             Rigidbody.AddForce(force, ForceMode.Acceleration);
