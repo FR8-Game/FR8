@@ -9,29 +9,29 @@ namespace FR8.Player.Submodules
     {
         private const float GimbalLockOffset = 0.1f;
         private const float YawRange = 180.0f - GimbalLockOffset;
-        
+
         [SerializeField] private float fieldOfView = 70.0f;
         [SerializeField] private float zoomFieldOfView = 35.0f;
         [SerializeField] private float fovSmoothTime = 0.2f;
         [SerializeField] private float nearPlane = 0.2f;
         [SerializeField] private float farPlane = 1000.0f;
-        
+
         private Func<PlayerController> controller;
         private Transform target;
         private float yaw;
         private bool cameraLocked;
-        
+
         private float fovVelocity;
 
         private int cursorLockID;
-        
+
         public Camera Camera { get; private set; }
-        
+
         public void Initialize(Func<PlayerController> controller, Transform target)
         {
             this.controller = controller;
             this.target = target;
-            
+
             Camera = Camera.main;
         }
 
@@ -45,12 +45,12 @@ namespace FR8.Player.Submodules
         {
             Cursor.Pop(ref cursorLockID);
         }
-        
+
         public void Update()
         {
             var controller = this.controller();
             if (!controller) return;
-            
+
             // Check if cursor is free, or camera has been grabbed.
             if (controller.FreeCam) cameraLocked = !cameraLocked;
 
@@ -60,12 +60,16 @@ namespace FR8.Player.Submodules
             }
             else
             {
+#if UNITY_EDITOR
+                Cursor.Change(cursorLockID, cameraLocked ? CursorLockMode.Locked : CursorLockMode.None);
+#else
                 Cursor.Change(cursorLockID, cameraLocked ? CursorLockMode.Locked : CursorLockMode.Confined);
+#endif
             }
 
             // Get delta rotation input from controller
             var delta = controller.LookFrameDelta;
-            
+
             // Apply input and clamp camera's yaw
             yaw = Mathf.Clamp(yaw + delta.y, -YawRange / 2.0f, YawRange / 2.0f);
 
