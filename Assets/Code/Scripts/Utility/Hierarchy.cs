@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace FR8.Utility
 {
@@ -6,8 +7,16 @@ namespace FR8.Utility
     {
         public static Transform FindOrCreate(Transform parent, string name)
         {
-            var group = parent.Find(name);
-            return group ? group : NewChild(parent, name);
+            return FindOrCreate(parent, new Regex($".+{name}.+"), name);
+        }
+        
+        public static Transform FindOrCreate(Transform parent, Regex pattern, string newName)
+        {
+            foreach (Transform child in parent)
+            {
+                if (pattern.IsMatch(child.name)) return child;
+            }
+            return NewChild(parent, newName);
         }
 
         public static Transform GetOrCreateChildren(Transform parent, string name, int index)
