@@ -1,30 +1,31 @@
 using FR8.Train;
 using UnityEditor;
+using UnityEngine;
 
 namespace FR8Editor.Inspector
 {
-    [CustomEditor(typeof(TrainMovement), true)]
+    [CustomEditor(typeof(TrainCarriage), true)]
     public class TrainMovementEditor : Editor
     {
-        private bool SnapToSpline
-        {
-            get => EditorPrefs.GetBool($"{GetType().FullName}snapToSpline", false);
-            set => EditorPrefs.SetBool($"{GetType().FullName}snapToSpline", value);
-        }
-        
-        public TrainMovement Target => target as TrainMovement;
+        public TrainCarriage Target => target as TrainCarriage;
 
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
 
-            SnapToSpline = EditorGUILayout.Toggle("Snap To Spline", SnapToSpline);
-            if (SnapToSpline && Target.Walker.CurrentSegment)
+            if (!Target.Segment)
             {
-                var transform = Target.transform;
-                var track = Target.Walker.CurrentSegment;
-                
-                transform.position = track.SamplePoint(track.GetClosestPoint(transform.position));
+                EditorGUILayout.HelpBox("Train is Missing Spline", MessageType.Error);
+            }
+            else if (GUILayout.Button("Snap To Spline", GUILayout.Height(30)))
+            {
+                if (Target.Segment)
+                {
+                    var transform = Target.transform;
+                    var track = Target.Segment;
+
+                    transform.position = track.SamplePoint(track.GetClosestPoint(transform.position));
+                }
             }
         }
     }
