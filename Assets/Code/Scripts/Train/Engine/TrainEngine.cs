@@ -10,19 +10,19 @@ namespace FR8.Train.Engine
     public sealed class TrainEngine : TrainElectrics
     {
         [SerializeField] private float maxSpeedKmpH = 120.0f;
-        [SerializeField] private float acceleration = 10.0f;
-        [SerializeField] private float internalFriction = 1.0f;
-        [SerializeField] private float maxSpeedPowerConsumptionMegawatts = 75.0f;
-        [SerializeField] private float stallLoad;
-        [SerializeField] private float currentLoad;
-        [SerializeField] private Vector2 rpmRemap = Vector2.up;
+        [SerializeField] private float accelerationTime = 5.0f;
+        [SerializeField] private float voltageScaling = 1500.0f;
+        [SerializeField] private float currentScaling = 4.0f;
+        [SerializeField] private float trackMagnetDistance = 2.0f;
 
-        private float velocity;
-        private float force;
-        
         private DriverGroup throttleDriver;
-        private DriverGroup rpmDriver;
+        private DriverGroup powerDrawDriver;
+        private DriverGroup currentDriver;
         private Locomotive train;
+
+        private float voltage;
+        private float current;
+        private float powerConsumption;
 
         public float Throttle => Connected ? (throttleDriver ? throttleDriver.Value : 0.0f) : 0.0f;
 
@@ -32,46 +32,29 @@ namespace FR8.Train.Engine
             
             var findDriver = DriverGroup.Find(gameObject);
             throttleDriver = findDriver("Throttle");
-            rpmDriver = findDriver("Rpm");
+            powerDrawDriver = findDriver("Power Draw");
+            currentDriver = findDriver("Current");
         }
 
         private void FixedUpdate()
         {
             if (train.Gear == 0) return;
+
+            var fwdSpeed = train.GetForwardSpeed();
+            var maxSpeed = maxSpeedKmpH / 3.6f;
+            var targetSpeed = maxSpeed * Throttle * train.Gear;
+            var acceleration = Mathf.Clamp((targetSpeed - fwdSpeed) / maxSpeed, -1.0f, 1.0f) * accelerationTime;
             
-            var maxSpeed = this.maxSpeedKmpH / 3.6f;
-            var acceleration = this.acceleration * Throttle * train.Gear;
+            train.Rigidbody.AddForce(train.DriverDirection * acceleration * train.ReferenceWeight);
 
-            acceleration -= velocity * internalFriction;
-            
-            var engineFriction = acceleration / (maxSpeed * maxSpeed);
-            var drag = Mathf.Abs(velocity) * velocity * engineFriction;
-            acceleration -= drag;
+            current = Mathf.Abs(fwdSpeed) / trackMagnetDistance * currentScaling;
+            voltage = Mathf.Abs(acceleration) * voltageScaling;
+            powerConsumption = current * voltage;
 
-            velocity += acceleration / train.Rigidbody.mass * train.ReferenceWeight * Time.deltaTime;
-            ApplyWheelFriction();
-
-            var rpm = Mathf.Lerp(rpmRemap.x, rpmRemap.y, Mathf.InverseLerp(0.0f, maxSpeed, velocity));
-            rpmDriver.SetValue(rpm);
+            powerDrawDriver.SetValue(powerConsumption / 1000.0f);
+            currentDriver.SetValue(current);
         }
 
-        private void ApplyWheelFriction()
-        {
-            var trainVelocity = train.GetForwardSpeed();
-
-            var targetVelocity = (velocity + trainVelocity) / 2.0f;
-
-            currentLoad = Mathf.Abs(targetVelocity - velocity);
-            velocity = targetVelocity;
-            if (currentLoad > stallLoad)
-            {
-                return;
-            }
-            
-            var trainVelocityChange = targetVelocity - trainVelocity;
-            train.Rigidbody.AddForce(train.DriverDirection * trainVelocityChange, ForceMode.VelocityChange);
-        }
-
-        public override float CalculatePowerConsumptionMegawatts() => -Throttle * maxSpeedPowerConsumptionMegawatts;
+        public override float CalculatePowerConsumptionMegawatts() => -powerConsumption;
     }
 }

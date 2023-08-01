@@ -15,7 +15,7 @@ namespace FR8.Train.Electrics
         
         public float PowerStorage { get; private set; }
         public float PowerDraw { get; private set; }
-        public float PowerCapacity => capacityMegaWattHours;
+        public float PowerCapacity => capacityMegaWattHours * 3600.0f;
         
         private void Awake()
         {
@@ -33,7 +33,7 @@ namespace FR8.Train.Electrics
                 deltaPower += e.CalculatePowerConsumptionMegawatts() * Time.deltaTime;
             }
 
-            PowerStorage += Mathf.Min(deltaPower, PowerCapacity);
+            PowerStorage += Mathf.Min(deltaPower, PowerCapacity - PowerStorage);
             if (PowerStorage < 0.0f)
             {
                 DisconnectFuzeGroup(LastFuzeGroup());
