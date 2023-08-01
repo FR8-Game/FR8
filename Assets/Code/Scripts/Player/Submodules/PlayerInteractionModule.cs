@@ -1,7 +1,7 @@
 using System;
-using FR8.Drivers;
+using FR8.Interactions.Drivers;
 using FR8.Pickups;
-using FR8.Rendering;
+using FR8.Rendering.Passes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;

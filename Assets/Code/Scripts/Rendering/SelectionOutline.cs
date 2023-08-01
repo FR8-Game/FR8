@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FR8.Rendering
+namespace FR8.Rendering.Passes
 {
     [ExecuteAlways]
     [DisallowMultipleComponent]

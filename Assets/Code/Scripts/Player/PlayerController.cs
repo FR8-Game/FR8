@@ -25,6 +25,7 @@ namespace FR8.Player
         private InputActionReference moveInput;
         private InputActionReference jumpInput;
         private InputActionReference lookAction;
+        private InputActionReference sprintAction;
         private InputActionReference crouchAction;
         private InputActionReference nudgeAction;
         private InputActionReference pressAction;
@@ -54,6 +55,7 @@ namespace FR8.Player
         public bool FreeCam => freeCamAction.action?.WasPerformedThisFrame() ?? false;
         public bool GrabCam => grabCamAction.Switch();
         public bool ZoomCam => zoomCamAction.Switch();
+        public bool Sprint => sprintAction.Switch();
 
         public Vector2 GetLookFrameDelta(bool forceMouseDelta)
         {
@@ -83,6 +85,7 @@ namespace FR8.Player
             moveInput = bind("Move");
             jumpInput = bind("Jump");
             lookAction = bind("Look");
+            sprintAction = bind("Sprint");
             crouchAction = bind("Crouch");
             nudgeAction = bind("Nudge");
             pressAction = bind("Press");
