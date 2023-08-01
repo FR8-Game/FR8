@@ -1,53 +1,70 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace FR8.Train.Track
 {
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(TrackSegment), typeof(MeshFilter))]
+    [RequireComponent(typeof(TrackSegment))]
     public sealed class TrackModel : MonoBehaviour
     {
-        private const int maxSegments = 1000;
+        private const int nextPointSubResolution = 10;
 
         [SerializeField] private Mesh baseMesh;
+        [SerializeField] private Material material;
+        [SerializeField] private bool optimize;
+        [SerializeField] private int segmentsPerSplit = 15;
 
         private void Awake()
         {
             BakeMesh();
         }
 
-        [ContextMenu("Bake Track Mesh")]
+        public void Clear()
+        {
+            var rendererContainer = transform.Find("Renderers");
+            if (rendererContainer) DestroyImmediate(rendererContainer.gameObject);
+        }
+        
         public void BakeMesh()
         {
+            Clear();
+            
+            var rendererContainer = new GameObject("Renderers").transform;
+            rendererContainer.SetParent(transform);
+            rendererContainer.localPosition = Vector3.zero;
+            rendererContainer.localRotation = Quaternion.identity;
+
             var segment = GetComponent<TrackSegment>();
-            var filter = GetComponent<MeshFilter>();
-
-            var mesh = new Mesh();
-            mesh.name = "[PROC] Track Segment";
-
+            
             var vertices = new List<Vector3>();
             var normals = new List<Vector3>();
             var indices = new List<int>();
             var uvs = new List<Vector2>();
 
-            var count = GetCount(segment);
+            var startPoint = 0.0f;
+            var endPoint = 0.0f;
+            var segmentSize = baseMesh.bounds.size.z;
 
             var rnd = new System.Random(gameObject.GetInstanceID());
             var vOffset = (float)rnd.NextDouble();
             vOffset *= 0.01f;
 
-            for (var i = 0; i < count; i++)
+            var index = 0;
+
+            while (endPoint < 1.0f)
             {
-                var p0 = i / (float)count;
-                var p1 = (i + 1.0f) / count;
+                if (index != 0 && index % segmentsPerSplit == 0)
+                {
+                    SplitMesh(vertices, normals, indices, uvs, rendererContainer);
+                }
+                
+                endPoint = FindNextPoint(segment, startPoint, segmentSize);
 
                 var indexBase = vertices.Count;
 
                 foreach (var v0 in baseMesh.vertices)
                 {
-                    var p2 = Mathf.Lerp(p0, p1, Mathf.InverseLerp(baseMesh.bounds.min.z, baseMesh.bounds.max.z, v0.z));
+                    var p2 = Mathf.Lerp(startPoint, endPoint, Mathf.InverseLerp(baseMesh.bounds.min.z, baseMesh.bounds.max.z, v0.z));
 
                     var t = segment.SamplePoint(p2);
                     var r = Quaternion.LookRotation(segment.SampleTangent(p2));
@@ -70,22 +87,57 @@ namespace FR8.Train.Track
                 {
                     uvs.Add(uv);
                 }
-            }
 
-            mesh.indexFormat = IndexFormat.UInt32;
+                startPoint = endPoint;
+                index++;
+            }
+            
+            SplitMesh(vertices, normals, indices, uvs, rendererContainer);
+        }
+
+        private void SplitMesh(List<Vector3> vertices, List<Vector3> normals, List<int> indices, List<Vector2> uvs, Transform rendererContainer)
+        {
+            var filter = new GameObject().AddComponent<MeshFilter>();
+            var renderer = filter.gameObject.AddComponent<MeshRenderer>();
+            var collider = filter.gameObject.AddComponent<MeshCollider>();
+            
+            renderer.sharedMaterials = new[] { material };
+
+            filter.transform.SetParent(rendererContainer);
+            filter.gameObject.name = $"Track Mesh Renderer.{filter.transform.GetSiblingIndex()}";
+            filter.transform.localPosition = Vector3.zero;
+            filter.transform.localRotation = Quaternion.identity;
+
+            var mesh = new Mesh();
+            mesh.name = "[PROC] Track Segment";
             mesh.SetVertices(vertices.ToArray());
             mesh.SetNormals(normals.ToArray());
             mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
             mesh.SetUVs(0, uvs.ToArray());
-            mesh.Optimize();
+            if (optimize) mesh.Optimize();
+            
+            vertices.Clear();
+            normals.Clear();
+            indices.Clear();
+            uvs.Clear();
 
             filter.sharedMesh = mesh;
+            collider.sharedMesh = mesh;
+        }
 
-            var collider = GetComponent<MeshCollider>();
-            if (collider)
+        private float FindNextPoint(TrackSegment segment, float startPoint, float segmentSize)
+        {
+            var start = segment.SamplePoint(startPoint);
+            var step = 1.0f / (segment.Resolution * nextPointSubResolution);
+            for (var p = startPoint + step; p <= 1.0f; p += step)
             {
-                collider.sharedMesh = mesh;
+                var end = segment.SamplePoint(p);
+
+                var dist = (end - start).magnitude;
+                if (dist > segmentSize) return p;
             }
+
+            return 1.0f;
         }
 
 #if UNITY_EDITOR
@@ -107,33 +159,5 @@ namespace FR8.Train.Track
             }
         }
 #endif
-
-        private int GetCount(TrackSegment segment)
-        {
-            var size = baseMesh.bounds.size.z;
-
-            for (var i = 2; i < maxSegments; i++)
-            {
-                var dist = getSubArcLength(1.0f / i);
-                if (size > dist) return i;
-            }
-
-            throw new Exception("Track is too long, it exceeds the maximum amount of segments.");
-
-            float getSubArcLength(float subArcLength)
-            {
-                const int resolution = 20;
-                
-                var distance = 0.0f;
-                for (var i = 0; i < resolution; i++)
-                {
-                    var p0 = (i / (float)resolution) * subArcLength;
-                    var p1 = ((i + 1.0f) / resolution ) * subArcLength;
-
-                    distance += (segment.SamplePoint(p1) - segment.SamplePoint(p0)).magnitude;
-                }
-                return distance;
-            }
-        }
     }
 }
