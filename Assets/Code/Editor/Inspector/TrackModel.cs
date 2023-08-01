@@ -36,6 +36,11 @@ namespace FR8Editor.Inspector
             {
                 target.BakeMesh();
             }
+            
+            if (GUILayout.Button("Clear", GUILayout.Height(30)))
+            {
+                target.Clear();
+            }
         }
     }
 }
