@@ -10,7 +10,7 @@ namespace FR8.Train.Track
         [SerializeField] private float checkRadius;
         [SerializeField] private bool active;
 
-        private HashSet<TrainMovement> deadSet = new();
+        private HashSet<TrainCarriage> deadSet = new();
 
         private void Awake()
         {
@@ -20,7 +20,7 @@ namespace FR8.Train.Track
 
         private void FixedUpdate()
         {
-            var trains = FindObjectsOfType<TrainMovement>();
+            var trains = FindObjectsOfType<TrainCarriage>();
 
             foreach (var train in trains)
             {
@@ -31,7 +31,7 @@ namespace FR8.Train.Track
                 deadSet.Add(train);
             }
 
-            var lastDeadSet = new HashSet<TrainMovement>(deadSet);
+            var lastDeadSet = new HashSet<TrainCarriage>(deadSet);
             
             foreach (var train in lastDeadSet)
             {
@@ -41,14 +41,14 @@ namespace FR8.Train.Track
             }
         }
 
-        private void SwitchTrack(TrainMovement train)
+        private void SwitchTrack(TrainCarriage train)
         {
-            var segment = train.Walker.CurrentSegment;
+            var segment = train.Segment;
             if (segment != primarySegment && segment != branchingSegment) return;
 
             if (segment == branchingSegment)
             {
-                train.Walker.CurrentSegment = primarySegment;
+                train.Segment = primarySegment;
                 return;
             }
             
@@ -58,7 +58,7 @@ namespace FR8.Train.Track
             var dot = Vector3.Dot(vector.normalized, transform.forward);
             if (dot > 0.0f) return;
 
-            train.Walker.CurrentSegment = branchingSegment;
+            train.Segment = branchingSegment;
         }
 
         private void OnDrawGizmos()

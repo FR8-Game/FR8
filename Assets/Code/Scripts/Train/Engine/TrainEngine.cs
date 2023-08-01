@@ -6,39 +6,55 @@ namespace FR8.Train.Engine
 {
     [SelectionBase]
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(TrainDrive))]
+    [RequireComponent(typeof(Locomotive))]
     public sealed class TrainEngine : TrainElectrics
     {
-        [SerializeField] private float maxSpeed;
-        [SerializeField] private float acceleration;
-        [SerializeField] private float maxSpeedPowerConsumptionMegawatts = 75.0f;
+        [SerializeField] private float maxSpeedKmpH = 120.0f;
+        [SerializeField] private float accelerationTime = 5.0f;
+        [SerializeField] private float voltageScaling = 1500.0f;
+        [SerializeField] private float currentScaling = 4.0f;
+        [SerializeField] private float trackMagnetDistance = 2.0f;
 
-        private float velocity;
-        private float force;
         private DriverGroup throttleDriver;
-        private TrainDrive train;
+        private DriverGroup powerDrawDriver;
+        private DriverGroup currentDriver;
+        private Locomotive train;
+
+        private float voltage;
+        private float current;
+        private float powerConsumption;
 
         public float Throttle => Connected ? (throttleDriver ? throttleDriver.Value : 0.0f) : 0.0f;
 
         private void Awake()
         {
-            train = GetComponent<TrainDrive>();
+            train = GetComponent<Locomotive>();
             
             var findDriver = DriverGroup.Find(gameObject);
-
             throttleDriver = findDriver("Throttle");
+            powerDrawDriver = findDriver("Power Draw");
+            currentDriver = findDriver("Current");
         }
 
         private void FixedUpdate()
         {
             if (train.Gear == 0) return;
-            
+
             var fwdSpeed = train.GetForwardSpeed();
-            var maxSpeed = this.maxSpeed / 3.6f;
-            var force = (maxSpeed * train.Gear - fwdSpeed) / maxSpeed * acceleration * Throttle;
-            train.Rigidbody.AddForce(train.DriverDirection * force, ForceMode.Acceleration);
+            var maxSpeed = maxSpeedKmpH / 3.6f;
+            var targetSpeed = maxSpeed * Throttle * train.Gear;
+            var acceleration = Mathf.Clamp((targetSpeed - fwdSpeed) / maxSpeed, -1.0f, 1.0f) * accelerationTime;
+            
+            train.Rigidbody.AddForce(train.DriverDirection * acceleration * train.ReferenceWeight);
+
+            current = Mathf.Abs(fwdSpeed) / trackMagnetDistance * currentScaling;
+            voltage = Mathf.Abs(acceleration) * voltageScaling;
+            powerConsumption = current * voltage;
+
+            powerDrawDriver.SetValue(powerConsumption / 1000.0f);
+            currentDriver.SetValue(current);
         }
 
-        public override float CalculatePowerConsumptionMegawatts() => -Throttle * maxSpeedPowerConsumptionMegawatts;
+        public override float CalculatePowerConsumptionMegawatts() => -powerConsumption;
     }
 }
