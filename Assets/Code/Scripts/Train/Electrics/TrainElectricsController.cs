@@ -8,61 +8,59 @@ namespace FR8.Train.Electrics
     [DisallowMultipleComponent]
     public sealed class TrainElectricsController : MonoBehaviour
     {
-        [SerializeField] private float capacityMegaWattHours;
-        [SerializeField] private float baselineGeneration = 150.0f;
-
-        private List<TrainElectrics> electrics;
+        [SerializeField] private bool connected = true;
         
-        public float PowerStorage { get; private set; }
+        private List<IElectricGenerator> generators;
+        private List<IElectricDevice> devices;
+        
         public float PowerDraw { get; private set; }
-        public float PowerCapacity => capacityMegaWattHours * 3600.0f;
+        public float Capacity { get; private set; }
+        public float Saturation { get; private set; }
         
         private void Awake()
         {
-            electrics = new List<TrainElectrics>(GetComponentsInChildren<TrainElectrics>());
+            generators = new List<IElectricGenerator>(GetComponentsInChildren<IElectricGenerator>());
+            devices = new List<IElectricDevice>(GetComponentsInChildren<IElectricDevice>());
 
-            foreach (var e in electrics) e.SetController(this).Connected = true;
+            foreach (var e in generators) e.SetClockSpeed(0.0f);
+            foreach (var e in devices) e.SetConnected(true);
+
+            SetConnected(connected);
         }
 
         private void FixedUpdate()
         {
-            var deltaPower = baselineGeneration * Time.deltaTime;
-
-            foreach (var e in electrics)
+            var draw = 0.0f;
+            foreach (var e in devices)
             {
-                deltaPower += e.CalculatePowerConsumptionMegawatts() * Time.deltaTime;
+                draw += e.CalculatePowerDraw();
             }
 
-            PowerStorage += Mathf.Min(deltaPower, PowerCapacity - PowerStorage);
-            if (PowerStorage < 0.0f)
-            {
-                DisconnectFuzeGroup(LastFuzeGroup());
-            }
+            var capacity = 0.0f;
+            foreach (var e in generators) capacity += e.MaximumPowerGeneration;
 
-            PowerDraw = deltaPower / Time.deltaTime;
+            var saturation = draw / capacity;
+            if (saturation > 1.01f)
+            {
+                saturation = 0.0f;
+                SetConnected(false);
+            }
+            foreach (var e in generators) e.SetClockSpeed(saturation);
+
+            PowerDraw = draw;
+            Capacity = capacity;
+            Saturation = saturation;
         }
 
-        private int LastFuzeGroup()
+        public void ResetFuze() => SetConnected(true);
+
+        private void SetConnected(bool newFuzeState)
         {
-            var lastFuzeGroup = 0;
-            foreach (var e in electrics)
+            connected = newFuzeState;
+            foreach (var e in devices)
             {
-                lastFuzeGroup = Mathf.Max(lastFuzeGroup, e.FuzeGroup);
-            }
-
-            return lastFuzeGroup;
-        }
-
-        private void UpdateFuzeGroup(int fuzeGroup, Action<TrainElectrics> callback)
-        {
-            foreach (var e in electrics)
-            {
-                if (e.FuzeGroup != fuzeGroup) continue;
-                callback(e);
+                e.SetConnected(connected);
             }
         }
-
-        public void ConnectFuzeGroup(int fuzeGroup) => UpdateFuzeGroup(fuzeGroup, e => e.Connected = true);
-        public void DisconnectFuzeGroup(int fuzeGroup) => UpdateFuzeGroup(fuzeGroup, e => e.Connected = false);
     }
 }

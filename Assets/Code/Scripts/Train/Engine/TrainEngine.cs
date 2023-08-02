@@ -7,7 +7,7 @@ namespace FR8.Train.Engine
     [SelectionBase]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Locomotive))]
-    public sealed class TrainEngine : TrainElectrics
+    public sealed class TrainEngine : MonoBehaviour, IElectricDevice
     {
         [SerializeField] private float maxSpeedKmpH = 120.0f;
         [SerializeField] private float accelerationTime = 5.0f;
@@ -20,11 +20,12 @@ namespace FR8.Train.Engine
         private DriverGroup currentDriver;
         private Locomotive train;
 
+        private bool connected;
         private float voltage;
         private float current;
         private float powerConsumption;
 
-        public float Throttle => Connected ? (throttleDriver ? throttleDriver.Value : 0.0f) : 0.0f;
+        public float Throttle => connected ? (throttleDriver ? throttleDriver.Value : 0.0f) : 0.0f;
 
         private void Awake()
         {
@@ -55,6 +56,8 @@ namespace FR8.Train.Engine
             currentDriver.SetValue(current);
         }
 
-        public override float CalculatePowerConsumptionMegawatts() => -powerConsumption;
+        public void SetConnected(bool connected) => this.connected = true;
+        
+        public float CalculatePowerDraw() => powerConsumption;
     }
 }
