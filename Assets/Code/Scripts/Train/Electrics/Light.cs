@@ -7,6 +7,7 @@ namespace FR8.Train.Electrics
     {
         [SerializeField] private bool state;
         [SerializeField] private string key;
+        [SerializeField] private string fuseGroup = "Lights";
         [SerializeField] private Renderer filamentRenderer;
         [SerializeField] private Gradient color;
         [SerializeField] private float lightBrightness = 1.5f;
@@ -31,6 +32,8 @@ namespace FR8.Train.Electrics
             light = GetComponentInChildren<UnityEngine.Light>();
             materialPropertyBlock = new MaterialPropertyBlock();
         }
+
+        public string FuseGroup => fuseGroup;
 
         public void SetConnected(bool connected)
         {

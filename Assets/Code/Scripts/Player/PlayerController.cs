@@ -49,6 +49,7 @@ namespace FR8.Player
         public Vector3 LookFrameDelta => GetLookFrameDelta(false);
 
         public int Nudge => Mathf.Clamp(Mathf.RoundToInt(nudgeAction.action?.ReadValue<float>() ?? 0.0f), -1, 1);
+        public bool Press => pressAction.action?.WasPerformedThisFrame() ?? false;
         public bool Drag => pressAction.Switch();
         public bool FreeCam => freeCamAction.action?.WasPerformedThisFrame() ?? false;
         public bool GrabCam => grabCamAction.Switch();

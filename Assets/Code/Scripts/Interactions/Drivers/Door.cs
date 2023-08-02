@@ -13,18 +13,18 @@ namespace FR8.Interactions.Drivers
         private bool state;
 
         public string Key => string.Empty;
-        public bool CanInteract => true;
+        public virtual bool CanInteract => true;
         public string DisplayName => "Door";
-        public string DisplayValue => state ? "Open" : "Closed";
+        public virtual string DisplayValue => state ? "Open" : "Closed";
 
-        private void Awake()
+        protected virtual void Awake()
         {
             SetValue(testValue ? 1.0f : 0.0f);
         }
 
         public void OnValueChanged(float newValue) { }
 
-        protected void SetValue(float newValue)
+        protected virtual void SetValue(float newValue)
         {
             state = newValue > 0.5f;
             animator.SetValue(state ? 1.0f : 0.0f);
@@ -49,7 +49,7 @@ namespace FR8.Interactions.Drivers
             animator.Update();
         }
 
-        private void FixedUpdate()
+        protected virtual void FixedUpdate()
         {
             animator.FixedUpdate();
         }

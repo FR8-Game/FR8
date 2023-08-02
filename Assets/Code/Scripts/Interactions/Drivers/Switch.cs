@@ -13,6 +13,8 @@ namespace FR8.Interactions.Drivers
         [SerializeField] private TwoPoseDrivableAnimator animator;
         [SerializeField] private DriverSounds sounds;
 
+        public override string DisplayValue => Value > 0.5f ? "On" : "Off";
+
         public override void OnValueChanged(float newValue)
         {
             animator.SetValue(newValue);

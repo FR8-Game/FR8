@@ -14,7 +14,12 @@ namespace FR8.Interactions.Drivables
         public void SetValue(float newValue)
         {
             var p = Mathf.InverseLerp(inputRange.x, inputRange.y, newValue);
-            var val = Mathf.Lerp(outputRange.x, outputRange.y, p);
+            SetValueNormalized(p);
+        }
+
+        public void SetValueNormalized(float percent)
+        {
+            var val = Mathf.Lerp(outputRange.x, outputRange.y, percent);
             image.fillAmount = val;
         }
         

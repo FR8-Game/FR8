@@ -14,7 +14,7 @@ namespace FR8.Interactions.Drivers
         
         public virtual bool CanInteract => true;
         public virtual string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
-        public virtual string DisplayValue => Mathf.RoundToInt(Value * 100.0f).ToString();
+        public virtual string DisplayValue => $"{Mathf.RoundToInt(Value * 100.0f)}%";
         
         public float Value { get; private set; }
         public string Key => key;

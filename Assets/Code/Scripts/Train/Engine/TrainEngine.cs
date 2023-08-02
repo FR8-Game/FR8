@@ -11,9 +11,10 @@ namespace FR8.Train.Engine
     {
         [SerializeField] private float maxSpeedKmpH = 120.0f;
         [SerializeField] private float accelerationTime = 5.0f;
-        [SerializeField] private float voltageScaling = 1500.0f;
-        [SerializeField] private float currentScaling = 4.0f;
-        [SerializeField] private float trackMagnetDistance = 2.0f;
+        [SerializeField] private float powerFromSpeed = 1.0f;
+        [SerializeField] private float powerFromDifference = 1.0f;
+        [SerializeField] private float amperesScaling = 0.01f;
+        [SerializeField][Range(0.0f, 1.0f)] private float throttleSmoothing;
 
         private const string ThrottleKey = "Throttle";
         private const string PowerDrawKey = "PowerDraw";
@@ -23,13 +24,13 @@ namespace FR8.Train.Engine
         private Locomotive train;
 
         private bool connected;
-        private float voltage;
-        private float current;
+        private float ps;
+        private float pd;
         private float powerConsumption;
+        private float throttleActual;
 
-        private float lastFwdSpeed;
-
-        public float Throttle => driverNetwork.Read(ThrottleKey);
+        public float ThrottleInput => driverNetwork.Read(ThrottleKey);
+        public string FuseGroup => null;
 
         private void Awake()
         {
@@ -45,6 +46,8 @@ namespace FR8.Train.Engine
 
         private void FixedUpdate()
         {
+            throttleActual += (ThrottleInput - throttleActual) * (1.0f - throttleSmoothing);
+            
             if (train.Gear == 0) return;
 
             var fwdSpeed = train.GetForwardSpeed();
@@ -52,28 +55,26 @@ namespace FR8.Train.Engine
             if (connected)
             {
                 var maxSpeed = maxSpeedKmpH / 3.6f;
-                var targetSpeed = maxSpeed * Throttle * train.Gear;
+                var targetSpeed = maxSpeed * throttleActual * train.Gear;
 
                 var acceleration = Mathf.Clamp((targetSpeed - fwdSpeed) / maxSpeed, -1.0f, 1.0f) * accelerationTime;
 
                 train.Rigidbody.AddForce(train.DriverDirection * acceleration * train.ReferenceWeight);
 
-                var resistance = Mathf.Abs(fwdSpeed - lastFwdSpeed) / Time.deltaTime;
-
-                current = Mathf.Abs(fwdSpeed) / trackMagnetDistance * currentScaling;
-                voltage = Mathf.Abs(acceleration + resistance) * voltageScaling;
-                powerConsumption = current * voltage;
+                ps = Mathf.Abs(fwdSpeed) * powerFromSpeed;
+                pd = Mathf.Abs(targetSpeed - fwdSpeed) * powerFromDifference;
+                
+                powerConsumption = ps + pd;
             }
             else
             {
-                current = 0.0f;
-                voltage = 0.0f;
+                ps = 0.0f;
+                pd = 0.0f;
                 powerConsumption = 0.0f;
             }
 
             driverNetwork.SetValue(PowerDrawKey, powerConsumption / 1000.0f);
-            driverNetwork.SetValue(CurrentKey, current);
-            lastFwdSpeed = fwdSpeed;
+            driverNetwork.SetValue(CurrentKey, pd * amperesScaling);
         }
 
         public void SetConnected(bool connected) => this.connected = connected;

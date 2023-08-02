@@ -1,10 +1,13 @@
 using System;
+using FR8.Interactions.Drivers;
 using FR8.Interactions.Drivers.Submodules;
 using FR8.Pickups;
 using FR8.Rendering.Passes;
+using FR8.Utility;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Cursor = UnityEngine.Cursor;
 using Object = UnityEngine.Object;
 
 namespace FR8.Player.Submodules
@@ -15,11 +18,13 @@ namespace FR8.Player.Submodules
     {
         [SerializeField] private float interactionDistance = 2.5f;
         [SerializeField] private TMP_Text readoutText;
+        [SerializeField] private DampedSpring transition;
 
         private PlayerController controller;
         private new Camera camera;
 
         private int nudge;
+        private bool press;
         private bool dragging;
         private float dragDistance;
 
@@ -34,6 +39,7 @@ namespace FR8.Player.Submodules
 
         public void Update()
         {
+            if (controller.Press) press = true;
             if (controller.Nudge != 0) nudge = controller.Nudge;
         }
 
@@ -50,15 +56,22 @@ namespace FR8.Player.Submodules
 
             if (newLookingAt != lookingAt)
             {
+                transition.currentPosition = 0.0f;
+                transition.velocity = 0.0f;
+                
                 if (lookingAt != null) SelectionOutlinePass.RemovePersistant(lookingAt.gameObject);
                 if (newLookingAt != null) SelectionOutlinePass.RenderPersistant(newLookingAt.gameObject);
             }
 
             lookingAt = newLookingAt;
-
+            transition.Target(lookingAt != null ? 1.0f : 0.0f).Iterate(Time.deltaTime);
+            var animatePosition = Mathf.Max(0.0f, transition.currentPosition);
+            readoutText.transform.localScale = Vector3.one * animatePosition;
+            readoutText.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, (1.0f - animatePosition) * 20.0f);
+            
             if (lookingAt == null)
             {
-                readoutText.text = null;
+                press = false;
                 nudge = 0;
                 dragging = false;
                 return;
@@ -67,7 +80,15 @@ namespace FR8.Player.Submodules
             var alpha = $"<alpha={(lookingAt.CanInteract ? "#FF" : "#80")}>";
             readoutText.text = $"{alpha}{lookingAt.DisplayName}\n<size=66%>{lookingAt.DisplayValue}";
 
-            if (!heldObject && lookingAt.CanInteract)
+            if (heldObject)
+            {
+                if (press)
+                {
+                    heldObject = heldObject.Drop();
+                    press = false;
+                }
+            }
+            else if (lookingAt.CanInteract)
             {
                 switch (lookingAt)
                 {
@@ -81,6 +102,7 @@ namespace FR8.Player.Submodules
             }
 
             nudge = 0;
+            press = false;
             dragging = controller.Drag;
         }
 
@@ -101,15 +123,19 @@ namespace FR8.Player.Submodules
 
         private void ProcessPickup(PickupObject pickup)
         {
+            if (!press) return;
+
             heldObject = pickup.Pickup(controller.CurrentAvatar as PlayerGroundedAvatar);
+                
+            press = false;
         }
 
         private IInteractable GetLookingAt()
         {
             var ray = GetLookingRay();
             if (!Physics.Raycast(ray, out var hit, interactionDistance)) return null;
-            
-            return hit.collider.GetComponentInParent<IInteractable>();
+
+            return hit.collider .GetComponentInParent<IInteractable>();
         }
 
         private Ray GetLookingRay()

@@ -9,7 +9,7 @@ namespace FR8.Interactions.Drivables
         [SerializeField] private TMP_Text text;
         
         private string template;
-     
+        
         public void Awake()
         {
             template = text.text;
@@ -19,6 +19,12 @@ namespace FR8.Interactions.Drivables
         {
             if (!text) return;
             text.text = string.Format(template, newValue);
+        }
+
+        public void SetText(string text)
+        {
+            if (!this.text) return;
+            this.text.text = text;
         }
     }
 }

@@ -12,13 +12,15 @@ namespace FR8.Train.Electrics
         [SerializeField] private bool connected = true;
 
         private DriverNetwork driverNetwork;
-        private const string MainFuzeGroup = "mainFuze";
+        private const string MainFuseGroup = "mainFuze";
         private const string SaturationKey = "Saturation";
 
         private List<IElectricGenerator> generators;
         private List<IElectricDevice> devices;
 
-        public string Key => MainFuzeGroup;
+        public string Key => MainFuseGroup;
+        public Dictionary<string, bool> FuseGroups = new();
+        
         public float PowerDraw { get; private set; }
         public float Capacity { get; private set; }
         public float Saturation { get; private set; }
@@ -39,11 +41,12 @@ namespace FR8.Train.Electrics
         public void OnValueChanged(float newValue)
         {
             connected = newValue > 0.5f;
-            UpdateChildren();
         }
 
         private void FixedUpdate()
         {
+            UpdateChildren();
+            
             var saturation = 0.0f;
             var draw = 0.0f;
 
@@ -87,8 +90,28 @@ namespace FR8.Train.Electrics
         {
             foreach (var e in devices)
             {
-                e.SetConnected(connected);
+                e.SetConnected(GetFuse(e.FuseGroup));
             }
+        }
+
+        private static string Simplify(string str) => str?.Trim().ToLower().Replace(" ", "");
+
+        public void SetFuse(string fuseName, bool state)
+        {
+            fuseName = Simplify(fuseName);
+            
+            if (FuseGroups.ContainsKey(fuseName)) FuseGroups[fuseName] = state;
+            else FuseGroups.Add(fuseName, state);
+        }
+        
+        public bool GetFuse(string fuseName)
+        {
+            fuseName = Simplify(fuseName);
+            
+            if (!connected) return false;
+            if (string.IsNullOrEmpty(fuseName)) return true;
+            
+            return FuseGroups.ContainsKey(fuseName) && FuseGroups[fuseName];
         }
     }
 }
