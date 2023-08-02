@@ -849,9 +849,17 @@ PrefabInstance:
       propertyPath: key
       value: Speedometer
       objectReference: {fileID: 0}
+    - target: {fileID: 1948529354362219670, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: displayUI.inputRange.y
+      value: 160
+      objectReference: {fileID: 0}
     - target: {fileID: 6936461394901215794, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: key
       value: Speedometer
+      objectReference: {fileID: 0}
+    - target: {fileID: 6936461394901215795, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: m_FillAmount
+      value: 0.069450006
       objectReference: {fileID: 0}
     - target: {fileID: 6936461395209199179, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: key
@@ -918,9 +926,17 @@ PrefabInstance:
       propertyPath: key
       value: RPM
       objectReference: {fileID: 0}
+    - target: {fileID: 1948529354362219670, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: displayUI.inputRange.y
+      value: 12000
+      objectReference: {fileID: 0}
     - target: {fileID: 6936461394901215794, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: key
       value: RPM
+      objectReference: {fileID: 0}
+    - target: {fileID: 6936461394901215795, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: m_FillAmount
+      value: 0.06407267
       objectReference: {fileID: 0}
     - target: {fileID: 6936461395209199177, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: m_text
@@ -1050,9 +1066,17 @@ PrefabInstance:
       propertyPath: key
       value: Power Draw
       objectReference: {fileID: 0}
+    - target: {fileID: 1948529354362219670, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: displayUI.inputRange.y
+      value: 400
+      objectReference: {fileID: 0}
     - target: {fileID: 6936461394901215794, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: key
       value: Power Draw
+      objectReference: {fileID: 0}
+    - target: {fileID: 6936461394901215795, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: m_FillAmount
+      value: 0.066180006
       objectReference: {fileID: 0}
     - target: {fileID: 6936461395209199177, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: m_text
@@ -1991,6 +2015,89 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2de40a509088b6e428ef0e687f8a2358, type: 3}
   m_PrefabInstance: {fileID: 8669327851359323733}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &8669327851931567304
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 4846799281317427165}
+    m_Modifications:
+    - target: {fileID: 1948529354362219670, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: key
+      value: Saturation
+      objectReference: {fileID: 0}
+    - target: {fileID: 1948529354362219670, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: displayUI.inputRange.y
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 6936461394901215794, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: key
+      value: RPM
+      objectReference: {fileID: 0}
+    - target: {fileID: 6936461394901215795, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: m_FillAmount
+      value: 0.072720006
+      objectReference: {fileID: 0}
+    - target: {fileID: 6936461395209199177, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: m_text
+      value: '{0:N0}%
+
+        <size=30%>Power Saturation'
+      objectReference: {fileID: 0}
+    - target: {fileID: 6936461395209199179, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: key
+      value: RPM
+      objectReference: {fileID: 0}
+    - target: {fileID: 6936461395732409891, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: m_Name
+      value: Saturation
+      objectReference: {fileID: 0}
+    - target: {fileID: 6936461395732409900, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6936461395732409900, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6936461395732409900, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6936461395732409900, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6936461395732409900, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6936461395732409900, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6936461395732409900, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6936461395732409900, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6936461395732409900, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6936461395732409900, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6936461395732409900, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ae851f06a593e204fb3418c760310250, type: 3}
 --- !u!1001 &8669327852006837359
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2064,4 +2171,52 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 6146274182722837314, guid: 1d36adfcfc439054a9f7f613221078e6, type: 3}
+    - {fileID: 8801025778114427316, guid: 1d36adfcfc439054a9f7f613221078e6, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 1d36adfcfc439054a9f7f613221078e6, type: 3}
+--- !u!4 &414383431228634250 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9047604343581456613, guid: 1d36adfcfc439054a9f7f613221078e6, type: 3}
+  m_PrefabInstance: {fileID: 8669327852006837359}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2999276862168800831 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5895266705354658384, guid: 1d36adfcfc439054a9f7f613221078e6, type: 3}
+  m_PrefabInstance: {fileID: 8669327852006837359}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2080756090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2999276862168800831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59aba7e3a8db4277b3346e7e0ed18c20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: Gear
+  displayName: Gear
+  defaultValue: 0
+  testGear: -1
+  animator:
+    handle: {fileID: 414383431228634250}
+    valueRange: {x: -1, y: 1}
+    animationSpring:
+      springConstant: 350
+      dampingConstant: 25
+      clamped: 1
+      range: {x: 0, y: 1}
+      bounce: 0.4
+      currentPosition: 0
+      targetPosition: 0
+      velocity: 0
+    animatePosition: 0
+    slidePoseAPosition: {x: 0, y: 0, z: 0}
+    slidePoseBPosition: {x: 0, y: 0, z: 0}
+    animateRotation: 1
+    slidePoseARotation: {x: -45, y: 0, z: 0}
+    slidePoseBRotation: {x: 45, y: 0, z: 0}
+  dragBehaviour:
+    sensitivity: 1
+    dragVector: {x: 0, y: 0, z: 1}

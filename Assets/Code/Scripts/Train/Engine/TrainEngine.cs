@@ -1,7 +1,5 @@
-using System;
 using FR8.Interactions.Drivers;
 using FR8.Train.Electrics;
-using Mono.Cecil.Cil;
 using UnityEngine;
 
 namespace FR8.Train.Engine
@@ -20,7 +18,7 @@ namespace FR8.Train.Engine
         private const string ThrottleKey = "Throttle";
         private const string PowerDrawKey = "PowerDraw";
         private const string CurrentKey = "Current";
-        
+
         private DriverNetwork driverNetwork;
         private Locomotive train;
 
@@ -29,7 +27,9 @@ namespace FR8.Train.Engine
         private float current;
         private float powerConsumption;
 
-        public float Throttle => connected ? driverNetwork.Read(ThrottleKey) : 0.0f;
+        private float lastFwdSpeed;
+
+        public float Throttle => driverNetwork.Read(ThrottleKey);
 
         private void Awake()
         {
@@ -48,23 +48,36 @@ namespace FR8.Train.Engine
             if (train.Gear == 0) return;
 
             var fwdSpeed = train.GetForwardSpeed();
-            var maxSpeed = maxSpeedKmpH / 3.6f;
-            var targetSpeed = maxSpeed * Throttle * train.Gear;
-            
-            var acceleration = Mathf.Clamp((targetSpeed - fwdSpeed) / maxSpeed, -1.0f, 1.0f) * accelerationTime;
-            
-            train.Rigidbody.AddForce(train.DriverDirection * acceleration * train.ReferenceWeight);
 
-            current = Mathf.Abs(fwdSpeed) / trackMagnetDistance * currentScaling;
-            voltage = Mathf.Abs(acceleration) * voltageScaling;
-            powerConsumption = current * voltage;
+            if (connected)
+            {
+                var maxSpeed = maxSpeedKmpH / 3.6f;
+                var targetSpeed = maxSpeed * Throttle * train.Gear;
+
+                var acceleration = Mathf.Clamp((targetSpeed - fwdSpeed) / maxSpeed, -1.0f, 1.0f) * accelerationTime;
+
+                train.Rigidbody.AddForce(train.DriverDirection * acceleration * train.ReferenceWeight);
+
+                var resistance = Mathf.Abs(fwdSpeed - lastFwdSpeed) / Time.deltaTime;
+
+                current = Mathf.Abs(fwdSpeed) / trackMagnetDistance * currentScaling;
+                voltage = Mathf.Abs(acceleration + resistance) * voltageScaling;
+                powerConsumption = current * voltage;
+            }
+            else
+            {
+                current = 0.0f;
+                voltage = 0.0f;
+                powerConsumption = 0.0f;
+            }
 
             driverNetwork.SetValue(PowerDrawKey, powerConsumption / 1000.0f);
             driverNetwork.SetValue(CurrentKey, current);
+            lastFwdSpeed = fwdSpeed;
         }
 
         public void SetConnected(bool connected) => this.connected = connected;
-        
+
         public float CalculatePowerDraw() => powerConsumption;
     }
 }

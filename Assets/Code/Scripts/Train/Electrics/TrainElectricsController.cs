@@ -22,7 +22,7 @@ namespace FR8.Train.Electrics
         public float PowerDraw { get; private set; }
         public float Capacity { get; private set; }
         public float Saturation { get; private set; }
-        
+
         private void Awake()
         {
             driverNetwork = GetComponentInParent<DriverNetwork>();
@@ -44,27 +44,35 @@ namespace FR8.Train.Electrics
 
         private void FixedUpdate()
         {
+            var saturation = 0.0f;
             var draw = 0.0f;
-            foreach (var e in devices)
-            {
-                draw += e.CalculatePowerDraw();
-            }
 
             var capacity = 0.0f;
             foreach (var e in generators) capacity += e.MaximumPowerGeneration;
 
-            var saturation = draw / capacity;
+            if (connected)
+            {
+                draw = 0.0f;
+                foreach (var e in devices)
+                {
+                    draw += e.CalculatePowerDraw();
+                }
+
+                saturation = draw / capacity;
+            }
+
             if (saturation > 1.01f)
             {
                 saturation = 0.0f;
                 SetConnected(false);
             }
+
             foreach (var e in generators) e.SetClockSpeed(saturation);
 
             PowerDraw = draw;
             Capacity = capacity;
             Saturation = saturation;
-            
+
             driverNetwork.SetValue(SaturationKey, saturation * 100.0f);
         }
 
