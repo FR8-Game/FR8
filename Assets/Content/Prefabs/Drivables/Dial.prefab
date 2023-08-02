@@ -178,7 +178,6 @@ GameObject:
   - component: {fileID: 6936461394901215793}
   - component: {fileID: 6936461394901215804}
   - component: {fileID: 6936461394901215795}
-  - component: {fileID: 6936461394901215794}
   m_Layer: 0
   m_Name: Ring
   m_TagString: Untagged
@@ -239,26 +238,11 @@ MonoBehaviour:
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
-  m_FillAmount: 0.077952005
+  m_FillAmount: 0.072720006
   m_FillClockwise: 1
   m_FillOrigin: 3
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &6936461394901215794
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6936461394901215792}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0660fd4d1ac714048a4d283a646f3559, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  inputRange: {x: 0, y: 120}
-  outputRange: {x: 0.064, y: 0.936}
-  testValue: 1.92
 --- !u!1 &6936461395209199183
 GameObject:
   m_ObjectHideFlags: 0
@@ -270,7 +254,6 @@ GameObject:
   - component: {fileID: 6936461395209199176}
   - component: {fileID: 6936461395209199178}
   - component: {fileID: 6936461395209199177}
-  - component: {fileID: 6936461395209199179}
   m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
@@ -397,18 +380,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &6936461395209199179
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6936461395209199183}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b6528e9133becf48932a6f21f66a78f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &6936461395528793607
 GameObject:
   m_ObjectHideFlags: 0
@@ -516,7 +487,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6936461395732409900}
-  - component: {fileID: 6936461395732409901}
+  - component: {fileID: 1948529354362219670}
   m_Layer: 0
   m_Name: Dial
   m_TagString: Untagged
@@ -541,7 +512,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6936461395732409901
+--- !u!114 &1948529354362219670
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -550,11 +521,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 6936461395732409891}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d2bfd71e87643e8a46440d6765ad930, type: 3}
+  m_Script: {fileID: 11500000, guid: 98e8b3f298834cf4aaaa5d96fb88cc4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  displayName: 
-  defaultValue: 0
+  key: 
+  displayText:
+    text: {fileID: 6936461395209199177}
+  displayUI:
+    image: {fileID: 6936461394901215795}
+    inputRange: {x: 0, y: 100}
+    outputRange: {x: 0.064, y: 0.936}
+    testValue: 1
 --- !u!1 &6936461395926282665
 GameObject:
   m_ObjectHideFlags: 0
@@ -566,7 +543,6 @@ GameObject:
   - component: {fileID: 6936461395926282666}
   - component: {fileID: 6936461395926282677}
   - component: {fileID: 6936461395926282676}
-  - component: {fileID: 6936461395926282667}
   m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
@@ -641,20 +617,3 @@ MonoBehaviour:
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
   m_PresetInfoIsWorld: 1
---- !u!114 &6936461395926282667
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6936461395926282665}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295

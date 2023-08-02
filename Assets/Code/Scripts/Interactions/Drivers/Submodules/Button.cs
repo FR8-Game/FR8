@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using FR8.Train.Signals;
 using UnityEngine;
 
-namespace FR8.Interactions.Drivers
+namespace FR8.Interactions.Drivers.Submodules
 {
     [SelectionBase, DisallowMultipleComponent]
     public class Button : MonoBehaviour, IInteractable

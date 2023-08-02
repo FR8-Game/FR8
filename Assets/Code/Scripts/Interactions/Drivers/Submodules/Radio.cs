@@ -1,7 +1,7 @@
 ﻿using FR8.Dialogue;
 using UnityEngine;
 
-namespace FR8.Interactions.Drivers
+namespace FR8.Interactions.Drivers.Submodules
 {
     public class Radio : Button
     {

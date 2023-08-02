@@ -15,7 +15,6 @@ namespace FR8.Player
 
         [Range(0.0f, 1.0f)]
         [SerializeField] private float controllerSensitivity = 0.4f;
-        [SerializeField] private float rollSensitivity = 0.4f;
 
         [Space]
         [SerializeField] private PlayerAvatar newAvatar;
@@ -50,7 +49,6 @@ namespace FR8.Player
         public Vector3 LookFrameDelta => GetLookFrameDelta(false);
 
         public int Nudge => Mathf.Clamp(Mathf.RoundToInt(nudgeAction.action?.ReadValue<float>() ?? 0.0f), -1, 1);
-        public bool Press => pressAction.action?.WasPerformedThisFrame() ?? false;
         public bool Drag => pressAction.Switch();
         public bool FreeCam => freeCamAction.action?.WasPerformedThisFrame() ?? false;
         public bool GrabCam => grabCamAction.Switch();

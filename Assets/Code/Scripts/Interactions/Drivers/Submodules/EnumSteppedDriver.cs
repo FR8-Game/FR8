@@ -1,8 +1,9 @@
 using UnityEngine;
 
-namespace FR8.Interactions.Drivers
+namespace FR8.Interactions.Drivers.Submodules
 {
-    public class EnumSteppedDriver : Driver
+    [System.Serializable]
+    public class EnumSteppedDriver
     {
         [SerializeField] private Entry[] entries =
         {
@@ -11,17 +12,7 @@ namespace FR8.Interactions.Drivers
         };
 
         private int index;
-        public override string DisplayValue => entries[index].name;
-
-        public override float Value
-        {
-            get => base.Value;
-            set
-            {
-                index = GetClosestEntry(value);
-                base.Value = entries[index].value;
-            }
-        }
+        public string DisplayValue => entries[index].name;
 
         private int GetClosestEntry(float value)
         {
@@ -38,11 +29,17 @@ namespace FR8.Interactions.Drivers
             return bestIndex;
         }
 
-        public override void Nudge(int direction)
+        public void Nudge(int direction)
         {
             var newIndex = index + direction;
             if (newIndex < 0 || newIndex >= entries.Length) return;
-            Value = entries[newIndex].value;
+            ProcessValue(entries[newIndex].value);
+        }
+
+        public float ProcessValue(float newValue)
+        {
+            index = GetClosestEntry(newValue);
+            return entries[index].value;
         }
 
         [System.Serializable]

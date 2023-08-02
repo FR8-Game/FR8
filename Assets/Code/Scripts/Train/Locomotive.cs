@@ -7,27 +7,24 @@ namespace FR8.Train
     {
         [SerializeField] private float brakeConstant = 4.0f;
 
-        private DriverGroup brakeDriver;
-        private DriverGroup gearDriver;
-        private DriverGroup speedometerDriver;
+        private const string BrakeKey = "Brake";
+        private const string GearKey = "Gear";
+        private const string SpeedometerKey = "Speedometer";
+
+        private DriverNetwork driverNetwork;
         
         private float engineVelocity;
         private float enginePower;
-        
-        public float Brake => brakeDriver ? brakeDriver.Value : 0.0f;
-        public int Gear => gearDriver ? Mathf.RoundToInt(gearDriver.Value) : 0;
+
+        public float Brake => driverNetwork.Read(BrakeKey);
+        public int Gear => Mathf.RoundToInt(driverNetwork.Read(GearKey));
 
         protected override void Configure()
         {
             base.Configure();
             
             brakeConstant = Mathf.Max(0.0f, brakeConstant);
-
-            var findDriver = DriverGroup.Find(gameObject);
-            
-            brakeDriver = findDriver("Brake");
-            gearDriver = findDriver("Gear");
-            speedometerDriver = findDriver("Speedometer");
+            driverNetwork = GetComponentInParent<DriverNetwork>();
         }
 
         protected override void FixedUpdate()
@@ -52,7 +49,7 @@ namespace FR8.Train
         public void UpdateDriverGroups()
         {
             var fwdSpeed = Mathf.Abs(ToKmpH(GetForwardSpeed()));
-            speedometerDriver.SetValue(fwdSpeed);
+            driverNetwork.SetValue(SpeedometerKey, fwdSpeed);
         }
     }
 }

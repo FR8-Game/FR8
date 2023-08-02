@@ -1,7 +1,5 @@
-using System;
 using FR8.Interactions.Drivers;
 using FR8.Utility;
-using UnityEditorInternal;
 using UnityEngine;
 
 namespace FR8.Train.Electrics
@@ -18,7 +16,9 @@ namespace FR8.Train.Electrics
         [SerializeField] private float smoothTime;
         [SerializeField] private NoiseMachine engineNoise;
 
-        private DriverGroup rmpDriver;
+        private const string RpmKey = "RPM";
+
+        private DriverNetwork driverNetwork;
         
         private float targetRpm;
         private float currentRpm;
@@ -28,14 +28,13 @@ namespace FR8.Train.Electrics
         
         private void Awake()
         {
-            var findDriver = DriverGroup.Find(gameObject);
-            rmpDriver = findDriver("RPM");
+            driverNetwork = GetComponentInParent<DriverNetwork>();
         }
 
         private void FixedUpdate()
         {
             currentRpm = Mathf.SmoothDamp(currentRpm, targetRpm + engineNoise.Sample(Time.time, 0.5f), ref velocity, smoothTime);
-            rmpDriver.SetValue(currentRpm);
+            driverNetwork.SetValue(RpmKey, currentRpm);
         }
 
         public void SetClockSpeed(float percent)

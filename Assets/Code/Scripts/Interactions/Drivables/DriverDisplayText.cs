@@ -1,23 +1,24 @@
-using FR8.Interactions.Drivers;
 using TMPro;
 using UnityEngine;
 
 namespace FR8.Interactions.Drivables
 {
-    public class DriverDisplayText : MonoBehaviour, IDrivable
+    [System.Serializable]
+    public class DriverDisplayText
     {
-        private string template;
-        private TMP_Text text;
+        [SerializeField] private TMP_Text text;
         
-        private void Awake()
+        private string template;
+     
+        public void Awake()
         {
-            text = GetComponent<TMP_Text>();
             template = text.text;
         }
-
-        public void SetValue(DriverGroup group, float value)
+        
+        public void SetValue(float newValue)
         {
-            text.text = string.Format(template, value, group.GroupName);
+            if (!text) return;
+            text.text = string.Format(template, newValue);
         }
     }
 }

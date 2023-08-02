@@ -1,5 +1,5 @@
 using System;
-using FR8.Interactions.Drivers;
+using FR8.Interactions.Drivers.Submodules;
 using FR8.Pickups;
 using FR8.Rendering.Passes;
 using TMPro;
@@ -20,7 +20,6 @@ namespace FR8.Player.Submodules
         private new Camera camera;
 
         private int nudge;
-        private bool press;
         private bool dragging;
         private float dragDistance;
 
@@ -35,7 +34,6 @@ namespace FR8.Player.Submodules
 
         public void Update()
         {
-            if (controller.Press) press = true;
             if (controller.Nudge != 0) nudge = controller.Nudge;
         }
 
@@ -61,7 +59,6 @@ namespace FR8.Player.Submodules
             if (lookingAt == null)
             {
                 readoutText.text = null;
-                press = false;
                 nudge = 0;
                 dragging = false;
                 return;
@@ -70,15 +67,7 @@ namespace FR8.Player.Submodules
             var alpha = $"<alpha={(lookingAt.CanInteract ? "#FF" : "#80")}>";
             readoutText.text = $"{alpha}{lookingAt.DisplayName}\n<size=66%>{lookingAt.DisplayValue}";
 
-            if (heldObject)
-            {
-                if (press)
-                {
-                    heldObject = heldObject.Drop();
-                    press = false;
-                }
-            }
-            else if (lookingAt.CanInteract)
+            if (!heldObject && lookingAt.CanInteract)
             {
                 switch (lookingAt)
                 {
@@ -92,7 +81,6 @@ namespace FR8.Player.Submodules
             }
 
             nudge = 0;
-            press = false;
             dragging = controller.Drag;
         }
 
@@ -109,29 +97,19 @@ namespace FR8.Player.Submodules
                 driver.Nudge(nudge);
                 nudge = 0;
             }
-
-            if (press)
-            {
-                driver.Press();
-                press = false;
-            }
         }
 
         private void ProcessPickup(PickupObject pickup)
         {
-            if (!press) return;
-
             heldObject = pickup.Pickup(controller.CurrentAvatar as PlayerGroundedAvatar);
-                
-            press = false;
         }
 
         private IInteractable GetLookingAt()
         {
             var ray = GetLookingRay();
             if (!Physics.Raycast(ray, out var hit, interactionDistance)) return null;
-
-            return hit.collider .GetComponentInParent<IInteractable>();
+            
+            return hit.collider.GetComponentInParent<IInteractable>();
         }
 
         private Ray GetLookingRay()

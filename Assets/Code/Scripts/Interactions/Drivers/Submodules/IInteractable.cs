@@ -1,4 +1,4 @@
-﻿namespace FR8.Interactions.Drivers
+﻿namespace FR8.Interactions.Drivers.Submodules
 {
     public interface IInteractable : IBehaviour
     {

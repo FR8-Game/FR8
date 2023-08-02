@@ -1,35 +1,27 @@
-using FR8.Interactions.Drivers;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace FR8.Interactions.Drivables
 {
-    [DisallowMultipleComponent]
-    [RequireComponent(typeof(Image))]
-    public sealed class DriverDisplayUI : MonoBehaviour, IDrivable
+    [System.Serializable]
+    public sealed class DriverDisplayUI
     {
-        [SerializeField] private Vector2 inputRange = Vector2.right;
-        [SerializeField] private Vector2 outputRange = Vector2.right;
+        [SerializeField] private Image image;
+        [SerializeField] private Vector2 inputRange = Vector2.up;
+        [SerializeField] private Vector2 outputRange = Vector2.up;
         [SerializeField] private float testValue;
-        
-        private Image image;
 
-        private void Awake()
+        public void SetValue(float newValue)
         {
-            image = GetComponent<Image>();
-        }
-        
-        public void SetValue(DriverGroup group, float value)
-        {
-            var p = Mathf.InverseLerp(inputRange.x, inputRange.y, value);
+            var p = Mathf.InverseLerp(inputRange.x, inputRange.y, newValue);
             var val = Mathf.Lerp(outputRange.x, outputRange.y, p);
             image.fillAmount = val;
         }
         
-        private void OnValidate()
+        public void OnValidate()
         {
-            image = GetComponent<Image>();
-            SetValue(null, testValue);
+            if (!image) return;
+            SetValue(testValue);
         }
     }
 }

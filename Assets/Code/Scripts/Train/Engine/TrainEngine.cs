@@ -1,5 +1,7 @@
+using System;
 using FR8.Interactions.Drivers;
 using FR8.Train.Electrics;
+using Mono.Cecil.Cil;
 using UnityEngine;
 
 namespace FR8.Train.Engine
@@ -15,9 +17,11 @@ namespace FR8.Train.Engine
         [SerializeField] private float currentScaling = 4.0f;
         [SerializeField] private float trackMagnetDistance = 2.0f;
 
-        private DriverGroup throttleDriver;
-        private DriverGroup powerDrawDriver;
-        private DriverGroup currentDriver;
+        private const string ThrottleKey = "Throttle";
+        private const string PowerDrawKey = "PowerDraw";
+        private const string CurrentKey = "Current";
+        
+        private DriverNetwork driverNetwork;
         private Locomotive train;
 
         private bool connected;
@@ -25,16 +29,18 @@ namespace FR8.Train.Engine
         private float current;
         private float powerConsumption;
 
-        public float Throttle => connected ? (throttleDriver ? throttleDriver.Value : 0.0f) : 0.0f;
+        public float Throttle => connected ? driverNetwork.Read(ThrottleKey) : 0.0f;
 
         private void Awake()
         {
             train = GetComponent<Locomotive>();
-            
-            var findDriver = DriverGroup.Find(gameObject);
-            throttleDriver = findDriver("Throttle");
-            powerDrawDriver = findDriver("Power Draw");
-            currentDriver = findDriver("Current");
+            driverNetwork = GetComponentInParent<DriverNetwork>();
+        }
+
+        private void Start()
+        {
+            driverNetwork.SetValue(PowerDrawKey, 0.0f);
+            driverNetwork.SetValue(CurrentKey, 0.0f);
         }
 
         private void FixedUpdate()
@@ -44,6 +50,7 @@ namespace FR8.Train.Engine
             var fwdSpeed = train.GetForwardSpeed();
             var maxSpeed = maxSpeedKmpH / 3.6f;
             var targetSpeed = maxSpeed * Throttle * train.Gear;
+            
             var acceleration = Mathf.Clamp((targetSpeed - fwdSpeed) / maxSpeed, -1.0f, 1.0f) * accelerationTime;
             
             train.Rigidbody.AddForce(train.DriverDirection * acceleration * train.ReferenceWeight);
@@ -52,11 +59,11 @@ namespace FR8.Train.Engine
             voltage = Mathf.Abs(acceleration) * voltageScaling;
             powerConsumption = current * voltage;
 
-            powerDrawDriver.SetValue(powerConsumption / 1000.0f);
-            currentDriver.SetValue(current);
+            driverNetwork.SetValue(PowerDrawKey, powerConsumption / 1000.0f);
+            driverNetwork.SetValue(CurrentKey, current);
         }
 
-        public void SetConnected(bool connected) => this.connected = true;
+        public void SetConnected(bool connected) => this.connected = connected;
         
         public float CalculatePowerDraw() => powerConsumption;
     }
