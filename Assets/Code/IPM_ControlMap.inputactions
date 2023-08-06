@@ -24,15 +24,6 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Roll",
-                    "type": "Value",
-                    "id": "497223ea-3e45-4e76-9aa8-446d054e860e",
-                    "expectedControlType": "Axis",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
                     "name": "Jump",
                     "type": "Value",
                     "id": "cf5a3145-956f-407c-89c6-e2ae7840b311",
@@ -42,9 +33,9 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Fly",
+                    "name": "Sprint",
                     "type": "Button",
-                    "id": "d3dbe247-327f-48c0-8171-efc7b2c18d03",
+                    "id": "b2868766-6b70-4ba7-a75f-8bf9499b66e9",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -90,6 +81,15 @@
                     "name": "GrabCam",
                     "type": "Button",
                     "id": "3440dd1d-17d4-4dd7-b64e-71aa33061399",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ZoomCam",
+                    "type": "Button",
+                    "id": "a4e4aa6f-2fdc-4201-a1d8-21b29f0ed69c",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -193,28 +193,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "Move",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "d204b288-56cb-457c-9242-2f01fe186b15",
-                    "path": "<Keyboard>/tab",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Fly",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "ff42c93f-258e-4cfd-8504-8b7b22c47d43",
-                    "path": "<Gamepad>/buttonNorth",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Fly",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -340,37 +318,26 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "Keyboard",
-                    "id": "4775f2ae-49e2-4983-952d-a00ae3acbca2",
-                    "path": "1DAxis",
+                    "name": "",
+                    "id": "fbfaed3f-0c12-4b44-8085-c419572e2afa",
+                    "path": "<Keyboard>/tab",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Roll",
-                    "isComposite": true,
+                    "action": "ZoomCam",
+                    "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "negative",
-                    "id": "1db448f7-3225-45d5-adec-913fae275f23",
-                    "path": "<Keyboard>/e",
+                    "name": "",
+                    "id": "a9c31f6e-5f9e-4001-aed9-4acaa2f7a7e5",
+                    "path": "<Keyboard>/leftShift",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Roll",
+                    "action": "Sprint",
                     "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "positive",
-                    "id": "47250d0f-e378-4105-8d5d-d657a097c1be",
-                    "path": "<Keyboard>/q",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Roll",
-                    "isComposite": false,
-                    "isPartOfComposite": true
+                    "isPartOfComposite": false
                 }
             ]
         }

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2544436754322828431}
   - component: {fileID: 6642188932095647077}
   - component: {fileID: 7569875079970103351}
+  - component: {fileID: 2186375648735075336}
   m_Layer: 0
   m_Name: Single Control Stick.Handle
   m_TagString: Untagged
@@ -62,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f802a82ef760cae47881981e2307afa5, type: 2}
+  - {fileID: 2100000, guid: c9ec8293529a8f04d992f8fe1dc88757, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -98,6 +99,20 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 2801000835536338540, guid: 7ede8a74de1e7ba428f59b3f63c8b624, type: 3}
+--- !u!114 &2186375648735075336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1745049495058535356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a3c7da84e21157459b00fb0db16531f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sensitivity: 1
+  dragVector: {x: 0, y: 0, z: 0.1}
 --- !u!1 &5895266705354658384
 GameObject:
   m_ObjectHideFlags: 0
@@ -110,7 +125,11 @@ GameObject:
   - component: {fileID: 3349898635897989016}
   - component: {fileID: 2238459430204802109}
   - component: {fileID: 5233045168322493834}
-  - component: {fileID: 2845039895893732168}
+  - component: {fileID: 6146274182722837314}
+  - component: {fileID: 2186359382506385862}
+  - component: {fileID: 9112768785411581255}
+  - component: {fileID: 46793511293734253}
+  - component: {fileID: 8651863562436570084}
   m_Layer: 0
   m_Name: Single Control Stick
   m_TagString: Untagged
@@ -126,7 +145,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5895266705354658384}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.1002636, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -162,7 +181,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ca921d71f81ded141bdee92cbedcf9e4, type: 2}
+  - {fileID: 2100000, guid: 61846437982249044bf9d27abb8e8a05, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -198,7 +217,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 1342504364486349867, guid: 7ede8a74de1e7ba428f59b3f63c8b624, type: 3}
---- !u!114 &2845039895893732168
+--- !u!114 &6146274182722837314
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -207,16 +226,100 @@ MonoBehaviour:
   m_GameObject: {fileID: 5895266705354658384}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0618e80a144647deaacf828008c2da6e, type: 3}
+  m_Script: {fileID: 11500000, guid: 13b9bab282324f44b938b466582ce752, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  displayName: Dial
-  nudgeStep: 8
+  initialValue: 0
   displayRange: {x: 0, y: 100}
-  displayTemplate: '{0:N1}%'
-  displayText: {fileID: 0}
-  limited: 1
-  dragMode: 1
+  displayTemplate: '{0:N0}%'
+  clamped: 1
+  steps: 10
+  forceStep: 0
+  valueRange: {x: 0, y: 1}
+--- !u!114 &2186359382506385862
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5895266705354658384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4ba9a1bf38c4cefb5f35ff6888db648, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   handle: {fileID: 9047604343581456613}
-  zeroRotation: {x: -45, y: 0, z: 0}
-  oneRotation: {x: 45, y: 0, z: 0}
+  valueRange: {x: 0, y: 1}
+  animationSpring:
+    springConstant: 350
+    dampingConstant: 25
+    clamped: 1
+    range: {x: 0, y: 1}
+    bounce: 0.4
+    currentPosition: 0.5
+    targetPosition: 0.5
+    velocity: 1.8433468e-26
+  animatePosition: 0
+  slidePoseAPosition: {x: 0, y: 0, z: 0}
+  slidePoseBPosition: {x: 0, y: 0, z: 0}
+  animateRotation: 1
+  slidePoseARotation: {x: -45, y: 0, z: 0}
+  slidePoseBRotation: {x: 45, y: 0, z: 0}
+--- !u!114 &9112768785411581255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5895266705354658384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a3c7da84e21157459b00fb0db16531f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sensitivity: 5
+  dragVector: {x: 0, y: 0, z: 1}
+--- !u!114 &46793511293734253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5895266705354658384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a6610d2e704f1648819acc8d7460285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CollisionTag: 
+  EventReference:
+    Guid:
+      Data1: 779939904
+      Data2: 1153591353
+      Data3: 1315055039
+      Data4: 1935609873
+    Path: event:/Interactions/Control Stick Click
+  Event: 
+  PlayEvent: 0
+  StopEvent: 0
+  AllowFadeout: 1
+  TriggerOnce: 0
+  Preload: 0
+  AllowNonRigidbodyDoppler: 0
+  Params: []
+  OverrideAttenuation: 0
+  OverrideMinDistance: 1
+  OverrideMaxDistance: 20
+--- !u!114 &8651863562436570084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5895266705354658384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c0a711a4969b934a95fb792060055d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  steps: 10

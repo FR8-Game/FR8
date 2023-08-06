@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using FR8.Signals;
+using FR8.Train.Signals;
 using FR8.Utility;
 using UnityEngine;
 

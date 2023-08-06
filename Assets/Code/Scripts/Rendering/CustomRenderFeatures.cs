@@ -1,9 +1,14 @@
+using FR8.Rendering.Passes;
+using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
 namespace FR8.Rendering
 {
     public sealed class CustomRenderFeatures : ScriptableRendererFeature
     {
+        [SerializeField] private bool renderFog = true;
+        [SerializeField] private bool renderOutline = true;
+        
         private FogPass fogPass;
         private SelectionOutlinePass outlinePass;
 
@@ -15,8 +20,8 @@ namespace FR8.Rendering
 
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
-            renderer.EnqueuePass(fogPass);
-            renderer.EnqueuePass(outlinePass);
+            if (renderFog) renderer.EnqueuePass(fogPass);
+            if (renderOutline) renderer.EnqueuePass(outlinePass);
         }
     }
 }
