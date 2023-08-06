@@ -1,3 +1,4 @@
+using FR8.Rendering.Passes;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 

@@ -1,10 +1,13 @@
 using System;
 using FR8.Interactions.Drivers;
+using FR8.Interactions.Drivers.Submodules;
 using FR8.Pickups;
-using FR8.Rendering;
+using FR8.Rendering.Passes;
+using FR8.Utility;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Cursor = UnityEngine.Cursor;
 using Object = UnityEngine.Object;
 
 namespace FR8.Player.Submodules
@@ -15,6 +18,7 @@ namespace FR8.Player.Submodules
     {
         [SerializeField] private float interactionDistance = 2.5f;
         [SerializeField] private TMP_Text readoutText;
+        [SerializeField] private DampedSpring transition;
 
         private PlayerController controller;
         private new Camera camera;
@@ -52,15 +56,21 @@ namespace FR8.Player.Submodules
 
             if (newLookingAt != lookingAt)
             {
+                transition.currentPosition = 0.0f;
+                transition.velocity = 0.0f;
+                
                 if (lookingAt != null) SelectionOutlinePass.RemovePersistant(lookingAt.gameObject);
                 if (newLookingAt != null) SelectionOutlinePass.RenderPersistant(newLookingAt.gameObject);
             }
 
             lookingAt = newLookingAt;
-
+            transition.Target(lookingAt != null ? 1.0f : 0.0f).Iterate(Time.deltaTime);
+            var animatePosition = Mathf.Max(0.0f, transition.currentPosition);
+            readoutText.transform.localScale = Vector3.one * animatePosition;
+            readoutText.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, (1.0f - animatePosition) * 20.0f);
+            
             if (lookingAt == null)
             {
-                readoutText.text = null;
                 press = false;
                 nudge = 0;
                 dragging = false;
@@ -108,12 +118,6 @@ namespace FR8.Player.Submodules
             {
                 driver.Nudge(nudge);
                 nudge = 0;
-            }
-
-            if (press)
-            {
-                driver.Press();
-                press = false;
             }
         }
 

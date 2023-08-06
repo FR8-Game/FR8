@@ -110,7 +110,6 @@ GameObject:
   - component: {fileID: 2857928202651626607}
   - component: {fileID: 452238579676532753}
   - component: {fileID: 1441174683049612566}
-  - component: {fileID: 8008248762543140124}
   m_Layer: 0
   m_Name: Flat Switch
   m_TagString: Untagged
@@ -199,28 +198,6 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -6716711626481436201, guid: 7ede8a74de1e7ba428f59b3f63c8b624, type: 3}
---- !u!114 &8008248762543140124
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6336872212546470005}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d4de036923043708aa2ab48e9ba48ad, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  displayName: Switch
-  nudgeStep: 8
-  displayRange: {x: 0, y: 100}
-  displayTemplate: '{0:N1}%'
-  displayText: {fileID: 0}
-  handle: {fileID: 3173532922704116893}
-  slidePoseA: {x: 0, y: 0.012496422, z: -0.007264267}
-  slidePoseB: {x: 0, y: 0.012496422, z: 0.0072642667}
-  trueDisplay: On
-  falseDisplay: Off
 --- !u!1 &8008248760862562106
 GameObject:
   m_ObjectHideFlags: 0

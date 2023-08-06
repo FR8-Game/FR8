@@ -13,7 +13,13 @@ namespace FR8.Train.Track
     [SelectionBase, DisallowMultipleComponent]
     public class TrackSegment : MonoBehaviour
     {
-        [SerializeField] private List<Vector3> knots = new();
+        [SerializeField] private List<Vector3> knots = new()
+        {
+            new Vector3(0.0f, 0.0f, -15.0f),
+            new Vector3(0.0f, 0.0f, -5.0f),
+            new Vector3(0.0f, 0.0f, 5.0f),
+            new Vector3(0.0f, 0.0f, 15.0f),
+        };
         [SerializeField] private int resolution = 100;
         [SerializeField] private bool closedLoop;
 
@@ -22,7 +28,7 @@ namespace FR8.Train.Track
 
         private float totalLength;
 
-        private Dictionary<TrainMovement, Vector3> trainMetadata = new();
+        private Dictionary<TrainCarriage, Vector3> trainMetadata = new();
 
         public int Resolution => resolution;
         public List<Vector3> Knots => knots;
@@ -31,14 +37,14 @@ namespace FR8.Train.Track
 
         private void FixedUpdate()
         {
-            var trains = FindObjectsOfType<TrainMovement>();
+            var trains = FindObjectsOfType<TrainCarriage>();
 
             UpdateConnection(trains, startConnection);
             UpdateConnection(trains, endConnection);
             UpdateTrainMetadata(trains);
         }
 
-        private void UpdateTrainMetadata(TrainMovement[] trains)
+        private void UpdateTrainMetadata(TrainCarriage[] trains)
         {
             foreach (var train in trains)
             {
@@ -47,14 +53,14 @@ namespace FR8.Train.Track
             }
         }
 
-        private void UpdateConnection(TrainMovement[] trains, EndConnection connection)
+        private void UpdateConnection(TrainCarriage[] trains, EndConnection connection)
         {
             if (!connection) return;
             if (!connection.connectionActive) return;
 
             foreach (var train in trains)
             {
-                if (train.Walker.CurrentSegment != connection.segment) continue;
+                if (train.Segment != connection.segment) continue;
                 if (!trainMetadata.ContainsKey(train)) continue;
 
                 var knotPercent = GetKnotPercent(connection.knotIndex);
@@ -65,7 +71,7 @@ namespace FR8.Train.Track
 
                 if (sign == switchSign && lastSign != switchSign)
                 {
-                    train.Walker.CurrentSegment = this;
+                    train.Segment = this;
                 }
             }
         }
