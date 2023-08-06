@@ -24,6 +24,7 @@ namespace FR8.Train.Electrics
         [SerializeField] private NoiseMachine engineNoise;
 
         private const string IgnitionKey = "Ignition";
+        private const string FuelKey = "Fuel";
         private const string RpmKey = "RPM";
 
         private DriverNetwork driverNetwork;
@@ -60,6 +61,7 @@ namespace FR8.Train.Electrics
 
             currentRpm = Mathf.SmoothDamp(currentRpm, t, ref velocity, smoothTime);
             driverNetwork.SetValue(RpmKey, currentRpm);
+            driverNetwork.SetValue(FuelKey, fuelLevel * 100.0f);
         }
 
         public void SetClockSpeed(float percent)
