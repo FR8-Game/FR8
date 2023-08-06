@@ -16,14 +16,13 @@ namespace FR8.Pickups
 
         [SerializeField] private float spring = 300.0f;
         [SerializeField] private float damping = 18.0f;
-        [SerializeField] private float error = 1800;
         [SerializeField] private float torqueScaling = 1.0f;
 
         private new Rigidbody rigidbody;
         private PlayerGroundedAvatar target;
         
-        private Vector3 translationError;
-        private Vector3 rotationError;
+        private Vector3 lastTargetPosition;
+        private Quaternion lastTargetRotation;
 
         // private Vector3 holdPosition, holdVelocity;
         // private Quaternion holdRotation;
@@ -44,15 +43,19 @@ namespace FR8.Pickups
         {
             if (!target) return;
             
-            var targetPosition = target.CameraTarget.TransformPoint(HoldTranslation);
-            var targetRotation = target.CameraTarget.rotation * HoldRotation;
+            var targetPosition = GetTargetPosition();
+            var targetRotation = GetTargetRotation();
 
-            var force = (targetPosition - rigidbody.position) * spring - rigidbody.velocity * damping + translationError * error;
+            var targetVelocity = (targetPosition - lastTargetPosition) / Time.deltaTime;
+            (targetRotation * Quaternion.Inverse(lastTargetRotation)).ToAngleAxis(out var angle, out var axis);
+            var targetAngularVelocity = axis * angle / Time.deltaTime * Mathf.Deg2Rad;
+
+            var force = (targetPosition - rigidbody.position) * spring + (targetVelocity - rigidbody.velocity) * damping;
             rigidbody.AddForce(force - Physics.gravity, ForceMode.Acceleration);
 
             var deltaRotation = (targetRotation * Quaternion.Inverse(rigidbody.rotation));
             if (deltaRotation.w < 0.0f) deltaRotation = Quaternion.Inverse(deltaRotation);
-            deltaRotation.ToAngleAxis(out var angle, out var axis);
+            deltaRotation.ToAngleAxis(out angle, out axis);
             if (Mathf.Abs(angle) > 180.0f) angle = 360.0f - angle;
             
             angle *= Mathf.Deg2Rad;
@@ -62,13 +65,16 @@ namespace FR8.Pickups
                 angle = 0.0f;
             }
             
-            var torque = (axis * angle * spring - rigidbody.angularVelocity * damping + rotationError * error) * torqueScaling;
+            var torque = (axis * angle * spring + (targetAngularVelocity - rigidbody.angularVelocity) * damping) * torqueScaling;
             rigidbody.AddTorque(torque, ForceMode.Acceleration);
 
-            translationError += (targetPosition - rigidbody.position) * Time.deltaTime;
-            rotationError += axis * angle * Time.deltaTime;
+            lastTargetPosition = targetPosition;
+            lastTargetRotation = targetRotation;
         }
 
+        private Vector3 GetTargetPosition() => target.CameraTarget.TransformPoint(HoldTranslation);
+        private Quaternion GetTargetRotation() => target.CameraTarget.rotation * HoldRotation;
+        
         public PickupObject Pickup(PlayerGroundedAvatar target)
         {
             if (this.target) return null;
@@ -76,6 +82,10 @@ namespace FR8.Pickups
             
             this.target = target;
             rigidbody.detectCollisions = false;
+
+            lastTargetPosition = GetTargetPosition();
+            lastTargetRotation = GetTargetRotation();
+            
             return this;
         }
 

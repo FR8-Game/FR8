@@ -26,7 +26,13 @@ namespace FR8.Interactions.Drivers
 
         protected virtual void SetValue(float newValue)
         {
-            driverNetwork.SetValue(key, newValue);
+            if (string.IsNullOrEmpty(key))
+            {
+                OnValueChanged(newValue);
+                return;
+            }
+
+            if (driverNetwork) driverNetwork.SetValue(key, newValue);
         }
 
         public abstract void Nudge(int direction);

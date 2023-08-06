@@ -1,27 +1,26 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using FR8.Interactions.Drivables;
+using FR8.Interactions.Drivers;
 using FR8.Utility;
 using UnityEngine;
 
 namespace FR8.Train
 {
-    public class CarriageConnector : MonoBehaviour, IDrivable
+    public class CarriageConnector : Driver
     {
-        [SerializeField] private string key;
         [SerializeField] private CarriageConnectorSettings settings;
         [SerializeField] private Transform anchor;
-        [SerializeField] private bool engaged = true;
 
         private new Rigidbody rigidbody;
         private CarriageConnector connection;
-        
-        public string Key => key;
 
         private static HashSet<CarriageConnector> all = new();
 
-        private void Awake()
+        public override string DisplayValue => Value > 0.5f ? "Engaged" : "Disengaged";
+
+        protected override void Awake()
         {
+            base.Awake();
             rigidbody = GetComponentInParent<Rigidbody>();
         }
 
@@ -37,7 +36,7 @@ namespace FR8.Train
 
         private void FixedUpdate()
         {
-            if (!engaged)
+            if (Value < 0.5f)
             {
                 connection = null;
                 return;
@@ -45,6 +44,12 @@ namespace FR8.Train
             
             if (connection)
             {
+                if (connection.Value < 0.5f)
+                {
+                    connection = null;
+                    return;
+                }
+                
                 var displacement = connection.anchor.position - anchor.position;
 
                 var mass = rigidbody.mass;
@@ -73,7 +78,8 @@ namespace FR8.Train
                 var vector = other.anchor.position - anchor.position;
                 var dist = vector.magnitude;
                 var direction = vector / dist;
-                
+
+                if (other.Value < 0.5f) continue;
                 if (dist < settings.connectionDistance)
                 {
                     Connect(other);
@@ -127,10 +133,22 @@ namespace FR8.Train
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(anchor.position, settings.connectionDistance);
         }
-        
-        public void OnValueChanged(float newValue)
+
+        protected override void SetValue(float newValue) => base.SetValue(newValue > 0.5f ? 1.0f : 0.0f);
+
+        public override void Nudge(int direction)
         {
-            engaged = newValue > 0.5f;
+            SetValue(direction == 1 ? 1.0f : 0.0f);
+        }
+
+        public override void BeginDrag(Ray ray)
+        {
+            SetValue(1.0f - Value);
+        }
+        
+        public override void ContinueDrag(Ray ray)
+        {
+            
         }
     }
 }

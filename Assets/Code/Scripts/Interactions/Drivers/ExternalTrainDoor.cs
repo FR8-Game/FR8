@@ -25,7 +25,7 @@ namespace FR8.Interactions.Drivers
                 return base.DisplayValue;
             }
         }
-
+        
         public void SetConnected(bool connected)
         {
             this.connected = connected;
