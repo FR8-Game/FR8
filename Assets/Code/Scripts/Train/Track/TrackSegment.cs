@@ -13,7 +13,13 @@ namespace FR8.Train.Track
     [SelectionBase, DisallowMultipleComponent]
     public class TrackSegment : MonoBehaviour
     {
-        [SerializeField] private List<Vector3> knots = new();
+        [SerializeField] private List<Vector3> knots = new()
+        {
+            new Vector3(0.0f, 0.0f, -15.0f),
+            new Vector3(0.0f, 0.0f, -5.0f),
+            new Vector3(0.0f, 0.0f, 5.0f),
+            new Vector3(0.0f, 0.0f, 15.0f),
+        };
         [SerializeField] private int resolution = 100;
         [SerializeField] private bool closedLoop;
 

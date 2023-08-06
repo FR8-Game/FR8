@@ -24,7 +24,9 @@ namespace FR8Editor.Inspector
                     var transform = Target.transform;
                     var track = Target.Segment;
 
-                    transform.position = track.SamplePoint(track.GetClosestPoint(transform.position));
+                    var t = track.GetClosestPoint(transform.position);
+                    transform.position = track.SamplePoint(t);
+                    transform.rotation = Quaternion.LookRotation(track.SampleTangent(t), Vector3.up);
                 }
             }
         }

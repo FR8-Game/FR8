@@ -15,7 +15,6 @@ namespace FR8.Player
 
         [Range(0.0f, 1.0f)]
         [SerializeField] private float controllerSensitivity = 0.4f;
-        [SerializeField] private float rollSensitivity = 0.4f;
 
         [Space]
         [SerializeField] private PlayerAvatar newAvatar;

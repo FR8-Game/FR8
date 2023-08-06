@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using FR8.Interactions.Drivables;
-using FR8.Interactions.Drivers;
 using FR8.Utility;
 using UnityEngine;
 
@@ -9,12 +8,15 @@ namespace FR8.Train
 {
     public class CarriageConnector : MonoBehaviour, IDrivable
     {
+        [SerializeField] private string key;
         [SerializeField] private CarriageConnectorSettings settings;
         [SerializeField] private Transform anchor;
         [SerializeField] private bool engaged = true;
 
         private new Rigidbody rigidbody;
         private CarriageConnector connection;
+        
+        public string Key => key;
 
         private static HashSet<CarriageConnector> all = new();
 
@@ -125,10 +127,10 @@ namespace FR8.Train
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(anchor.position, settings.connectionDistance);
         }
-
-        public void SetValue(DriverGroup group, float value)
+        
+        public void OnValueChanged(float newValue)
         {
-            engaged = value > 0.5f;
+            engaged = newValue > 0.5f;
         }
     }
 }
