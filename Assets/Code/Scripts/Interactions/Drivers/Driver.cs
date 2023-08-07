@@ -16,6 +16,9 @@ namespace FR8.Interactions.Drivers
         public virtual string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
         public virtual string DisplayValue => $"{Mathf.RoundToInt(Value * 100.0f)}%";
         
+        public bool OverrideInteractDistance => false;
+        public float InteractDistance => throw new System.NotImplementedException();
+        
         public float Value { get; private set; }
         public string Key => key;
         

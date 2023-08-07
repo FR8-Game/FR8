@@ -92,11 +92,11 @@ namespace FR8.Player.Submodules
             {
                 switch (lookingAt)
                 {
-                    case IDriver driver:
-                        ProcessDriver(driver, ray);
-                        break;
                     case PickupObject pickup:
                         ProcessPickup(pickup);
+                        break;
+                    default:
+                        ProcessInteractable(lookingAt, ray);
                         break;
                 }
             }
@@ -106,7 +106,7 @@ namespace FR8.Player.Submodules
             dragging = controller.Drag;
         }
 
-        private void ProcessDriver(IDriver driver, Ray ray)
+        private void ProcessInteractable(IInteractable driver, Ray ray)
         {
             if (controller.Drag)
             {
@@ -133,9 +133,13 @@ namespace FR8.Player.Submodules
         private IInteractable GetLookingAt()
         {
             var ray = GetLookingRay();
-            if (!Physics.Raycast(ray, out var hit, interactionDistance)) return null;
+            if (!Physics.Raycast(ray, out var hit)) return null;
 
-            return hit.collider .GetComponentInParent<IInteractable>();
+            var interactable = hit.collider.GetComponentInParent<IInteractable>();
+            if (!(Object)interactable) return null;
+
+            var distance = interactable.OverrideInteractDistance ? interactable.InteractDistance : interactionDistance;
+            return (hit.distance < distance) ? interactable : null;
         }
 
         private Ray GetLookingRay()

@@ -23,13 +23,15 @@ namespace FR8.Train.Track
         [SerializeField] private int resolution = 100;
         [SerializeField] private bool closedLoop;
 
-        [SerializeField] private EndConnection startConnection;
-        [SerializeField] private EndConnection endConnection;
+        [SerializeField] private Connection startConnection;
+        [SerializeField] private Connection endConnection;
 
         private float totalLength;
 
         private Dictionary<TrainCarriage, Vector3> trainMetadata = new();
 
+        public Connection StartConnection => startConnection;
+        public Connection EndConnection => endConnection;
         public int Resolution => resolution;
         public List<Vector3> Knots => knots;
 
@@ -53,7 +55,7 @@ namespace FR8.Train.Track
             }
         }
 
-        private void UpdateConnection(TrainCarriage[] trains, EndConnection connection)
+        private void UpdateConnection(TrainCarriage[] trains, Connection connection)
         {
             if (!connection) return;
             if (!connection.connectionActive) return;
@@ -179,13 +181,13 @@ namespace FR8.Train.Track
             if (startConnection && i == 0) return startConnection.Knot;
             if (startConnection && i == 1) return startConnection.KnotBackTangent;
 
-            var end = startConnection ? knots.Count + EndConnection.AdditionalKnotsPerConnection : knots.Count;
+            var end = startConnection ? knots.Count + Connection.AdditionalKnotsPerConnection : knots.Count;
 
             //if (endConnection && i == end) return endConnection.KnotForwardTangent;
-            if (endConnection && i == end + 0) return endConnection.Knot;
+            if (endConnection && i == end) return endConnection.Knot;
             if (endConnection && i == end + 1) return endConnection.KnotBackTangent;
 
-            return transform.TransformPoint(knots[startConnection ? i - EndConnection.AdditionalKnotsPerConnection : i]);
+            return transform.TransformPoint(knots[startConnection ? i - Connection.AdditionalKnotsPerConnection : i]);
         }
 
         public Vector3 KnotVelocity(int index) => SampleVelocity(GetKnotPercent(index));
@@ -195,8 +197,8 @@ namespace FR8.Train.Track
             if (closedLoop) return knots.Count + 3;
 
             var c = knots.Count;
-            if (startConnection) c += EndConnection.AdditionalKnotsPerConnection;
-            if (endConnection) c += EndConnection.AdditionalKnotsPerConnection;
+            if (startConnection) c += Connection.AdditionalKnotsPerConnection;
+            if (endConnection) c += Connection.AdditionalKnotsPerConnection;
 
             return c;
         }
@@ -288,13 +290,13 @@ namespace FR8.Train.Track
         }
 
         [Serializable]
-        public class EndConnection
+        public class Connection
         {
             public const int AdditionalKnotsPerConnection = 2;
 
             public TrackSegment segment;
             public int knotIndex;
-            public float handleScale = 1.0f;
+            public int handleScale = 1;
             public bool connectionActive;
 
             public Vector3 Knot => segment.Knot(knotIndex);
@@ -307,9 +309,11 @@ namespace FR8.Train.Track
                 {
                     if (!segment.closedLoop) knotIndex = Mathf.Clamp(knotIndex, 0, segment.knots.Count - 1);
                 }
+
+                handleScale = Mathf.Clamp(handleScale, -1, 1);
             }
 
-            public static implicit operator bool(EndConnection connection)
+            public static implicit operator bool(Connection connection)
             {
                 if (connection == null) return false;
                 if (!connection.segment) return false;

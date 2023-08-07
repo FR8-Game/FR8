@@ -31,6 +31,14 @@ namespace FR8.Pickups
         public bool CanInteract => !target;
         public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
         public string DisplayValue => target ? "Drop" : "Pickup";
+        
+        public bool OverrideInteractDistance => false;
+        public float InteractDistance => throw new System.NotImplementedException();
+
+        public void Nudge(int direction) { }
+        public void BeginDrag(Ray ray) { }
+        public void ContinueDrag(Ray ray) { }
+
         public Vector3 HoldTranslation => (pickupPose ? pickupPose.holdTranslation : Vector3.zero) + additionalTranslation;
         public Quaternion HoldRotation => Quaternion.Euler(pickupPose ? pickupPose.holdRotation : Vector3.zero) * Quaternion.Euler(additionalRotation);
         

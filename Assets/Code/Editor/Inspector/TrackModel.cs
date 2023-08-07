@@ -37,7 +37,7 @@ namespace FR8Editor.Inspector
             {
                 if (GUILayout.Button($"Bake{append}", GUILayout.Height(30)))
                 {
-                    target.BakeMesh();
+                    target.BakeMesh(true);
                 }
 
                 if (GUILayout.Button($"Clear{append}", GUILayout.Height(30)))

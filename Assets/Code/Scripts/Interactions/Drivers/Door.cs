@@ -16,7 +16,10 @@ namespace FR8.Interactions.Drivers
         public virtual bool CanInteract => true;
         public string DisplayName => "Door";
         public virtual string DisplayValue => state ? "Open" : "Closed";
-
+        
+        public bool OverrideInteractDistance => false;
+        public float InteractDistance => throw new System.NotImplementedException();
+        
         protected virtual void Awake()
         {
             SetValue(testValue ? 1.0f : 0.0f);

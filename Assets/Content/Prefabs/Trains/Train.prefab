@@ -890,9 +890,9 @@ MonoBehaviour:
   drag: 12
   referenceWeight: 100000
   cornerLean: 0.6
-  retentionSpring: 2500
-  retentionDamping: 50
-  retentionTorqueConstant: 0.2
+  retentionSpring: 1250
+  retentionDamping: 25
+  retentionTorqueConstant: 0.05
   segment: {fileID: 0}
   brakeConstant: 30
 --- !u!114 &6888675464939285067
@@ -910,7 +910,7 @@ MonoBehaviour:
   maxSpeedKmpH: 120
   acceleration: 0.1
   maxPowerConsumption: 75
-  tangentialForceCost: 10
+  tangentialForceCost: 0
   throttleSmoothing: 0.8
 --- !u!114 &1884765813156554468
 MonoBehaviour:
@@ -1956,7 +1956,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2de40a509088b6e428ef0e687f8a2358, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.25
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2de40a509088b6e428ef0e687f8a2358, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2280,8 +2280,34 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 2.4, y: 2.3, z: 0.42993212}
-  m_Center: {x: 0, y: 1.9288591, z: 5.292001}
+  m_Size: {x: 2.4, y: 0.48930264, z: 0.4299317}
+  m_Center: {x: -0.00000000573213, y: 2.8342075, z: 5.292001}
+--- !u!65 &5116380730646841155
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3969472291139084178}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 2.3999999, y: 1.0451274, z: 0.4299317}
+  m_Center: {x: -0.000000009459157, y: 1.2951152, z: 5.2920003}
+--- !u!65 &6319248695790666432
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3969472291139084178}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.40012008, y: 2.3, z: 0.4299317}
+  m_Center: {x: -0.000000009459157, y: 1.9288591, z: 5.2920003}
 --- !u!1 &4042292891318952683 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4636095486146340030, guid: 2de40a509088b6e428ef0e687f8a2358, type: 3}

@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Splines;
 
 namespace FR8.Train.Track
 {
@@ -13,6 +15,7 @@ namespace FR8.Train.Track
         [SerializeField] private Material material;
         [SerializeField] private bool optimize;
         [SerializeField] private int segmentsPerSplit = 15;
+        [SerializeField] private float verticalOffset;
 
         private List<Vector3> lastBakedPoints = new();
         
@@ -22,9 +25,9 @@ namespace FR8.Train.Track
             if (rendererContainer) DestroyImmediate(rendererContainer.gameObject);
         }
         
-        public void BakeMesh()
+        public void BakeMesh(bool force = false)
         {
-            if (!Dirty()) return;
+            if (!Dirty() && !force) return;
             
             Clear();
             
@@ -43,10 +46,6 @@ namespace FR8.Train.Track
             var startPoint = 0.0f;
             var endPoint = 0.0f;
             var segmentSize = baseMesh.bounds.size.z;
-
-            var rnd = new System.Random(gameObject.GetInstanceID());
-            var vOffset = (float)rnd.NextDouble();
-            vOffset *= 0.01f;
 
             var index = 0;
 
@@ -69,12 +68,12 @@ namespace FR8.Train.Track
                     var r = Quaternion.LookRotation(segment.SampleTangent(p2));
                     var v2 = r * new Vector3(v0.x, v0.y, 0.0f) + t;
 
-                    vertices.Add(transform.InverseTransformPoint(v2 + Vector3.up * vOffset));
+                    vertices.Add(transform.InverseTransformPoint(v2));
                 }
 
                 foreach (var n in baseMesh.normals)
                 {
-                    normals.Add(n);
+                    normals.Add(transform.InverseTransformDirection(n).normalized);
                 }
 
                 foreach (var t in baseMesh.triangles)
@@ -110,7 +109,7 @@ namespace FR8.Train.Track
 
             filter.transform.SetParent(rendererContainer);
             filter.gameObject.name = $"Track Mesh Renderer.{filter.transform.GetSiblingIndex()}";
-            filter.transform.localPosition = Vector3.zero;
+            filter.transform.localPosition = Vector3.up * verticalOffset;
             filter.transform.localRotation = Quaternion.identity;
 
             var mesh = new Mesh();
@@ -160,6 +159,17 @@ namespace FR8.Train.Track
                 if ((knot - other).sqrMagnitude > threshold) return true;
             }
             return false;
+        }
+
+        private void OnValidate()
+        {
+            if (transform.childCount == 0) return;
+            
+            foreach (Transform child in transform.GetChild(0))
+            {
+                child.localPosition = Vector3.up * verticalOffset;
+                child.localRotation = Quaternion.identity;
+            }
         }
 
 #if UNITY_EDITOR
