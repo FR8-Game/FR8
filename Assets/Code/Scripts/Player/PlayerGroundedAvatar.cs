@@ -13,7 +13,7 @@ namespace FR8.Player
         [SerializeField] private float radius = 0.25f;
 
         [Header("Movement")]
-        [SerializeField] private float moveSpeed = 8.0f;
+        [SerializeField] private float maxGroundedSpeed = 4.0f;
         [SerializeField] private float accelerationTime = 0.12f;
         [SerializeField] private float sprintSpeedScalar = 2.0f;
 
@@ -42,10 +42,10 @@ namespace FR8.Player
         [SerializeField] private PlayerGroundedCamera cameraController;
 
         private bool jumpTrigger;
+        private float lastJumpTime;
 
         private Rigidbody lastGroundObject;
         private Vector3 lastGroundVelocity;
-        private Quaternion lastGroundRotation = Quaternion.identity;
 
         private Pose cameraPose;
 
@@ -55,6 +55,17 @@ namespace FR8.Player
         public Vector3 Velocity => IsOnGround && GroundHit.rigidbody ? Rigidbody.velocity - GroundHit.rigidbody.GetPointVelocity(Rigidbody.position) : Rigidbody.velocity;
         public Vector3 Gravity => new Vector3(0.0f, -9.81f, 0.0f) * (Velocity.y > 0.0f && Controller.Jump ? upGravityScale : downGravityScale);
 
+        public float MoveSpeed
+        {
+            get
+            {
+                var velocity = Velocity;
+                return Mathf.Sqrt(velocity.x * velocity.x + velocity.z * velocity.z);
+            }
+        }
+
+        public float MaxSpeed => maxGroundedSpeed;
+        
         #region Initalization
 
         protected override void Awake()
@@ -183,6 +194,13 @@ namespace FR8.Player
 
             var contraction = 1.0f - GroundHit.distance / distance;
 
+            ApplyGroundSpring(contraction);
+        }
+
+        private void ApplyGroundSpring(float contraction)
+        {
+            if (Time.time - lastJumpTime < 0.08f) return;
+            
             var spring = contraction * groundSpring - Velocity.y * groundDamping;
             var force = Vector3.up * spring;
             Rigidbody.AddForce(force, ForceMode.Acceleration);
@@ -190,7 +208,7 @@ namespace FR8.Player
 
         private void Move()
         {
-            var moveSpeed = this.moveSpeed;
+            var moveSpeed = this.maxGroundedSpeed;
             if (Controller.Sprint) moveSpeed *= sprintSpeedScalar;
 
             var input = Controller.Move;
@@ -216,9 +234,11 @@ namespace FR8.Player
             if (!jump) return;
 
             var power = Mathf.Sqrt(Mathf.Max(2.0f * 9.81f * upGravityScale * (jumpHeight - stepHeight), 0.0f)) - Velocity.y;
+            Debug.Log(power);
             var force = Vector3.up * power;
 
             Rigidbody.AddForce(force, ForceMode.VelocityChange);
+            lastJumpTime = Time.time;
         }
 
         private void ApplyGravity()
@@ -245,7 +265,6 @@ namespace FR8.Player
                 }
 
                 lastGroundVelocity = velocity;
-                lastGroundRotation = groundObject.rotation;
             }
 
             lastGroundObject = groundObject;

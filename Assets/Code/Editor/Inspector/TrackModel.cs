@@ -1,12 +1,19 @@
 ﻿using FR8.Train.Track;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace FR8Editor.Inspector
 {
+    [InitializeOnLoad]
     [CustomEditor(typeof(TrackModel))]
     public class TrackModelEditor : Editor
     {
+        static TrackModelEditor()
+        {
+            EditorSceneManager.sceneSaved += _ => BakeAllTracks();
+        }
+
         [MenuItem("Actions/Track Model/Bake All Meshes")]
         public static void BakeAllTracks()
         {

@@ -14,6 +14,8 @@ namespace FR8.Train.Track
         [SerializeField] private bool optimize;
         [SerializeField] private int segmentsPerSplit = 15;
 
+        private List<Vector3> lastBakedPoints = new();
+        
         public void Clear()
         {
             var rendererContainer = transform.Find("Renderers");
@@ -22,6 +24,8 @@ namespace FR8.Train.Track
         
         public void BakeMesh()
         {
+            if (!Dirty()) return;
+            
             Clear();
             
             var rendererContainer = new GameObject("Renderers").transform;
@@ -88,6 +92,12 @@ namespace FR8.Train.Track
             }
             
             SplitMesh(vertices, normals, indices, uvs, rendererContainer);
+            
+            lastBakedPoints.Clear();
+            for (var i = 0; i < segment.KnotCount(); i++)
+            {
+                lastBakedPoints.Add(segment.Knot(i));
+            }
         }
 
         private void SplitMesh(List<Vector3> vertices, List<Vector3> normals, List<int> indices, List<Vector2> uvs, Transform rendererContainer)
@@ -133,6 +143,23 @@ namespace FR8.Train.Track
             }
 
             return 1.0f;
+        }
+
+        private bool Dirty()
+        {
+            var segment = GetComponent<TrackSegment>();
+
+            if (lastBakedPoints.Count != segment.KnotCount()) return true;
+            
+            for (var i = 0; i < segment.KnotCount(); i++)
+            {
+                var knot = segment.Knot(i);
+                var other = lastBakedPoints[i];
+                var threshold = 0.01f;
+
+                if ((knot - other).sqrMagnitude > threshold) return true;
+            }
+            return false;
         }
 
 #if UNITY_EDITOR

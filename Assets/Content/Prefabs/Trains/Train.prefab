@@ -1169,6 +1169,10 @@ PrefabInstance:
       propertyPath: displayUI.inputRange.y
       value: 160
       objectReference: {fileID: 0}
+    - target: {fileID: 1948529354362219670, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: displayText.valueSmoothing
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 6936461394901215794, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: key
       value: Speedometer
@@ -2466,9 +2470,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   key: 
+  displayName: 
+  defaultValue: 0
   settings: {fileID: 11400000, guid: 9826cd7c0dba1394b8a24b0110955138, type: 2}
   anchor: {fileID: 8853930767191054095}
-  engaged: 1
 --- !u!1 &6823709371480325566 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -6413956847900099605, guid: 2de40a509088b6e428ef0e687f8a2358, type: 3}
@@ -2800,3 +2805,72 @@ MonoBehaviour:
   dragBehaviour:
     sensitivity: 6
     dragVector: {x: 0, y: 0, z: 1}
+--- !u!1001 &9112374151810871179
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 3412095045141690939}
+    m_Modifications:
+    - target: {fileID: 2981972372904957814, guid: 9e0225a9b192be148a4e8b8025f81fd7, type: 3}
+      propertyPath: key
+      value: Ignition
+      objectReference: {fileID: 0}
+    - target: {fileID: 2981972372904957814, guid: 9e0225a9b192be148a4e8b8025f81fd7, type: 3}
+      propertyPath: testValue
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5282422784880534934, guid: 9e0225a9b192be148a4e8b8025f81fd7, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.015
+      objectReference: {fileID: 0}
+    - target: {fileID: 6029019517590116832, guid: 9e0225a9b192be148a4e8b8025f81fd7, type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6029019517590116832, guid: 9e0225a9b192be148a4e8b8025f81fd7, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.27
+      objectReference: {fileID: 0}
+    - target: {fileID: 6029019517590116832, guid: 9e0225a9b192be148a4e8b8025f81fd7, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6029019517590116832, guid: 9e0225a9b192be148a4e8b8025f81fd7, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6029019517590116832, guid: 9e0225a9b192be148a4e8b8025f81fd7, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6029019517590116832, guid: 9e0225a9b192be148a4e8b8025f81fd7, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6029019517590116832, guid: 9e0225a9b192be148a4e8b8025f81fd7, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6029019517590116832, guid: 9e0225a9b192be148a4e8b8025f81fd7, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6029019517590116832, guid: 9e0225a9b192be148a4e8b8025f81fd7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6029019517590116832, guid: 9e0225a9b192be148a4e8b8025f81fd7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6029019517590116832, guid: 9e0225a9b192be148a4e8b8025f81fd7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8661377903221331546, guid: 9e0225a9b192be148a4e8b8025f81fd7, type: 3}
+      propertyPath: m_Name
+      value: Button
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 9e0225a9b192be148a4e8b8025f81fd7, type: 3}

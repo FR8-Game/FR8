@@ -64,6 +64,8 @@ namespace FR8.Interactions.Drivers
         private void FixedUpdate()
         {
             group.alpha += ((powered ? 1.0f : 0.0f) - group.alpha) * 2.0f * Time.deltaTime / fadeTime;
+            
+            displayText.FixedUpdate();
         }
         
         public void SetConnected(bool connected)

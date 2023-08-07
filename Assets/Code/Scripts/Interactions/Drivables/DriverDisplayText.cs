@@ -12,7 +12,11 @@ namespace FR8.Interactions.Drivables
         [SerializeField] private string label;
         [SerializeField] private int round = 0;
         [SerializeField] private float monospace;
+        [SerializeField] private float valueSmoothing;
 
+        private float targetValue;
+        private float currentValue;
+        
         private Func<RadialDisplay.DisplayMode> displayMode;
 
         public void Awake(Func<RadialDisplay.DisplayMode> displayMode)
@@ -22,10 +26,23 @@ namespace FR8.Interactions.Drivables
         
         public void SetValue(float newValue)
         {
-            if (!text) return;
-            text.text = $"{Format(newValue)}\n<size=30%>{label}</size>";
+            targetValue = newValue;
         }
 
+        public void ApplyValue()
+        {
+            if (!text) return;
+            text.text = $"{Format(currentValue)}\n<size=30%>{label}</size>";
+        }
+
+        public void FixedUpdate()
+        {
+            if (valueSmoothing < Time.deltaTime) currentValue = targetValue;
+            else currentValue += (targetValue - currentValue) / valueSmoothing * Time.deltaTime;
+
+            ApplyValue();
+        }
+        
         public string Format(float value)
         {
             var displayMode = this.displayMode();
@@ -70,7 +87,8 @@ namespace FR8.Interactions.Drivables
 
         public void OnValidate(float testValue)
         {
-            SetValue(testValue);
+            currentValue = testValue;
+            ApplyValue();
         }
     }
 }

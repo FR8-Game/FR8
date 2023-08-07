@@ -52,7 +52,7 @@ MonoBehaviour:
   mass: 4
   playerHeight: 1.7
   radius: 0.2
-  moveSpeed: 4
+  maxGroundedSpeed: 4
   accelerationTime: 0.12
   sprintSpeedScalar: 2
   airMovePenalty: 0.8
@@ -70,6 +70,10 @@ MonoBehaviour:
     fovSmoothTime: 0.08
     nearPlane: 0.1
     farPlane: 10000
+    shakeModule:
+      amplitude: {x: 0.3, y: 0, z: 0.5}
+      frequency: 6
+      slope: 0.2
 --- !u!136 &6394128087836156411
 CapsuleCollider:
   m_ObjectHideFlags: 0

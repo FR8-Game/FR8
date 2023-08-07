@@ -15,6 +15,7 @@ namespace FR8.Player.Submodules
         [SerializeField] private float fovSmoothTime = 0.2f;
         [SerializeField] private float nearPlane = 0.2f;
         [SerializeField] private float farPlane = 1000.0f;
+        [SerializeField] private CameraShake shakeModule;
 
         private Func<PlayerController> controller;
         private Transform target;
@@ -29,6 +30,7 @@ namespace FR8.Player.Submodules
         private int cursorLockID;
 
         public Camera Camera { get; private set; }
+        public PlayerController Controller => controller();
 
         public void Initialize(Func<PlayerController> controller, Transform target)
         {
@@ -83,11 +85,13 @@ namespace FR8.Player.Submodules
             // Apply input and clamp camera's yaw
             yaw = Mathf.Clamp(yaw + delta.y, -YawRange / 2.0f, YawRange / 2.0f);
 
+            shakeModule.GetOffsets(this, out var translationalOffset, out var rotationalOffset);
+            
             target.transform.rotation = Quaternion.Euler(-yaw, target.transform.eulerAngles.y + delta.x, 0.0f);
-            Camera.transform.rotation = target.transform.rotation;
+            Camera.transform.rotation = target.transform.rotation * rotationalOffset;
 
             // Update additional camera variables.
-            Camera.transform.position = target.position;
+            Camera.transform.position = target.position + Camera.transform.rotation * translationalOffset;
             Camera.fieldOfView = Mathf.SmoothDamp(Camera.fieldOfView, controller.ZoomCam ? zoomFieldOfView : fieldOfView, ref fovVelocity, fovSmoothTime);
             Camera.nearClipPlane = nearPlane;
             Camera.farClipPlane = farPlane;
