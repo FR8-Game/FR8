@@ -1,3 +1,5 @@
+using System;
+using FR8.Interactions.Drivers;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,11 +11,21 @@ namespace FR8.Interactions.Drivables
         [SerializeField] private Image image;
         [SerializeField] private Vector2 inputRange = Vector2.up;
         [SerializeField] private Vector2 outputRange = Vector2.up;
-        [SerializeField] private float testValue;
+
+        private Func<RadialDisplay.DisplayMode> displayMode;
+
+        public void Awake(Func<RadialDisplay.DisplayMode> displayMode)
+        {
+            this.displayMode = displayMode;
+        }
 
         public void SetValue(float newValue)
         {
-            var p = Mathf.InverseLerp(inputRange.x, inputRange.y, newValue);
+            var p = displayMode() switch
+            {
+                RadialDisplay.DisplayMode.Percentage => newValue, 
+                _ => Mathf.InverseLerp(inputRange.x, inputRange.y, newValue),
+            };
             SetValueNormalized(p);
         }
 
@@ -22,8 +34,8 @@ namespace FR8.Interactions.Drivables
             var val = Mathf.Lerp(outputRange.x, outputRange.y, percent);
             image.fillAmount = val;
         }
-        
-        public void OnValidate()
+
+        public void OnValidate(float testValue)
         {
             if (!image) return;
             SetValue(testValue);

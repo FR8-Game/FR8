@@ -45,13 +45,6 @@ Shader "Hidden/Fog"
                 float4(3.0, -1.0, 0.0, 1.0),
             };
 
-            static const float2 uv[] =
-            {
-                float2(0.0, 0.0),
-                float2(0.0, 1.0),
-                float2(1.0, 1.0),
-            };
-
             Varyings vert(Attributes input)
             {
                 Varyings o;

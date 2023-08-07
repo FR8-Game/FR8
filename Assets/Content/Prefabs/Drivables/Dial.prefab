@@ -309,9 +309,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '{0:N0}
+  m_text: '<mspace=0.7em>0</mspace>
 
-    <size=30%>KM/H'
+    <size=30%></size>'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 79ff2569a5a52ae499331f3e22f217ca, type: 2}
   m_sharedMaterial: {fileID: -946139818346727396, guid: 79ff2569a5a52ae499331f3e22f217ca, type: 2}
@@ -529,15 +529,19 @@ MonoBehaviour:
   group: {fileID: 5906605058864684903}
   displayText:
     text: {fileID: 6936461395209199177}
+    label: 
+    round: 0
+    monospace: 0.7
   displayUI:
     image: {fileID: 6936461394901215795}
     inputRange: {x: 0, y: 100}
     outputRange: {x: 0.064, y: 0.936}
-    testValue: 0
   powerDrawWatts: 10
   fadeTime: 0.1
   powerUpTime: 3
   powerUpVariance: 0.4
+  displayMode: 0
+  testValue: 0
 --- !u!1 &6936461395926282665
 GameObject:
   m_ObjectHideFlags: 0

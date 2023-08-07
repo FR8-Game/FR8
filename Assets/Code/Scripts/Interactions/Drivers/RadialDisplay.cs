@@ -15,7 +15,6 @@ namespace FR8.Interactions.Drivers
 
         [Space]
         [SerializeField] private CanvasGroup group;
-
         [SerializeField] private DriverDisplayText displayText;
         [SerializeField] private DriverDisplayUI displayUI;
         [SerializeField] private float powerDrawWatts;
@@ -26,6 +25,10 @@ namespace FR8.Interactions.Drivers
         [SerializeField] private float powerUpTime = 4.0f;
         [SerializeField] private float powerUpVariance = 0.4f;
 
+        [Space]
+        [SerializeField] private DisplayMode displayMode = DisplayMode.Raw;
+        [SerializeField] private float testValue;
+
         private bool powered;
         private bool warmingUp;
 
@@ -33,6 +36,12 @@ namespace FR8.Interactions.Drivers
         public float Value { get; private set; }
         public string Key => key;
         public string FuseGroup => fuseGroup;
+
+        private void Awake()
+        {
+            displayText.Awake(() => displayMode);
+            displayUI.Awake(() => displayMode);
+        }
 
         public void OnValueChanged(float newValue)
         {
@@ -44,14 +53,12 @@ namespace FR8.Interactions.Drivers
             displayUI.SetValue(newValue);
         }
 
-        private void Awake()
-        {
-            displayText.Awake();
-        }
-
         private void OnValidate()
         {
-            displayUI.OnValidate();
+            Awake();
+            
+            displayUI.OnValidate(testValue);
+            displayText.OnValidate(testValue);
         }
 
         private void FixedUpdate()
@@ -105,5 +112,11 @@ namespace FR8.Interactions.Drivers
         }
 
         public float CalculatePowerDraw() => powerDrawWatts / 1000.0f;
+        
+        public enum DisplayMode
+        {
+            Raw,
+            Percentage
+        }
     }
 }
