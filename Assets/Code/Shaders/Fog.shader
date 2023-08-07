@@ -45,6 +45,13 @@ Shader "Hidden/Fog"
                 float4(3.0, -1.0, 0.0, 1.0),
             };
 
+            static const float2 uv[] =
+            {
+                float2(0.0, 0.0),
+                float2(0.0, 1.0),
+                float2(1.0, 1.0),
+            };
+
             Varyings vert(Attributes input)
             {
                 Varyings o;
@@ -66,11 +73,10 @@ Shader "Hidden/Fog"
             {
                 float depth = SampleSceneDepth(input.uv);
                 float3 pos = ComputeWorldSpacePosition(input.uv, depth, UNITY_MATRIX_I_VP);
-                float dist = length(pos - _WorldSpaceCameraPos);
+                float dist = length(pos - _WorldSpaceCameraPos) / 100.0f;
                 
-                float fog = pow(2.71, dist / 1000.0 * _Value);
-                fog = fog * fog - 1.0;
-                fog = clamp(fog, 0.0, 1.0);
+                float fog = pow(2.71, -(dist * dist) * _Value);
+                fog = clamp(1.0f - fog, 0.0, 1.0);
                 clip(fog);
                 
                 return float4(_Color, fog);
