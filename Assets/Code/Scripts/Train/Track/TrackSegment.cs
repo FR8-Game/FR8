@@ -175,15 +175,15 @@ namespace FR8.Train.Track
                 return transform.TransformPoint(knots[(i % knots.Count + knots.Count) % knots.Count]);
             }
 
-            if (startConnection && i == 0) return startConnection.KnotForwardTangent;
-            if (startConnection && i == 1) return startConnection.Knot;
-            if (startConnection && i == 2) return startConnection.KnotBackTangent;
+            //if (startConnection && i == 0) return startConnection.KnotForwardTangent;
+            if (startConnection && i == 0) return startConnection.Knot;
+            if (startConnection && i == 1) return startConnection.KnotBackTangent;
 
             var end = startConnection ? knots.Count + EndConnection.AdditionalKnotsPerConnection : knots.Count;
 
-            if (endConnection && i == end) return endConnection.KnotForwardTangent;
-            if (endConnection && i == end + 1) return endConnection.Knot;
-            if (endConnection && i == end + 2) return endConnection.KnotBackTangent;
+            //if (endConnection && i == end) return endConnection.KnotForwardTangent;
+            if (endConnection && i == end + 0) return endConnection.Knot;
+            if (endConnection && i == end + 1) return endConnection.KnotBackTangent;
 
             return transform.TransformPoint(knots[startConnection ? i - EndConnection.AdditionalKnotsPerConnection : i]);
         }
@@ -290,7 +290,7 @@ namespace FR8.Train.Track
         [Serializable]
         public class EndConnection
         {
-            public const int AdditionalKnotsPerConnection = 3;
+            public const int AdditionalKnotsPerConnection = 2;
 
             public TrackSegment segment;
             public int knotIndex;
@@ -298,7 +298,6 @@ namespace FR8.Train.Track
             public bool connectionActive;
 
             public Vector3 Knot => segment.Knot(knotIndex);
-            public Vector3 KnotForwardTangent => Knot + Velocity;
             public Vector3 KnotBackTangent => Knot - Velocity;
             public Vector3 Velocity => segment.KnotVelocity(knotIndex) * handleScale;
 
