@@ -56,6 +56,7 @@ namespace FR8.Player
 
         private Rigidbody lastGroundObject;
         private Vector3 lastGroundVelocity;
+        private ParticleSystem pee;
 
         private float targetLadderPosition;
 
@@ -98,6 +99,8 @@ namespace FR8.Player
 
             base.Awake();
             cameraController.Initialize(() => Controller, CameraTarget);
+
+            pee = transform.Find("Pee").GetComponent<ParticleSystem>();
         }
 
         private void OnValidate()
@@ -158,6 +161,17 @@ namespace FR8.Player
             if (Controller.JumpTriggered) jumpTrigger = true;
 
             cameraController.Update();
+
+            if (Controller.Pee && !pee.isPlaying)
+            {
+                pee.Play();
+            }
+            if (!Controller.Pee && pee.isPlaying)
+            {
+                pee.Stop();
+            }
+
+            pee.transform.localRotation = Quaternion.Euler(-cameraController.Yaw * 0.5f, 0.0f, 0.0f);
         }
 
         private void FixedUpdate()

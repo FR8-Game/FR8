@@ -57,8 +57,8 @@ namespace FR8.Player.Submodules
                 transition.currentPosition = 0.0f;
                 transition.velocity = 0.0f;
                 
-                if (lookingAt != null) SelectionOutlinePass.RemovePersistant(lookingAt.gameObject);
-                if (newLookingAt != null) SelectionOutlinePass.RenderPersistant(newLookingAt.gameObject);
+                if ((Object)lookingAt) SelectionOutlinePass.RemovePersistant(lookingAt.gameObject);
+                if ((Object)newLookingAt) SelectionOutlinePass.RenderPersistant(newLookingAt.gameObject);
             }
 
             lookingAt = newLookingAt;

@@ -31,6 +31,7 @@ namespace FR8.Player
         private InputActionReference freeCamAction;
         private InputActionReference grabCamAction;
         private InputActionReference zoomCamAction;
+        private InputActionReference peeAction;
 
         public PlayerAvatar CurrentAvatar { get; private set; }
 
@@ -55,6 +56,7 @@ namespace FR8.Player
         public bool GrabCam => grabCamAction.Switch();
         public bool ZoomCam => zoomCamAction.Switch();
         public bool Sprint => sprintAction.Switch();
+        public bool Pee => peeAction.Switch();
 
         public Vector2 GetLookFrameDelta(bool forceMouseDelta)
         {
@@ -91,6 +93,7 @@ namespace FR8.Player
             freeCamAction = bind("FreeCam");
             grabCamAction = bind("GrabCam");
             zoomCamAction = bind("ZoomCam");
+            peeAction = bind("Pee");
             
             mainCamera = Camera.main;
         }

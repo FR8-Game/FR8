@@ -20,12 +20,10 @@ namespace FR8.Player.Submodules
         private Func<PlayerController> controller;
         private Transform target;
         private Vector2 delta;
-        private float yaw;
         private bool zoomCamera;
         private bool cameraLocked;
         private bool wasCameraLocked;
 
-        private Quaternion orientation;
         private Vector3 translationOffset;
 
         private int lastCursorX, lastCursorY;
@@ -33,6 +31,7 @@ namespace FR8.Player.Submodules
 
         private int cursorLockID;
 
+        public float Yaw { get; private set; }
         public Camera Camera { get; private set; }
         public PlayerController Controller => controller();
 
@@ -86,8 +85,7 @@ namespace FR8.Player.Submodules
 
             zoomCamera = controller.ZoomCam;
             
-            target.transform.rotation = orientation;
-            Camera.transform.rotation = orientation;
+            Camera.transform.rotation = target.transform.rotation;
             
              // Update additional camera variables.
             Camera.transform.position = target.position + Camera.transform.rotation * translationOffset;
@@ -103,10 +101,10 @@ namespace FR8.Player.Submodules
             this.delta = Vector2.zero;
             
             // Apply input and clamp camera's yaw
-            yaw = Mathf.Clamp(yaw + delta.y, -YawRange / 2.0f, YawRange / 2.0f);
+            Yaw = Mathf.Clamp(Yaw + delta.y, -YawRange / 2.0f, YawRange / 2.0f);
             
             shakeModule.GetOffsets(this, out translationOffset, out var rotationalOffset);
-            orientation = Quaternion.Euler(-yaw, orientation.eulerAngles.y + delta.x, 0.0f) * rotationalOffset;
+            target.transform.rotation = Quaternion.Euler(-Yaw, target.transform.eulerAngles.y + delta.x, 0.0f) * rotationalOffset;
         }
         
         public void SetCameraLock(bool state)
