@@ -23,7 +23,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.rider": {
-      "version": "3.0.15",
+      "version": "3.0.24",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -75,6 +75,13 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
+    "com.unity.settings-manager": {
+      "version": "1.0.3",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
     "com.unity.shadergraph": {
       "version": "12.1.7",
       "depth": 1,
@@ -83,6 +90,27 @@
         "com.unity.render-pipelines.core": "12.1.7",
         "com.unity.searcher": "4.9.1"
       }
+    },
+    "com.unity.splines": {
+      "version": "2.3.0",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.settings-manager": "1.0.3",
+        "com.unity.mathematics": "1.2.1",
+        "com.unity.ugui": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.terrain-tools": {
+      "version": "4.0.5",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.modules.terrain": "1.0.0",
+        "com.unity.modules.terrainphysics": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
     },
     "com.unity.textmeshpro": {
       "version": "3.0.6",
@@ -102,16 +130,25 @@
         "com.unity.modules.imgui": "1.0.0"
       }
     },
-    "net.harrybosch.terrainhandles": {
-      "version": "file:net.harrybosch.terrainhandles",
+    "com.unity.visualeffectgraph": {
+      "version": "12.1.7",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {
+        "com.unity.shadergraph": "12.1.7",
+        "com.unity.render-pipelines.core": "12.1.7"
+      }
+    },
+    "net.harrybosch03.hierarchycolorator": {
+      "version": "file:net.harrybosch03.hierarchycolorator",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}
     },
-    "com.unity.modules.ai": {
-      "version": "1.0.0",
+    "net.harrybosch03.scenequickaccess": {
+      "version": "file:net.harrybosch03.scenequickaccess",
       "depth": 0,
-      "source": "builtin",
+      "source": "embedded",
       "dependencies": {}
     },
     "com.unity.modules.animation": {
@@ -131,15 +168,6 @@
       "depth": 0,
       "source": "builtin",
       "dependencies": {}
-    },
-    "com.unity.modules.director": {
-      "version": "1.0.0",
-      "depth": 0,
-      "source": "builtin",
-      "dependencies": {
-        "com.unity.modules.audio": "1.0.0",
-        "com.unity.modules.animation": "1.0.0"
-      }
     },
     "com.unity.modules.imageconversion": {
       "version": "1.0.0",
@@ -177,6 +205,21 @@
       "source": "builtin",
       "dependencies": {
         "com.unity.modules.imageconversion": "1.0.0"
+      }
+    },
+    "com.unity.modules.terrain": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {}
+    },
+    "com.unity.modules.terrainphysics": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {
+        "com.unity.modules.physics": "1.0.0",
+        "com.unity.modules.terrain": "1.0.0"
       }
     },
     "com.unity.modules.ui": {

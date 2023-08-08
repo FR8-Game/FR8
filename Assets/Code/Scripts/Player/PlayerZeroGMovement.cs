@@ -1,4 +1,3 @@
-using FR8.Environment;
 using UnityEngine;
 
 namespace FR8.Player
@@ -41,21 +40,16 @@ namespace FR8.Player
             Configure();
         }
 
-        private void Configure()
+        protected override void Configure()
         {
+            base.Configure();
+            
             collider = gameObject.GetOrAddComponent<SphereCollider>();
             collider.radius = collisionRadius;
         }
 
         private void FixedUpdate()
-        {
-            if (GravZone.IsGravityAffected(Rigidbody, out var gravity))
-            {
-                Controller.SetAvatar<PlayerGroundedAvatar>();
-                Rigidbody.AddForce(-gravity, ForceMode.Acceleration);
-                return;
-            }
-            
+        {   
             Move();
             Rotate();
         }

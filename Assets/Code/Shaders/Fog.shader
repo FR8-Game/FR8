@@ -2,17 +2,21 @@ Shader "Hidden/Fog"
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
         _Value ("Fog Density", float) = 1.0
         _Color ("Fog Color", Color) = (0.5, 0.5, 0.5, 1.0)
         _FarPlane ("Far Plane", float) = 0.9
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" "RenderPipeline" = "UniversalPipeline" }
+        Tags
+        {
+            "RenderType"="Transparent" "Queue"="Transparent" "RenderPipeline" = "UniversalPipeline"
+        }
         ZWrite Off
+        ZTest Always
+        Blend SrcAlpha OneMinusSrcAlpha
         Cull Off
-        
+
         Pass
         {
             HLSLPROGRAM
@@ -23,7 +27,7 @@ Shader "Hidden/Fog"
             #pragma fragment frag
             struct Attributes
             {
-                float4 vertex : POSITION;
+                uint id : SV_VertexID;
                 float2 uv : TEXCOORD0;
             };
 
@@ -31,35 +35,51 @@ Shader "Hidden/Fog"
             {
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
+                float3 direction : VAR_DIRECTION;
             };
 
-            Varyings vert (Attributes input)
+            static const float4 vertices[] =
             {
-                Varyings o = (Varyings)0;
-                
-                o.vertex = TransformObjectToHClip(input.vertex);
-                o.uv = input.uv;
+                float4(-1.0, -1.0, 0.0, 1.0),
+                float4(-1.0, 3.0, 0.0, 1.0),
+                float4(3.0, -1.0, 0.0, 1.0),
+            };
+
+            static const float2 uv[] =
+            {
+                float2(0.0, 0.0),
+                float2(0.0, 1.0),
+                float2(1.0, 1.0),
+            };
+
+            Varyings vert(Attributes input)
+            {
+                Varyings o;
+
+                o.vertex = vertices[input.id];
+                o.uv = (o.vertex.xy + 1) / 2;
+                o.uv.y = 1 - o.uv.y;
+                o.direction = mul(UNITY_MATRIX_I_VP, o.vertex);
                 return o;
             }
 
-            TEXTURE2D(_MainTex);
-            SAMPLER(sampler_MainTex);
-
             float3 _Color;
-            float _Value, _FarPlane;
-            
-            float4 frag (Varyings i) : SV_Target
+            float _Value;
+
+            TEXTURECUBE(_Noise);
+            SAMPLER(sampler_Noise);
+
+            float4 frag(Varyings input) : SV_Target
             {
-                float3 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv).rgb;
-                float depth = SampleSceneDepth(i.uv);
-                float3 pos = ComputeWorldSpacePosition(i.uv, depth, UNITY_MATRIX_I_VP);
+                float depth = SampleSceneDepth(input.uv);
+                float3 pos = ComputeWorldSpacePosition(input.uv, depth, UNITY_MATRIX_I_VP);
                 float dist = length(pos - _WorldSpaceCameraPos);
-                
+
                 float fog = pow(2.71, dist / 1000.0 * _Value) - 1.0;
                 fog = clamp(fog, 0.0, 1.0);
-
-                col = lerp(col, _Color, fog);
-                return float4(col, 1.0);
+                clip(fog);
+                
+                return float4(_Color, fog);
             }
             ENDHLSL
         }

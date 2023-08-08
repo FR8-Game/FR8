@@ -85,28 +85,6 @@ MonoBehaviour:
   dirtIntensity:
     m_OverrideState: 0
     m_Value: 0
---- !u!114 &-885600517854525056
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c48b2f1b22017ab49a7e3e30aa258bdc, type: 3}
-  m_Name: Fog
-  m_EditorClassIdentifier: 
-  active: 1
-  density:
-    m_OverrideState: 1
-    m_Value: 10
-  color:
-    m_OverrideState: 1
-    m_Value: {r: 0.6226415, g: 0.5155375, b: 0.4669811, a: 1}
-  farPlane:
-    m_OverrideState: 1
-    m_Value: 0.9
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -125,7 +103,7 @@ MonoBehaviour:
   - {fileID: -2564793198712954828}
   - {fileID: -3604325393800674914}
   - {fileID: 1018422938413055945}
-  - {fileID: -885600517854525056}
+  - {fileID: 1139883039152830590}
 --- !u!114 &1018422938413055945
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -141,10 +119,10 @@ MonoBehaviour:
   active: 1
   postExposure:
     m_OverrideState: 1
-    m_Value: -0.5
+    m_Value: -0.2
   contrast:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: 15
   colorFilter:
     m_OverrideState: 0
     m_Value: {r: 1, g: 1, b: 1, a: 1}
@@ -154,6 +132,25 @@ MonoBehaviour:
   saturation:
     m_OverrideState: 0
     m_Value: 0
+--- !u!114 &1139883039152830590
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c48b2f1b22017ab49a7e3e30aa258bdc, type: 3}
+  m_Name: Fog
+  m_EditorClassIdentifier: 
+  active: 0
+  density:
+    m_OverrideState: 1
+    m_Value: 12
+  color:
+    m_OverrideState: 1
+    m_Value: {r: 0.69803923, g: 0.5019608, b: 0.4156863, a: 1}
 --- !u!114 &8819430488983324804
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -192,6 +189,3 @@ MonoBehaviour:
   color:
     m_OverrideState: 1
     m_Value: {r: 0.75294125, g: 0.5019608, b: 0.4156863, a: 1}
-  farPlane:
-    m_OverrideState: 1
-    m_Value: 1

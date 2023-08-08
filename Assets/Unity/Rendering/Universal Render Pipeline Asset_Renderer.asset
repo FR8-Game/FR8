@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-6654866533574122124
+--- !u!114 &-8427150731024958650
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -12,7 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 129e4f3c4c9fe784a98adf228830e7b5, type: 3}
   m_Name: CustomRenderFeatures
   m_EditorClassIdentifier: 
-  m_Active: 0
+  m_Active: 1
+  renderFog: 1
+  renderOutline: 1
+  unlitShader: {fileID: 10755, guid: 0000000000000000f000000000000000, type: 0}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29,9 +32,9 @@ MonoBehaviour:
     debugReplacementPS: {fileID: 4800000, guid: cf852408f2e174538bcd9b7fda1c5ae7, type: 3}
   m_RendererFeatures:
   - {fileID: 6791128578398083358}
-  - {fileID: -6654866533574122124}
   - {fileID: 7172154630020702444}
-  m_RendererFeatureMap: 1ed96b0b76ef3e5e74e5ad8e252aa5a3eca08ee4a29c8863
+  - {fileID: -8427150731024958650}
+  m_RendererFeatureMap: 1ed96b0b76ef3e5eeca08ee4a29c8863467b95200fbf0c8b
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   shaders:

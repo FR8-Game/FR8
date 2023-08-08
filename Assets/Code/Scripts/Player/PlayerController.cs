@@ -16,17 +16,23 @@ namespace FR8.Player
         [Range(0.0f, 1.0f)]
         [SerializeField] private float controllerSensitivity = 0.4f;
 
+        [Space]
+        [SerializeField] private PlayerAvatar newAvatar;
+
+        private Camera mainCamera;
+        
         private InputActionReference moveInput;
         private InputActionReference jumpInput;
         private InputActionReference lookAction;
+        private InputActionReference sprintAction;
         private InputActionReference crouchAction;
         private InputActionReference nudgeAction;
         private InputActionReference pressAction;
         private InputActionReference freeCamAction;
         private InputActionReference grabCamAction;
+        private InputActionReference zoomCamAction;
 
-        private PlayerAvatar[] avatars;
-        private PlayerAvatar currentAvatar;
+        public PlayerAvatar CurrentAvatar { get; private set; }
 
         public Vector3 Move
         {
@@ -37,30 +43,35 @@ namespace FR8.Player
                 return new Vector3(xz.x, y, xz.y);
             }
         }
+
         public bool JumpTriggered => jumpInput.action?.WasPerformedThisFrame() ?? false;
         public bool Jump => jumpInput.Switch();
-        public Vector2 LookFrameDelta => GetLookFrameDelta(false);
+        public Vector3 LookFrameDelta => GetLookFrameDelta(false);
 
         public int Nudge => Mathf.Clamp(Mathf.RoundToInt(nudgeAction.action?.ReadValue<float>() ?? 0.0f), -1, 1);
         public bool Press => pressAction.action?.WasPerformedThisFrame() ?? false;
         public bool Drag => pressAction.Switch();
         public bool FreeCam => freeCamAction.action?.WasPerformedThisFrame() ?? false;
         public bool GrabCam => grabCamAction.Switch();
+        public bool ZoomCam => zoomCamAction.Switch();
+        public bool Sprint => sprintAction.Switch();
 
         public Vector2 GetLookFrameDelta(bool forceMouseDelta)
         {
+            var fovSensitivity = Mathf.Tan(mainCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
+            
             var delta = Vector2.zero;
 
-            delta += lookAction.action?.ReadValue<Vector2>() * controllerSensitivity * Time.deltaTime ?? Vector2.zero;
+            delta += (lookAction.action?.ReadValue<Vector2>() * controllerSensitivity * Time.deltaTime ?? Vector2.zero);
             var mouse = Mouse.current;
             if (mouse != null && (Cursor.lockState == CursorLockMode.Locked || forceMouseDelta))
             {
                 delta += mouse.delta.ReadValue() * mouseSensitivity;
             }
 
-            return delta;
+            return delta * fovSensitivity;
         }
-        
+
         #region Initalization
 
         private void Awake()
@@ -73,44 +84,38 @@ namespace FR8.Player
             moveInput = bind("Move");
             jumpInput = bind("Jump");
             lookAction = bind("Look");
+            sprintAction = bind("Sprint");
             crouchAction = bind("Crouch");
             nudgeAction = bind("Nudge");
             pressAction = bind("Press");
             freeCamAction = bind("FreeCam");
             grabCamAction = bind("GrabCam");
-
-            // Configure Avatars
-            avatars = new PlayerAvatar[transform.childCount];
-            for (var i = 0; i < avatars.Length; i++)
-            {
-                avatars[i] = transform.GetChild(i).GetComponent<PlayerAvatar>();
-                avatars[i].gameObject.SetActive(false);
-            }
-
-            SetAvatar(0);
+            zoomCamAction = bind("ZoomCam");
+            
+            mainCamera = Camera.main;
         }
 
-        public void SetAvatar<T>() where T : PlayerAvatar
+        private void Start()
         {
-            for (var i = 0; i < avatars.Length; i++)
-            {
-                if (avatars[i].GetType() != typeof(T)) continue;
-                SetAvatar(i);
-                break;
-            }
+            var avatar = GetComponentInChildren<PlayerAvatar>();
+            SetAvatar(avatar);
         }
 
-        public void SetAvatar(int index)
+        public void SetAvatar(PlayerAvatar newAvatar)
         {
-            for (var i = 0; i < avatars.Length; i++)
-            {
-                if (i == index) continue;
-                avatars[i].gameObject.SetActive(false);
-            }
+            if (CurrentAvatar) CurrentAvatar.Release();
+            if (newAvatar) newAvatar.Possess(this);
 
-            if (index < 0 || index >= avatars.Length) return;
-            currentAvatar = avatars[index];
-            currentAvatar.gameObject.SetActive(true);
+            CurrentAvatar = newAvatar;
+        }
+
+        private void Update()
+        {
+            if (newAvatar)
+            {
+                SetAvatar(newAvatar);
+                newAvatar = null;
+            }
         }
 
         #endregion
