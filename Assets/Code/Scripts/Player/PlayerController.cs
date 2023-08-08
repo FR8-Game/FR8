@@ -46,7 +46,7 @@ namespace FR8.Player
 
         public bool JumpTriggered => jumpInput.action?.WasPerformedThisFrame() ?? false;
         public bool Jump => jumpInput.Switch();
-        public Vector3 LookFrameDelta => GetLookFrameDelta(false);
+        public Vector2 LookFrameDelta => GetLookFrameDelta(false);
 
         public int Nudge => Mathf.Clamp(Mathf.RoundToInt(nudgeAction.action?.ReadValue<float>() ?? 0.0f), -1, 1);
         public bool Press => pressAction.action?.WasPerformedThisFrame() ?? false;

@@ -1,9 +1,7 @@
 using System;
-using FR8.Interactions.Drivers;
 using FR8.Interactions.Drivers.Submodules;
 using FR8.Pickups;
 using FR8.Rendering.Passes;
-using FR8.Utility;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -18,7 +16,7 @@ namespace FR8.Player.Submodules
     {
         [SerializeField] private float interactionDistance = 2.5f;
         [SerializeField] private TMP_Text readoutText;
-        [SerializeField] private DampedSpring transition;
+        [SerializeField] private Utility.DampedSpring transition;
 
         private PlayerController controller;
         private new Camera camera;

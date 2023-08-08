@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using FR8.Interactions.Drivers;
-using FR8.Utility;
 using UnityEngine;
 
 namespace FR8.Train
@@ -122,7 +121,7 @@ namespace FR8.Train
 
         private void OnValidate()
         {
-            if (!anchor) anchor = Hierarchy.FindOrCreate(transform, new Regex(@".*(anchor|connect|point).*", RegexOptions.Compiled | RegexOptions.IgnoreCase), "Anchor");
+            if (!anchor) anchor = Utility.Hierarchy.FindOrCreate(transform, new Regex(@".*(anchor|connect|point).*", RegexOptions.Compiled | RegexOptions.IgnoreCase), "Anchor");
         }
 
         private void OnDrawGizmosSelected()

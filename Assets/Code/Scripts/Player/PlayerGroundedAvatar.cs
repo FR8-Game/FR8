@@ -1,4 +1,6 @@
+using FR8.Level;
 using FR8.Player.Submodules;
+using UnityEditor;
 using UnityEngine;
 
 namespace FR8.Player
@@ -14,6 +16,7 @@ namespace FR8.Player
 
         [Header("Movement")]
         [SerializeField] private float maxGroundedSpeed = 4.0f;
+
         [SerializeField] private float accelerationTime = 0.12f;
         [SerializeField] private float sprintSpeedScalar = 2.0f;
 
@@ -36,6 +39,13 @@ namespace FR8.Player
 
         [SerializeField] private float upGravityScale = 2.0f;
 
+        [Space]
+        [SerializeField] private float ladderClimbSpeed = 5.0f;
+        [SerializeField] private float ladderRungDistance = 0.4f;
+        [SerializeField] private float ladderClimbSpring = 300.0f;
+        [SerializeField] private float ladderClimbDamper = 15.0f;
+        [SerializeField] private float ladderJumpForce = 5.0f;
+
         [Header("Camera")]
         [SerializeField] private Vector3 cameraOffset = new(0.0f, 1.6f, 0.0f);
 
@@ -47,6 +57,8 @@ namespace FR8.Player
         private Rigidbody lastGroundObject;
         private Vector3 lastGroundVelocity;
 
+        private float targetLadderPosition;
+
         private Pose cameraPose;
 
         public Transform CameraTarget { get; private set; }
@@ -54,6 +66,16 @@ namespace FR8.Player
         public RaycastHit GroundHit { get; private set; }
         public Vector3 Velocity => IsOnGround && GroundHit.rigidbody ? Rigidbody.velocity - GroundHit.rigidbody.GetPointVelocity(Rigidbody.position) : Rigidbody.velocity;
         public Vector3 Gravity => new Vector3(0.0f, -9.81f, 0.0f) * (Velocity.y > 0.0f && Controller.Jump ? upGravityScale : downGravityScale);
+        public Ladder Ladder { get; private set; }
+
+        public Vector3 MoveDirection
+        {
+            get
+            {
+                var input = Controller.Move;
+                return transform.TransformDirection(input.x, 0.0f, input.z);
+            }
+        }
 
         public float MoveSpeed
         {
@@ -65,7 +87,7 @@ namespace FR8.Player
         }
 
         public float MaxSpeed => maxGroundedSpeed;
-        
+
         #region Initalization
 
         protected override void Awake()
@@ -143,7 +165,10 @@ namespace FR8.Player
             Rigidbody.rotation = Quaternion.Euler(0.0f, CameraTarget.eulerAngles.y, 0.0f);
             CameraTarget.localRotation = Quaternion.identity;
             CameraTarget.localPosition = cameraOffset;
-            
+
+            cameraController.FixedUpdate();
+
+            if (LookForLadder()) return;
             CheckForGround();
             Move();
             Jump();
@@ -160,6 +185,43 @@ namespace FR8.Player
 
         #region Physics
 
+        private bool LookForLadder()
+        {
+            if (!Ladder) return false;
+
+            var dot = -Vector3.Dot(Rigidbody.transform.forward, Ladder.transform.forward);
+            var direction = Mathf.Round(Controller.Move.z) * Mathf.Sign(dot);
+            var delta = direction * ladderClimbSpeed * Time.deltaTime;
+            
+            var overTop = targetLadderPosition + delta > Ladder.Height;
+            var overBottom = targetLadderPosition + delta < 0.0f;
+            var dismount = overTop || overBottom;
+            if (jumpTrigger)
+            {
+                dismount = true;
+                Rigidbody.AddForce((Ladder.transform.forward + Vector3.up) * ladderJumpForce, ForceMode.VelocityChange);
+            }
+
+            if (dismount)
+            {
+                if (overTop) Rigidbody.AddForce(Vector3.up * ladderJumpForce, ForceMode.VelocityChange);
+                
+                Ladder = null;
+                return false;
+            }
+            
+            jumpTrigger = false;
+
+            targetLadderPosition += delta;
+            targetLadderPosition = Mathf.Clamp(targetLadderPosition, 0.0f, Ladder.Height);
+            var targetPosition = Ladder.ToWorldPos(Mathf.Round(targetLadderPosition / ladderRungDistance) * ladderRungDistance);
+
+            var force = (targetPosition - Rigidbody.position) * ladderClimbSpring + (Ladder.Velocity - Rigidbody.velocity) * ladderClimbDamper;
+            Rigidbody.AddForce(force);
+
+            return true;
+        }
+
         private void CheckForGround()
         {
             var distance = 1.0f - radius;
@@ -167,7 +229,7 @@ namespace FR8.Player
 
             var ray = new Ray(transform.position + Vector3.up, Vector3.down);
 
-            var res = Physics.SphereCastAll(ray, radius * 0.25f, distance);
+            var res = Physics.SphereCastAll(ray, radius * 0.25f, distance, ~0, QueryTriggerInteraction.Ignore);
             if (res.Length == 0) return;
 
             RaycastHit? bestHit = null;
@@ -200,7 +262,7 @@ namespace FR8.Player
         private void ApplyGroundSpring(float contraction)
         {
             if (Time.time - lastJumpTime < 0.08f) return;
-            
+
             var spring = contraction * groundSpring - Velocity.y * groundDamping;
             var force = Vector3.up * spring;
             Rigidbody.AddForce(force, ForceMode.Acceleration);
@@ -208,11 +270,10 @@ namespace FR8.Player
 
         private void Move()
         {
-            var moveSpeed = this.maxGroundedSpeed;
+            var moveSpeed = maxGroundedSpeed;
             if (Controller.Sprint) moveSpeed *= sprintSpeedScalar;
 
-            var input = Controller.Move;
-            var target = transform.TransformDirection(input.x, 0.0f, input.z) * moveSpeed;
+            var target = MoveDirection * moveSpeed;
 
             var difference = target - Velocity;
             difference.y = 0.0f;
@@ -234,7 +295,6 @@ namespace FR8.Player
             if (!jump) return;
 
             var power = Mathf.Sqrt(Mathf.Max(2.0f * 9.81f * upGravityScale * (jumpHeight - stepHeight), 0.0f)) - Velocity.y;
-            Debug.Log(power);
             var force = Vector3.up * power;
 
             Rigidbody.AddForce(force, ForceMode.VelocityChange);
@@ -259,7 +319,7 @@ namespace FR8.Player
                     var deltaRotation = groundObject.angularVelocity * Mathf.Rad2Deg * Time.deltaTime;
 
                     var force = deltaVelocity / Time.deltaTime;
-                    
+
                     Rigidbody.AddForce(force, ForceMode.Acceleration);
                     Rigidbody.MoveRotation(Rigidbody.rotation * Quaternion.Euler(deltaRotation));
                 }
@@ -271,5 +331,11 @@ namespace FR8.Player
         }
 
         #endregion
+
+        public void SetLadder(Ladder ladder)
+        {
+            Ladder = ladder;
+            targetLadderPosition = ladder.FromWorldPos(Rigidbody.position);
+        }
     }
 }

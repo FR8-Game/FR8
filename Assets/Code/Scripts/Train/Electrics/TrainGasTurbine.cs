@@ -1,5 +1,4 @@
 using FR8.Interactions.Drivers;
-using FR8.Utility;
 using UnityEngine;
 
 namespace FR8.Train.Electrics
@@ -21,7 +20,7 @@ namespace FR8.Train.Electrics
 
         [Space]
         [SerializeField] private float smoothTime;
-        [SerializeField] private NoiseMachine engineNoise;
+        [SerializeField] private Utility.NoiseMachine engineNoise;
 
         private const string IgnitionKey = "Ignition";
         private const string FuelKey = "Fuel";

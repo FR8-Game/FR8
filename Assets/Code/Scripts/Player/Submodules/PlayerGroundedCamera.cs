@@ -19,12 +19,15 @@ namespace FR8.Player.Submodules
 
         private Func<PlayerController> controller;
         private Transform target;
+        private Vector2 delta;
         private float yaw;
+        private bool zoomCamera;
         private bool cameraLocked;
         private bool wasCameraLocked;
 
-        private int lastCursorX, lastCursorY;
+        private Quaternion orientation;
 
+        private int lastCursorX, lastCursorY;
         private float fovVelocity;
 
         private int cursorLockID;
@@ -78,25 +81,33 @@ namespace FR8.Player.Submodules
             }
             
             wasCameraLocked = cameraLockedThisFrame;
+            delta += controller.LookFrameDelta;
 
+            zoomCamera = controller.ZoomCam;
+            
+            target.transform.rotation = orientation;
+            Camera.transform.rotation = orientation;
+        }
+
+        public void FixedUpdate()
+        {
             // Get delta rotation input from controller
-            var delta = controller.LookFrameDelta;
-
+            var delta = this.delta;
+            this.delta = Vector2.zero;
+            
             // Apply input and clamp camera's yaw
             yaw = Mathf.Clamp(yaw + delta.y, -YawRange / 2.0f, YawRange / 2.0f);
-
-            shakeModule.GetOffsets(this, out var translationalOffset, out var rotationalOffset);
             
-            target.transform.rotation = Quaternion.Euler(-yaw, target.transform.eulerAngles.y + delta.x, 0.0f);
-            Camera.transform.rotation = target.transform.rotation * rotationalOffset;
+            shakeModule.GetOffsets(this, out var translationalOffset, out var rotationalOffset);
+            orientation = Quaternion.Euler(-yaw, orientation.eulerAngles.y + delta.x, 0.0f) * rotationalOffset;
 
             // Update additional camera variables.
             Camera.transform.position = target.position + Camera.transform.rotation * translationalOffset;
-            Camera.fieldOfView = Mathf.SmoothDamp(Camera.fieldOfView, controller.ZoomCam ? zoomFieldOfView : fieldOfView, ref fovVelocity, fovSmoothTime);
+            Camera.fieldOfView = Mathf.SmoothDamp(Camera.fieldOfView, zoomCamera ? zoomFieldOfView : fieldOfView, ref fovVelocity, fovSmoothTime);
             Camera.nearClipPlane = nearPlane;
             Camera.farClipPlane = farPlane;
         }
-
+        
         public void SetCameraLock(bool state)
         {
             cameraLocked = state;

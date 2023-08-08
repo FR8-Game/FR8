@@ -1,6 +1,5 @@
 using System;
 using FR8.Interactions.Drivers.Submodules;
-using FR8.Utility;
 using UnityEngine;
 
 namespace FR8.Train.Track
@@ -11,7 +10,7 @@ namespace FR8.Train.Track
         [SerializeField] private ConnectionEnd connectionEnd;
         [SerializeField] private Transform primaryIndicator;
         [SerializeField] private Transform secondaryIndicator;
-        [SerializeField] private DampedSpring animationSpring;
+        [SerializeField] private Utility.DampedSpring animationSpring;
         [SerializeField] private bool flip;
         [SerializeField] private bool testActive;
 
