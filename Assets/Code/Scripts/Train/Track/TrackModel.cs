@@ -14,11 +14,6 @@ namespace FR8.Train.Track
         [SerializeField] private bool optimize;
         [SerializeField] private int segmentsPerSplit = 15;
 
-        private void Awake()
-        {
-            BakeMesh();
-        }
-
         public void Clear()
         {
             var rendererContainer = transform.Find("Renderers");
