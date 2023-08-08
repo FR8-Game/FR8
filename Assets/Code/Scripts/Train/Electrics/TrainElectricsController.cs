@@ -9,6 +9,7 @@ namespace FR8.Train.Electrics
     [DisallowMultipleComponent]
     public sealed class TrainElectricsController : MonoBehaviour, IDrivable
     {
+        [SerializeField] private float baselineGeneration = 5.0f;
         [SerializeField] private bool connected = true;
 
         private DriverNetwork driverNetwork;
@@ -48,9 +49,10 @@ namespace FR8.Train.Electrics
             UpdateChildren();
             
             var saturation = 0.0f;
+            var clockSpeed = 0.0f;
             var draw = 0.0f;
 
-            var capacity = 0.0f;
+            var capacity = baselineGeneration;
             foreach (var e in generators) capacity += e.MaximumPowerGeneration;
 
             if (connected)
@@ -62,15 +64,17 @@ namespace FR8.Train.Electrics
                 }
 
                 saturation = draw / capacity;
+                clockSpeed = draw / (capacity - baselineGeneration);
             }
 
             if (saturation > 1.01f)
             {
                 saturation = 0.0f;
+                clockSpeed = 0.0f;
                 SetConnected(false);
             }
 
-            foreach (var e in generators) e.SetClockSpeed(saturation);
+            foreach (var e in generators) e.SetClockSpeed(clockSpeed);
 
             PowerDraw = draw;
             Capacity = capacity;

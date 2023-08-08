@@ -11,6 +11,8 @@ namespace FR8.Interactions.Drivers
 
         private bool state;
 
+        public override string DisplayValue => state ? "Pressed" : "Press";
+
         public override void OnValueChanged(float newValue)
         {
             base.OnValueChanged(newValue);

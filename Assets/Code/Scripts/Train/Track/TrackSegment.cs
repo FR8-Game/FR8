@@ -29,6 +29,7 @@ namespace FR8.Train.Track
         private float totalLength;
 
         private Dictionary<TrainCarriage, Vector3> trainMetadata = new();
+        private List<Vector3> points;
 
         public Connection StartConnection => startConnection;
         public Connection EndConnection => endConnection;
@@ -36,6 +37,21 @@ namespace FR8.Train.Track
         public List<Vector3> Knots => knots;
 
         public static readonly Spline.SplineProfile SplineProfile = Spline.CatmullRom;
+
+        private void Awake()
+        {
+            BakePoints();
+        }
+
+        private void BakePoints()
+        {
+            points = new List<Vector3>();
+            for (var i = 0; i < resolution; i++)
+            {
+                var p = i / (resolution - 1.0f);
+                points.Add(SamplePoint(p));
+            }
+        }
 
         private void FixedUpdate()
         {
@@ -232,48 +248,37 @@ namespace FR8.Train.Track
             endConnection.OnValidate();
         }
 
-        public float GetClosestPoint(Vector3 point, bool debugDraw = false)
+        public float GetClosestPoint(Vector3 point)
         {
-            var colors = new[]
+            if (points == null) BakePoints();
+
+            var best = 0;
+            var bestScore = float.MaxValue;
+            for (var i = 0; i < points.Count; i++)
             {
-                Color.red,
-                Color.yellow,
-                Color.green,
-                Color.cyan,
-                Color.blue,
-                Color.magenta,
-            };
+                var score = (points[i] - point).sqrMagnitude;
+                if (score > bestScore) continue;
 
-            var t0 = 0.0f;
-            var bestDistanceSquares = float.MaxValue;
-
-            for (var i = 0; i < resolution; i++)
-            {
-                var p = closedLoop ? (float)i / resolution : i / (resolution - 1.0f);
-
-                var other = SamplePoint(p);
-                var otherDistanceSquared = (other - point).magnitude;
-
-                if (otherDistanceSquared > bestDistanceSquares) continue;
-
-                t0 = p;
-                bestDistanceSquares = otherDistanceSquared;
+                best = i;
+                bestScore = score;
             }
 
-            var t1 = t0 + 1.0f / resolution;
+            var other = best + 1;
+            if (other == points.Count)
+            {
+                other--;
+                best--;
+            }
 
-            var point0 = SamplePoint(t0);
-            var point1 = SamplePoint(t1);
+            var a = points[best];
+            var b = points[other];
 
-            if (debugDraw) Debug.DrawRay(point0, (point - point0) * 0.5f, colors[0]);
-            if (debugDraw) Debug.DrawRay(point1, (point - point1) * 0.5f, colors[0]);
+            var v1 = b - a;
+            var v2 = point - a;
 
-            var v0 = point1 - point0;
-            var v1 = point - point0;
+            var dot = Vector3.Dot(v1.normalized, v2) / v1.magnitude;
 
-            var dot = Vector3.Dot(v0.normalized, v1) / v0.magnitude;
-
-            return t0 + dot / resolution;
+            return Mathf.LerpUnclamped(best / (points.Count - 1.0f), other / (points.Count - 1.0f), dot);
         }
 
         public float GetKnotPercent(int index)
