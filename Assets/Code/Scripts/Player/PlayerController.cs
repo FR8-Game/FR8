@@ -15,7 +15,6 @@ namespace FR8.Player
 
         [Range(0.0f, 1.0f)]
         [SerializeField] private float controllerSensitivity = 0.4f;
-        [SerializeField] private float rollSensitivity = 0.4f;
 
         [Space]
         [SerializeField] private PlayerAvatar newAvatar;
@@ -32,6 +31,7 @@ namespace FR8.Player
         private InputActionReference freeCamAction;
         private InputActionReference grabCamAction;
         private InputActionReference zoomCamAction;
+        private InputActionReference peeAction;
 
         public PlayerAvatar CurrentAvatar { get; private set; }
 
@@ -47,7 +47,7 @@ namespace FR8.Player
 
         public bool JumpTriggered => jumpInput.action?.WasPerformedThisFrame() ?? false;
         public bool Jump => jumpInput.Switch();
-        public Vector3 LookFrameDelta => GetLookFrameDelta(false);
+        public Vector2 LookFrameDelta => GetLookFrameDelta(false);
 
         public int Nudge => Mathf.Clamp(Mathf.RoundToInt(nudgeAction.action?.ReadValue<float>() ?? 0.0f), -1, 1);
         public bool Press => pressAction.action?.WasPerformedThisFrame() ?? false;
@@ -56,6 +56,7 @@ namespace FR8.Player
         public bool GrabCam => grabCamAction.Switch();
         public bool ZoomCam => zoomCamAction.Switch();
         public bool Sprint => sprintAction.Switch();
+        public bool Pee => peeAction.Switch();
 
         public Vector2 GetLookFrameDelta(bool forceMouseDelta)
         {
@@ -92,6 +93,7 @@ namespace FR8.Player
             freeCamAction = bind("FreeCam");
             grabCamAction = bind("GrabCam");
             zoomCamAction = bind("ZoomCam");
+            peeAction = bind("Pee");
             
             mainCamera = Camera.main;
         }

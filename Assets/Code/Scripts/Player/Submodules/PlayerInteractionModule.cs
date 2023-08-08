@@ -1,10 +1,11 @@
 using System;
-using FR8.Interactions.Drivers;
+using FR8.Interactions.Drivers.Submodules;
 using FR8.Pickups;
 using FR8.Rendering.Passes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Cursor = UnityEngine.Cursor;
 using Object = UnityEngine.Object;
 
 namespace FR8.Player.Submodules
@@ -15,6 +16,7 @@ namespace FR8.Player.Submodules
     {
         [SerializeField] private float interactionDistance = 2.5f;
         [SerializeField] private TMP_Text readoutText;
+        [SerializeField] private Utility.DampedSpring transition;
 
         private PlayerController controller;
         private new Camera camera;
@@ -52,15 +54,21 @@ namespace FR8.Player.Submodules
 
             if (newLookingAt != lookingAt)
             {
-                if (lookingAt != null) SelectionOutlinePass.RemovePersistant(lookingAt.gameObject);
-                if (newLookingAt != null) SelectionOutlinePass.RenderPersistant(newLookingAt.gameObject);
+                transition.currentPosition = 0.0f;
+                transition.velocity = 0.0f;
+                
+                if ((Object)lookingAt) SelectionOutlinePass.RemovePersistant(lookingAt.gameObject);
+                if ((Object)newLookingAt) SelectionOutlinePass.RenderPersistant(newLookingAt.gameObject);
             }
 
             lookingAt = newLookingAt;
-
+            transition.Target(lookingAt != null ? 1.0f : 0.0f).Iterate(Time.deltaTime);
+            var animatePosition = Mathf.Max(0.0f, transition.currentPosition);
+            readoutText.transform.localScale = Vector3.one * animatePosition;
+            readoutText.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, (1.0f - animatePosition) * 20.0f);
+            
             if (lookingAt == null)
             {
-                readoutText.text = null;
                 press = false;
                 nudge = 0;
                 dragging = false;
@@ -82,11 +90,11 @@ namespace FR8.Player.Submodules
             {
                 switch (lookingAt)
                 {
-                    case IDriver driver:
-                        ProcessDriver(driver, ray);
-                        break;
                     case PickupObject pickup:
                         ProcessPickup(pickup);
+                        break;
+                    default:
+                        ProcessInteractable(lookingAt, ray);
                         break;
                 }
             }
@@ -96,7 +104,7 @@ namespace FR8.Player.Submodules
             dragging = controller.Drag;
         }
 
-        private void ProcessDriver(IDriver driver, Ray ray)
+        private void ProcessInteractable(IInteractable driver, Ray ray)
         {
             if (controller.Drag)
             {
@@ -108,12 +116,6 @@ namespace FR8.Player.Submodules
             {
                 driver.Nudge(nudge);
                 nudge = 0;
-            }
-
-            if (press)
-            {
-                driver.Press();
-                press = false;
             }
         }
 
@@ -129,9 +131,13 @@ namespace FR8.Player.Submodules
         private IInteractable GetLookingAt()
         {
             var ray = GetLookingRay();
-            if (!Physics.Raycast(ray, out var hit, interactionDistance)) return null;
+            if (!Physics.Raycast(ray, out var hit)) return null;
 
-            return hit.collider .GetComponentInParent<IInteractable>();
+            var interactable = hit.collider.GetComponentInParent<IInteractable>();
+            if (!(Object)interactable) return null;
+
+            var distance = interactable.OverrideInteractDistance ? interactable.InteractDistance : interactionDistance;
+            return (hit.distance < distance) ? interactable : null;
         }
 
         private Ray GetLookingRay()

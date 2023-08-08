@@ -65,11 +65,10 @@ MonoBehaviour:
   drag: 0
   referenceWeight: 100000
   cornerLean: 0.6
-  retentionSpring: 100
-  retentionDamping: 10
-  retentionTorqueConstant: 4
-  walker:
-    currentSegment: {fileID: 0}
+  retentionSpring: 2500
+  retentionDamping: 50
+  retentionTorqueConstant: 0.2
+  segment: {fileID: 0}
 --- !u!1001 &3915251474078818112
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -87,7 +86,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2f3a4313adfbfb94db402ef85b4c1f5a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.25
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2f3a4313adfbfb94db402ef85b4c1f5a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -229,9 +228,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec82d84e2f30255438c24fa453fa663c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  key: 
+  displayName: 
+  defaultValue: 0
   settings: {fileID: 11400000, guid: 9826cd7c0dba1394b8a24b0110955138, type: 2}
   anchor: {fileID: 4041281457244915054}
-  engaged: 1
 --- !u!4 &3593728491188107435 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2f3a4313adfbfb94db402ef85b4c1f5a, type: 3}
@@ -308,9 +309,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec82d84e2f30255438c24fa453fa663c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  key: 
+  displayName: 
+  defaultValue: 0
   settings: {fileID: 11400000, guid: 9826cd7c0dba1394b8a24b0110955138, type: 2}
   anchor: {fileID: 8125118800026551936}
-  engaged: 1
 --- !u!1 &7342414291782545350 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6030525085624430726, guid: 2f3a4313adfbfb94db402ef85b4c1f5a, type: 3}
