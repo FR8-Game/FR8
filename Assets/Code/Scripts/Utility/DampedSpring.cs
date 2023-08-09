@@ -70,6 +70,24 @@ namespace FR8
                     }
                 }
             }
+
+            public static void ApplyForce(Rigidbody body, Vector3 position, UnityEngine.Quaternion rotation, float spring, float damper, float torqueScale, bool ignoreMass)
+            {
+                ApplyForce(body, position, rotation, Vector3.zero, Vector3.zero, spring, damper, torqueScale, ignoreMass);
+            }
+            
+            public static void ApplyForce(Rigidbody body, Vector3 position, UnityEngine.Quaternion rotation, Vector3 velocity, Vector3 angularVelocity, float spring, float damper, float torqueScale, bool ignoreMass)
+            {
+                var current = new Physics.SpringBody(body);
+                var target = new Physics.SpringBody(position, rotation, velocity, angularVelocity);
+                var settings = new Physics.SpringSettings(spring, damper, torqueScale);
+
+                var forceMode = ignoreMass ? ForceMode.Acceleration : ForceMode.Force;
+                
+                var (force, torque) = Physics.CalculateDampedSpring(current, target, settings);
+                body.AddForce(force, forceMode);
+                body.AddForce(torque, forceMode);
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using FR8.Train.Signals;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -48,6 +49,25 @@ namespace FR8
             {
                 var t = queue.Dequeue();
                 if (match(t.name, name)) return t;
+
+                foreach (Transform c in t)
+                {
+                    queue.Enqueue(c);
+                }
+            }
+
+            return null;
+        }
+        
+        public static Transform DeepFind(this Transform transform, Regex regex)
+        {
+            var queue = new Queue<Transform>();
+            queue.Enqueue(transform);
+
+            while (queue.Count > 0)
+            {
+                var t = queue.Dequeue();
+                if (regex.IsMatch(t.name)) return t;
 
                 foreach (Transform c in t)
                 {

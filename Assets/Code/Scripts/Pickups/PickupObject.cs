@@ -1,9 +1,6 @@
-using System;
 using FR8.Interactions.Drivers.Submodules;
 using FR8.Player;
-using FR8;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace FR8.Pickups
 {
@@ -21,15 +18,16 @@ namespace FR8.Pickups
         [SerializeField] private float damping = 18.0f;
         [SerializeField] private float torqueScaling = 1.0f;
 
-        private new Rigidbody rigidbody;
         private PlayerGroundedAvatar target;
 
         private Vector3 lastTargetPosition;
         private Quaternion lastTargetRotation;
 
-        public bool CanInteract => !target;
+        public Rigidbody Rigidbody { get; private set; }
+        public virtual bool CanInteract => !Held;
         public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
         public string DisplayValue => target ? "Drop" : "Pickup";
+        public bool Held => target;
 
         public bool OverrideInteractDistance => false;
         public float InteractDistance => throw new System.NotImplementedException();
@@ -51,10 +49,10 @@ namespace FR8.Pickups
 
         private void Awake()
         {
-            rigidbody = GetComponent<Rigidbody>();
+            Rigidbody = GetComponent<Rigidbody>();
         }
 
-        private void FixedUpdate()
+        protected virtual void FixedUpdate()
         {
             if (!target) return;
 
@@ -66,10 +64,10 @@ namespace FR8.Pickups
 
             var targetAngularVelocity = axis * angle / Time.deltaTime * Mathf.Deg2Rad;
 
-            var force = (targetPosition - rigidbody.position) * spring + (targetVelocity - rigidbody.velocity) * damping;
-            rigidbody.AddForce(force - Physics.gravity, ForceMode.Acceleration);
+            var force = (targetPosition - Rigidbody.position) * spring + (targetVelocity - Rigidbody.velocity) * damping;
+            Rigidbody.AddForce(force - Physics.gravity, ForceMode.Acceleration);
 
-            (angle, axis) = Utility.Quaternion.ToAngleAxis(targetRotation * Quaternion.Inverse(rigidbody.rotation));
+            (angle, axis) = Utility.Quaternion.ToAngleAxis(targetRotation * Quaternion.Inverse(Rigidbody.rotation));
 
             angle *= Mathf.Deg2Rad;
             if (angle == 0.0f)
@@ -78,8 +76,8 @@ namespace FR8.Pickups
                 angle = 0.0f;
             }
 
-            var torque = (axis * angle * spring + (targetAngularVelocity - rigidbody.angularVelocity) * damping) * torqueScaling;
-            rigidbody.AddTorque(torque, ForceMode.Acceleration);
+            var torque = (axis * angle * spring + (targetAngularVelocity - Rigidbody.angularVelocity) * damping) * torqueScaling;
+            Rigidbody.AddTorque(torque, ForceMode.Acceleration);
 
             lastTargetPosition = targetPosition;
             lastTargetRotation = targetRotation;
@@ -88,13 +86,13 @@ namespace FR8.Pickups
         private Vector3 GetTargetPosition() => target.CameraTarget.TransformPoint(HoldTranslation);
         private Quaternion GetTargetRotation() => target.CameraTarget.rotation * HoldRotation;
 
-        public PickupObject Pickup(PlayerGroundedAvatar target)
+        public virtual PickupObject Pickup(PlayerGroundedAvatar target)
         {
             if (this.target) return null;
             if (!target) return null;
 
             this.target = target;
-            rigidbody.detectCollisions = false;
+            Rigidbody.detectCollisions = false;
 
             lastTargetPosition = GetTargetPosition();
             lastTargetRotation = GetTargetRotation();
@@ -102,11 +100,11 @@ namespace FR8.Pickups
             return this;
         }
 
-        public PickupObject Drop()
+        public virtual PickupObject Drop()
         {
             if (!target) return null;
 
-            rigidbody.detectCollisions = true;
+            Rigidbody.detectCollisions = true;
 
             target = null;
             return null;
