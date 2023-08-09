@@ -1,4 +1,5 @@
 ﻿using FR8.Train.Track;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -22,6 +23,31 @@ namespace FR8Editor.Inspector
             {
                 e.BakeMesh();
             }
+        }
+
+        [MenuItem("Actions/Track Model/Clear All Meshes")]
+        public static void ClearAllTracks()
+        {
+            var list = FindObjectsOfType<TrackModel>();
+            foreach (var e in list)
+            {
+                e.Clear();
+            }
+        }
+
+        [MenuItem("Actions/Track Model/Purge Leaked Meshes")]
+        public static void PurgeLeakedMeshes()
+        {
+            var list = FindObjectsOfType<Mesh>();
+            var regex = new Regex(@"\[PROC\].*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            var c = 0;
+            foreach (var e in list)
+            {
+                if (!regex.IsMatch(e.name)) continue;
+                DestroyImmediate(e);
+                c++;
+            }
+            Debug.Log($"Deleted {c} meshes");
         }
 
         public override void OnInspectorGUI()
