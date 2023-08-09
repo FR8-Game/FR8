@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6394128087836156411}
   - component: {fileID: 6783170715577434548}
   - component: {fileID: 5998356665163689951}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Grounded Controller
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -52,8 +52,9 @@ MonoBehaviour:
   mass: 4
   playerHeight: 1.7
   radius: 0.2
-  moveSpeed: 4
+  maxGroundedSpeed: 4
   accelerationTime: 0.12
+  sprintSpeedScalar: 2
   airMovePenalty: 0.8
   jumpHeight: 2
   stepHeight: 0.4
@@ -62,13 +63,22 @@ MonoBehaviour:
   groundDamping: 25
   downGravityScale: 3
   upGravityScale: 2
+  ladderClimbSpeed: 2
+  ladderRungDistance: 0.6
+  ladderClimbSpring: 400
+  ladderClimbDamper: 50
+  ladderJumpForce: 5
   cameraOffset: {x: 0, y: 1.6, z: 0}
   cameraController:
     fieldOfView: 80
     zoomFieldOfView: 20
     fovSmoothTime: 0.08
-    nearPlane: 0.1
-    farPlane: 1000
+    nearPlane: 0.02
+    farPlane: 10000
+    shakeModule:
+      amplitude: {x: 0.3, y: 0, z: 0.5}
+      frequency: 6
+      slope: 0.2
 --- !u!136 &6394128087836156411
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -97,6 +107,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionDistance: 2.5
   readoutText: {fileID: 1921352481845593271}
+  transition:
+    springConstant: 350
+    dampingConstant: 25
+    clamped: 1
+    range: {x: 0, y: 1}
+    bounce: 0.4
+    currentPosition: 0
+    targetPosition: 0
+    velocity: 0
 --- !u!54 &5998356665163689951
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -122,7 +141,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3074157741673521788}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Interaction
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -161,7 +180,7 @@ GameObject:
   - component: {fileID: 4152964452604636917}
   - component: {fileID: 5201278916995637737}
   - component: {fileID: 4183848386361849601}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -243,7 +262,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6496025909817959921}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Camera Target
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -275,7 +294,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6066431375291976692}
   - component: {fileID: 6066431375291976694}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: PFB_Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -313,7 +332,6 @@ MonoBehaviour:
   inputMap: {fileID: -944628639613478452, guid: badd88ac4cdc31941ad634977f07e0fd, type: 3}
   mouseSensitivity: 0.3
   controllerSensitivity: 0.4
-  rollSensitivity: 90
   newAvatar: {fileID: 0}
 --- !u!1 &6125957971899221248
 GameObject:
@@ -326,7 +344,7 @@ GameObject:
   - component: {fileID: 5121809080928981005}
   - component: {fileID: 3989679741167504888}
   - component: {fileID: 9132342546323086027}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Crosshair
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -402,7 +420,7 @@ GameObject:
   - component: {fileID: 566534860154784961}
   - component: {fileID: 5374003581893951361}
   - component: {fileID: 1921352481845593271}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -426,9 +444,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -0.000061035156, y: 0}
   m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0.25, y: 0.5}
 --- !u!222 &5374003581893951361
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -457,7 +475,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '{DisplayName}\n<size=50%>{DisplayValue}'
+  m_text: '{DisplayName}\n<size=50%>  {DisplayValue}'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 79ff2569a5a52ae499331f3e22f217ca, type: 2}
   m_sharedMaterial: {fileID: -946139818346727396, guid: 79ff2569a5a52ae499331f3e22f217ca, type: 2}
@@ -484,8 +502,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 55
+  m_fontSizeBase: 55
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -500,7 +518,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_enableWordWrapping: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}

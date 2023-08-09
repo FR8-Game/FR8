@@ -1,10 +1,9 @@
-﻿using FR8.Interactions.Drivers;
-using FR8.Utility;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace FR8.Interactions.Drivables
 {
-    public class TwoPoseDrivableAnimator : MonoBehaviour, IDrivable
+    [System.Serializable]
+    public class TwoPoseDrivableAnimator
     {
         [Header("HANDLE SETTINGS")]
         [Space]
@@ -13,7 +12,7 @@ namespace FR8.Interactions.Drivables
 
         [Header("HANDLE SETTINGS")]
         [Space]
-        [SerializeField] private DampedSpring animationSpring;
+        [SerializeField] private Utility.DampedSpring animationSpring;
         
         [Header("POSE PARAMETERS")]
         [Space]
@@ -23,27 +22,35 @@ namespace FR8.Interactions.Drivables
         [SerializeField] private bool animateRotation;
         [SerializeField] private Vector3 slidePoseARotation;
         [SerializeField] private Vector3 slidePoseBRotation;
-
-        private void Update()
+        
+        public void Update()
         {
             var t = animationSpring.currentPosition;
-            if (handle && animatePosition) handle.localPosition = Vector3.LerpUnclamped(slidePoseAPosition, slidePoseBPosition, t);
-            if (handle && animateRotation) handle.localRotation = Quaternion.Euler(Vector3.LerpUnclamped(slidePoseARotation, slidePoseBRotation, t));
+            SetPosition(t);
         }
 
-        private void FixedUpdate()
+        public void FixedUpdate()
         {
             animationSpring.Iterate(Time.deltaTime);
         }
-
-        public void SetValue(DriverGroup group, float value)
+        
+        public void SetValue(float newValue)
         {
-            animationSpring.Target(Mathf.InverseLerp(valueRange.x, valueRange.y, value));
+            animationSpring.Target(Mathf.InverseLerp(valueRange.x, valueRange.y, newValue));
         }
 
-        private void OnValidate()
+        private void SetPosition(float position)
         {
-            if (!handle && transform.childCount > 0) handle = transform.GetChild(0);
+            if (handle && animatePosition) handle.localPosition = Vector3.LerpUnclamped(slidePoseAPosition, slidePoseBPosition, position);
+            if (handle && animateRotation) handle.localRotation = Quaternion.Euler(Vector3.LerpUnclamped(slidePoseARotation, slidePoseBRotation, position));
+        }
+
+        public void OnValidate(float testValue)
+        {
+            if (!Application.isPlaying)
+            {
+                SetPosition(Mathf.InverseLerp(valueRange.x, valueRange.y, testValue));
+            }
         }
     }
 }

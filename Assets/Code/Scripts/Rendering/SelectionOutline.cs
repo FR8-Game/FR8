@@ -1,3 +1,4 @@
+using FR8.Rendering.Passes;
 using UnityEngine;
 
 namespace FR8.Rendering

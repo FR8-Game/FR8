@@ -1,35 +1,48 @@
-using System.Collections.Generic;
-using FR8.Train.Signals;
+﻿using System;
+using FR8.Interactions.Drivables;
 using UnityEngine;
 
 namespace FR8.Interactions.Drivers
 {
-    [SelectionBase, DisallowMultipleComponent]
-    public class Button : MonoBehaviour, IInteractable
+    public class Button : Driver
     {
-        [SerializeField] private string displayName = "Button";
-        [SerializeField] private List<Signal> pressSignalList;
+        [SerializeField] private TwoPoseDrivableAnimator animator;
+        [SerializeField] private bool testValue;
 
-        public virtual bool CanInteract => true;
-        public virtual string DisplayName => displayName;
-        public virtual string DisplayValue => "Press";
-        
-        public void Nudge(int direction)
+        private bool state;
+
+        public override string DisplayValue => state ? "Pressed" : "Press";
+
+        public override void OnValueChanged(float newValue)
         {
-            Press();
+            base.OnValueChanged(newValue);
+            animator.SetValue(newValue);
         }
 
-        public virtual void Press()
+        private void FixedUpdate()
         {
-            pressSignalList.Raise();
+            SetValue(state ? 1.0f : 0.0f);
+            state = false;
+            
+            animator.FixedUpdate();
         }
 
-        public void BeginDrag(Ray ray)
+        private void Update()
         {
+            animator.Update();
         }
 
-        public void ContinueDrag(Ray ray)
+        private void OnValidate()
         {
+            animator.OnValidate(testValue ? 1.0f : 0.0f);
+        }
+
+        public override void Nudge(int direction) { }
+
+        public override void BeginDrag(Ray ray) { }
+        public override void ContinueDrag(Ray ray)
+        {
+            state = true;
         }
     }
 }

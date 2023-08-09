@@ -35,26 +35,9 @@ namespace FR8Editor.Inspector
                 {
                     using (new EditorGUI.DisabledScope(true))
                     {
-                        EditorGUILayout.FloatField("Power In Storage [MWh]", Mathf.Round(electricsController.PowerStorage));
                         EditorGUILayout.FloatField("Power Draw [MW]", Mathf.Round(electricsController.PowerDraw));
-                    }
-
-                    var electrics = new List<TrainElectrics>(electricsController.GetComponentsInChildren<TrainElectrics>()).OrderBy(e => e.FuzeGroup).ToList();
-                    if (electrics.Count == 0) return;
-
-                    var fuzeGroup = electrics[0].FuzeGroup - 1;
-                    foreach (var e in electrics)
-                    {
-                        if (e.FuzeGroup != fuzeGroup)
-                        {
-                            fuzeGroup = e.FuzeGroup;
-                            EditorGUILayout.LabelField($"Fuze Group {fuzeGroup}");
-                        }
-
-                        if (GUILayout.Button($"[{e.GetType().Name}] {e.gameObject.name}"))
-                        {
-                            EditorGUIUtility.PingObject(e.gameObject);
-                        }
+                        EditorGUILayout.FloatField("Power Capacity [MW]", Mathf.Round(electricsController.Capacity));
+                        EditorGUILayout.FloatField("Power Saturation [%]", Mathf.Round(electricsController.Saturation * 100.0f));
                     }
                 }
             }

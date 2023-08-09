@@ -6,39 +6,70 @@ namespace FR8.Train.Engine
 {
     [SelectionBase]
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(TrainDrive))]
-    public sealed class TrainEngine : TrainElectrics
+    [RequireComponent(typeof(Locomotive))]
+    public sealed class TrainEngine : MonoBehaviour, IElectricDevice
     {
-        [SerializeField] private float maxSpeed;
-        [SerializeField] private float acceleration;
-        [SerializeField] private float maxSpeedPowerConsumptionMegawatts = 75.0f;
+        [SerializeField] private float maxSpeedKmpH = 120.0f;
+        [SerializeField] private float acceleration = 8.0f;
+        [SerializeField] private float maxPowerConsumption = 75.0f;
+        [SerializeField] private float tangentialForceCost = 10.0f;
+        [SerializeField] [Range(0.0f, 1.0f)] private float throttleSmoothing;
 
-        private float velocity;
-        private float force;
-        private DriverGroup throttleDriver;
-        private TrainDrive train;
+        private const string ThrottleKey = "Throttle";
+        private const string PowerDrawKey = "PowerDraw";
+        private const string CurrentKey = "Current";
 
-        public float Throttle => Connected ? (throttleDriver ? throttleDriver.Value : 0.0f) : 0.0f;
+        private DriverNetwork driverNetwork;
+        private Locomotive locomotive;
+
+        private bool connected;
+        private float powerDraw;
+        private float throttleActual;
+
+        public float ThrottleInput => driverNetwork.Read(ThrottleKey);
+        public string FuseGroup => null;
 
         private void Awake()
         {
-            train = GetComponent<TrainDrive>();
-            
-            var findDriver = DriverGroup.Find(gameObject);
+            locomotive = GetComponent<Locomotive>();
+            driverNetwork = GetComponentInParent<DriverNetwork>();
+        }
 
-            throttleDriver = findDriver("Throttle");
+        private void Start()
+        {
+            driverNetwork.SetValue(PowerDrawKey, 0.0f);
+            driverNetwork.SetValue(CurrentKey, 0.0f);
         }
 
         private void FixedUpdate()
         {
-            if (train.Gear == 0) return;
+            throttleActual += (ThrottleInput - throttleActual) * (1.0f - throttleSmoothing);
+
+            if (locomotive.Gear == 0) return;
+
+            var fwdSpeed = locomotive.GetForwardSpeed();
+            var oldPowerDraw = powerDraw;
             
-            var fwdSpeed = train.GetForwardSpeed();
-            var maxSpeed = this.maxSpeed / 3.6f;
-            var force = (maxSpeed * train.Gear - fwdSpeed) / maxSpeed * acceleration * Throttle;
-            train.Rigidbody.AddForce(train.DriverDirection * force, ForceMode.Acceleration);
+            if (connected)
+            {
+                var maxSpeed = maxSpeedKmpH / 3.6f;
+                var acceleration = (maxSpeed - Mathf.Abs(fwdSpeed)) * this.acceleration * throttleActual * locomotive.Gear;
+
+                locomotive.Rigidbody.AddForce(locomotive.DriverDirection * acceleration * locomotive.ReferenceWeight);
+
+                powerDraw = throttleActual * maxPowerConsumption + Mathf.Abs(Vector3.Dot(locomotive.TangentialForce, transform.right)) * tangentialForceCost;
+            }
+            else
+            {
+                powerDraw = 0.0f;
+            }
+            powerDraw = (powerDraw + oldPowerDraw) / 2.0f;
+
+            driverNetwork.SetValue(PowerDrawKey, powerDraw);
         }
 
-        public override float CalculatePowerConsumptionMegawatts() => -Throttle * maxSpeedPowerConsumptionMegawatts;
+        public void SetConnected(bool connected) => this.connected = connected;
+
+        public float CalculatePowerDraw() => powerDraw;
     }
 }

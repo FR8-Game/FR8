@@ -1,30 +1,58 @@
+using System.Linq;
 using FR8.Train;
 using UnityEditor;
+using UnityEngine;
 
 namespace FR8Editor.Inspector
 {
-    [CustomEditor(typeof(TrainMovement), true)]
-    public class TrainMovementEditor : Editor
+    [CanEditMultipleObjects]
+    [CustomEditor(typeof(TrainCarriage), true)]
+    public class TrainCarriageEditor : Editor
     {
-        private bool SnapToSpline
-        {
-            get => EditorPrefs.GetBool($"{GetType().FullName}snapToSpline", false);
-            set => EditorPrefs.SetBool($"{GetType().FullName}snapToSpline", value);
-        }
-        
-        public TrainMovement Target => target as TrainMovement;
-
         public override void OnInspectorGUI()
         {
+            var targets = new TrainCarriage[this.targets.Length];
+            for (var i = 0; i < targets.Length; i++)
+            {
+                targets[i] = (TrainCarriage)this.targets[i];
+            }
+
             base.OnInspectorGUI();
 
-            SnapToSpline = EditorGUILayout.Toggle("Snap To Spline", SnapToSpline);
-            if (SnapToSpline && Target.Walker.CurrentSegment)
+            if (targets.Length == 0) return;
+            if (targets.Length == 1)
             {
-                var transform = Target.transform;
-                var track = Target.Walker.CurrentSegment;
-                
-                transform.position = track.SamplePoint(track.GetClosestPoint(transform.position));
+                var target = targets[0];
+
+                if (!target.Segment)
+                {
+                    EditorGUILayout.HelpBox("Train is Missing Spline", MessageType.Error);
+                }
+                else if (GUILayout.Button("Snap To Spline", GUILayout.Height(30)))
+                {
+                    if (!target.Segment) return;
+
+                    var transform = target.transform;
+                    var track = target.Segment;
+
+                    var t = track.GetClosestPoint(transform.position);
+                    transform.position = track.SamplePoint(t);
+                    transform.rotation = Quaternion.LookRotation(track.SampleTangent(t), Vector3.up);
+                }
+            }
+            else if (GUILayout.Button("Snap All To Spline", GUILayout.Height(30)))
+            {
+                foreach (var target in targets)
+                {
+                    if (!target.Segment) continue;
+
+                    var transform = target.transform;
+                    var track = target.Segment;
+
+                    var t = track.GetClosestPoint(transform.position);
+                    transform.position = track.SamplePoint(t);
+                    transform.rotation = Quaternion.LookRotation(track.SampleTangent(t), Vector3.up);
+                }
             }
         }
     }

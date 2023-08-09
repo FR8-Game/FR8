@@ -1,81 +1,82 @@
-using System.Collections.Generic;
+using System;
+using FR8.Interactions.Drivers.Submodules;
 using UnityEngine;
 
 namespace FR8.Train.Track
 {
-    public class TrackJunction : MonoBehaviour
+    public class TrackJunction : MonoBehaviour, IInteractable
     {
-        [SerializeField] private TrackSegment primarySegment;
-        [SerializeField] private TrackSegment branchingSegment;
-        [SerializeField] private float checkRadius;
-        [SerializeField] private bool active;
+        [SerializeField] private TrackSegment segment;
+        [SerializeField] private ConnectionEnd connectionEnd;
+        [SerializeField] private Transform primaryIndicator;
+        [SerializeField] private Transform secondaryIndicator;
+        [SerializeField] private Utility.DampedSpring animationSpring;
+        [SerializeField] private bool flip;
+        [SerializeField] private bool testActive;
 
-        private HashSet<TrainMovement> deadSet = new();
+        private bool state;
+        
+        public bool CanInteract => true;
+        public string DisplayName => "Train Signal";
+        public string DisplayValue => state ? "Engaged" : "Disengaged";
+        public bool OverrideInteractDistance => true;
+        public float InteractDistance => float.MaxValue;
 
-        private void Awake()
+        private void OnValidate()
         {
-            var t = primarySegment.GetClosestPoint(transform.position);
-            transform.position = primarySegment.SamplePoint(t);
+            if (segment)
+            {
+                var t = connectionEnd == ConnectionEnd.Start ? 0.0f : 1.0f;
+                transform.position = segment.SamplePoint(t);
+                var tangent = segment.SampleTangent(t);
+                transform.rotation = Quaternion.LookRotation(tangent, Vector3.up);
+            }
+            
+            Animate(testActive ? 1.0f : 0.0f);
         }
 
         private void FixedUpdate()
         {
-            var trains = FindObjectsOfType<TrainMovement>();
-
-            foreach (var train in trains)
+            var connection = connectionEnd switch
             {
-                if (deadSet.Contains(train)) continue;
-                if ((train.transform.position - transform.position).magnitude > checkRadius) continue;
-                
-                SwitchTrack(train);
-                deadSet.Add(train);
-            }
+                ConnectionEnd.Start => segment.StartConnection,
+                ConnectionEnd.End => segment.EndConnection,
+                _ => throw new ArgumentOutOfRangeException()
+            };
 
-            var lastDeadSet = new HashSet<TrainMovement>(deadSet);
-            
-            foreach (var train in lastDeadSet)
-            {
-                if ((train.transform.position - transform.position).magnitude < checkRadius) continue;
+            state = connection.connectionActive;
+            animationSpring.Target(state ? 1.0f : 0.0f).Iterate(Time.deltaTime);
 
-                deadSet.Remove(train);
-            }
+            Animate(animationSpring.currentPosition);
         }
 
-        private void SwitchTrack(TrainMovement train)
+        private void Animate(float t)
         {
-            var segment = train.Walker.CurrentSegment;
-            if (segment != primarySegment && segment != branchingSegment) return;
+            if (flip) t = 1.0f - t;
 
-            if (segment == branchingSegment)
-            {
-                train.Walker.CurrentSegment = primarySegment;
-                return;
-            }
-            
-            if (!active) return;
-            
-            var vector = train.transform.position - transform.position;
-            var dot = Vector3.Dot(vector.normalized, transform.forward);
-            if (dot > 0.0f) return;
-
-            train.Walker.CurrentSegment = branchingSegment;
+            if (primaryIndicator) primaryIndicator.transform.localRotation = Quaternion.Euler(0.0f, t * 90.0f, 0.0f);
+            if (secondaryIndicator) secondaryIndicator.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, t * -180.0f);
         }
 
-        private void OnDrawGizmos()
+        private enum ConnectionEnd
         {
-            if (!primarySegment) return;
-
-            var t = primarySegment.GetClosestPoint(transform.position);
-            Gizmos.DrawLine(transform.position, primarySegment.SamplePoint(t));
-
-            Gizmos.color = Color.yellow;
-            Gizmos.matrix = transform.localToWorldMatrix;
-
-            var length = 5.0f;
-            var width = 0.1f;
-            
-            Gizmos.DrawCube(Vector3.zero, new Vector3(2.0f * length, width, width));
-            Gizmos.DrawCube(Vector3.back * length * 0.5f, new Vector3(width, width, length));
+            Start,
+            End
         }
+        
+        public void Nudge(int direction) {  }
+
+        public void BeginDrag(Ray ray)
+        {
+            var connection = connectionEnd switch
+            {
+                ConnectionEnd.Start => segment.StartConnection,
+                ConnectionEnd.End => segment.EndConnection,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            connection.connectionActive = !connection.connectionActive;
+        }
+
+        public void ContinueDrag(Ray ray) { }
     }
 }
