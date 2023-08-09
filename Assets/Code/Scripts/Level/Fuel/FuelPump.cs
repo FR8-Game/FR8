@@ -13,18 +13,12 @@ namespace FR8.Level.Fuel
         private void Awake()
         {
             handle = GetComponentInChildren<FuelPumpHandle>();
-
-            socketManager = new SocketManager(transform, "FuelPump");
+            socketManager = GetComponentInChildren<SocketManager>();
         }
 
         private void Start()
         {
             socketManager.Bind(handle);
-        }
-
-        private void FixedUpdate()
-        {
-            socketManager.FixedUpdate();
         }
     }
 }

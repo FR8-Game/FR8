@@ -40,7 +40,7 @@ namespace FR8.Train
                 connection = null;
                 return;
             }
-            
+
             if (connection)
             {
                 if (connection.Value < 0.5f)
@@ -48,7 +48,7 @@ namespace FR8.Train
                     connection = null;
                     return;
                 }
-                
+
                 var displacement = connection.anchor.position - anchor.position;
 
                 var mass = rigidbody.mass;
@@ -60,7 +60,7 @@ namespace FR8.Train
                 force *= mass * (mass / totalMass);
 
                 force = transform.forward * Vector3.Dot(transform.forward, force);
-                
+
                 rigidbody.AddForce(force);
                 connection.rigidbody.AddForce(-force);
 
@@ -96,19 +96,20 @@ namespace FR8.Train
             foreach (var e in all)
             {
                 if (e == this) continue;
-                
+
                 if ((e.anchor.position - anchor.position).sqrMagnitude < settings.forceRange * settings.forceRange)
                 {
                     list.Add(e);
                 }
             }
+
             return list;
         }
 
         public void Connect(CarriageConnector other)
         {
             if (other == this) return;
-            
+
             other.connection = this;
             connection = other;
         }
@@ -140,14 +141,11 @@ namespace FR8.Train
             SetValue(direction == 1 ? 1.0f : 0.0f);
         }
 
-        public override void BeginDrag(Ray ray)
+        public override void BeginInteract(GameObject interactingObject)
         {
             SetValue(1.0f - Value);
         }
-        
-        public override void ContinueDrag(Ray ray)
-        {
-            
-        }
+
+        public override void ContinueInteract(GameObject interactingObject) { }
     }
 }

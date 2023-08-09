@@ -39,8 +39,8 @@ namespace FR8.Interactions.Drivers
 
         public override void Nudge(int direction) { }
 
-        public override void BeginDrag(Ray ray) { }
-        public override void ContinueDrag(Ray ray)
+        public override void BeginInteract(GameObject interactingObject) { }
+        public override void ContinueInteract(GameObject interactingObject)
         {
             state = true;
         }

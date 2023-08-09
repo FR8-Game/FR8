@@ -1,53 +1,75 @@
+using System;
 using System.Text.RegularExpressions;
+using FR8.Interactions.Drivers.Submodules;
+using FR8.Pickups;
+using FR8.Player.Submodules;
+using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace FR8.Sockets
 {
-    public sealed class SocketManager
+    [System.Serializable]
+    public sealed class SocketManager : MonoBehaviour, IInteractable
     {
-        private static readonly Regex SocketRegex = new(@".*\.Socket", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private const float SearchRadius = 0.2f;
-        
-        private Regex filterRegex;
+        [SerializeField] private string regexFilter = @".*";
 
+        private new Collider[] collider;
         private ISocketable currentBinding;
 
-        public Transform SocketTarget { get; private set; }
-
-        public SocketManager(Transform root, string filter)
+        private void Awake()
         {
-            SocketTarget = root.DeepFind(SocketRegex);
-            filterRegex = new Regex(filter);
-        }
-        
-        public void FixedUpdate()
-        {
-            if (!SocketTarget) return;
-
-            var list = Physics.OverlapSphere(SocketTarget.position, SearchRadius);
-            foreach (var e in list)
-            {
-                var socketable = e.GetComponentInParent<ISocketable>();
-                if (!(Object)socketable) continue;
-                if (!socketable.CanBind()) continue;
-                if (string.IsNullOrWhiteSpace(socketable.SocketType)) continue;
-                if (!filterRegex.IsMatch(socketable.SocketType)) continue;
-
-                currentBinding = socketable.Bind(this);
-            }
+            collider = GetComponentsInChildren<Collider>();
+            SetCollision(true);
         }
 
         public void Bind(ISocketable socketable)
         {
+            var filterRegex = new Regex(regexFilter, RegexOptions.IgnoreCase);
+
             if (!socketable.CanBind()) return;
+            if (!filterRegex.IsMatch(socketable.SocketType)) return;
+            
             currentBinding = socketable.Bind(this);
+
+            SetCollision(false);
         }
-        
+
         public void Unbind()
         {
             if (!(Object)currentBinding) return;
-            
+
             currentBinding = currentBinding.Unbind();
+            
+            SetCollision(true);
         }
+
+        public void SetCollision(bool state)
+        {
+            foreach (var e in collider) e.enabled = state;
+        }
+        
+        public bool CanInteract => !(Object)currentBinding;
+        public string DisplayName => name;
+        public string DisplayValue => string.Empty;
+        public bool OverrideInteractDistance => false;
+        public float InteractDistance => throw new NotImplementedException();
+
+        public void Nudge(int direction) { }
+
+        public void BeginInteract(GameObject interactingObject)
+        {
+            if ((Object)currentBinding) return;
+            
+            var interactionManager = interactingObject.GetComponentInParent<PlayerInteractionManager>();
+            if (!interactionManager) return;
+            if (!interactionManager.HeldObject) return;
+            if (interactionManager.HeldObject is not ISocketable socketable) return;
+
+            interactionManager.Drop();
+            Bind(socketable);
+        }
+        
+        public void ContinueInteract(GameObject interactingObject) { }
     }
 }

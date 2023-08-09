@@ -1,6 +1,7 @@
 ﻿using FR8.Interactions.Drivables;
 using FR8.Interactions.Drivers.DragBehaviours;
 using FR8.Interactions.Drivers.Submodules;
+using FR8.Player;
 using UnityEngine;
 
 namespace FR8.Interactions.Drivers
@@ -52,13 +53,21 @@ namespace FR8.Interactions.Drivers
             SetValue(Value + direction);
         }
 
-        public override void BeginDrag(Ray ray)
+        public override void BeginInteract(GameObject interactingObject)
         {
+            var avatar = interactingObject.GetComponentInParent<PlayerGroundedAvatar>();
+            if (!avatar) return;
+            var ray = avatar.LookingRay;
+            
             dragBehaviour.BeginDrag(transform, Value, ray);
         }
 
-        public override void ContinueDrag(Ray ray)
+        public override void ContinueInteract(GameObject interactingObject)
         {
+            var avatar = interactingObject.GetComponentInParent<PlayerGroundedAvatar>();
+            if (!avatar) return;
+            var ray = avatar.LookingRay;
+            
             SetValue(dragBehaviour.ContinueDrag(transform, ray));
         }
         

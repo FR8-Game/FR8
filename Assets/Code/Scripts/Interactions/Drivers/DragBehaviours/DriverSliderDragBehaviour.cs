@@ -31,9 +31,10 @@ namespace FR8.Interactions.Drivers.DragBehaviours
         private Vector3 GetDragPoint(Transform transform, Ray ray)
         {
             var plane = GetDragPlane(transform, ray);
-            if (!plane.Raycast(ray, out var enter)) return default;
-
-            return transform.InverseTransformPoint(ray.GetPoint(enter));
+            if (plane.Raycast(ray, out var enter)) return transform.InverseTransformPoint(ray.GetPoint(enter));
+            
+            var direction = (ray.direction - plane.normal * Vector3.Dot(plane.normal, ray.direction)).normalized;
+            return transform.InverseTransformPoint(ray.origin + direction * 1000.0f);
         }
         
         private Plane GetDragPlane(Transform transform,Ray ray)

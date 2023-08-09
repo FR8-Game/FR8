@@ -68,6 +68,7 @@ namespace FR8.Player
         public Vector3 Velocity => IsOnGround && GroundHit.rigidbody ? Rigidbody.velocity - GroundHit.rigidbody.GetPointVelocity(Rigidbody.position) : Rigidbody.velocity;
         public Vector3 Gravity => new Vector3(0.0f, -9.81f, 0.0f) * (Velocity.y > 0.0f && Controller.Jump ? upGravityScale : downGravityScale);
         public Ladder Ladder { get; private set; }
+        public Ray LookingRay => new Ray(CameraTarget.position, CameraTarget.forward);
 
         public Vector3 MoveDirection
         {

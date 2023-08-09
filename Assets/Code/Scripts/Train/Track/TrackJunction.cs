@@ -66,7 +66,7 @@ namespace FR8.Train.Track
         
         public void Nudge(int direction) {  }
 
-        public void BeginDrag(Ray ray)
+        public void BeginInteract(GameObject interactingObject)
         {
             var connection = connectionEnd switch
             {
@@ -77,6 +77,6 @@ namespace FR8.Train.Track
             connection.connectionActive = !connection.connectionActive;
         }
 
-        public void ContinueDrag(Ray ray) { }
+        public void ContinueInteract(GameObject interactingObject) { }
     }
 }

@@ -1,5 +1,6 @@
 using FR8.Interactions.Drivers.Submodules;
 using FR8.Player;
+using FR8.Player.Submodules;
 using UnityEngine;
 
 namespace FR8.Pickups
@@ -9,6 +10,9 @@ namespace FR8.Pickups
     [RequireComponent(typeof(Rigidbody))]
     public class PickupObject : MonoBehaviour, IInteractable
     {
+        public const int DefaultLayer = 0;
+        public const int PickupLayer = 8;
+
         [SerializeField] private string displayName;
         [SerializeField] private PickupPose pickupPose;
         [SerializeField] private Vector3 additionalTranslation;
@@ -18,13 +22,13 @@ namespace FR8.Pickups
         [SerializeField] private float damping = 18.0f;
         [SerializeField] private float torqueScaling = 1.0f;
 
-        private PlayerGroundedAvatar target;
+        private PlayerInteractionManager target;
 
         private Vector3 lastTargetPosition;
         private Quaternion lastTargetRotation;
 
         public Rigidbody Rigidbody { get; private set; }
-        public virtual bool CanInteract => !Held;
+        public virtual bool CanInteract => true;
         public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
         public string DisplayValue => target ? "Drop" : "Pickup";
         public bool Held => target;
@@ -32,17 +36,38 @@ namespace FR8.Pickups
         public bool OverrideInteractDistance => false;
         public float InteractDistance => throw new System.NotImplementedException();
 
-        public void Nudge(int direction)
+        public void Nudge(int direction) { }
+
+        public void BeginInteract(GameObject interactingObject)
         {
+            var avatar = interactingObject.GetComponentInParent<PlayerInteractionManager>();
+            if (!avatar) return;
+            if (target && avatar != target) return;
+
+            if (Held) target.Drop();
+            else avatar.Pickup(this);
         }
 
-        public void BeginDrag(Ray ray)
+        public virtual PickupObject Pickup(PlayerInteractionManager target)
         {
+            this.target = target;
+            
+            Rigidbody.detectCollisions = false;
+            lastTargetPosition = GetTargetPosition();
+            lastTargetRotation = GetTargetRotation();
+
+            return this;
         }
 
-        public void ContinueDrag(Ray ray)
+        public virtual PickupObject Drop(PlayerInteractionManager target)
         {
+            this.target = null;
+            Rigidbody.detectCollisions = true;
+            
+            return null;
         }
+
+        public void ContinueInteract(GameObject interactingObject) { }
 
         public Vector3 HoldTranslation => (pickupPose ? pickupPose.holdTranslation : Vector3.zero) + additionalTranslation;
         public Quaternion HoldRotation => Quaternion.Euler(pickupPose ? pickupPose.holdRotation : Vector3.zero) * Quaternion.Euler(additionalRotation);
@@ -50,6 +75,7 @@ namespace FR8.Pickups
         private void Awake()
         {
             Rigidbody = GetComponent<Rigidbody>();
+            Rigidbody.gameObject.layer = PickupLayer;
         }
 
         protected virtual void FixedUpdate()
@@ -83,31 +109,7 @@ namespace FR8.Pickups
             lastTargetRotation = targetRotation;
         }
 
-        private Vector3 GetTargetPosition() => target.CameraTarget.TransformPoint(HoldTranslation);
-        private Quaternion GetTargetRotation() => target.CameraTarget.rotation * HoldRotation;
-
-        public virtual PickupObject Pickup(PlayerGroundedAvatar target)
-        {
-            if (this.target) return null;
-            if (!target) return null;
-
-            this.target = target;
-            Rigidbody.detectCollisions = false;
-
-            lastTargetPosition = GetTargetPosition();
-            lastTargetRotation = GetTargetRotation();
-
-            return this;
-        }
-
-        public virtual PickupObject Drop()
-        {
-            if (!target) return null;
-
-            Rigidbody.detectCollisions = true;
-
-            target = null;
-            return null;
-        }
+        private Vector3 GetTargetPosition() => ((PlayerGroundedAvatar)target.Controller.CurrentAvatar).CameraTarget.TransformPoint(HoldTranslation);
+        private Quaternion GetTargetRotation() => ((PlayerGroundedAvatar)target.Controller.CurrentAvatar).CameraTarget.rotation * HoldRotation;
     }
 }

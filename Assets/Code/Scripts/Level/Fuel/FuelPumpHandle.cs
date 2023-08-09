@@ -1,7 +1,5 @@
-﻿
-using System.Runtime.InteropServices;
-using FR8.Pickups;
-using FR8.Player;
+﻿using FR8.Pickups;
+using FR8.Player.Submodules;
 using FR8.Sockets;
 using UnityEngine;
 
@@ -10,24 +8,36 @@ namespace FR8.Level.Fuel
     [SelectionBase, DisallowMultipleComponent]
     public class FuelPumpHandle : PickupObject, ISocketable
     {
-        public const float TargetSpring = 100.0f;
-        public const float TargetDamping = 10.0f;
-        public const float TargetTorqueScale = 1.0f;
-        
+        public static readonly Utility.Physics.SpringSettings SpringSettings = new()
+        {
+            spring = 300.0f,
+            damper = 18.0f,
+            torqueScale = 1.0f,
+        };
+
+        private Vector3 velocity, angularVelocity;
+
         private SocketManager currentBinding;
         public string SocketType => "FuelPump";
 
-        public bool CanBind() => currentBinding == null && !Held;
+        public bool CanBind() => !currentBinding && !Held;
 
         protected override void FixedUpdate()
         {
             base.FixedUpdate();
 
-            if (currentBinding == null) return;
+            if (!currentBinding) return;
 
-            var target = currentBinding.SocketTarget;
-            transform.position = target.position;
-            transform.rotation = target.rotation;
+            var current = new Utility.Physics.SpringBody(transform.position, transform.rotation, velocity, angularVelocity);
+            var target = new Utility.Physics.SpringBody(currentBinding.transform.position, currentBinding.transform.rotation);
+
+            var (force, torque) = Utility.Physics.CalculateDampedSpring(current, target, SpringSettings);
+
+            transform.position += velocity * Time.deltaTime;
+            velocity += force * Time.deltaTime;
+
+            transform.rotation = Quaternion.Euler(angularVelocity * Time.deltaTime) * transform.rotation;
+            angularVelocity += torque * Time.deltaTime;
         }
 
         public ISocketable Bind(SocketManager manager)
@@ -35,7 +45,7 @@ namespace FR8.Level.Fuel
             if (!CanBind()) return null;
 
             LockRigidbody(true);
-            
+
             currentBinding = manager;
             return this;
         }
@@ -43,21 +53,31 @@ namespace FR8.Level.Fuel
         public ISocketable Unbind()
         {
             LockRigidbody(false);
-            
+
             currentBinding = null;
             return null;
+        }
+
+        public override PickupObject Pickup(PlayerInteractionManager target)
+        {
+            if (currentBinding) currentBinding.Unbind();
+            return base.Pickup(target);
         }
 
         public void LockRigidbody(bool state)
         {
             Rigidbody.isKinematic = state;
-            Rigidbody.velocity = Vector3.zero;
-        }
 
-        public override PickupObject Pickup(PlayerGroundedAvatar target)
-        {
-            currentBinding?.Unbind();
-            return base.Pickup(target);
+            if (state)
+            {
+                velocity = Rigidbody.velocity;
+                angularVelocity = Rigidbody.angularVelocity;
+            }
+            else
+            {
+                Rigidbody.velocity = velocity;
+                Rigidbody.angularVelocity = angularVelocity;
+            }
         }
     }
 }
