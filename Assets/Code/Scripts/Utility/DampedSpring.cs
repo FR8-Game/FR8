@@ -86,7 +86,7 @@ namespace FR8
                 
                 var (force, torque) = Physics.CalculateDampedSpring(current, target, settings);
                 body.AddForce(force, forceMode);
-                body.AddForce(torque, forceMode);
+                body.AddTorque(torque, forceMode);
             }
         }
     }

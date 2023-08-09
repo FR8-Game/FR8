@@ -30,7 +30,7 @@ namespace FR8.Pickups
         public Rigidbody Rigidbody { get; private set; }
         public virtual bool CanInteract => true;
         public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
-        public string DisplayValue => target ? "Drop" : "Pickup";
+        public virtual string DisplayValue => target ? "Drop" : "Pickup";
         public bool Held => target;
 
         public bool OverrideInteractDistance => false;
@@ -72,7 +72,7 @@ namespace FR8.Pickups
         public Vector3 HoldTranslation => (pickupPose ? pickupPose.holdTranslation : Vector3.zero) + additionalTranslation;
         public Quaternion HoldRotation => Quaternion.Euler(pickupPose ? pickupPose.holdRotation : Vector3.zero) * Quaternion.Euler(additionalRotation);
 
-        private void Awake()
+        protected virtual void Awake()
         {
             Rigidbody = GetComponent<Rigidbody>();
             Rigidbody.gameObject.layer = PickupLayer;

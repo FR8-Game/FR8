@@ -1,6 +1,7 @@
 ﻿using FR8.Pickups;
 using FR8.Player.Submodules;
 using FR8.Sockets;
+using FR8.Train.Electrics;
 using UnityEngine;
 
 namespace FR8.Level.Fuel
@@ -15,12 +16,20 @@ namespace FR8.Level.Fuel
             torqueScale = 1.0f,
         };
 
-        private Vector3 velocity, angularVelocity;
+        private Collider[] colliders;
 
         private SocketManager currentBinding;
-        public string SocketType => "FuelPump";
+        public string SocketType => "Fuel";
 
         public bool CanBind() => !currentBinding && !Held;
+        public TrainGasTurbine Engine { get; private set; }
+        public override string DisplayValue => Engine ? $"{Engine.FuelLevel * 100.0f:N0}%" : base.DisplayValue;
+
+        protected override void Awake()
+        {
+            base.Awake();
+            colliders = GetComponentsInChildren<Collider>();
+        }
 
         protected override void FixedUpdate()
         {
@@ -28,16 +37,8 @@ namespace FR8.Level.Fuel
 
             if (!currentBinding) return;
 
-            var current = new Utility.Physics.SpringBody(transform.position, transform.rotation, velocity, angularVelocity);
-            var target = new Utility.Physics.SpringBody(currentBinding.transform.position, currentBinding.transform.rotation);
-
-            var (force, torque) = Utility.Physics.CalculateDampedSpring(current, target, SpringSettings);
-
-            transform.position += velocity * Time.deltaTime;
-            velocity += force * Time.deltaTime;
-
-            transform.rotation = Quaternion.Euler(angularVelocity * Time.deltaTime) * transform.rotation;
-            angularVelocity += torque * Time.deltaTime;
+            var target = currentBinding.transform;
+            Utility.DampedSpring.ApplyForce(Rigidbody, target.position, target.rotation, SpringSettings.spring, SpringSettings.damper, SpringSettings.torqueScale, true);
         }
 
         public ISocketable Bind(SocketManager manager)
@@ -47,6 +48,7 @@ namespace FR8.Level.Fuel
             LockRigidbody(true);
 
             currentBinding = manager;
+            Engine = manager.GetComponentInParent<TrainGasTurbine>();
             return this;
         }
 
@@ -55,6 +57,7 @@ namespace FR8.Level.Fuel
             LockRigidbody(false);
 
             currentBinding = null;
+            Engine = null;
             return null;
         }
 
@@ -66,18 +69,7 @@ namespace FR8.Level.Fuel
 
         public void LockRigidbody(bool state)
         {
-            Rigidbody.isKinematic = state;
-
-            if (state)
-            {
-                velocity = Rigidbody.velocity;
-                angularVelocity = Rigidbody.angularVelocity;
-            }
-            else
-            {
-                Rigidbody.velocity = velocity;
-                Rigidbody.angularVelocity = angularVelocity;
-            }
+            foreach (var e in colliders) e.isTrigger = state;
         }
     }
 }

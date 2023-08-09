@@ -34,6 +34,7 @@ namespace FR8.Train.Electrics
 
         public bool Running => fuelLevel > 0.0f && currentRpm > stallRpm;
         public float MaximumPowerGeneration => Running ? maxPowerProduction : 0.0f;
+        public float FuelLevel => fuelLevel;
 
         private void Awake()
         {
@@ -66,6 +67,12 @@ namespace FR8.Train.Electrics
         public void SetClockSpeed(float percent)
         {
             targetRpm = Mathf.Max(idleRpm, maxRpm * percent);
+        }
+
+        public void Refuel(float rate)
+        {
+            fuelLevel += rate / fuelCapacity * Time.deltaTime;
+            fuelLevel = Mathf.Clamp01(fuelLevel);
         }
     }
 }

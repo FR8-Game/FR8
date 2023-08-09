@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using FR8.Interactions.Drivables;
 using FR8.Interactions.Drivers;
@@ -26,6 +27,8 @@ namespace FR8.Train.Electrics
         public float Capacity { get; private set; }
         public float Saturation { get; private set; }
 
+        public event Action FuseBlown;
+
         private void Awake()
         {
             driverNetwork = GetComponentInParent<DriverNetwork>();
@@ -36,7 +39,7 @@ namespace FR8.Train.Electrics
             foreach (var e in generators) e.SetClockSpeed(0.0f);
             foreach (var e in devices) e.SetConnected(true);
 
-            SetConnected(connected);
+            SetMainFuse(connected);
         }
 
         public void OnValueChanged(float newValue)
@@ -71,7 +74,8 @@ namespace FR8.Train.Electrics
             {
                 saturation = 0.0f;
                 clockSpeed = 0.0f;
-                SetConnected(false);
+                SetMainFuse(false);
+                FuseBlown?.Invoke();
             }
 
             foreach (var e in generators) e.SetClockSpeed(clockSpeed);
@@ -83,9 +87,9 @@ namespace FR8.Train.Electrics
             driverNetwork.SetValue(SaturationKey, saturation * 100.0f);
         }
 
-        public void ResetFuze() => SetConnected(true);
+        public void ResetFuze() => SetMainFuse(true);
 
-        private void SetConnected(bool connected)
+        public void SetMainFuse(bool connected)
         {
             driverNetwork.SetValue(Key, connected ? 1.0f : 0.0f);
         }

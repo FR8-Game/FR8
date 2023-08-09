@@ -11,9 +11,11 @@ namespace FR8
                 var force = (target.position - current.position) * settings.spring + (target.velocity - current.velocity) * settings.damper;
 
                 var (angle, axis) = Quaternion.ToAngleAxis(target.rotation * UnityEngine.Quaternion.Inverse(current.rotation));
-                var torque = (axis * angle) * settings.spring + (target.angularVelocity - current.angularVelocity) * settings.damper;
+                var torque = (axis * angle * Mathf.Deg2Rad) * settings.spring + (target.angularVelocity - current.angularVelocity) * settings.damper;
                 torque *= settings.torqueScale;
 
+                force -= UnityEngine.Physics.gravity;
+                
                 return (force, torque);
             }
 
