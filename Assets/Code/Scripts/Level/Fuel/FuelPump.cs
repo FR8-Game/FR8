@@ -58,7 +58,7 @@ namespace FR8.Level.Fuel
 
             if (distance > maxRange)
             {
-                handle.Unbind();
+                if (handle.CurrentBinding) handle.CurrentBinding.Unbind();
 
                 var displacement = direction * maxRange;
                 handle.Rigidbody.position = handleAnchor.position + displacement;

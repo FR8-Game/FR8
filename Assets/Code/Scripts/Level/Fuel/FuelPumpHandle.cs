@@ -16,12 +16,13 @@ namespace FR8.Level.Fuel
             torqueScale = 1.0f,
         };
 
+        private ParticleSystem[] disconnectFX;
         private Collider[] colliders;
 
-        private SocketManager currentBinding;
+        public SocketManager CurrentBinding { get; private set; }
         public string SocketType => "Fuel";
 
-        public bool CanBind() => !currentBinding && !Held;
+        public bool CanBind() => !CurrentBinding && !Held;
         public TrainGasTurbine Engine { get; private set; }
         public override string DisplayValue => Engine ? $"{Engine.FuelLevel * 100.0f:N0}%" : base.DisplayValue;
 
@@ -29,15 +30,16 @@ namespace FR8.Level.Fuel
         {
             base.Awake();
             colliders = GetComponentsInChildren<Collider>();
+            disconnectFX = GetComponentsInChildren<ParticleSystem>();
         }
 
         protected override void FixedUpdate()
         {
             base.FixedUpdate();
 
-            if (!currentBinding) return;
+            if (!CurrentBinding) return;
 
-            var target = currentBinding.transform;
+            var target = CurrentBinding.transform;
             Utility.DampedSpring.ApplyForce(Rigidbody, target.position, target.rotation, SpringSettings.spring, SpringSettings.damper, SpringSettings.torqueScale, true);
         }
 
@@ -47,7 +49,7 @@ namespace FR8.Level.Fuel
 
             LockRigidbody(true);
 
-            currentBinding = manager;
+            CurrentBinding = manager;
             Engine = manager.GetComponentInParent<TrainGasTurbine>();
             return this;
         }
@@ -56,14 +58,16 @@ namespace FR8.Level.Fuel
         {
             LockRigidbody(false);
 
-            currentBinding = null;
+            if (Engine) foreach (var p in disconnectFX) p.Play();
+            
+            CurrentBinding = null;
             Engine = null;
             return null;
         }
 
         public override PickupObject Pickup(PlayerInteractionManager target)
         {
-            if (currentBinding) currentBinding.Unbind();
+            if (CurrentBinding) CurrentBinding.Unbind();
             return base.Pickup(target);
         }
 

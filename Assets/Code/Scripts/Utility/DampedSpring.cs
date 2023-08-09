@@ -28,6 +28,7 @@ namespace FR8
 
             public DampedSpring Target(float targetPosition)
             {
+                if (clamped) targetPosition = Mathf.Clamp(targetPosition, range.x, range.y);
                 this.targetPosition = targetPosition;
                 return this;
             }
