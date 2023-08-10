@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using FR8.Train.Signals;
-using FR8.Utility;
 using UnityEngine;
 
 namespace FR8.Dialogue
@@ -34,7 +33,7 @@ namespace FR8.Dialogue
                 var header = text[..splitPoint];
                 var body = text[splitPoint..];
                 
-                var source = sourceList[Search.FuzzySearch(i => sourceList[i].title, sourceList.Length, header)];
+                var source = sourceList[Utility.Search.FuzzySearch(i => sourceList[i].title, sourceList.Length, header)];
                 entry.source = source;
                 entry.body = body;
                 

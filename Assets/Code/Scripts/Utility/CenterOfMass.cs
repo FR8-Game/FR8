@@ -1,13 +1,16 @@
 using UnityEngine;
 
-namespace FR8.Utility
+namespace FR8
 {
-    public class CenterOfMass : MonoBehaviour
+    public static partial class Utility
     {
-        private void Awake()
+        public class CenterOfMass : MonoBehaviour
         {
-            var rb = GetComponentInParent<Rigidbody>();
-            rb.centerOfMass = rb.transform.InverseTransformPoint(transform.position);
+            private void Awake()
+            {
+                var rb = GetComponentInParent<Rigidbody>();
+                rb.centerOfMass = rb.transform.InverseTransformPoint(transform.position);
+            }
         }
     }
 }

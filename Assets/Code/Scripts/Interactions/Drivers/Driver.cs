@@ -16,6 +16,9 @@ namespace FR8.Interactions.Drivers
         public virtual string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
         public virtual string DisplayValue => $"{Mathf.RoundToInt(Value * 100.0f)}%";
         
+        public bool OverrideInteractDistance => false;
+        public float InteractDistance => throw new System.NotImplementedException();
+        
         public float Value { get; private set; }
         public string Key => key;
         
@@ -26,7 +29,13 @@ namespace FR8.Interactions.Drivers
 
         protected virtual void SetValue(float newValue)
         {
-            driverNetwork.SetValue(key, newValue);
+            if (string.IsNullOrEmpty(key))
+            {
+                OnValueChanged(newValue);
+                return;
+            }
+
+            if (driverNetwork) driverNetwork.SetValue(key, newValue);
         }
 
         public abstract void Nudge(int direction);

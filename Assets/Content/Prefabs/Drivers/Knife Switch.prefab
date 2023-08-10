@@ -9,10 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1405971581292269082}
-  - component: {fileID: 7535105983077900593}
-  - component: {fileID: 5482883813231224585}
-  - component: {fileID: 5843293232620156618}
-  - component: {fileID: 15382593641779299}
   m_Layer: 0
   m_Name: Knife Switch
   m_TagString: Untagged
@@ -36,81 +32,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
---- !u!114 &7535105983077900593
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4544524209986317411}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d2bfd71e87643e8a46440d6765ad930, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  displayName: Breaker
-  defaultValue: 0
---- !u!114 &5482883813231224585
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4544524209986317411}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d4de036923043708aa2ab48e9ba48ad, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  initialValue: 0
-  entries:
-  - name: Off
-    value: 0
-  - name: On
-    value: 1
---- !u!114 &5843293232620156618
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4544524209986317411}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a3c7da84e21157459b00fb0db16531f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sensitivity: 20
-  dragVector: {x: 0, y: 0, z: 1}
---- !u!114 &15382593641779299
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4544524209986317411}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4ba9a1bf38c4cefb5f35ff6888db648, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  handle: {fileID: 738718053148958015}
-  valueRange: {x: 0, y: 1}
-  animationSpring:
-    springConstant: 350
-    dampingConstant: 25
-    clamped: 1
-    range: {x: 0, y: 1}
-    bounce: 0.4
-    currentPosition: 0
-    targetPosition: 0
-    velocity: 0
-  animatePosition: 0
-  slidePoseAPosition: {x: 0, y: 0, z: 0}
-  slidePoseBPosition: {x: 0, y: 0, z: 0}
-  animateRotation: 1
-  slidePoseARotation: {x: 0, y: 0, z: 0}
-  slidePoseBRotation: {x: 180, y: 0, z: 0}
 --- !u!1001 &3046003864768426325
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -172,11 +93,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0e115b05853c10244a1d1a2fa05091f3, type: 3}
---- !u!4 &738718053148958015 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2307496982545017962, guid: 0e115b05853c10244a1d1a2fa05091f3, type: 3}
-  m_PrefabInstance: {fileID: 3046003864768426325}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2775622209231653892 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 0e115b05853c10244a1d1a2fa05091f3, type: 3}

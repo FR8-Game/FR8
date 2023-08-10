@@ -42,6 +42,8 @@ namespace FR8.Rendering.Passes
             if (!whiteMaterial) whiteMaterial = new Material(Shader.Find("Unlit/OutlineObject"));
             if (!blackMaterial) blackMaterial = new Material(Shader.Find("Unlit/OutlineObject"));
             if (!blitMaterial) blitMaterial = new Material(Shader.Find("Hidden/OutlineBlit"));
+
+            Persistant.RemoveAll(e => !e);
         }
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
