@@ -44,6 +44,8 @@ namespace FR8.Rendering.Passes
             if (!blitMaterial) blitMaterial = new Material(Shader.Find("Hidden/OutlineBlit"));
 
             Persistant.RemoveAll(e => !e);
+            Persistant.RemoveAll(e => e.CompareTag("Do Not Outline"));
+            ThisFrame.RemoveAll(e => e.CompareTag("Do Not Outline"));
         }
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)

@@ -1716,6 +1716,68 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   regexFilter: Fuel
+--- !u!1001 &1720703826571763993
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 8853930767191054095}
+    m_Modifications:
+    - target: {fileID: 94351068782255760, guid: a809fb9e31b3eaf4e99bb9a2a203f67d, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94351068782255760, guid: a809fb9e31b3eaf4e99bb9a2a203f67d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94351068782255760, guid: a809fb9e31b3eaf4e99bb9a2a203f67d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94351068782255760, guid: a809fb9e31b3eaf4e99bb9a2a203f67d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94351068782255760, guid: a809fb9e31b3eaf4e99bb9a2a203f67d, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 94351068782255760, guid: a809fb9e31b3eaf4e99bb9a2a203f67d, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -6.613724e-24
+      objectReference: {fileID: 0}
+    - target: {fileID: 94351068782255760, guid: a809fb9e31b3eaf4e99bb9a2a203f67d, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 6.0765615e-11
+      objectReference: {fileID: 0}
+    - target: {fileID: 94351068782255760, guid: a809fb9e31b3eaf4e99bb9a2a203f67d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94351068782255760, guid: a809fb9e31b3eaf4e99bb9a2a203f67d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94351068782255760, guid: a809fb9e31b3eaf4e99bb9a2a203f67d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94351068782255760, guid: a809fb9e31b3eaf4e99bb9a2a203f67d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6478354597127082602, guid: a809fb9e31b3eaf4e99bb9a2a203f67d, type: 3}
+      propertyPath: m_Name
+      value: Magnet FX
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a809fb9e31b3eaf4e99bb9a2a203f67d, type: 3}
+--- !u!4 &1634270993873043337 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 94351068782255760, guid: a809fb9e31b3eaf4e99bb9a2a203f67d, type: 3}
+  m_PrefabInstance: {fileID: 1720703826571763993}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1733007745319725417
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3144,6 +3206,8 @@ MonoBehaviour:
   defaultValue: 0
   settings: {fileID: 11400000, guid: 9826cd7c0dba1394b8a24b0110955138, type: 2}
   anchor: {fileID: 8853930767191054095}
+  magnetFX: {fileID: 1634270993873043337}
+  fxTransitionSpeed: 6
 --- !u!1 &6823709371480325566 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -6413956847900099605, guid: 2de40a509088b6e428ef0e687f8a2358, type: 3}

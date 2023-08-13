@@ -9,9 +9,14 @@ namespace FR8.Train
     {
         [SerializeField] private CarriageConnectorSettings settings;
         [SerializeField] private Transform anchor;
+        [SerializeField] private Transform magnetFX;
+        [SerializeField] private float fxTransitionSpeed;
 
         private new Rigidbody rigidbody;
         private CarriageConnector connection;
+
+        private float magnetFXPercent;
+        private Vector3 magnetFXScale;
 
         private static HashSet<CarriageConnector> all = new();
 
@@ -21,6 +26,11 @@ namespace FR8.Train
         {
             base.Awake();
             rigidbody = GetComponentInParent<Rigidbody>();
+
+            if (magnetFX)
+            {
+                magnetFXScale = magnetFX.transform.localScale;
+            }
         }
 
         private void OnEnable()
@@ -35,20 +45,26 @@ namespace FR8.Train
 
         private void FixedUpdate()
         {
-            if (Value < 0.5f)
+            var engaged = Value > 0.5f;
+
+            if (magnetFX)
             {
+                magnetFXPercent += ((engaged ? 1.0f : 0.0f) - magnetFXPercent) * fxTransitionSpeed * Time.deltaTime;
+                magnetFX.transform.localScale = magnetFXScale * magnetFXPercent;
+            }
+
+            if (engaged)
+            {
+                if (connection)
+                {
+                    connection.SetValue(0.0f);
+                }
                 connection = null;
                 return;
             }
 
             if (connection)
             {
-                if (connection.Value < 0.5f)
-                {
-                    connection = null;
-                    return;
-                }
-
                 var displacement = connection.anchor.position - anchor.position;
 
                 var mass = rigidbody.mass;
