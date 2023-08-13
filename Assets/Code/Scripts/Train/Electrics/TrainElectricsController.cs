@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using FR8.Interactions.Drivables;
 using FR8.Interactions.Drivers;
@@ -9,6 +10,7 @@ namespace FR8.Train.Electrics
     [DisallowMultipleComponent]
     public sealed class TrainElectricsController : MonoBehaviour, IDrivable
     {
+        [SerializeField] private float baselineGeneration = 5.0f;
         [SerializeField] private bool connected = true;
 
         private DriverNetwork driverNetwork;
@@ -25,6 +27,8 @@ namespace FR8.Train.Electrics
         public float Capacity { get; private set; }
         public float Saturation { get; private set; }
 
+        public event Action FuseBlown;
+
         private void Awake()
         {
             driverNetwork = GetComponentInParent<DriverNetwork>();
@@ -35,7 +39,7 @@ namespace FR8.Train.Electrics
             foreach (var e in generators) e.SetClockSpeed(0.0f);
             foreach (var e in devices) e.SetConnected(true);
 
-            SetConnected(connected);
+            SetMainFuse(connected);
         }
 
         public void OnValueChanged(float newValue)
@@ -48,9 +52,10 @@ namespace FR8.Train.Electrics
             UpdateChildren();
             
             var saturation = 0.0f;
+            var clockSpeed = 0.0f;
             var draw = 0.0f;
 
-            var capacity = 0.0f;
+            var capacity = baselineGeneration;
             foreach (var e in generators) capacity += e.MaximumPowerGeneration;
 
             if (connected)
@@ -62,15 +67,18 @@ namespace FR8.Train.Electrics
                 }
 
                 saturation = draw / capacity;
+                clockSpeed = draw / (capacity - baselineGeneration);
             }
 
             if (saturation > 1.01f)
             {
                 saturation = 0.0f;
-                SetConnected(false);
+                clockSpeed = 0.0f;
+                SetMainFuse(false);
+                FuseBlown?.Invoke();
             }
 
-            foreach (var e in generators) e.SetClockSpeed(saturation);
+            foreach (var e in generators) e.SetClockSpeed(clockSpeed);
 
             PowerDraw = draw;
             Capacity = capacity;
@@ -79,9 +87,9 @@ namespace FR8.Train.Electrics
             driverNetwork.SetValue(SaturationKey, saturation * 100.0f);
         }
 
-        public void ResetFuze() => SetConnected(true);
+        public void ResetFuze() => SetMainFuse(true);
 
-        private void SetConnected(bool connected)
+        public void SetMainFuse(bool connected)
         {
             driverNetwork.SetValue(Key, connected ? 1.0f : 0.0f);
         }

@@ -6,6 +6,8 @@ namespace FR8
     {
         public static class Math
         {
+            public const float Sqrt2 = 1.4142135623730950488016887242097f;
+            
             public static float Remap(float lowerIn, float upperIn, float lowerOut, float upperOut, float value)
             {
                 var p = (value - lowerIn) / (upperIn - lowerIn);

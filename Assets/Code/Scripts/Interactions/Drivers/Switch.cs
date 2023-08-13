@@ -34,9 +34,9 @@ namespace FR8.Interactions.Drivers
             SetValue(direction);
         }
 
-        public override void BeginDrag(Ray ray) => SetValue(1.0f - Value);
+        public override void BeginInteract(GameObject interactingObject) => SetValue(1.0f - Value);
 
-        public override void ContinueDrag(Ray ray) { }
+        public override void ContinueInteract(GameObject interactingObject) { }
 
         protected override void Awake()
         {

@@ -70,7 +70,7 @@ Shader "Skybox/Cubemap Blend"
 			#pragma shader_feature_local _ENABLEROTATION_ON
 
 
-			struct appdata
+			struct Attributes
 			{
 				float4 vertex : POSITION;
 				float4 color : COLOR;
@@ -78,7 +78,7 @@ Shader "Skybox/Cubemap Blend"
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 			
-			struct v2f
+			struct Varyings
 			{
 				float4 vertex : SV_POSITION;
 				#ifdef ASE_NEEDS_FRAG_WORLD_POSITION
@@ -122,16 +122,16 @@ Shader "Skybox/Cubemap Blend"
 			
 
 			
-			v2f vert ( appdata v )
+			Varyings vert ( Attributes input )
 			{
-				v2f o;
+				Varyings o;
 				UNITY_SETUP_INSTANCE_ID(v);
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 				UNITY_TRANSFER_INSTANCE_ID(v, o);
 
 				float lerpResult268 = lerp( 1.0 , ( unity_OrthoParams.y / unity_OrthoParams.x ) , unity_OrthoParams.w);
 				half CAMERA_MODE300 = lerpResult268;
-				float3 appendResult1220 = (float3(v.vertex.xyz.x , ( v.vertex.xyz.y * CAMERA_MODE300 ) , v.vertex.xyz.z));
+				float3 appendResult1220 = (float3(input.vertex.xyz.x , ( input.vertex.xyz.y * CAMERA_MODE300 ) , input.vertex.xyz.z));
 				float3 appendResult1208 = (float3(0.0 , -_CubemapPosition , 0.0));
 				half3 VertexPos40_g1 = appendResult1220;
 				float3 appendResult74_g1 = (float3(0.0 , VertexPos40_g1.y , 0.0));
@@ -148,7 +148,7 @@ Shader "Skybox/Cubemap Blend"
 				float3 vertexToFrag774 = staticSwitch1164;
 				o.ase_texcoord1.xyz = vertexToFrag774;
 				
-				o.ase_texcoord2 = v.vertex;
+				o.ase_texcoord2 = input.vertex;
 				
 				//setting value to unused interpolator channels and avoid initialization warnings
 				o.ase_texcoord1.w = 0;
@@ -160,9 +160,9 @@ Shader "Skybox/Cubemap Blend"
 				#if ASE_ABSOLUTE_VERTEX_POS
 				v.vertex.xyz = vertexValue;
 				#else
-				v.vertex.xyz += vertexValue;
+				input.vertex.xyz += vertexValue;
 				#endif
-				o.vertex = UnityObjectToClipPos(v.vertex);
+				o.vertex = UnityObjectToClipPos(input.vertex);
 
 				#ifdef ASE_NEEDS_FRAG_WORLD_POSITION
 				o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
@@ -170,7 +170,7 @@ Shader "Skybox/Cubemap Blend"
 				return o;
 			}
 			
-			fixed4 frag (v2f i ) : SV_Target
+			fixed4 frag (Varyings input ) : SV_Target
 			{
 				UNITY_SETUP_INSTANCE_ID(i);
 				UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
@@ -178,14 +178,14 @@ Shader "Skybox/Cubemap Blend"
 				#ifdef ASE_NEEDS_FRAG_WORLD_POSITION
 				float3 WorldPosition = i.worldPos;
 				#endif
-				float3 vertexToFrag774 = i.ase_texcoord1.xyz;
+				float3 vertexToFrag774 = input.ase_texcoord1.xyz;
 				half4 Data1189 = texCUBE( _Tex, vertexToFrag774 );
 				half3 localDecodeHDR1189 = DecodeHDR1189( Data1189 );
 				half4 Data1224 = texCUBE( _Tex_Blend, vertexToFrag774 );
 				half3 localDecodeHDR1224 = DecodeHDR1224( Data1224 );
 				float3 lerpResult1227 = lerp( localDecodeHDR1189 , localDecodeHDR1224 , _CubemapTransition);
 				half4 CUBEMAP222 = ( float4( lerpResult1227 , 0.0 ) * unity_ColorSpaceDouble * _TintColor * _Exposure );
-				float lerpResult678 = lerp( saturate( pow( (0.0 + (abs( ( i.ase_texcoord2.xyz.y + -_FogPosition ) ) - 0.0) * (1.0 - 0.0) / (_FogHeight - 0.0)) , ( 1.0 - _FogSmoothness ) ) ) , 0.0 , _FogFill);
+				float lerpResult678 = lerp( saturate( pow( (0.0 + (abs( ( input.ase_texcoord2.xyz.y + -_FogPosition ) ) - 0.0) * (1.0 - 0.0) / (_FogHeight - 0.0)) , ( 1.0 - _FogSmoothness ) ) ) , 0.0 , _FogFill);
 				float lerpResult1205 = lerp( 1.0 , lerpResult678 , _FogIntensity);
 				half FOG_MASK359 = lerpResult1205;
 				float4 lerpResult317 = lerp( unity_FogColor , CUBEMAP222 , FOG_MASK359);
