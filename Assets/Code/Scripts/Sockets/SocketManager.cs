@@ -1,6 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
 using FR8.Interactions.Drivers.Submodules;
+using FR8.Player;
 using FR8.Player.Submodules;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -59,8 +60,10 @@ namespace FR8.Sockets
         {
             if ((Object)currentBinding) return;
             
-            var interactionManager = interactingObject.GetComponentInParent<PlayerInteractionManager>();
-            if (!interactionManager) return;
+            var avatar = interactingObject.GetComponentInParent<PlayerAvatar>();
+            if (!avatar) return;
+            
+            var interactionManager = avatar.interactionManager;
             if (!interactionManager.HeldObject) return;
             if (interactionManager.HeldObject is not ISocketable socketable) return;
 

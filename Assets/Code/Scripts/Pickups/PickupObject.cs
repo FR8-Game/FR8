@@ -22,7 +22,7 @@ namespace FR8.Pickups
         [SerializeField] private float damping = 18.0f;
         [SerializeField] private float torqueScaling = 1.0f;
 
-        private PlayerInteractionManager target;
+        private PlayerAvatar target;
 
         private Vector3 lastTargetPosition;
         private Quaternion lastTargetRotation;
@@ -40,15 +40,15 @@ namespace FR8.Pickups
 
         public void BeginInteract(GameObject interactingObject)
         {
-            var avatar = interactingObject.GetComponentInParent<PlayerInteractionManager>();
+            var avatar = interactingObject.GetComponentInParent<PlayerAvatar>();
             if (!avatar) return;
             if (target && avatar != target) return;
 
-            if (Held) target.Drop();
-            else avatar.Pickup(this);
+            if (Held) target.interactionManager.Drop();
+            else avatar.interactionManager.Pickup(this);
         }
 
-        public virtual PickupObject Pickup(PlayerInteractionManager target)
+        public virtual PickupObject Pickup(PlayerAvatar target)
         {
             this.target = target;
             
@@ -59,7 +59,7 @@ namespace FR8.Pickups
             return this;
         }
 
-        public virtual PickupObject Drop(PlayerInteractionManager target)
+        public virtual PickupObject Drop(PlayerAvatar target)
         {
             this.target = null;
             Rigidbody.detectCollisions = true;
@@ -109,7 +109,7 @@ namespace FR8.Pickups
             lastTargetRotation = targetRotation;
         }
 
-        private Vector3 GetTargetPosition() => ((PlayerGroundedAvatar)target.Controller.CurrentAvatar).CameraTarget.TransformPoint(HoldTranslation);
-        private Quaternion GetTargetRotation() => ((PlayerGroundedAvatar)target.Controller.CurrentAvatar).CameraTarget.rotation * HoldRotation;
+        private Vector3 GetTargetPosition() => target.CameraTarget.TransformPoint(HoldTranslation);
+        private Quaternion GetTargetRotation() => target.CameraTarget.rotation * HoldRotation;
     }
 }

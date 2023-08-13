@@ -1,4 +1,5 @@
 ﻿using FR8.Pickups;
+using FR8.Player;
 using FR8.Player.Submodules;
 using FR8.Sockets;
 using FR8.Train.Electrics;
@@ -65,7 +66,7 @@ namespace FR8.Level.Fuel
             return null;
         }
 
-        public override PickupObject Pickup(PlayerInteractionManager target)
+        public override PickupObject Pickup(PlayerAvatar target)
         {
             if (CurrentBinding) CurrentBinding.Unbind();
             return base.Pickup(target);

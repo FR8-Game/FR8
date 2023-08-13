@@ -43,7 +43,7 @@ namespace FR8.Interactions.Drivers
 
         public override void BeginInteract(GameObject interactingObject)
         {
-            var avatar = interactingObject.GetComponentInParent<PlayerGroundedAvatar>();
+            var avatar = interactingObject.GetComponentInParent<PlayerAvatar>();
             if (!avatar) return;
             var ray = avatar.LookingRay;
 
@@ -52,7 +52,7 @@ namespace FR8.Interactions.Drivers
 
         public override void ContinueInteract(GameObject interactingObject)
         {
-            var avatar = interactingObject.GetComponentInParent<PlayerGroundedAvatar>();
+            var avatar = interactingObject.GetComponentInParent<PlayerAvatar>();
             if (!avatar) return;
             var ray = avatar.LookingRay;
 

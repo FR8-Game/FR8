@@ -52,7 +52,7 @@ namespace FR8.Level
 
         private void OnTriggerEnter(Collider other)
         {
-            var player = other.transform.GetComponentInParent<PlayerGroundedAvatar>();
+            var player = other.transform.GetComponentInParent<PlayerAvatar>();
             if (!player) return;
             if (player.Ladder) return;
 

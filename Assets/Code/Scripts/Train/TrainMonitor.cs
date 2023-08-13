@@ -35,7 +35,7 @@ namespace FR8.Train
             var fwdSpeed = carriage.GetForwardSpeed();
             if (Mathf.Abs(fwdSpeed) < MaxTrainSafeSpeed) return;
             
-            var players = FindObjectsOfType<PlayerGroundedAvatar>();
+            var players = FindObjectsOfType<PlayerAvatar>();
             foreach (var p in players)
             {
                 var point = transform.InverseTransformPoint(p.transform.position);

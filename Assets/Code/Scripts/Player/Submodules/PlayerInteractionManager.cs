@@ -11,39 +11,38 @@ using Object = UnityEngine.Object;
 
 namespace FR8.Player.Submodules
 {
-    [SelectionBase, DisallowMultipleComponent]
-    [RequireComponent(typeof(PlayerAvatar))]
-    public class PlayerInteractionManager : MonoBehaviour
+    [System.Serializable]
+    public class PlayerInteractionManager
     {
         [SerializeField] private float interactionDistance = 2.5f;
         [SerializeField] private TMP_Text readoutText;
         [SerializeField] private Utility.DampedSpring transition;
 
-        private new Camera camera;
-
         private int nudge;
-        private bool press;
         private bool dragging;
-        private float dragDistance;
 
         private IInteractable lookingAt;
 
         public PickupObject HeldObject { get; private set; }
-        public PlayerController Controller { get; private set; }
+        public PlayerAvatar Avatar { get; private set; }
 
-        public void Awake()
+        public void Init(PlayerAvatar avatar)
         {
-            Controller = transform.parent.GetComponent<PlayerController>();
-            camera = Camera.main;
+            Avatar = avatar;
+
+            avatar.UpdateEvent += Update;
+            avatar.FixedUpdateEvent += FixedUpdate;
+            avatar.DisabledEvent += OnDisable;
         }
 
         public void Update()
         {
-            if (Controller.Press) press = true;
-            if (Controller.Nudge != 0) nudge = Controller.Nudge;
+            if (Avatar.input.Press) { }
+
+            if (Avatar.input.Nudge != 0) nudge = Avatar.input.Nudge;
         }
 
-        private void OnDisable()
+        public void OnDisable()
         {
             if ((Object)lookingAt) SelectionOutlinePass.RemovePersistant(lookingAt.gameObject);
         }
@@ -71,7 +70,6 @@ namespace FR8.Player.Submodules
 
             if (lookingAt == null)
             {
-                press = false;
                 nudge = 0;
                 dragging = false;
                 return;
@@ -86,16 +84,15 @@ namespace FR8.Player.Submodules
             }
 
             nudge = 0;
-            press = false;
-            dragging = Controller.Drag;
+            dragging = Avatar.input.Drag;
         }
 
         private void ProcessInteractable(IInteractable driver, Ray ray)
         {
-            if (Controller.Drag)
+            if (Avatar.input.Drag)
             {
-                if (dragging) driver.ContinueInteract(gameObject);
-                else driver.BeginInteract(gameObject);
+                if (dragging) driver.ContinueInteract(Avatar.gameObject);
+                else driver.BeginInteract(Avatar.gameObject);
             }
 
             if (nudge != 0)
@@ -109,13 +106,13 @@ namespace FR8.Player.Submodules
         {
             if (HeldObject) return null;
 
-            HeldObject = pickup.Pickup(this);
+            HeldObject = pickup.Pickup(Avatar);
             return this;
         }
 
         public PlayerInteractionManager Drop()
         {
-            HeldObject = HeldObject.Drop(this);
+            HeldObject = HeldObject.Drop(Avatar);
             return null;
         }
 
@@ -148,7 +145,7 @@ namespace FR8.Player.Submodules
                     throw new ArgumentOutOfRangeException();
             }
 
-            return camera.ScreenPointToRay(position);
+            return Avatar.cameraController.Camera.ScreenPointToRay(position);
         }
     }
 }
