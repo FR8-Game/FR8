@@ -10,11 +10,6 @@ namespace FR8.Rendering
         [SerializeField] private bool renderOutline = true;
         [SerializeField] private bool volumetrics = true;
 
-        [Space]
-        [SerializeField] private int volumetricsResolution = 1000;
-        [SerializeField] private float volumetricsFarPlane = 100.0f;
-        [SerializeField] private float volumetricsDensity = 0.2f;
-        
         private FogPass fogPass;
         private SelectionOutlinePass outlinePass;
         private LightVolumetricPass volumetricPass;
@@ -23,7 +18,7 @@ namespace FR8.Rendering
         {
             fogPass = new FogPass();
             outlinePass = new SelectionOutlinePass();
-            volumetricPass = new LightVolumetricPass(volumetricsResolution, volumetricsFarPlane, volumetricsDensity);
+            volumetricPass = new LightVolumetricPass();
         }
 
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)

@@ -7,8 +7,9 @@ Shader "Hidden/Volumetrics"
         {
             "RenderType"="Transparent" "Queue"="Transparent" "RenderPipeline" = "UniversalPipeline"
         }
-        Blend SrcAlpha OneMinusSrcAlpha
+        Blend One One
         ZWrite Off
+        Cull Front
 
         Pass
         {
@@ -24,57 +25,55 @@ Shader "Hidden/Volumetrics"
             struct Varyings
             {
                 float4 vertex : SV_POSITION;
-                float4 worldPos : VAR_WORLDPOS;
+                float3 worldPos : VAR_WORLDPOS;
+                float3 lightPos : VAR_LIGHTPOS;
+                float3 spotDirection : VAR_SPOT_DIRECTION;
             };
 
-            static const float4 vertices[] =
+            static const float3 vertices[] =
             {
-                float4(-1.0, -1.0, 0.0, 1.0),
-                float4(3.0, -1.0, 0.0, 1.0),
-                float4(-1.0, 3.0, 0.0, 1.0),
+                float3(-1.0, -1.0, 0.0),
+                float3(1.0, -1.0, 0.0),
+                float3(1.0, 1.0, 0.0),
+
+                float3(1.0, 1.0, 0.0),
+                float3(-1.0, 1.0, 0.0),
+                float3(-1.0, -1.0, 0.0),
             };
 
-            int _Volumetrics_Resolution = 1000;
-            float _Volumetrics_Percent = 0.2;
-            float _Volumetrics_Density = 0.2;
+            float4 _LightData;
+            int _Resolution;
 
             Varyings vert(uint id : SV_VertexID)
             {
-                Varyings o;
+                Varyings output;
 
-                int planeID = id / 3;
-                int vertexID = id % 3;
+                int vertexID = id % 6;
+                int planeID = id / 6;
 
-                float3 cameraPos = vertices[vertexID];
-                float p = (1.0f - (planeID + 1.0) / _Volumetrics_Resolution) * _Volumetrics_Percent;
-                float far = _ProjectionParams.z;
-                float near = _ProjectionParams.y;
-                cameraPos.z -= p * (far - near) + near;
-
-                o.worldPos.xyz = mul(UNITY_MATRIX_I_V, float4(cameraPos, 1.0));
-
-                o.vertex = TransformWorldToHClip(o.worldPos.xyz);
-                o.vertex.xy = cameraPos.xy * o.vertex.w;
-
-                o.worldPos = mul(UNITY_MATRIX_I_VP, o.vertex);
+                output.lightPos = TransformObjectToWorld(0.0);
                 
-                return o;
+                float d = (planeID / (float)_Resolution * -2.0 + 1.0) * _LightData.x;
+                float3 planeOffset = normalize(_WorldSpaceCameraPos - output.lightPos) * d;
+                float4 vertexOffset = float4(vertices[vertexID] * _LightData.x, 0.0);
+                
+                output.vertex = mul(UNITY_MATRIX_P, mul(UNITY_MATRIX_V, float4(output.lightPos + planeOffset, 1.0)) + vertexOffset * 1.414);
+                output.worldPos = mul(UNITY_MATRIX_I_VP, output.vertex);
+                output.spotDirection = TransformObjectToWorldDir(float3(0, 0, 1));
+
+                return output;
             }
 
-            float3 _Color;
-            float _Value;
+            float3 _LightColor;
+            float _Density;
 
-            half4 frag(Varyings input) : SV_Target
+            float4 frag(Varyings input) : SV_Target
             {
-                Light mainLight = GetMainLight();
-                half3 col = mainLight.color * mainLight.distanceAttenuation * mainLight.shadowAttenuation;
+                float3 vec = input.worldPos - input.lightPos;
+                float dist2 = dot(vec, vec);
 
-                LIGHT_LOOP_BEGIN(GetAdditionalLightsCount())
-                    Light light = GetAdditionalLight(lightIndex, input.worldPos);
-                    col.rgb += light.color * light.distanceAttenuation * light.shadowAttenuation;
-                LIGHT_LOOP_END
-
-                return half4(col.rgb, _Volumetrics_Density / _Volumetrics_Resolution);
+                float attenuation = DistanceAttenuation(dist2, 1.0 / (_LightData.x * _LightData.x)) * AngleAttenuation(input.spotDirection, normalize(vec), _LightData.yz);
+                return float4(_LightColor * attenuation / _Resolution * 5.0 * _Density, 1.0);
             }
             ENDHLSL
         }
