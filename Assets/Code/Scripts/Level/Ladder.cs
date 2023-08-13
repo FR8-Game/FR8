@@ -7,9 +7,9 @@ namespace FR8.Level
 {
     public class Ladder : MonoBehaviour
     {
-        [SerializeField] private float height;
+        [SerializeField] private float height = 5.0f;
         [SerializeField] private float heightOffset;
-        [SerializeField] private float normalOffset;
+        [SerializeField] private float normalOffset = 0.25f;
 
         public Rigidbody ParentRigidbody { get; private set; }
         public float Height => height;
@@ -52,7 +52,7 @@ namespace FR8.Level
 
         private void OnTriggerEnter(Collider other)
         {
-            var player = other.transform.GetComponentInParent<PlayerGroundedAvatar>();
+            var player = other.transform.GetComponentInParent<PlayerAvatar>();
             if (!player) return;
             if (player.Ladder) return;
 

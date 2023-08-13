@@ -25,7 +25,7 @@ namespace FR8.Rendering.Passes
         public FogPass()
         {
             fogMaterial = CoreUtils.CreateEngineMaterial(fogShader);
-            renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
+            renderPassEvent = RenderPassEvent.AfterRenderingSkybox;
         }
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)

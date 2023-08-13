@@ -110,7 +110,6 @@ GameObject:
   - component: {fileID: 3349898635897989016}
   - component: {fileID: 2238459430204802109}
   - component: {fileID: 5233045168322493834}
-  - component: {fileID: 46793511293734253}
   - component: {fileID: 8801025778114427316}
   m_Layer: 0
   m_Name: Single Control Stick
@@ -199,37 +198,6 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 1342504364486349867, guid: 7ede8a74de1e7ba428f59b3f63c8b624, type: 3}
---- !u!114 &46793511293734253
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5895266705354658384}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a6610d2e704f1648819acc8d7460285, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  CollisionTag: 
-  EventReference:
-    Guid:
-      Data1: 779939904
-      Data2: 1153591353
-      Data3: 1315055039
-      Data4: 1935609873
-    Path: event:/Interactions/Control Stick Click
-  Event: 
-  PlayEvent: 0
-  StopEvent: 0
-  AllowFadeout: 1
-  TriggerOnce: 0
-  Preload: 0
-  AllowNonRigidbodyDoppler: 0
-  Params: []
-  OverrideAttenuation: 0
-  OverrideMinDistance: 1
-  OverrideMaxDistance: 20
 --- !u!114 &8801025778114427316
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -267,6 +235,14 @@ MonoBehaviour:
     animateRotation: 1
     slidePoseARotation: {x: -45, y: 0, z: 0}
     slidePoseBRotation: {x: 45, y: 0, z: 0}
+  sounds:
+    clickEvent:
+      Guid:
+        Data1: 779939904
+        Data2: 1153591353
+        Data3: 1315055039
+        Data4: 1935609873
+      Path: event:/Interactions/Control Stick Click
   dragBehaviour:
     sensitivity: 1
     dragVector: {x: 0, y: 0, z: 1}

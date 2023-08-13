@@ -9,9 +9,14 @@ namespace FR8.Train
     {
         [SerializeField] private CarriageConnectorSettings settings;
         [SerializeField] private Transform anchor;
+        [SerializeField] private Transform magnetFX;
+        [SerializeField] private float fxTransitionSpeed;
 
         private new Rigidbody rigidbody;
         private CarriageConnector connection;
+
+        private float magnetFXPercent;
+        private Vector3 magnetFXScale;
 
         private static HashSet<CarriageConnector> all = new();
 
@@ -21,6 +26,11 @@ namespace FR8.Train
         {
             base.Awake();
             rigidbody = GetComponentInParent<Rigidbody>();
+
+            if (magnetFX)
+            {
+                magnetFXScale = magnetFX.transform.localScale;
+            }
         }
 
         private void OnEnable()
@@ -35,12 +45,24 @@ namespace FR8.Train
 
         private void FixedUpdate()
         {
-            if (Value < 0.5f)
+            var engaged = Value > 0.5f;
+
+            if (magnetFX)
             {
+                magnetFXPercent += ((engaged ? 1.0f : 0.0f) - magnetFXPercent) * fxTransitionSpeed * Time.deltaTime;
+                magnetFX.transform.localScale = magnetFXScale * magnetFXPercent;
+            }
+
+            if (engaged)
+            {
+                if (connection)
+                {
+                    connection.SetValue(0.0f);
+                }
                 connection = null;
                 return;
             }
-            
+
             if (connection)
             {
                 if (connection.Value < 0.5f)
@@ -60,7 +82,7 @@ namespace FR8.Train
                 force *= mass * (mass / totalMass);
 
                 force = transform.forward * Vector3.Dot(transform.forward, force);
-                
+
                 rigidbody.AddForce(force);
                 connection.rigidbody.AddForce(-force);
 
@@ -96,19 +118,20 @@ namespace FR8.Train
             foreach (var e in all)
             {
                 if (e == this) continue;
-                
+
                 if ((e.anchor.position - anchor.position).sqrMagnitude < settings.forceRange * settings.forceRange)
                 {
                     list.Add(e);
                 }
             }
+
             return list;
         }
 
         public void Connect(CarriageConnector other)
         {
             if (other == this) return;
-            
+
             other.connection = this;
             connection = other;
         }
@@ -140,14 +163,11 @@ namespace FR8.Train
             SetValue(direction == 1 ? 1.0f : 0.0f);
         }
 
-        public override void BeginDrag(Ray ray)
+        public override void BeginInteract(GameObject interactingObject)
         {
             SetValue(1.0f - Value);
         }
-        
-        public override void ContinueDrag(Ray ray)
-        {
-            
-        }
+
+        public override void ContinueInteract(GameObject interactingObject) { }
     }
 }

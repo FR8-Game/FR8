@@ -15,7 +15,7 @@ namespace FR8.Train.Track
         [SerializeField] private bool testActive;
 
         private bool state;
-        
+
         public bool CanInteract => true;
         public string DisplayName => "Train Signal";
         public string DisplayValue => state ? "Engaged" : "Disengaged";
@@ -31,20 +31,13 @@ namespace FR8.Train.Track
                 var tangent = segment.SampleTangent(t);
                 transform.rotation = Quaternion.LookRotation(tangent, Vector3.up);
             }
-            
+
             Animate(testActive ? 1.0f : 0.0f);
         }
 
         private void FixedUpdate()
         {
-            var connection = connectionEnd switch
-            {
-                ConnectionEnd.Start => segment.StartConnection,
-                ConnectionEnd.End => segment.EndConnection,
-                _ => throw new ArgumentOutOfRangeException()
-            };
-
-            state = connection.connectionActive;
+            state = GetState();
             animationSpring.Target(state ? 1.0f : 0.0f).Iterate(Time.deltaTime);
 
             Animate(animationSpring.currentPosition);
@@ -63,20 +56,30 @@ namespace FR8.Train.Track
             Start,
             End
         }
+
+        public void Nudge(int direction)
+        {
+            SetState(direction == 1);
+        }
+
+        public void BeginInteract(GameObject interactingObject)
+        {
+            SetState(!GetState());
+        }
         
         public void Nudge(int direction) {  }
 
-        public void BeginDrag(Ray ray)
+        public TrackSegment.Connection GetConnection() => connectionEnd switch
         {
-            var connection = connectionEnd switch
-            {
-                ConnectionEnd.Start => segment.StartConnection,
-                ConnectionEnd.End => segment.EndConnection,
-                _ => throw new ArgumentOutOfRangeException()
-            };
-            connection.connectionActive = !connection.connectionActive;
-        }
+            ConnectionEnd.Start => segment.StartConnection,
+            ConnectionEnd.End => segment.EndConnection,
+            _ => throw new ArgumentOutOfRangeException()
+        };
 
-        public void ContinueDrag(Ray ray) { }
+        public bool GetState() => GetConnection().connectionActive;
+
+        public void SetState(bool state) => GetConnection().connectionActive = state;
+
+        public void ContinueInteract(GameObject interactingObject) { }
     }
 }

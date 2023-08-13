@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace FR8
 {
@@ -8,6 +8,7 @@ namespace FR8
         {
             public static (float, Vector3) ToAngleAxis(UnityEngine.Quaternion q)
             {
+                if (q.w < 0.0f) q = UnityEngine.Quaternion.Inverse(q);
                 q.ToAngleAxis(out var angle, out var axis);
                 if (!float.IsFinite(axis.magnitude)) return (0.0f, Vector3.up);
 

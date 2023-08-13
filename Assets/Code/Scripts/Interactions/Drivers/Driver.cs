@@ -40,9 +40,9 @@ namespace FR8.Interactions.Drivers
 
         public abstract void Nudge(int direction);
 
-        public abstract void BeginDrag(Ray ray);
+        public abstract void BeginInteract(GameObject interactingObject);
 
-        public abstract void ContinueDrag(Ray ray);
+        public abstract void ContinueInteract(GameObject interactingObject);
 
         protected virtual void Awake()
         {

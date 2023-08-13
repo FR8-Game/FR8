@@ -20,12 +20,12 @@ namespace FR8.Interactions
         
         public void Nudge(int direction) { }
 
-        public void BeginDrag(Ray ray)
+        public void BeginInteract(GameObject interactingObject)
         {
             FpAnimations.Play(animationName);
             if (destroyOnConsumption) Destroy(gameObject);
         }
 
-        public void ContinueDrag(Ray ray) { }
+        public void ContinueInteract(GameObject interactingObject) { }
     }
 }

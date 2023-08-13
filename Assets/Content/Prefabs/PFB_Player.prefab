@@ -1,137 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2050345455342946461
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2058770502592048207}
-  - component: {fileID: 8266726128216843699}
-  - component: {fileID: 6394128087836156411}
-  - component: {fileID: 6783170715577434548}
-  - component: {fileID: 5998356665163689951}
-  m_Layer: 7
-  m_Name: Grounded Controller
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2058770502592048207
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2050345455342946461}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 4152964452604636917}
-  - {fileID: 6496025909817959921}
-  m_Father: {fileID: 6066431375291976692}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8266726128216843699
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2050345455342946461}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: adfce35f66e0f914da764fb9c47eba65, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mass: 4
-  playerHeight: 1.7
-  radius: 0.2
-  maxGroundedSpeed: 4
-  accelerationTime: 0.12
-  sprintSpeedScalar: 2
-  airMovePenalty: 0.8
-  jumpHeight: 2
-  stepHeight: 0.4
-  maxWalkableSlope: 40
-  groundSpring: 300
-  groundDamping: 25
-  downGravityScale: 3
-  upGravityScale: 2
-  ladderClimbSpeed: 2
-  ladderRungDistance: 0.6
-  ladderClimbSpring: 400
-  ladderClimbDamper: 50
-  ladderJumpForce: 5
-  cameraOffset: {x: 0, y: 1.6, z: 0}
-  cameraController:
-    fieldOfView: 80
-    zoomFieldOfView: 20
-    fovSmoothTime: 0.08
-    nearPlane: 0.02
-    farPlane: 10000
-    shakeModule:
-      amplitude: {x: 0.3, y: 0, z: 0.5}
-      frequency: 6
-      slope: 0.2
---- !u!136 &6394128087836156411
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2050345455342946461}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.2
-  m_Height: 1.3000001
-  m_Direction: 1
-  m_Center: {x: 0, y: 1.0500001, z: 0}
---- !u!114 &6783170715577434548
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2050345455342946461}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5d8fa53135b466994ec94989fba2221, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactionDistance: 2.5
-  readoutText: {fileID: 1921352481845593271}
-  transition:
-    springConstant: 350
-    dampingConstant: 25
-    clamped: 1
-    range: {x: 0, y: 1}
-    bounce: 0.4
-    currentPosition: 0
-    targetPosition: 0
-    velocity: 0
---- !u!54 &5998356665163689951
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2050345455342946461}
-  serializedVersion: 2
-  m_Mass: 4
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 112
-  m_CollisionDetection: 1
 --- !u!1 &4313947242455073423
 GameObject:
   m_ObjectHideFlags: 0
@@ -201,7 +69,7 @@ RectTransform:
   m_Children:
   - {fileID: 3074157741673521788}
   - {fileID: 5121809080928981005}
-  m_Father: {fileID: 2058770502592048207}
+  m_Father: {fileID: 6066431375291976692}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -276,12 +144,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5469784151333166432}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2058770502592048207}
+  m_Father: {fileID: 6066431375291976692}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6066431375291976688
@@ -293,7 +161,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6066431375291976692}
-  - component: {fileID: 6066431375291976694}
+  - component: {fileID: 6758334141463345623}
+  - component: {fileID: 1866438777064635445}
+  - component: {fileID: 4854786108294605827}
   m_Layer: 7
   m_Name: PFB_Player
   m_TagString: Untagged
@@ -313,11 +183,12 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2058770502592048207}
+  - {fileID: 4152964452604636917}
+  - {fileID: 6496025909817959921}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6066431375291976694
+--- !u!114 &6758334141463345623
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -326,13 +197,93 @@ MonoBehaviour:
   m_GameObject: {fileID: 6066431375291976688}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e36e079ef20d0f0448c3f34564e3cd21, type: 3}
+  m_Script: {fileID: 11500000, guid: adfce35f66e0f914da764fb9c47eba65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputMap: {fileID: -944628639613478452, guid: badd88ac4cdc31941ad634977f07e0fd, type: 3}
-  mouseSensitivity: 0.3
-  controllerSensitivity: 0.4
-  newAvatar: {fileID: 0}
+  input:
+    inputMap: {fileID: -944628639613478452, guid: badd88ac4cdc31941ad634977f07e0fd, type: 3}
+    mouseSensitivity: 0.3
+    controllerSensitivity: 0.4
+  mass: 4
+  playerHeight: 1.7
+  radius: 0.2
+  maxGroundedSpeed: 4
+  accelerationTime: 0.12
+  sprintSpeedScalar: 2
+  airMovePenalty: 0.8
+  jumpHeight: 2
+  stepHeight: 0.4
+  maxWalkableSlope: 40
+  groundSpring: 300
+  groundDamping: 25
+  downGravityScale: 3
+  upGravityScale: 2
+  ladderClimbSpeed: 2
+  ladderRungDistance: 0.6
+  ladderClimbSpring: 400
+  ladderClimbDamper: 50
+  ladderJumpForce: 5
+  interactionManager:
+    interactionDistance: 2.5
+    readoutText: {fileID: 1921352481845593271}
+    transition:
+      springConstant: 350
+      dampingConstant: 25
+      clamped: 1
+      range: {x: 0, y: 1}
+      bounce: 0.4
+      currentPosition: 0
+      targetPosition: 0
+      velocity: 0
+  cameraOffset: {x: 0, y: 1.6, z: 0}
+  cameraController:
+    fieldOfView: 80
+    zoomFieldOfView: 20
+    fovSmoothTime: 0.08
+    nearPlane: 0.02
+    farPlane: 10000
+    shakeModule:
+      amplitude: {x: 0.3, y: 0, z: 0.5}
+      frequency: 2.4
+      slope: 0.2
+  footstepSound:
+    Guid:
+      Data1: -1942607919
+      Data2: 1137974629
+      Data3: 759065220
+      Data4: -8390218
+    Path: event:/Player/Footstep
+  footstepFrequency: 2.4
+--- !u!54 &1866438777064635445
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6066431375291976688}
+  serializedVersion: 2
+  m_Mass: 4
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 112
+  m_CollisionDetection: 1
+--- !u!136 &4854786108294605827
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6066431375291976688}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.2
+  m_Height: 1.3000001
+  m_Direction: 1
+  m_Center: {x: 0, y: 1.0500001, z: 0}
 --- !u!1 &6125957971899221248
 GameObject:
   m_ObjectHideFlags: 0
