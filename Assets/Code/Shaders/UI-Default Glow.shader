@@ -68,7 +68,7 @@ Shader "UI/Default Glow"
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
-            struct v2f
+            struct Varyings
             {
                 float4 vertex   : SV_POSITION;
                 fixed4 color    : COLOR;
@@ -86,9 +86,9 @@ Shader "UI/Default Glow"
             float _UIMaskSoftnessX;
             float _UIMaskSoftnessY;
 
-            v2f vert(appdata_t v)
+            Varyings vert(appdata_t v)
             {
-                v2f OUT;
+                Varyings OUT;
                 UNITY_SETUP_INSTANCE_ID(v);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(OUT);
                 float4 vPosition = UnityObjectToClipPos(v.vertex);
@@ -109,7 +109,7 @@ Shader "UI/Default Glow"
 
             float _Brightness;
 
-            fixed4 frag(v2f IN) : SV_Target
+            fixed4 frag(Varyings IN) : SV_Target
             {
                 //Round up the alpha color coming from the interpolator (to 1.0/256.0 steps)
                 //The incoming alpha could have numerical instability, which makes it very sensible to

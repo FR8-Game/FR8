@@ -1,5 +1,6 @@
 ﻿using System;
 using FR8.Interactions.Drivables;
+using FR8.Interactions.Drivers.Submodules;
 using UnityEngine;
 
 namespace FR8.Interactions.Drivers
@@ -8,6 +9,7 @@ namespace FR8.Interactions.Drivers
     {
         [SerializeField] private TwoPoseDrivableAnimator animator;
         [SerializeField] private bool testValue;
+        [SerializeField] private DriverSounds sounds;
 
         private bool state;
 
@@ -17,6 +19,13 @@ namespace FR8.Interactions.Drivers
         {
             base.OnValueChanged(newValue);
             animator.SetValue(newValue);
+            sounds.SetValue(newValue, 2);
+        }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            sounds.Awake(gameObject);
         }
 
         private void FixedUpdate()

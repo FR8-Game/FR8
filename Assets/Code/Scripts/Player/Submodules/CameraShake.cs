@@ -21,13 +21,15 @@ namespace FR8.Player.Submodules
             if (!playerGroundedCamera.Controller.CurrentAvatar) return;
             if (playerGroundedCamera.Controller.CurrentAvatar is not PlayerGroundedAvatar avatar) return;
 
+            if (!avatar.IsOnGround) return;
+            
             var moveSpeed = avatar.MoveSpeed / avatar.MaxSpeed;
             var shakeAmount = -1.0f / (moveSpeed / slope + 1.0f) + 1.0f;
 
             d += moveSpeed * frequency * Time.deltaTime;
 
             var x = Mathf.Abs(Mathf.Cos(d)) * shakeAmount;
-            var y = Mathf.Sin(d) * shakeAmount;
+            var y = Mathf.Sin(d * Mathf.PI) * shakeAmount;
             rotationalOffset = Quaternion.Euler(amplitude.x * x, amplitude.y * y, amplitude.z * y);
         }
     }

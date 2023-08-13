@@ -1,7 +1,9 @@
+using FMODUnity;
 using FR8.Level;
 using FR8.Player.Submodules;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace FR8.Player
 {
@@ -41,6 +43,7 @@ namespace FR8.Player
 
         [Space]
         [SerializeField] private float ladderClimbSpeed = 5.0f;
+
         [SerializeField] private float ladderRungDistance = 0.4f;
         [SerializeField] private float ladderClimbSpring = 300.0f;
         [SerializeField] private float ladderClimbDamper = 15.0f;
@@ -51,6 +54,15 @@ namespace FR8.Player
 
         [SerializeField] private PlayerGroundedCamera cameraController;
 
+        [FormerlySerializedAs("footstepRef")]
+        [Header("Audio")]
+        [SerializeField] private EventReference footstepSound;
+
+        [SerializeField] private float footstepFrequency;
+
+        private float footstepCounter;
+
+        private bool wasOnGround;
         private bool jumpTrigger;
         private float lastJumpTime;
 
@@ -167,6 +179,7 @@ namespace FR8.Player
             {
                 pee.Play();
             }
+
             if (!Controller.Pee && pee.isPlaying)
             {
                 pee.Stop();
@@ -184,11 +197,32 @@ namespace FR8.Player
             cameraController.FixedUpdate();
 
             if (LookForLadder()) return;
-            CheckForGround();
             Move();
             Jump();
+            CheckForGround();
             ApplyGravity();
             MoveWithGround();
+
+            if (IsOnGround)
+            {
+                if (!wasOnGround)
+                {
+                    footstepSound.OneShot(gameObject);
+                }
+                else
+                {
+                    var v = Velocity;
+                    var s = Mathf.Sqrt(v.x * v.x + v.z * v.z) / MaxSpeed;
+                    footstepCounter += s * footstepFrequency * Time.deltaTime;
+                    if (footstepCounter > 1.0f)
+                    {
+                        footstepCounter -= 1.0f;
+                        footstepSound.OneShot(gameObject);
+                    }
+                }
+            }
+
+            wasOnGround = IsOnGround;
         }
 
         private void GetCameraPose()
@@ -207,7 +241,7 @@ namespace FR8.Player
             var dot = -Vector3.Dot(Rigidbody.transform.forward, Ladder.transform.forward);
             var direction = Mathf.Round(Controller.Move.z) * Mathf.Sign(dot);
             var delta = direction * ladderClimbSpeed * Time.deltaTime;
-            
+
             var overTop = targetLadderPosition + delta > Ladder.Height;
             var overBottom = targetLadderPosition + delta < 0.0f;
             var dismount = overTop || overBottom;
@@ -220,11 +254,11 @@ namespace FR8.Player
             if (dismount)
             {
                 if (overTop) Rigidbody.AddForce(Vector3.up * ladderJumpForce, ForceMode.VelocityChange);
-                
+
                 Ladder = null;
                 return false;
             }
-            
+
             jumpTrigger = false;
 
             targetLadderPosition += delta;

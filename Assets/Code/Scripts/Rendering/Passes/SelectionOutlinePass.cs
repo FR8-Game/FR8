@@ -83,7 +83,7 @@ namespace FR8.Rendering.Passes
 
         private void DrawRenderer(CommandBuffer cmd, Renderer renderer)
         {
-            for (var i = 0; i < renderer.materials.Length; i++)
+            for (var i = 0; i < renderer.sharedMaterials.Length; i++)
             {
                 cmd.DrawRenderer(renderer, whiteMaterial, i, 0);
             }

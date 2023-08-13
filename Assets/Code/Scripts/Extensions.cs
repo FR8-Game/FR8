@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using FMODUnity;
 using FR8.Train.Signals;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -92,6 +93,14 @@ namespace FR8
         {
             if (cache) return cache;
             return cache = component.GetComponent<T>();
+        }
+
+        public static void OneShot(this EventReference eventReference, GameObject gameObject)
+        {
+            var fmodEvent = RuntimeManager.CreateInstance(eventReference);
+            fmodEvent.set3DAttributes(gameObject.To3DAttributes());
+            fmodEvent.start();
+            fmodEvent.release();
         }
     }
 }
