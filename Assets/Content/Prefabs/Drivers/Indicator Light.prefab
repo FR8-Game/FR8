@@ -48,7 +48,7 @@ MonoBehaviour:
   state: 0
   color: {r: 0, g: 1, b: 0.003575325, a: 1}
   lightIntensity: 20
-  materialIntensity: 2
+  materialIntensity: 30
   warmUpTime: 0.5
   cooldownTime: 1
   smoothingCurve:
@@ -76,7 +76,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   renderer: {fileID: 9146580959196818101}
-  materialIndex: 1
+  materialIndex: 2
   materialEmissionPropertyName: _EmissionColor
   key: 
   fuseGroup: Lights
@@ -147,60 +147,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 02291dd31cfe23d4f87b263544b18864, type: 3}
---- !u!1 &7345321083662797664 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 02291dd31cfe23d4f87b263544b18864, type: 3}
-  m_PrefabInstance: {fileID: 7579201150032131633}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1716954446193252481
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7345321083662797664}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b00a66c668671fa429e39507ea842827, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  state: 0
-  color: {r: 1, g: 0.14693816, b: 0, a: 1}
-  lightIntensity: 20
-  materialIntensity: 2
-  warmUpTime: 0.5
-  cooldownTime: 15
-  smoothingCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  renderer: {fileID: 0}
-  materialIndex: 1
-  materialEmissionPropertyName: _EmissionColor
-  key: 
-  fuseGroup: Lights
-  powerDrawWatts: 40
-  threshold: 0.5
 --- !u!4 &7972499677114847706 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 02291dd31cfe23d4f87b263544b18864, type: 3}

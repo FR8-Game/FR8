@@ -53,7 +53,7 @@ namespace FR8.Train
                 magnetFX.transform.localScale = magnetFXScale * magnetFXPercent;
             }
 
-            if (engaged)
+            if (!engaged)
             {
                 if (connection)
                 {

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace FR8.Level
 {
@@ -26,8 +27,11 @@ namespace FR8.Level
         {
             if (renderer && renderer.sharedMaterials.Length > materialIndex)
             {
-                material = Instantiate(renderer.sharedMaterials[materialIndex]);
-                renderer.sharedMaterials[materialIndex] = material;
+                var materials = renderer.sharedMaterials;
+                material = Instantiate(materials[materialIndex]);
+                materials[materialIndex] = material;
+                renderer.sharedMaterials = materials;
+                
                 material.hideFlags = HideFlags.HideAndDontSave;
             }
 
@@ -36,12 +40,13 @@ namespace FR8.Level
 
         protected virtual void FixedUpdate()
         {
-            percent = Mathf.Clamp01(percent + (state ? warmUpTime : cooldownTime) * Time.deltaTime);
+            percent = Mathf.Clamp01(percent + (state ? warmUpTime : -cooldownTime) * Time.deltaTime);
             var smoothedPercent = smoothingCurve.Evaluate(percent);
 
             if (material)
             {
-                material.SetColor(materialEmissionPropertyName, color * smoothedPercent * materialIndex);
+                material.SetKeyword(new LocalKeyword(material.shader, "_EMISSION"), true);
+                material.SetColor(materialEmissionPropertyName, color * smoothedPercent * materialIntensity);
             }
 
             if (light)

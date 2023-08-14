@@ -11,6 +11,7 @@ namespace FR8.Train.Electrics
         [SerializeField] private float powerDrawWatts = 40.0f;
         [SerializeField] private float threshold = 0.5f;
         
+        private bool driverState;
         private bool connected;
 
         public string Key => key;
@@ -23,11 +24,11 @@ namespace FR8.Train.Electrics
 
         protected override void FixedUpdate()
         {
-            state = connected;
+            state = connected && driverState;
             base.FixedUpdate();
         }
 
         public float CalculatePowerDraw() => state ? powerDrawWatts / 1000.0f : 0.0f;
-        public void OnValueChanged(float newValue) => state = newValue > threshold;
+        public void OnValueChanged(float newValue) => driverState = newValue > threshold;
     }
 }
