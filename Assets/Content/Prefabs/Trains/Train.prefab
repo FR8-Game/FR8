@@ -288,6 +288,7 @@ GameObject:
   - component: {fileID: 4894752358886216854}
   - component: {fileID: 4355600215810239047}
   - component: {fileID: 4440090236352725265}
+  - component: {fileID: 4894009795323560519}
   m_Layer: 0
   m_Name: Spot Light.R
   m_TagString: Untagged
@@ -323,7 +324,7 @@ Light:
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 3000
-  m_Range: 300
+  m_Range: 50
   m_SpotAngle: 49.67501
   m_InnerSpotAngle: 26.9347
   m_CookieSize: 10
@@ -405,44 +406,56 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state: 0
+  color: {r: 1, g: 0.14693816, b: 0, a: 1}
+  lightIntensity: 20
+  materialIntensity: 2
+  warmUpTime: 0.5
+  cooldownTime: 0.06
+  smoothingCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  renderer: {fileID: 0}
+  materialIndex: 1
+  materialEmissionPropertyName: _EmissionColor
   key: Headlights
   fuseGroup: Headlights
-  filamentRenderer: {fileID: 0}
-  color:
-    serializedVersion: 2
-    key0: {r: 1, g: 1, b: 1, a: 1}
-    key1: {r: 1, g: 1, b: 1, a: 1}
-    key2: {r: 0, g: 0, b: 0, a: 0}
-    key3: {r: 0, g: 0, b: 0, a: 0}
-    key4: {r: 0, g: 0, b: 0, a: 0}
-    key5: {r: 0, g: 0, b: 0, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
-    key7: {r: 0, g: 0, b: 0, a: 0}
-    ctime0: 0
-    ctime1: 65535
-    ctime2: 0
-    ctime3: 0
-    ctime4: 0
-    ctime5: 0
-    ctime6: 0
-    ctime7: 0
-    atime0: 0
-    atime1: 65535
-    atime2: 0
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_NumColorKeys: 2
-    m_NumAlphaKeys: 2
-  lightBrightness: 800
-  materialBrightness: 50
-  warmupTime: 0.06
-  cooldownTime: 0.06
   powerDrawWatts: 40
-  remapExponent: 2
+  threshold: 0.5
+--- !u!114 &4894009795323560519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2674341771936020717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66a5c0c163bd4d258c2cd729c7672583, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  density: 1
+  resolution: 500
 --- !u!1 &8238142573764840505
 GameObject:
   m_ObjectHideFlags: 0
@@ -455,6 +468,7 @@ GameObject:
   - component: {fileID: 6391109790148636693}
   - component: {fileID: 3113730685523176453}
   - component: {fileID: 4327638035634713442}
+  - component: {fileID: 5863160897243849776}
   m_Layer: 0
   m_Name: Spot Light.L
   m_TagString: Untagged
@@ -490,7 +504,7 @@ Light:
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 3000
-  m_Range: 300
+  m_Range: 50
   m_SpotAngle: 49.67501
   m_InnerSpotAngle: 26.9347
   m_CookieSize: 10
@@ -572,44 +586,56 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state: 0
+  color: {r: 1, g: 0.14693816, b: 0, a: 1}
+  lightIntensity: 20
+  materialIntensity: 2
+  warmUpTime: 0.5
+  cooldownTime: 0.06
+  smoothingCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  renderer: {fileID: 0}
+  materialIndex: 1
+  materialEmissionPropertyName: _EmissionColor
   key: Headlights
   fuseGroup: Headlights
-  filamentRenderer: {fileID: 0}
-  color:
-    serializedVersion: 2
-    key0: {r: 1, g: 1, b: 1, a: 1}
-    key1: {r: 1, g: 1, b: 1, a: 1}
-    key2: {r: 0, g: 0, b: 0, a: 0}
-    key3: {r: 0, g: 0, b: 0, a: 0}
-    key4: {r: 0, g: 0, b: 0, a: 0}
-    key5: {r: 0, g: 0, b: 0, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
-    key7: {r: 0, g: 0, b: 0, a: 0}
-    ctime0: 0
-    ctime1: 65535
-    ctime2: 0
-    ctime3: 0
-    ctime4: 0
-    ctime5: 0
-    ctime6: 0
-    ctime7: 0
-    atime0: 0
-    atime1: 65535
-    atime2: 0
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_NumColorKeys: 2
-    m_NumAlphaKeys: 2
-  lightBrightness: 800
-  materialBrightness: 50
-  warmupTime: 0.06
-  cooldownTime: 0.06
   powerDrawWatts: 40
-  remapExponent: 2
+  threshold: 0.5
+--- !u!114 &5863160897243849776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8238142573764840505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66a5c0c163bd4d258c2cd729c7672583, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  density: 1
+  resolution: 500
 --- !u!1 &8654185401422689508
 GameObject:
   m_ObjectHideFlags: 0
@@ -2456,6 +2482,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3412095045141690939}
     m_Modifications:
+    - target: {fileID: 513763837560409728, guid: fbc0a25f5b394444db0579129cb6efac, type: 3}
+      propertyPath: key
+      value: RPM
+      objectReference: {fileID: 0}
+    - target: {fileID: 513763837560409728, guid: fbc0a25f5b394444db0579129cb6efac, type: 3}
+      propertyPath: threshold
+      value: 800
+      objectReference: {fileID: 0}
     - target: {fileID: 3836259661596507635, guid: fbc0a25f5b394444db0579129cb6efac, type: 3}
       propertyPath: m_Name
       value: Train Console Bottom

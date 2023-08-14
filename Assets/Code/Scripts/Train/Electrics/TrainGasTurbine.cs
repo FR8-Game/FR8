@@ -31,6 +31,7 @@ namespace FR8.Train.Electrics
         private float targetRpm;
         private float currentRpm;
         private float velocity;
+        private bool fuse;
 
         public bool Running => fuelLevel > 0.0f && currentRpm > stallRpm;
         public float MaximumPowerGeneration => Running ? maxPowerProduction : 0.0f;
@@ -44,6 +45,7 @@ namespace FR8.Train.Electrics
         private void FixedUpdate()
         {
             var t = targetRpm + engineNoise.Sample(Time.time, 0.5f);
+            if (!fuse) t = 0.0f;
 
             if (Running)
             {
@@ -69,10 +71,14 @@ namespace FR8.Train.Electrics
             targetRpm = Mathf.Max(idleRpm, maxRpm * percent);
         }
 
+        public void ChangedFuseState(bool fuseState) => fuse = fuseState;
+
         public void Refuel(float rate)
         {
             fuelLevel += rate / fuelCapacity * Time.deltaTime;
             fuelLevel = Mathf.Clamp01(fuelLevel);
         }
+
+        public string FuseGroup => string.Empty;
     }
 }

@@ -53,7 +53,7 @@ namespace FR8.Train
                 magnetFX.transform.localScale = magnetFXScale * magnetFXPercent;
             }
 
-            if (engaged)
+            if (!engaged)
             {
                 if (connection)
                 {
@@ -65,6 +65,12 @@ namespace FR8.Train
 
             if (connection)
             {
+                if (connection.Value < 0.5f)
+                {
+                    connection = null;
+                    return;
+                }
+                
                 var displacement = connection.anchor.position - anchor.position;
 
                 var mass = rigidbody.mass;

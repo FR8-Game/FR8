@@ -20,6 +20,7 @@ namespace FR8.Train.Track
             new Vector3(0.0f, 0.0f, 5.0f),
             new Vector3(0.0f, 0.0f, 15.0f),
         };
+
         [SerializeField] private int resolution = 100;
         [SerializeField] private bool closedLoop;
 
@@ -28,7 +29,6 @@ namespace FR8.Train.Track
 
         private float totalLength;
 
-        private Dictionary<TrainCarriage, Vector3> trainMetadata = new();
         private List<Vector3> points;
 
         public Connection StartConnection => startConnection;
@@ -57,39 +57,49 @@ namespace FR8.Train.Track
         {
             var trains = FindObjectsOfType<TrainCarriage>();
 
-            UpdateConnection(trains, startConnection);
-            UpdateConnection(trains, endConnection);
-            UpdateTrainMetadata(trains);
+            UpdateConnection(trains, ConnectionType.Start);
+            UpdateConnection(trains, ConnectionType.End);
         }
 
-        private void UpdateTrainMetadata(TrainCarriage[] trains)
+        private void UpdateConnection(TrainCarriage[] trains, ConnectionType type)
         {
-            foreach (var train in trains)
+            bool compare(float v) => type switch
             {
-                if (!trainMetadata.ContainsKey(train)) trainMetadata.Add(train, train.Rigidbody.position);
-                else trainMetadata[train] = train.Rigidbody.position;
-            }
-        }
+                ConnectionType.Start => v < 0.0f,
+                ConnectionType.End => v > 1.0f,
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
 
-        private void UpdateConnection(TrainCarriage[] trains, Connection connection)
-        {
+            var connection = type switch
+            {
+                ConnectionType.Start => startConnection,
+                ConnectionType.End => endConnection,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
             if (!connection) return;
-            if (!connection.connectionActive) return;
+            if (connection.connectionActive)
+            {
+                foreach (var train in trains)
+                {
+                    if (train.Segment != connection.segment) continue;
+
+                    var p = GetClosestPoint(train.Rigidbody.position);
+                    if (!compare(p))
+                    {
+                        train.Segment = this;
+                    }
+                }
+            }
 
             foreach (var train in trains)
             {
-                if (train.Segment != connection.segment) continue;
-                if (!trainMetadata.ContainsKey(train)) continue;
+                if (train.Segment != this) continue;
 
-                var knotPercent = GetKnotPercent(connection.knotIndex);
-
-                var lastSign = (GetClosestPoint(trainMetadata[train]) - knotPercent) > 0.5f;
-                var sign = (GetClosestPoint(train.Rigidbody.position) - knotPercent) > 0.5f;
-                var switchSign = connection.handleScale > 0.0f;
-
-                if (sign == switchSign && lastSign != switchSign)
+                var p = GetClosestPoint(train.Rigidbody.position);
+                if (compare(p))
                 {
-                    train.Segment = this;
+                    train.Segment = connection.segment;
                 }
             }
         }
@@ -104,7 +114,7 @@ namespace FR8.Train.Track
                 var range = p1 - p0;
                 p0 += range * 0.1f;
                 p1 -= range * 0.1f;
-                
+
                 GizmosDrawLine(SamplePoint(p0), SamplePoint(p1), new Color(1.0f, 0.6f, 0.1f, 1.0f), true);
             }
 
@@ -146,7 +156,7 @@ namespace FR8.Train.Track
                     Handles.DrawWireArc(hit.point, Vector3.up, Vector3.right, 360.0f, radius);
                 }
             }
-            
+
             Gizmos.color = new Color(1.0f, 1.0f, 1.0f, 0.4f);
             if (startConnection)
             {
@@ -166,7 +176,7 @@ namespace FR8.Train.Track
         private void GizmosDrawLine(Vector3 a, Vector3 b, Color color, bool occlude)
         {
             const float width = 4.0f;
-            
+
 #if UNITY_EDITOR
             Handles.color = color;
 
@@ -327,6 +337,12 @@ namespace FR8.Train.Track
 
                 return true;
             }
+        }
+
+        private enum ConnectionType
+        {
+            Start,
+            End,
         }
     }
 }

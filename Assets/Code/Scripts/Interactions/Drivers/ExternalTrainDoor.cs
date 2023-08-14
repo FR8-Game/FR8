@@ -1,4 +1,4 @@
-﻿using FR8.Train;
+using FR8.Train;
 using UnityEngine;
 
 namespace FR8.Interactions.Drivers

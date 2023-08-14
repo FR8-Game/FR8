@@ -1,6 +1,5 @@
 using FR8.Interactions.Drivers.Submodules;
 using FR8.Player;
-using FR8.Player.Submodules;
 using UnityEngine;
 
 namespace FR8.Pickups
