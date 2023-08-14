@@ -1,6 +1,5 @@
 ﻿using FR8.Pickups;
 using FR8.Player;
-using FR8.Player.Submodules;
 using FR8.Sockets;
 using FR8.Train.Electrics;
 using UnityEngine;

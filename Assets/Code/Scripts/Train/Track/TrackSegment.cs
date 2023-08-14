@@ -29,7 +29,6 @@ namespace FR8.Train.Track
 
         private float totalLength;
 
-        private Dictionary<TrainCarriage, Vector3> trainMetadata = new();
         private List<Vector3> points;
 
         public Connection StartConnection => startConnection;
@@ -60,20 +59,17 @@ namespace FR8.Train.Track
 
             UpdateConnection(trains, ConnectionType.Start);
             UpdateConnection(trains, ConnectionType.End);
-            UpdateTrainMetadata(trains);
-        }
-
-        private void UpdateTrainMetadata(TrainCarriage[] trains)
-        {
-            foreach (var train in trains)
-            {
-                if (!trainMetadata.ContainsKey(train)) trainMetadata.Add(train, train.Rigidbody.position);
-                else trainMetadata[train] = train.Rigidbody.position;
-            }
         }
 
         private void UpdateConnection(TrainCarriage[] trains, ConnectionType type)
         {
+            bool compare(float v) => type switch
+            {
+                ConnectionType.Start => v < 0.0f,
+                ConnectionType.End => v > 1.0f,
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+
             var connection = type switch
             {
                 ConnectionType.Start => startConnection,
@@ -87,15 +83,9 @@ namespace FR8.Train.Track
                 foreach (var train in trains)
                 {
                     if (train.Segment != connection.segment) continue;
-                    if (!trainMetadata.ContainsKey(train)) continue;
 
-                    var knotPercent = GetKnotPercent(connection.knotIndex);
-
-                    var lastSign = (GetClosestPoint(trainMetadata[train]) - knotPercent) > 0.5f;
-                    var sign = (GetClosestPoint(train.Rigidbody.position) - knotPercent) > 0.5f;
-                    var switchSign = connection.handleScale > 0.0f;
-
-                    if (sign == switchSign && lastSign != switchSign)
+                    var p = GetClosestPoint(train.Rigidbody.position);
+                    if (!compare(p))
                     {
                         train.Segment = this;
                     }
@@ -107,25 +97,9 @@ namespace FR8.Train.Track
                 if (train.Segment != this) continue;
 
                 var p = GetClosestPoint(train.Rigidbody.position);
-                switch (type)
+                if (compare(p))
                 {
-                    case ConnectionType.Start:
-                    {
-                        if (p < 0.0f)
-                        {
-                            train.Segment = connection.segment;
-                        }
-                        break;
-                    }
-                    case ConnectionType.End:
-                    {
-                        if (p > 1.0f)
-                        {
-                            train.Segment = connection.segment;
-                        }
-                        break;
-                    }
-                    default: throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                    train.Segment = connection.segment;
                 }
             }
         }

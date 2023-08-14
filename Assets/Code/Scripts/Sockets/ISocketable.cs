@@ -1,6 +1,4 @@
 ﻿
-using UnityEngine;
-
 namespace FR8.Sockets
 {
     public interface ISocketable
