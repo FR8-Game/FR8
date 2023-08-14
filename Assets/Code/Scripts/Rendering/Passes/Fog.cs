@@ -22,10 +22,10 @@ namespace FR8.Rendering.Passes
         private static readonly int Value = Shader.PropertyToID("_Value");
         private static readonly int Color = Shader.PropertyToID("_Color");
 
-        public FogPass()
+        public FogPass(bool renderOverSkybox)
         {
             fogMaterial = CoreUtils.CreateEngineMaterial(fogShader);
-            renderPassEvent = RenderPassEvent.AfterRenderingSkybox;
+            this.renderPassEvent = renderOverSkybox ? RenderPassEvent.AfterRenderingSkybox : RenderPassEvent.BeforeRenderingSkybox;
         }
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
