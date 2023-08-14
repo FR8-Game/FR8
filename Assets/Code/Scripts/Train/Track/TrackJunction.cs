@@ -67,8 +67,6 @@ namespace FR8.Train.Track
             SetState(!GetState());
         }
         
-        public void Nudge(int direction) {  }
-
         public TrackSegment.Connection GetConnection() => connectionEnd switch
         {
             ConnectionEnd.Start => segment.StartConnection,
