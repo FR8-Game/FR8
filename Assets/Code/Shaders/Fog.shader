@@ -74,12 +74,12 @@ Shader "Hidden/Fog"
                 float depth = SampleSceneDepth(input.uv);
                 float3 pos = ComputeWorldSpacePosition(input.uv, depth, UNITY_MATRIX_I_VP);
                 float dist = length(pos - _WorldSpaceCameraPos) / 100.0f;
-                
+
                 float fog = pow(2.71, -(dist * dist) * _Value);
                 fog = clamp(1.0f - fog, 0.0, 1.0);
                 clip(fog);
-                
-                return float4(_Color, fog);
+
+                return float4(pow(_Color, 1), fog);
             }
             ENDHLSL
         }
