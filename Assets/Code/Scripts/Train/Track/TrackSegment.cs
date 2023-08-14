@@ -131,6 +131,7 @@ namespace FR8.Train.Track
 
         private void OnDrawGizmosSelected()
         {
+#if UNITY_EDITOR
             for (var i = 0; i < KnotCount() - 1; i++)
             {
                 var p0 = Knot(i);
@@ -171,6 +172,7 @@ namespace FR8.Train.Track
                 Gizmos.DrawSphere(Knot(KnotCount() - 2), 0.2f);
                 Gizmos.DrawSphere(Knot(KnotCount() - 3), 0.2f);
             }
+#endif
         }
 
         private void GizmosDrawLine(Vector3 a, Vector3 b, Color color, bool occlude)
