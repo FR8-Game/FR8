@@ -9,6 +9,9 @@ namespace FR8.Rendering
         [SerializeField] private bool renderFog = true;
         [SerializeField] private bool renderOutline = true;
         [SerializeField] private bool volumetrics = true;
+
+        [Space]
+        [SerializeField] private bool renderFogOverSkybox;
         
         private FogPass fogPass;
         private SelectionOutlinePass outlinePass;
@@ -16,7 +19,7 @@ namespace FR8.Rendering
 
         public override void Create()
         {
-            fogPass = new FogPass();
+            fogPass = new FogPass(renderFogOverSkybox);
             outlinePass = new SelectionOutlinePass();
             volumetricsPass = new LightVolumetricsPass();
         }
