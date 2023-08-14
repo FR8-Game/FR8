@@ -164,6 +164,37 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0.00000023841858, y: 0, z: 0}
+--- !u!1 &5225719516377256812
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 119fe4836439d5b4195a1bbb7958d514, type: 3}
+  m_PrefabInstance: {fileID: 6193746045971259805}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3085439830736363326}
+  m_Layer: 0
+  m_Name: 'ConsoleProp (Missing Prefab with guid: 119fe4836439d5b4195a1bbb7958d514)'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3085439830736363326
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 119fe4836439d5b4195a1bbb7958d514, type: 3}
+  m_PrefabInstance: {fileID: 6193746045971259805}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5225719516377256812}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5903849066165733433}
+  m_RootOrder: 15
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8669327850709267215
 GameObject:
   m_ObjectHideFlags: 0
@@ -531,10 +562,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxSpeedKmpH: 120
-  accelerationTime: 5
-  powerFromSpeed: 200
-  powerFromDifference: 20000
-  amperesScaling: 0.0001
+  acceleration: 8
+  maxPowerConsumption: 75
+  tangentialForceCost: 10
   throttleSmoothing: 0.8
 --- !u!114 &1884765813156554468
 MonoBehaviour:
@@ -548,6 +578,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b2a6bc294147454e99b307823142596, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  baselineGeneration: 5
   connected: 0
 --- !u!114 &2338552693555117045
 MonoBehaviour:
@@ -563,7 +594,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   idleRpm: 1000
   maxRpm: 10000
-  megawattsPerRevolution: 30
+  stallRpm: 700
+  maxPowerProduction: 200
+  fuelCapacity: 20
+  fuelLevel: 1
   smoothTime: 0.1
   engineNoise:
     offset: -100
@@ -792,7 +826,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6936461394901215795, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: m_FillAmount
-      value: 0.069450006
+      value: 0.064
       objectReference: {fileID: 0}
     - target: {fileID: 6936461395209199179, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: key
@@ -869,13 +903,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6936461394901215795, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: m_FillAmount
-      value: 0.06407267
+      value: 0.064
       objectReference: {fileID: 0}
     - target: {fileID: 6936461395209199177, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: m_text
-      value: '{0:N0}
+      value: '<mspace=0.7em>0</mspace>
 
-        <size=30%>RPM'
+        <size=30%></size>'
       objectReference: {fileID: 0}
     - target: {fileID: 6936461395209199179, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: key
@@ -1165,13 +1199,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6936461394901215795, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: m_FillAmount
-      value: 0.066180006
+      value: 0.064
       objectReference: {fileID: 0}
     - target: {fileID: 6936461395209199177, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: m_text
-      value: '{0:N0}
+      value: '<mspace=0.7em>0</mspace>
 
-        <size=30%>Kilowatts'
+        <size=30%></size>'
       objectReference: {fileID: 0}
     - target: {fileID: 6936461395209199179, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: key
@@ -1244,9 +1278,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6936461395209199177, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: m_text
-      value: '{0:N0}
+      value: '<mspace=0.7em>0</mspace>
 
-        <size=30%>Load'
+        <size=30%></size>'
       objectReference: {fileID: 0}
     - target: {fileID: 6936461395209199179, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: key
@@ -1421,6 +1455,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 772659b66c69cf74aa10750dbb44b784, type: 3}
       propertyPath: m_Name
       value: Locomotive
+      objectReference: {fileID: 0}
+    - target: {fileID: 8832422709379285958, guid: 772659b66c69cf74aa10750dbb44b784, type: 3}
+      propertyPath: m_RootOrder
+      value: 16
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 772659b66c69cf74aa10750dbb44b784, type: 3}
@@ -2122,9 +2160,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   key: 
+  displayName: 
+  defaultValue: 0
   settings: {fileID: 11400000, guid: 9826cd7c0dba1394b8a24b0110955138, type: 2}
   anchor: {fileID: 8853930767191054095}
-  engaged: 1
 --- !u!1 &6823709371480325566 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -6413956847900099605, guid: 2de40a509088b6e428ef0e687f8a2358, type: 3}
@@ -2264,13 +2303,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6936461394901215795, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: m_FillAmount
-      value: 0.072720006
+      value: 0.064
       objectReference: {fileID: 0}
     - target: {fileID: 6936461395209199177, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: m_text
-      value: '{0:N0}%
+      value: '<mspace=0.7em>0</mspace>
 
-        <size=30%>Saturation'
+        <size=30%></size>'
       objectReference: {fileID: 0}
     - target: {fileID: 6936461395209199179, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: key
