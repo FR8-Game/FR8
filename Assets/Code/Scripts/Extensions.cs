@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using FMODUnity;
 using FR8.Train.Signals;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -57,6 +59,25 @@ namespace FR8
 
             return null;
         }
+        
+        public static Transform DeepFind(this Transform transform, Regex regex)
+        {
+            var queue = new Queue<Transform>();
+            queue.Enqueue(transform);
+
+            while (queue.Count > 0)
+            {
+                var t = queue.Dequeue();
+                if (regex.IsMatch(t.name)) return t;
+
+                foreach (Transform c in t)
+                {
+                    queue.Enqueue(c);
+                }
+            }
+
+            return null;
+        }
 
         public static void Listen(this List<Signal> signals, Action callback)
         {
@@ -72,6 +93,14 @@ namespace FR8
         {
             if (cache) return cache;
             return cache = component.GetComponent<T>();
+        }
+
+        public static void OneShot(this EventReference eventReference, GameObject gameObject)
+        {
+            var fmodEvent = RuntimeManager.CreateInstance(eventReference);
+            fmodEvent.set3DAttributes(gameObject.To3DAttributes());
+            fmodEvent.start();
+            fmodEvent.release();
         }
     }
 }

@@ -1,68 +1,125 @@
 using System;
 using System.Collections.Generic;
+using FR8.Interactions.Drivables;
+using FR8.Interactions.Drivers;
 using UnityEngine;
 
 namespace FR8.Train.Electrics
 {
     [SelectionBase]
     [DisallowMultipleComponent]
-    public sealed class TrainElectricsController : MonoBehaviour
+    public sealed class TrainElectricsController : MonoBehaviour, IDrivable
     {
-        [SerializeField] private float capacityMegaWattHours;
-        [SerializeField] private float baselineGeneration = 150.0f;
+        [SerializeField] private float baselineGeneration = 5.0f;
+        [SerializeField] private bool connected = true;
 
-        private List<TrainElectrics> electrics;
+        private DriverNetwork driverNetwork;
+        private const string MainFuseGroup = "mainFuze";
+        private const string SaturationKey = "Saturation";
+
+        private List<IElectricGenerator> generators;
+        private List<IElectricDevice> devices;
+
+        public string Key => MainFuseGroup;
+        public Dictionary<string, bool> FuseGroups = new();
         
-        public float PowerStorage { get; private set; }
         public float PowerDraw { get; private set; }
-        public float PowerCapacity => capacityMegaWattHours * 3600.0f;
-        
+        public float Capacity { get; private set; }
+        public float Saturation { get; private set; }
+
+        public event Action FuseBlown;
+
         private void Awake()
         {
-            electrics = new List<TrainElectrics>(GetComponentsInChildren<TrainElectrics>());
+            driverNetwork = GetComponentInParent<DriverNetwork>();
 
-            foreach (var e in electrics) e.SetController(this).Connected = true;
+            generators = new List<IElectricGenerator>(GetComponentsInChildren<IElectricGenerator>());
+            devices = new List<IElectricDevice>(GetComponentsInChildren<IElectricDevice>());
+
+            foreach (var e in generators) e.SetClockSpeed(0.0f);
+            foreach (var e in devices) e.SetConnected(true);
+
+            SetMainFuse(connected);
+        }
+
+        public void OnValueChanged(float newValue)
+        {
+            connected = newValue > 0.5f;
         }
 
         private void FixedUpdate()
         {
-            var deltaPower = baselineGeneration * Time.deltaTime;
+            UpdateChildren();
+            
+            var saturation = 0.0f;
+            var clockSpeed = 0.0f;
+            var draw = 0.0f;
 
-            foreach (var e in electrics)
+            var capacity = baselineGeneration;
+            foreach (var e in generators) capacity += e.MaximumPowerGeneration;
+
+            if (connected)
             {
-                deltaPower += e.CalculatePowerConsumptionMegawatts() * Time.deltaTime;
+                draw = 0.0f;
+                foreach (var e in devices)
+                {
+                    draw += e.CalculatePowerDraw();
+                }
+
+                saturation = draw / capacity;
+                clockSpeed = draw / (capacity - baselineGeneration);
             }
 
-            PowerStorage += Mathf.Min(deltaPower, PowerCapacity - PowerStorage);
-            if (PowerStorage < 0.0f)
+            if (saturation > 1.01f)
             {
-                DisconnectFuzeGroup(LastFuzeGroup());
+                saturation = 0.0f;
+                clockSpeed = 0.0f;
+                SetMainFuse(false);
+                FuseBlown?.Invoke();
             }
 
-            PowerDraw = deltaPower / Time.deltaTime;
+            foreach (var e in generators) e.SetClockSpeed(clockSpeed);
+
+            PowerDraw = draw;
+            Capacity = capacity;
+            Saturation = saturation;
+
+            driverNetwork.SetValue(SaturationKey, saturation * 100.0f);
         }
 
-        private int LastFuzeGroup()
+        public void ResetFuze() => SetMainFuse(true);
+
+        public void SetMainFuse(bool connected)
         {
-            var lastFuzeGroup = 0;
-            foreach (var e in electrics)
-            {
-                lastFuzeGroup = Mathf.Max(lastFuzeGroup, e.FuzeGroup);
-            }
-
-            return lastFuzeGroup;
+            driverNetwork.SetValue(Key, connected ? 1.0f : 0.0f);
         }
 
-        private void UpdateFuzeGroup(int fuzeGroup, Action<TrainElectrics> callback)
+        private void UpdateChildren()
         {
-            foreach (var e in electrics)
+            foreach (var e in devices)
             {
-                if (e.FuzeGroup != fuzeGroup) continue;
-                callback(e);
+                e.SetConnected(GetFuse(e.FuseGroup));
             }
         }
 
-        public void ConnectFuzeGroup(int fuzeGroup) => UpdateFuzeGroup(fuzeGroup, e => e.Connected = true);
-        public void DisconnectFuzeGroup(int fuzeGroup) => UpdateFuzeGroup(fuzeGroup, e => e.Connected = false);
+        private static string Simplify(string str) => str?.Trim().ToLower().Replace(" ", "");
+
+        public void SetFuse(string fuseName, bool state)
+        {
+            fuseName = Simplify(fuseName);
+            
+            if (FuseGroups.ContainsKey(fuseName)) FuseGroups[fuseName] = state;
+            else FuseGroups.Add(fuseName, state);
+        }
+        
+        public bool GetFuse(string fuseName)
+        {
+            fuseName = Simplify(fuseName);
+            
+            if (!connected) return false;
+            if (string.IsNullOrEmpty(fuseName)) return true;
+            
+            return FuseGroups.ContainsKey(fuseName) && FuseGroups[fuseName];
+        }
     }
 }

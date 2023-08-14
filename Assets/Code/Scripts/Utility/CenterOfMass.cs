@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FR8.Utility
+namespace FR8
 {
     public class CenterOfMass : MonoBehaviour
     {

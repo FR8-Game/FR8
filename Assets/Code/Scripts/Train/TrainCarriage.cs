@@ -30,6 +30,7 @@ namespace FR8.Train
         public Rigidbody Rigidbody { get; private set; }
         public Vector3 DriverDirection { get; private set; }
         public float ReferenceWeight => referenceWeight;
+        public Vector3 TangentialForce { get; private set; }
 
         private void Awake()
         {
@@ -98,6 +99,8 @@ namespace FR8.Train
             
             var torque = (axis * angle * Mathf.Deg2Rad * retentionSpring - Rigidbody.angularVelocity * retentionDamping) * retentionTorqueConstant;
             Rigidbody.AddTorque(torque, ForceMode.Acceleration);
+            
+            TangentialForce = transform.InverseTransformVector(force);
         }
 
         public float GetForwardSpeed() => Vector3.Dot(DriverDirection, Rigidbody.velocity);

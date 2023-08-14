@@ -1,17 +1,20 @@
 ﻿using UnityEngine;
 
-namespace FR8.Utility
+namespace FR8
 {
-    public static class Curves
+    public static partial class Utility
     {
-        public static float SmootherStep(float x) => x * x * x * (3.0f * x * (2.0f * x - 5.0f) + 10.0f);
-
-        public static float Bounce(float x)
+        public static class Curves
         {
-            const float c1 = 1.70158f;
-            const float c3 = c1 + 1.0f;
+            public static float SmootherStep(float x) => x * x * x * (3.0f * x * (2.0f * x - 5.0f) + 10.0f);
 
-            return 1.0f + c3 * Mathf.Pow(x - 1.0f, 3.0f) + c1 * Mathf.Pow(x - 1.0f, 2.0f); 
+            public static float Bounce(float x)
+            {
+                const float c1 = 1.70158f;
+                const float c3 = c1 + 1.0f;
+
+                return 1.0f + c3 * Mathf.Pow(x - 1.0f, 3.0f) + c1 * Mathf.Pow(x - 1.0f, 2.0f);
+            }
         }
     }
 }

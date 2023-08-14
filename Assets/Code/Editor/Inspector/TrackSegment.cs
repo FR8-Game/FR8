@@ -1,6 +1,8 @@
-﻿using FR8.Train.Track;
+﻿using System;
+using FR8.Train.Track;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace FR8Editor.Inspector
 {
@@ -62,6 +64,7 @@ namespace FR8Editor.Inspector
             {
                 var worldPos = trackSegment.transform.TransformPoint(trackSegment.Knots[i]);
                 worldPos = Handles.PositionHandle(worldPos, Quaternion.identity);
+                
                 trackSegment.Knots[i] = trackSegment.transform.InverseTransformPoint(worldPos);
             }
         }
