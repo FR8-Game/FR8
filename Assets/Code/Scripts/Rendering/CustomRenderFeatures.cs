@@ -15,20 +15,20 @@ namespace FR8.Rendering
         
         private FogPass fogPass;
         private SelectionOutlinePass outlinePass;
-        private LightVolumetricsPass volumetricsPass;
+        private LightVolumetricPass volumetricPass;
 
         public override void Create()
         {
             fogPass = new FogPass(renderFogOverSkybox);
             outlinePass = new SelectionOutlinePass();
-            volumetricsPass = new LightVolumetricsPass();
+            volumetricPass = new LightVolumetricPass();
         }
 
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
             if (renderFog) renderer.EnqueuePass(fogPass);
             if (renderOutline) renderer.EnqueuePass(outlinePass);
-            if (volumetrics) renderer.EnqueuePass(volumetricsPass);
+            if (volumetrics) renderer.EnqueuePass(volumetricPass);
         }
     }
 }
