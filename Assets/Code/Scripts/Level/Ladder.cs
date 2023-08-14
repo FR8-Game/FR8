@@ -1,5 +1,3 @@
-using System;
-using System.Security.Cryptography;
 using FR8.Player;
 using UnityEngine;
 

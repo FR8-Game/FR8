@@ -5,5 +5,6 @@
         float MaximumPowerGeneration { get; }
         
         void SetClockSpeed(float percent);
+        void ChangedFuseState(bool fuseState);
     }
 }

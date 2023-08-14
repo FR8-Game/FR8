@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using FR8.Interactions.Drivables;
 using FR8.Train.Electrics;
 using UnityEngine;
