@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using FR8.Interactions.Drivables;
 using FR8.Interactions.Drivers.Submodules;
 using UnityEngine;

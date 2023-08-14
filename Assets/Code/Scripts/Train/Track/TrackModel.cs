@@ -22,6 +22,12 @@ namespace FR8.Train.Track
         public void Clear()
         {
             var rendererContainer = transform.Find("Renderers");
+            foreach (Transform child in rendererContainer)
+            {
+                var filter = child.GetComponent<MeshFilter>();
+                DestroyImmediate(filter.sharedMesh);
+            }
+
             if (rendererContainer) DestroyImmediate(rendererContainer.gameObject);
         }
         

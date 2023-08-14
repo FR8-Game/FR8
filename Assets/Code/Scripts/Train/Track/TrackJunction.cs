@@ -66,7 +66,7 @@ namespace FR8.Train.Track
         {
             SetState(!GetState());
         }
-
+        
         public TrackSegment.Connection GetConnection() => connectionEnd switch
         {
             ConnectionEnd.Start => segment.StartConnection,
