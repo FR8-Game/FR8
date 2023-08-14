@@ -1,4 +1,4 @@
-using FR8.Train.Track;
+﻿using FR8.Train.Track;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -7,7 +7,7 @@ using UnityEngine;
 namespace FR8Editor.Inspector
 {
     [InitializeOnLoad]
-    [CustomEditor(typeof(TrackModel))]
+    [CustomEditor(typeof(TrackMesh))]
     public class TrackModelEditor : Editor
     {
         static TrackModelEditor()
@@ -18,7 +18,7 @@ namespace FR8Editor.Inspector
         [MenuItem("Actions/Track Model/Bake All Meshes")]
         public static void BakeAllTracks()
         {
-            var list = FindObjectsOfType<TrackModel>();
+            var list = FindObjectsOfType<TrackMesh>();
             foreach (var e in list)
             {
                 e.BakeMesh();
@@ -28,7 +28,7 @@ namespace FR8Editor.Inspector
         [MenuItem("Actions/Track Model/Clear All Meshes")]
         public static void ClearAllTracks()
         {
-            var list = FindObjectsOfType<TrackModel>();
+            var list = FindObjectsOfType<TrackMesh>();
             foreach (var e in list)
             {
                 e.Clear();
@@ -54,7 +54,7 @@ namespace FR8Editor.Inspector
         {
             base.OnInspectorGUI();
 
-            var target = this.target as TrackModel;
+            var target = this.target as TrackMesh;
             if (!target) return;
 
             var append = Application.isPlaying ? " [Cannot perform in playmode]" : string.Empty;

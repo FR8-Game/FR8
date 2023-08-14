@@ -7,7 +7,7 @@ namespace FR8.Train.Track
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(TrackSegment))]
-    public sealed class TrackModel : MonoBehaviour
+    public sealed class TrackMesh : MonoBehaviour
     {
         private const int nextPointSubResolution = 10;
 
@@ -18,7 +18,7 @@ namespace FR8.Train.Track
         [SerializeField] private float verticalOffset;
 
         private List<Vector3> lastBakedPoints = new();
-        
+
         public void Clear()
         {
             var rendererContainer = transform.Find("Renderers");
@@ -33,6 +33,8 @@ namespace FR8.Train.Track
         
         public void BakeMesh(bool force = false)
         {
+            return;
+            
             if (!Dirty() && !force) return;
             
             Clear();
