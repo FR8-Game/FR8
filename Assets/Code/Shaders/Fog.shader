@@ -79,7 +79,7 @@ Shader "Hidden/Fog"
                 fog = clamp(1.0f - fog, 0.0, 1.0);
                 clip(fog);
 
-                return float4(pow(_Color, 1 / 2.2), fog);
+                return float4(pow(_Color, 1), fog);
             }
             ENDHLSL
         }
