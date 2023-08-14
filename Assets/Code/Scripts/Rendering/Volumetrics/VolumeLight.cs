@@ -7,7 +7,7 @@ namespace FR8.Rendering.Volumetrics
     [RequireComponent(typeof(Light))]
     public class VolumeLight : MonoBehaviour
     {
-        [SerializeField] private float density = 0.2f;
+        [SerializeField] private float density = 1.0f;
         [SerializeField] private int resolution = 50;
         
         private Material material;
@@ -46,7 +46,7 @@ namespace FR8.Rendering.Volumetrics
                 _ => throw new ArgumentOutOfRangeException()
             };
             material.SetVector(LightData, lightData);
-            material.SetFloat(Density, density);
+            material.SetFloat(Density, density / 100.0f);
             material.SetInt(Resolution, resolution);
 
             var lightColor = light.color * light.intensity * (light.useColorTemperature ? Mathf.CorrelatedColorTemperatureToRGB(light.colorTemperature) : Color.white);
