@@ -208,22 +208,31 @@ MonoBehaviour:
   mass: 4
   playerHeight: 1.7
   radius: 0.2
-  maxGroundedSpeed: 4
-  accelerationTime: 0.12
-  sprintSpeedScalar: 2
-  airMovePenalty: 0.8
-  jumpHeight: 2
   stepHeight: 0.4
-  maxWalkableSlope: 40
-  groundSpring: 300
-  groundDamping: 25
-  downGravityScale: 3
-  upGravityScale: 2
-  ladderClimbSpeed: 2
-  ladderRungDistance: 0.6
-  ladderClimbSpring: 400
-  ladderClimbDamper: 50
-  ladderJumpForce: 5
+  movement:
+    maxGroundedSpeed: 4
+    accelerationTime: 0.12
+    sprintSpeedScalar: 2
+    airMovePenalty: 0.8
+    jumpHeight: 2.5
+    maxWalkableSlope: 40
+    groundSpring: 500
+    groundDamping: 25
+    downGravityScale: 3
+    upGravityScale: 2
+    ladderClimbSpeed: 5
+    ladderRungDistance: 0.4
+    ladderClimbSpring: 300
+    ladderClimbDamper: 15
+    ladderJumpForce: 5
+    footstepSound:
+      Guid:
+        Data1: -1942607919
+        Data2: 1137974629
+        Data3: 759065220
+        Data4: -8390218
+      Path: event:/Player/Footstep
+    footstepFrequency: 2.4
   interactionManager:
     interactionDistance: 2.5
     readoutText: {fileID: 1921352481845593271}
@@ -247,14 +256,6 @@ MonoBehaviour:
       amplitude: {x: 0.3, y: 0, z: 0.5}
       frequency: 2.4
       slope: 0.2
-  footstepSound:
-    Guid:
-      Data1: -1942607919
-      Data2: 1137974629
-      Data3: 759065220
-      Data4: -8390218
-    Path: event:/Player/Footstep
-  footstepFrequency: 2.4
 --- !u!54 &1866438777064635445
 Rigidbody:
   m_ObjectHideFlags: 0

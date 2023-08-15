@@ -75,6 +75,8 @@ namespace FR8.Pickups
         {
             Rigidbody = GetComponent<Rigidbody>();
             Rigidbody.gameObject.layer = PickupLayer;
+
+            transform.SetParent(null);
         }
 
         protected virtual void FixedUpdate()
