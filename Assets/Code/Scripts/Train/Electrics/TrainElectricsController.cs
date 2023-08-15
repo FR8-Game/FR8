@@ -110,6 +110,8 @@ namespace FR8.Train.Electrics
             }
         }
 
+        public bool GetMainFuse() => connected;
+
         private void UpdateChildren()
         {
             foreach (var e in devices)

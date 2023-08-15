@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FR8.Train.Splines;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.UI;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -29,6 +30,7 @@ namespace FR8.Train.Track
 
         private float totalLength;
 
+        private Dictionary<TrainCarriage, Vector3> trainMetadata = new();
         private List<Vector3> points;
 
         public Connection StartConnection => startConnection;
@@ -59,17 +61,20 @@ namespace FR8.Train.Track
 
             UpdateConnection(trains, ConnectionType.Start);
             UpdateConnection(trains, ConnectionType.End);
+            UpdateTrainMetadata(trains);
+        }
+
+        private void UpdateTrainMetadata(TrainCarriage[] trains)
+        {
+            foreach (var train in trains)
+            {
+                if (!trainMetadata.ContainsKey(train)) trainMetadata.Add(train, train.Rigidbody.position);
+                else trainMetadata[train] = train.Rigidbody.position;
+            }
         }
 
         private void UpdateConnection(TrainCarriage[] trains, ConnectionType type)
         {
-            bool compare(float v) => type switch
-            {
-                ConnectionType.Start => v < 0.0f,
-                ConnectionType.End => v > 1.0f,
-                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
-            };
-
             var connection = type switch
             {
                 ConnectionType.Start => startConnection,
@@ -77,15 +82,24 @@ namespace FR8.Train.Track
                 _ => throw new ArgumentOutOfRangeException()
             };
 
+            var other = connection.segment;
+
             if (!connection) return;
             if (connection.connectionActive)
             {
                 foreach (var train in trains)
                 {
-                    if (train.Segment != connection.segment) continue;
+                    if (train.Segment != other) continue;
+                    if (!trainMetadata.ContainsKey(train)) continue;
 
-                    var p = GetClosestPoint(train.Rigidbody.position);
-                    if (!compare(p))
+                    var knotPercent = other.GetKnotPercent(connection.knotIndex);
+
+                    var lastSign = difference(other.GetClosestPoint(trainMetadata[train]), knotPercent, other.closedLoop) > 0.0f;
+                    var d0 = difference(other.GetClosestPoint(train.Rigidbody.position), knotPercent, other.closedLoop);  
+                    var sign = d0 > 0.0f;
+                    var switchSign = connection.handleScale > 0.0f;
+
+                    if (sign == switchSign && lastSign != switchSign)
                     {
                         train.Segment = this;
                     }
@@ -97,10 +111,36 @@ namespace FR8.Train.Track
                 if (train.Segment != this) continue;
 
                 var p = GetClosestPoint(train.Rigidbody.position);
-                if (compare(p))
+                switch (type)
                 {
-                    train.Segment = connection.segment;
+                    case ConnectionType.Start:
+                    {
+                        if (p < 0.0f)
+                        {
+                            train.Segment = connection.segment;
+                        }
+                        break;
+                    }
+                    case ConnectionType.End:
+                    {
+                        if (p > 1.0f)
+                        {
+                            train.Segment = connection.segment;
+                        }
+                        break;
+                    }
+                    default: throw new ArgumentOutOfRangeException(nameof(type), type, null);
                 }
+            }
+
+            float difference(float p0, float p1, bool loop)
+            {
+                var diff = p0 - p1;
+                if (!loop) return diff;
+
+                if (diff > 0.5f) diff -= 1.0f;
+                if (diff < -0.5f) diff += 1.0f;
+                return diff;
             }
         }
 
@@ -131,7 +171,6 @@ namespace FR8.Train.Track
 
         private void OnDrawGizmosSelected()
         {
-#if UNITY_EDITOR
             for (var i = 0; i < KnotCount() - 1; i++)
             {
                 var p0 = Knot(i);
@@ -172,7 +211,6 @@ namespace FR8.Train.Track
                 Gizmos.DrawSphere(Knot(KnotCount() - 2), 0.2f);
                 Gizmos.DrawSphere(Knot(KnotCount() - 3), 0.2f);
             }
-#endif
         }
 
         private void GizmosDrawLine(Vector3 a, Vector3 b, Color color, bool occlude)
@@ -295,7 +333,7 @@ namespace FR8.Train.Track
 
         public float GetKnotPercent(int index)
         {
-            return (index - 1.0f) / (KnotCount() - 3.0f);
+            return (index - 1.0f) / (KnotCount() - 2.0f);
         }
 
         public int GetKnotIndex(float t)
