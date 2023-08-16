@@ -16,20 +16,26 @@ namespace FR8.Rendering.Passes
 
     public sealed class FogPass : ScriptableRenderPass
     {
+        private bool showFogInSceneView;
+        
         private readonly Shader fogShader = Shader.Find("Hidden/Fog");
         private readonly Material fogMaterial;
         
         private static readonly int Value = Shader.PropertyToID("_Value");
         private static readonly int Color = Shader.PropertyToID("_Color");
 
-        public FogPass(bool renderOverSkybox)
+        public FogPass(bool renderOverSkybox, bool showFogInSceneView)
         {
             fogMaterial = CoreUtils.CreateEngineMaterial(fogShader);
-            this.renderPassEvent = renderOverSkybox ? RenderPassEvent.AfterRenderingSkybox : RenderPassEvent.BeforeRenderingSkybox;
+            renderPassEvent = renderOverSkybox ? RenderPassEvent.AfterRenderingSkybox : RenderPassEvent.BeforeRenderingSkybox;
+            
+            this.showFogInSceneView = showFogInSceneView;
         }
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
+            if (renderingData.cameraData.isSceneViewCamera && !showFogInSceneView) return;
+            
             var stack = VolumeManager.instance.stack;
             var effect = stack.GetComponent<Fog>();
             if (!effect.IsActive()) return;

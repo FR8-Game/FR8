@@ -2568,7 +2568,6 @@ GameObject:
   - component: {fileID: 4044833910008329776}
   - component: {fileID: 1120825213929339285}
   - component: {fileID: 2911876080524578143}
-  - component: {fileID: 4707943645208690539}
   m_Layer: 0
   m_Name: Control Pannel Light
   m_TagString: Untagged
@@ -2643,55 +2642,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &4707943645208690539
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3704760097796287626}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b00a66c668671fa429e39507ea842827, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  state: 0
-  color: {r: 1, g: 0.14693816, b: 0, a: 1}
-  lightIntensity: 20
-  materialIntensity: 2
-  warmUpTime: 0.5
-  cooldownTime: 15
-  smoothingCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  renderer: {fileID: 0}
-  materialIndex: 1
-  materialEmissionPropertyName: _EmissionColor
-  key: 
-  fuseGroup: Lights
-  powerDrawWatts: 40
-  threshold: 0.5
 --- !u!1 &3858861403563888017
 GameObject:
   m_ObjectHideFlags: 0
@@ -5220,7 +5170,7 @@ MonoBehaviour:
   state: 0
   color: {r: 0, g: 1, b: 0.003575325, a: 1}
   lightIntensity: 20
-  materialIntensity: 2
+  materialIntensity: 15
   warmUpTime: 0.5
   cooldownTime: 1
   smoothingCurve:
@@ -5248,12 +5198,12 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   renderer: {fileID: 2911876080524578143}
-  materialIndex: 1
+  materialIndex: 2
   materialEmissionPropertyName: _EmissionColor
-  key: 
+  key: RPM
   fuseGroup: Lights
   powerDrawWatts: 40
-  threshold: 0.5
+  threshold: 800
 --- !u!1 &6881576634660925474
 GameObject:
   m_ObjectHideFlags: 0

@@ -52,9 +52,9 @@ namespace FR8.Level
         {
             var player = other.transform.GetComponentInParent<PlayerAvatar>();
             if (!player) return;
-            if (player.Ladder) return;
+            if (player.groundedMovement.Ladder) return;
 
-            player.SetLadder(this);
+            player.groundedMovement.SetLadder(this);
         }
     }
 }
