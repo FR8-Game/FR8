@@ -41,7 +41,7 @@ Shader "Unlit/Clouds"
         {
             HLSLPROGRAM
 
-            const static int Resolution = 100;
+            const static int Resolution = 30;
             
             #pragma vertex vert
             #pragma fragment frag
@@ -137,40 +137,38 @@ Shader "Unlit/Clouds"
 
                 float majorNoise = SAMPLE_TEXTURE2D(_Noise, sampler_Noise, getUV(start) * 0.1);
 
-                float3 scenePos = worldPositionFromDepth(input.screenPos);
-
                 float2 density = 0.0;
                 for (int i = 0; i < Resolution; i++)
                 {
                     float p = i / (Resolution - 1.0);
 
                     float3 worldPos = start + offset * (1.0 - p);
-
                     float2 uv = getUV(worldPos);
 
                     float sample = sampleNoise(uv);
                     float shading = sampleNoise(getUV(worldPos + float3(_ShadingDirection.x, 0.0, _ShadingDirection.y)));
 
                     float depth = 1.0 - sqr(2.0f * p - 1.0);
-                    depth = depth * depth * depth * depth;
+                    depth = pow(depth, 12.0);
                     sample *= depth;
                     sample -= 1.0 - _CloudSize;
                     sample /= _CloudSize;
                     sample = max(sample, 0.0);
 
                     float layer = sample * _CloudDensity;
-                    density.x = lerp(density.x, layer, layer / Resolution);
-                    density.y = lerp(density.y, shading, layer / Resolution);
+                    density.x = lerp(density.x, layer, saturate(layer / Resolution));
+                    density.y = lerp(density.y, shading, saturate(layer / Resolution));
                 }
 
                 float alpha = density.x * majorNoise;
                 alpha = 1.0 - exp(-alpha);
 
                 float3 lightColor = GetMainLight().color.rgb;
+                
                 float shading = exp(_ShadingContrast * -density.y) * _ShadingStrength + (1.0 - _ShadingStrength);
                 float4 baseColor = lerp(_ColorLow, _ColorHigh, saturate(shading));
 
-                return float4(baseColor.rgb * lightColor * saturate(shading), baseColor.a * alpha);
+                return float4(baseColor.rgb * lightColor * saturate(shading), saturate(baseColor.a * alpha));
             }
             ENDHLSL
         }
