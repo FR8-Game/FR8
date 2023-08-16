@@ -41,6 +41,8 @@ namespace FR8.Train
                 var point = transform.InverseTransformPoint(p.transform.position);
                 if (cockpitBounds.Contains(point)) return;
             }
+
+            if (!trainElectrics.GetMainFuse()) return;
             
             trainElectrics.SetMainFuse(false);
             trainDrivers.SetValue("Brake", 1.0f);

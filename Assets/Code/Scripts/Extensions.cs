@@ -97,6 +97,8 @@ namespace FR8
 
         public static void OneShot(this EventReference eventReference, GameObject gameObject)
         {
+            if (eventReference.IsNull) return;
+            
             var fmodEvent = RuntimeManager.CreateInstance(eventReference);
             fmodEvent.set3DAttributes(gameObject.To3DAttributes());
             fmodEvent.start();
