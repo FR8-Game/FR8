@@ -7,6 +7,7 @@ namespace FR8.Rendering
     public sealed class CustomRenderFeatures : ScriptableRendererFeature
     {
         [SerializeField] private bool renderFog = true;
+        [SerializeField] private bool showFogInSceneView = false;
         [SerializeField] private bool renderOutline = true;
         [SerializeField] private bool volumetrics = true;
 
@@ -19,7 +20,7 @@ namespace FR8.Rendering
 
         public override void Create()
         {
-            fogPass = new FogPass(renderFogOverSkybox);
+            fogPass = new FogPass(renderFogOverSkybox, showFogInSceneView);
             outlinePass = new SelectionOutlinePass();
             volumetricPass = new LightVolumetricPass();
         }
