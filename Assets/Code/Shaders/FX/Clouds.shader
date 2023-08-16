@@ -9,7 +9,8 @@ Shader "Unlit/Clouds"
         [MainColor]
         _ColorHigh("Cloud Color", Color) = (1.0, 1.0, 1.0, 1.0)
         _ColorLow("Cloud Color", Color) = (0.2, 0.2, 0.2, 1.0)
-        
+
+        _CloudHeight("Cloud Height", float) = 20.0
         _CloudDepth("Cloud Depth", float) = 20.0
         _CloudDensity("Cloud Density", float) = 2.0
         _CloudSize("Cloud Size", Range(0.0, 1.0)) = 1.0
@@ -39,12 +40,16 @@ Shader "Unlit/Clouds"
         Pass
         {
             HLSLPROGRAM
+
+            const static int Resolution = 100;
+            
             #pragma vertex vert
             #pragma fragment frag
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/core.hlsl"
             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/RealtimeLights.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
 
             //#define DEBUG;
 
@@ -55,16 +60,33 @@ Shader "Unlit/Clouds"
 
             struct Varyings
             {
-                float3 worldPosition : VAR_WORLDPOS;
+                float3 normal : VAR_WORLDPOS;
                 float4 vertex : SV_POSITION;
+                float4 screenPos : VAR_SCREENPOS;
 
                 #ifdef DEBUG
                 float debug : VAR_DEBUG;
                 #endif
             };
 
+            TEXTURE2D(_MainTex);
+            SAMPLER(sampler_MainTex);
+            TEXTURE2D(_Noise);
+            SAMPLER(sampler_Noise);
+            float _NoiseInfluence;
+            float _NoiseScale;
+            float2 _ScrollSpeed;
             float _CloudDepth;
             float _GeometrySize;
+            float4 _ColorLow;
+            float4 _ColorHigh;
+            float _CloudHeight;
+            float _CloudDensity;
+            float _CloudSize;
+            float _ShadingContrast;
+            float _ShadingStrength;
+            float2 _ShadingDirection;
+            float _TextureScale;
 
             float sqr(float v) { return v * v; }
 
@@ -72,33 +94,13 @@ Shader "Unlit/Clouds"
             {
                 Varyings output;
 
-                float3 worldOffset;
-                worldOffset.xz = _WorldSpaceCameraPos.xz;
-                worldOffset.y = TransformObjectToWorld(0.0).y;
-
-                float3 vertex = input.vertex.xyz / 10.0;
-                vertex.x *= -1.0;
-                vertex.xz *= _GeometrySize;
-
-                float heightScale = 1.0 - length(input.vertex.xz / 10.0) * 2.0;
-                output.worldPosition = worldOffset + vertex;
-                
-                worldOffset.y *= heightScale;
-                output.vertex = TransformWorldToHClip(worldOffset + vertex);
+                float3 vertex = input.vertex.xyz * _GeometrySize + _WorldSpaceCameraPos;
+                output.vertex = TransformWorldToHClip(vertex);
+                output.normal = input.vertex;
+                output.screenPos = ComputeScreenPos(output.vertex);
 
                 return output;
             }
-
-            TEXTURE2D(_MainTex);
-            SAMPLER(sampler_MainTex);
-
-            TEXTURE2D(_Noise);
-            SAMPLER(sampler_Noise);
-
-            float _NoiseInfluence;
-            float _NoiseScale;
-
-            float2 _ScrollSpeed;
 
             float sampleNoise(float2 uv)
             {
@@ -107,20 +109,21 @@ Shader "Unlit/Clouds"
                 return (sample + noise * _NoiseInfluence) / (1.0 + _NoiseInfluence);
             }
 
-            float _TextureScale;
 
             float2 getUV(float3 worldPosition) { return worldPosition.xz / _TextureScale * 0.01; }
 
-            float4 _ColorLow;
-            float4 _ColorHigh;
-            float _CloudDensity;
-            float _CloudSize;
+            float3 worldPositionFromDepth(float4 screenPos)
+            {
+                float2 uv = screenPos.xy / screenPos.w;
+                #if UNITY_REVERSED_Z
+                real depth = SampleSceneDepth(uv);
+                #else
+                // Adjust z to match NDC for OpenGL
+                real depth = lerp(UNITY_NEAR_CLIP_VALUE, 1, SampleSceneDepth(UV));
+                #endif
 
-            float _ShadingContrast;
-            float _ShadingStrength;
-            float2 _ShadingDirection;
-
-            const static int Resolution = 100;
+                return ComputeWorldSpacePosition(uv, depth, UNITY_MATRIX_I_VP);
+            }
 
             half4 frag(Varyings input) : SV_Target
             {
@@ -128,9 +131,13 @@ Shader "Unlit/Clouds"
                 return float4(input.debug.xxx, 1.0);
                 #endif
 
-                float3 start = input.worldPosition;
-                float3 offset = normalize(_WorldSpaceCameraPos - start);
-                offset *= _CloudDepth / offset.y;
+                float3 normal = normalize(input.normal);
+                float3 start = normal * _CloudHeight / normal.y;
+                float3 offset = normal * _CloudDepth / normal.y;
+
+                float majorNoise = SAMPLE_TEXTURE2D(_Noise, sampler_Noise, getUV(start) * 0.1);
+
+                float3 scenePos = worldPositionFromDepth(input.screenPos);
 
                 float2 density = 0.0;
                 for (int i = 0; i < Resolution; i++)
@@ -138,6 +145,7 @@ Shader "Unlit/Clouds"
                     float p = i / (Resolution - 1.0);
 
                     float3 worldPos = start + offset * (1.0 - p);
+
                     float2 uv = getUV(worldPos);
 
                     float sample = sampleNoise(uv);
@@ -155,13 +163,13 @@ Shader "Unlit/Clouds"
                     density.y = lerp(density.y, shading, layer / Resolution);
                 }
 
-                float alpha = density.x;
+                float alpha = density.x * majorNoise;
                 alpha = 1.0 - exp(-alpha);
 
                 float3 lightColor = GetMainLight().color.rgb;
                 float shading = exp(_ShadingContrast * -density.y) * _ShadingStrength + (1.0 - _ShadingStrength);
                 float4 baseColor = lerp(_ColorLow, _ColorHigh, saturate(shading));
-                
+
                 return float4(baseColor.rgb * lightColor * saturate(shading), baseColor.a * alpha);
             }
             ENDHLSL
