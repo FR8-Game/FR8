@@ -42,6 +42,10 @@ namespace FR8.Rendering.Passes
             if (!whiteMaterial) whiteMaterial = new Material(Shader.Find("Unlit/OutlineObject"));
             if (!blackMaterial) blackMaterial = new Material(Shader.Find("Unlit/OutlineObject"));
             if (!blitMaterial) blitMaterial = new Material(Shader.Find("Hidden/OutlineBlit"));
+
+            Persistant.RemoveAll(e => !e);
+            Persistant.RemoveAll(e => e.CompareTag("Do Not Outline"));
+            ThisFrame.RemoveAll(e => e.CompareTag("Do Not Outline"));
         }
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
@@ -59,8 +63,15 @@ namespace FR8.Rendering.Passes
             cmd.SetRenderTarget(OutlineTarget);
             cmd.ClearRenderTarget(true, true, Color.clear);
 
-            foreach (var r in ThisFrame) cmd.DrawRenderer(r, whiteMaterial, 0, 0);
-            foreach (var r in Persistant) cmd.DrawRenderer(r, whiteMaterial, 0, 0);
+            foreach (var r in ThisFrame)
+            {
+                DrawRenderer(cmd, r);
+            }
+
+            foreach (var r in Persistant)
+            {
+                DrawRenderer(cmd, r);
+            }
             
             cmd.SetRenderTarget(renderingData.cameraData.renderer.cameraColorTarget);
             cmd.DrawProcedural(Matrix4x4.identity, blitMaterial, 0, MeshTopology.Triangles, 3);
@@ -72,6 +83,14 @@ namespace FR8.Rendering.Passes
             ThisFrame.Clear();
         }
 
+        private void DrawRenderer(CommandBuffer cmd, Renderer renderer)
+        {
+            for (var i = 0; i < renderer.sharedMaterials.Length; i++)
+            {
+                cmd.DrawRenderer(renderer, whiteMaterial, i, 0);
+            }
+        }
+        
         public override void OnCameraCleanup(CommandBuffer cmd)
         {
             base.OnCameraCleanup(cmd);

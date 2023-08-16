@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using FR8.Interactions.Drivables;
 using FR8.Interactions.Drivers;
@@ -9,6 +10,7 @@ namespace FR8.Train.Electrics
     [DisallowMultipleComponent]
     public sealed class TrainElectricsController : MonoBehaviour, IDrivable
     {
+        [SerializeField] private float baselineGeneration = 5.0f;
         [SerializeField] private bool connected = true;
 
         private DriverNetwork driverNetwork;
@@ -20,10 +22,12 @@ namespace FR8.Train.Electrics
 
         public string Key => MainFuseGroup;
         public Dictionary<string, bool> FuseGroups = new();
-        
+
         public float PowerDraw { get; private set; }
         public float Capacity { get; private set; }
         public float Saturation { get; private set; }
+
+        public event Action FuseBlown;
 
         private void Awake()
         {
@@ -35,22 +39,24 @@ namespace FR8.Train.Electrics
             foreach (var e in generators) e.SetClockSpeed(0.0f);
             foreach (var e in devices) e.SetConnected(true);
 
-            SetConnected(connected);
+            connected = !connected;
+            SetConnected(!connected);
         }
 
         public void OnValueChanged(float newValue)
         {
-            connected = newValue > 0.5f;
+            SetConnected(newValue > 0.5f);
         }
 
         private void FixedUpdate()
         {
             UpdateChildren();
-            
+
             var saturation = 0.0f;
+            var clockSpeed = 0.0f;
             var draw = 0.0f;
 
-            var capacity = 0.0f;
+            var capacity = baselineGeneration;
             foreach (var e in generators) capacity += e.MaximumPowerGeneration;
 
             if (connected)
@@ -62,15 +68,18 @@ namespace FR8.Train.Electrics
                 }
 
                 saturation = draw / capacity;
+                clockSpeed = draw / (capacity - baselineGeneration);
             }
 
             if (saturation > 1.01f)
             {
                 saturation = 0.0f;
-                SetConnected(false);
+                clockSpeed = 0.0f;
+                SetMainFuse(false);
+                FuseBlown?.Invoke();
             }
 
-            foreach (var e in generators) e.SetClockSpeed(saturation);
+            foreach (var e in generators) e.SetClockSpeed(clockSpeed);
 
             PowerDraw = draw;
             Capacity = capacity;
@@ -79,11 +88,26 @@ namespace FR8.Train.Electrics
             driverNetwork.SetValue(SaturationKey, saturation * 100.0f);
         }
 
-        public void ResetFuze() => SetConnected(true);
+        public void ResetFuze() => SetMainFuse(true);
 
-        private void SetConnected(bool connected)
+        public void SetConnected(bool connected)
+        {
+            if (this.connected == connected) return;
+
+            this.connected = connected;
+            foreach (var e in generators)
+            {
+                e.ChangedFuseState(connected);
+            }
+        }
+
+        public void SetMainFuse(bool connected)
         {
             driverNetwork.SetValue(Key, connected ? 1.0f : 0.0f);
+            foreach (var e in generators)
+            {
+                e.ChangedFuseState(connected);
+            }
         }
 
         private void UpdateChildren()
@@ -99,18 +123,18 @@ namespace FR8.Train.Electrics
         public void SetFuse(string fuseName, bool state)
         {
             fuseName = Simplify(fuseName);
-            
+
             if (FuseGroups.ContainsKey(fuseName)) FuseGroups[fuseName] = state;
             else FuseGroups.Add(fuseName, state);
         }
-        
+
         public bool GetFuse(string fuseName)
         {
             fuseName = Simplify(fuseName);
-            
+
             if (!connected) return false;
             if (string.IsNullOrEmpty(fuseName)) return true;
-            
+
             return FuseGroups.ContainsKey(fuseName) && FuseGroups[fuseName];
         }
     }

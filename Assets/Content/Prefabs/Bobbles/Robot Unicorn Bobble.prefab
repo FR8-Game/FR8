@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6905182064482775545}
-  - component: {fileID: 7118173184555173190}
+  - component: {fileID: 6590507382149107529}
   m_Layer: 0
   m_Name: COM
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Father: {fileID: 8014949602851487600}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7118173184555173190
+--- !u!114 &6590507382149107529
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -109,11 +109,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayName: Evil Robot Unicorn Bobble
   pickupPose: {fileID: 11400000, guid: 924f2f6e4eea6bd4585e4a0540a2f97c, type: 2}
-  additionalTranslation: {x: 0, y: 0, z: 0}
+  additionalTranslation: {x: 0, y: -0.04, z: 0}
   additionalRotation: {x: 0, y: 0, z: 0}
   spring: 300
   damping: 18
-  error: 1800
   torqueScaling: 1
 --- !u!1001 &8014949601342121786
 PrefabInstance:

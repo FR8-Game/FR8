@@ -1,5 +1,4 @@
-﻿using FR8.Utility;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace FR8.Interactions.Drivables
 {
@@ -13,7 +12,7 @@ namespace FR8.Interactions.Drivables
 
         [Header("HANDLE SETTINGS")]
         [Space]
-        [SerializeField] private DampedSpring animationSpring;
+        [SerializeField] private Utility.DampedSpring animationSpring;
         
         [Header("POSE PARAMETERS")]
         [Space]

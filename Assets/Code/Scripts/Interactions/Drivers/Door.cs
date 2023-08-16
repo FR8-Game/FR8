@@ -16,7 +16,10 @@ namespace FR8.Interactions.Drivers
         public virtual bool CanInteract => true;
         public string DisplayName => "Door";
         public virtual string DisplayValue => state ? "Open" : "Closed";
-
+        
+        public bool OverrideInteractDistance => false;
+        public float InteractDistance => throw new System.NotImplementedException();
+        
         protected virtual void Awake()
         {
             SetValue(testValue ? 1.0f : 0.0f);
@@ -35,12 +38,12 @@ namespace FR8.Interactions.Drivers
             SetValue(direction);
         }
 
-        public void BeginDrag(Ray ray)
+        public void BeginInteract(GameObject interactingObject)
         {
             SetValue(state ? 0.0f : 1.0f);
         }
 
-        public void ContinueDrag(Ray ray)
+        public void ContinueInteract(GameObject interactingObject)
         {
         }
 
