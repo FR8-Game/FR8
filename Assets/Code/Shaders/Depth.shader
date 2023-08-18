@@ -34,7 +34,7 @@
 			
 			half4 frag (Varyings input) : SV_Target
 			{
-				return input.height;
+				return input.height / unity_OrthoParams.y;
 			}
 			ENDHLSL
 		}
