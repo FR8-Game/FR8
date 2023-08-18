@@ -20,8 +20,10 @@
 			HLSLPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-			
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/core.hlsl"
+
+			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
+			#include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariables.hlsl"
+			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/SpaceTransforms.hlsl"
 
 			struct Attributes
 			{
@@ -34,7 +36,7 @@
 				float height : VAR_HEIGHT;
 			};
 			
-			TEXTURE2D_X(_MainTex);
+			TEXTURE2D(_MainTex);
 			SAMPLER(sampler_MainTex);
 
 			float _HeightScale;
