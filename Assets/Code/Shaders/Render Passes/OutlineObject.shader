@@ -14,7 +14,7 @@ Shader "Unlit/OutlineObject"
             #pragma vertex vert
             #pragma fragment frag
 
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
             sampler2D _MainTex;
             float4 _MainTex_ST;

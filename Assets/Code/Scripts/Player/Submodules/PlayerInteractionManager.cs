@@ -21,6 +21,7 @@ namespace FR8.Player.Submodules
         private bool dragging;
 
         private IInteractable lookingAt;
+        private GameObject outline;
 
         public PickupObject HeldObject { get; private set; }
         public PlayerAvatar Avatar { get; private set; }
@@ -31,23 +32,19 @@ namespace FR8.Player.Submodules
 
             avatar.UpdateEvent += Update;
             avatar.FixedUpdateEvent += FixedUpdate;
-            avatar.DisabledEvent += OnDisable;
         }
 
         public void Update()
         {
-            if (Avatar.input.Press) { }
+            if (outline) SelectionOutlinePass.Add(outline);
 
             if (Avatar.input.Nudge != 0) nudge = Avatar.input.Nudge;
         }
 
-        public void OnDisable()
-        {
-            if ((Object)lookingAt) SelectionOutlinePass.RemovePersistant(lookingAt.gameObject);
-        }
-
         public void FixedUpdate()
         {
+            outline = null;
+            
             var ray = GetLookingRay();
             var newLookingAt = dragging ? lookingAt : GetLookingAt();
             if (HeldObject && !(Object)newLookingAt) newLookingAt = HeldObject;
@@ -56,10 +53,11 @@ namespace FR8.Player.Submodules
             {
                 transition.currentPosition = 0.0f;
                 transition.velocity = 0.0f;
-
-                if ((Object)lookingAt) SelectionOutlinePass.RemovePersistant(lookingAt.gameObject);
-                if ((Object)newLookingAt) SelectionOutlinePass.RenderPersistant(newLookingAt.gameObject);
             }
+            
+            
+            //if ((Object)lookingAt) SelectionOutlinePass.Add(lookingAt.gameObject);
+            if ((Object)lookingAt) outline = lookingAt.gameObject;
 
             lookingAt = newLookingAt;
             transition.Target(lookingAt != null ? 1.0f : 0.0f).Iterate(Time.deltaTime);

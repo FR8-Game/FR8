@@ -13,11 +13,25 @@ MonoBehaviour:
   m_Name: CustomRenderFeatures
   m_EditorClassIdentifier: 
   m_Active: 1
-  renderFog: 1
-  showFogInSceneView: 0
-  renderOutline: 1
-  volumetrics: 0
-  renderFogOverSkybox: 0
+  fogSettings:
+    enabled: 1
+    color: {r: 0.2924528, g: 0.09204782, b: 0.017933436, a: 1}
+    density: 0.555
+    heightFalloffLower: 0
+    heightFalloffUpper: 60
+    renderOverSkybox: 1
+    showFogInSceneView: 1
+  outlineSettings:
+    enabled: 1
+  volumetricsSettings:
+    enabled: 0
+  mapMarkerSettings:
+    enabled: 1
+    markerScale: 1
+  cloudSettings:
+    enabled: 1
+    domeMesh: {fileID: -4592596678803082537, guid: 9cb18f9e22591424c9809955e55f95a2, type: 3}
+    material: {fileID: 2100000, guid: 59a68a055ac19404391c8ef8a5d50618, type: 2}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -54,10 +68,10 @@ MonoBehaviour:
   m_AssetVersion: 2
   m_OpaqueLayerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1463
   m_TransparentLayerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1463
   m_DefaultStencilState:
     overrideStencilState: 0
     stencilReference: 0

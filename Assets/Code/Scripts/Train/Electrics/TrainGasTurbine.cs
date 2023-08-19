@@ -7,15 +7,15 @@ namespace FR8.Train.Electrics
     [DisallowMultipleComponent]
     public sealed class TrainGasTurbine : MonoBehaviour, IElectricGenerator
     {
-        [SerializeField] private float idleRpm = 1000.0f;
-        [SerializeField] private float maxRpm = 10000.0f;
-        [SerializeField] private float stallRpm = 700.0f;
+        public float idleRpm = 1000.0f;
+        public float maxRpm = 10000.0f;
+        public float stallRpm = 700.0f;
         
         [Space]
-        [SerializeField] private float maxPowerProduction = 200.0f;
+        public float maxPowerProduction = 200.0f;
         
         [Space]
-        [SerializeField] private float fuelCapacity = 20.0f;
+        public float fuelCapacity = 20.0f;
         [SerializeField] [Range(0.0f, 1.0f)] private float fuelLevel = 1.0f;
 
         [Space]
@@ -34,6 +34,7 @@ namespace FR8.Train.Electrics
         private bool fuse;
 
         public bool Running => fuelLevel > 0.0f && currentRpm > stallRpm;
+        public float CurrentRpm => currentRpm;
         public float MaximumPowerGeneration => Running ? maxPowerProduction : 0.0f;
         public float FuelLevel => fuelLevel;
 

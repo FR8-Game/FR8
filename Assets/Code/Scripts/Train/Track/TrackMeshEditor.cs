@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using FR8.Rendering;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -160,6 +161,8 @@ namespace FR8.Train.Track
             var filter = new GameObject().AddComponent<MeshFilter>();
             var renderer = filter.gameObject.AddComponent<MeshRenderer>();
             var collider = filter.gameObject.AddComponent<MeshCollider>();
+            var marker = filter.gameObject.AddComponent<MapMarker>();
+            marker.MarkerColor = Color.green;
 
             renderer.sharedMaterials = new[] { material };
 

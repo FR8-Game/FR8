@@ -1,4 +1,5 @@
 using System;
+using FR8.UI.Loading;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -33,7 +34,9 @@ namespace FR8.UI
 
         public UnityAction LoadScene(string sceneName)
         {
-            return () => SceneManager.LoadScene(sceneName);
+            var loadScreen = FindObjectOfType<LoadScreen>();
+            
+            return () => loadScreen.LoadScene(sceneName);
         }
 
         public void Quit()

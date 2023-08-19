@@ -11,16 +11,18 @@
 			#pragma vertex vert
 			#pragma fragment frag
 			
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/core.hlsl"
+			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
 			struct Attributes
 			{
 				float4 vertex : POSITION;
+				float4 normal : NORMAL;
 			};
 
 			struct Varyings
 			{
 				float4 vertex : SV_POSITION;
+				float3 normal : NORMAL;
 				float height : VAR_HEIGHT;
 			};
 
@@ -29,12 +31,15 @@
 				Varyings output;
 				output.vertex = TransformObjectToHClip(input.vertex.xyz);
 				output.height = TransformObjectToWorld(input.vertex.xyz).y;
+				output.normal = TransformObjectToWorldNormal(input.normal.xyz);
 				return output;
 			}
 			
-			half4 frag (Varyings input) : SV_Target
+			float4 frag (Varyings input) : SV_Target
 			{
-				return input.height / unity_OrthoParams.y;
+				float3 normal = normalize(input.normal);
+				float heightScale = 1.0 / unity_OrthoParams.y;
+				return float4(input.height * heightScale, normal.xz * 0.5 + 0.5, 1.0);
 			}
 			ENDHLSL
 		}

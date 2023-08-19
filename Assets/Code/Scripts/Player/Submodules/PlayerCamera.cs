@@ -7,7 +7,7 @@ namespace FR8.Player.Submodules
     [Serializable]
     public class PlayerCamera
     {
-        private const float GimbalLockOffset = 0.1f;
+        private const float GimbalLockOffset = 1.0f;
         private const float YawRange = 180.0f - GimbalLockOffset;
 
         [SerializeField] private float fieldOfView = 70.0f;
