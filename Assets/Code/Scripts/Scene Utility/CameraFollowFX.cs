@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FR8
+namespace FR8.FX
 {
     [ExecuteAlways]
     [SelectionBase, DisallowMultipleComponent]

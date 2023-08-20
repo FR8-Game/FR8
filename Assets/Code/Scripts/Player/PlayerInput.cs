@@ -52,19 +52,31 @@ namespace FR8.Player
 
         public Vector2 GetLookFrameDelta(bool forceMouseDelta)
         {
-            var fovSensitivity = Mathf.Tan(mainCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
-            
+            var fovSensitivity = GetFovSensitivity();
             var delta = Vector2.zero;
-
-            delta += (lookAction.action?.ReadValue<Vector2>() * controllerSensitivity * Time.deltaTime ?? Vector2.zero);
-            var mouse = Mouse.current;
-            if (mouse != null && (Cursor.lockState == CursorLockMode.Locked || forceMouseDelta))
-            {
-                delta += mouse.delta.ReadValue() * mouseSensitivity;
-            }
+            
+            delta += GetAdditiveLookInput();
+            delta += GetMouseLookInput(forceMouseDelta);
 
             return delta * fovSensitivity;
         }
+
+        private Vector2 GetMouseLookInput(bool forceMouseDelta)
+        {
+            var mouse = Mouse.current;
+            if (mouse != null && (Cursor.lockState == CursorLockMode.Locked || forceMouseDelta))
+            {
+                return mouse.delta.ReadValue() * mouseSensitivity;
+            }
+            return Vector2.zero;
+        }
+
+        private Vector2 GetAdditiveLookInput()
+        {
+            return lookAction.action?.ReadValue<Vector2>() * controllerSensitivity * Time.deltaTime ?? Vector2.zero;
+        }
+
+        private float GetFovSensitivity() => Mathf.Tan(mainCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
 
         public void Init()
         {
@@ -85,6 +97,7 @@ namespace FR8.Player
             zoomCamAction = bind("ZoomCam");
             peeAction = bind("Pee");
             
+            // Set Camera
             mainCamera = Camera.main;
         }
     }
