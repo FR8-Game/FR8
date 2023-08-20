@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace FR8.Player
+namespace FR8.Player.Submodules
 {
     [System.Serializable]
     public class PlayerInput

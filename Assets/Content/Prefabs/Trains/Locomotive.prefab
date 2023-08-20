@@ -2204,7 +2204,6 @@ MonoBehaviour:
         Data3: 1315055039
         Data4: 1935609873
       Path: event:/Interactions/Control Stick Click
-  fuseGroup: Headlights
   indicator:
     handle: {fileID: 4676308515946671086}
     valueRange: {x: 0, y: 1}
@@ -2495,7 +2494,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baselineGeneration: 1
-  connected: 0
 --- !u!114 &273895400744375868
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3007,7 +3005,6 @@ MonoBehaviour:
         Data3: 1315055039
         Data4: 1935609873
       Path: event:/Interactions/Control Stick Click
-  fuseGroup: Lights
   indicator:
     handle: {fileID: 6341069709492901156}
     valueRange: {x: 0, y: 1}
@@ -3365,7 +3362,6 @@ MonoBehaviour:
         Data3: 1315055039
         Data4: 1935609873
       Path: event:/Interactions/Control Stick Click
-  fuseGroup: Dash
   indicator:
     handle: {fileID: 2855266551019710477}
     valueRange: {x: 0, y: 1}
@@ -5382,7 +5378,6 @@ MonoBehaviour:
   renderer: {fileID: 2911876080524578143}
   materialIndex: 2
   materialEmissionPropertyName: _EmissionColor
-  key: RPM
   fuseGroup: Lights
   powerDrawWatts: 40
   threshold: 800
@@ -6784,8 +6779,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39bd86096eec427ab1095ca10a9fa1b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  key: mainFuze
-  displayName: Main Fuze
+  key: mainFuse
+  displayName: Main Fuse
   defaultValue: 0
   testValue: 0
   animator:
@@ -6814,7 +6809,6 @@ MonoBehaviour:
         Data3: 1315055039
         Data4: 1935609873
       Path: event:/Interactions/Control Stick Click
-  fuseGroup: 
   indicator:
     handle: {fileID: 1263966371722626564}
     valueRange: {x: 0, y: 1}

@@ -23,7 +23,7 @@ namespace FR8
             Handles.matrix = matrix;
             Handles.zTest = CompareFunction.Less;
             
-            Handles.DrawAAPolyLine(1.0f, a, b);
+            Handles.DrawAAPolyLine(2.0f, a, b);
 
             Handles.color = pColor;
             Handles.matrix = pMatrix;

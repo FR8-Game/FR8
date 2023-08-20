@@ -34,7 +34,7 @@ namespace FR8.Rendering.Passes
             {
                 x = Mathf.Pow(settings.density, 10.0f),
                 y = settings.heightFalloffLower,
-                z = settings.heightFalloffUpper,
+                z = settings.heightFalloffUpper
             };
 
             cmd.SetGlobalColor(FogColor, fogColor);

@@ -22,12 +22,10 @@ namespace FR8.Train.Engine
         private DriverNetwork driverNetwork;
         private Locomotive locomotive;
 
-        private bool connected;
         private float powerDraw;
         private float throttleActual;
 
-        public float ThrottleInput => driverNetwork.Read(ThrottleKey);
-        public string FuseGroup => null;
+        public float ThrottleInput => driverNetwork.GetValue(ThrottleKey);
 
         private void Awake()
         {
@@ -49,26 +47,34 @@ namespace FR8.Train.Engine
 
             var fwdSpeed = locomotive.GetForwardSpeed();
             var oldPowerDraw = powerDraw;
+            var connected = driverNetwork.GetValue(TrainElectricsController.MainFuse) > 0.5f;
             
             if (connected)
             {
-                var maxSpeed = maxSpeedKmpH / 3.6f;
-                var acceleration = (maxSpeed - Mathf.Abs(fwdSpeed)) * this.acceleration * throttleActual * locomotive.Gear;
-
-                locomotive.Rigidbody.AddForce(locomotive.DriverDirection * acceleration * locomotive.ReferenceWeight);
-
-                powerDraw = throttleActual * maxPowerConsumption + Mathf.Abs(Vector3.Dot(locomotive.TangentialForce, transform.right)) * tangentialForceCost;
+                ApplyDriveForce(fwdSpeed);
             }
             else
             {
                 powerDraw = 0.0f;
             }
-            powerDraw = (powerDraw + oldPowerDraw) / 2.0f;
+            
+            UpdatePowerDraw(oldPowerDraw);
+        }
 
+        private void UpdatePowerDraw(float oldPowerDraw)
+        {
+            powerDraw = (powerDraw + oldPowerDraw) / 2.0f;
             driverNetwork.SetValue(PowerDrawKey, powerDraw);
         }
 
-        public void SetConnected(bool connected) => this.connected = connected;
+        private void ApplyDriveForce(float fwdSpeed)
+        {
+            var maxSpeed = maxSpeedKmpH / 3.6f;
+            var acceleration = (maxSpeed - Mathf.Abs(fwdSpeed)) * this.acceleration * throttleActual * locomotive.Gear;
+
+            locomotive.Rigidbody.AddForce(locomotive.DriverDirection * acceleration * locomotive.ReferenceWeight);
+            powerDraw = throttleActual * maxPowerConsumption + Mathf.Abs(Vector3.Dot(locomotive.TangentialForce, transform.right)) * tangentialForceCost;
+        }
 
         public float CalculatePowerDraw() => powerDraw;
     }

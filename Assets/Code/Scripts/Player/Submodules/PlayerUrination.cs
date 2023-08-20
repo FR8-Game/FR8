@@ -19,9 +19,6 @@ namespace FR8.Player.Submodules
 
         private void Update()
         {
-            var input = avatar.input;
-            var cameraController = avatar.cameraController;
-            
             SyncParticleState(avatar.input.Pee);
             AimParticles();
         }

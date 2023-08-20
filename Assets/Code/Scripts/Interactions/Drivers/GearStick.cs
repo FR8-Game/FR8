@@ -83,8 +83,9 @@ namespace FR8.Interactions.Drivers
             animator.Update();
         }
 
-        private void FixedUpdate()
+        protected override void FixedUpdate()
         {
+            base.FixedUpdate();
             animator.FixedUpdate();
         }
 
