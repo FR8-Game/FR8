@@ -14,7 +14,7 @@ namespace FR8.UI
 
         private void Start()
         {
-            makeButton("Play", LoadScene("Harry"));
+            makeButton("Play", LoadScene("Game Scene"));
             makeButton("Quit", Quit);
             
             Destroy(buttonInstance.gameObject);
