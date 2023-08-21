@@ -30,7 +30,7 @@ namespace FR8.Interactions.Drivers
         protected override void FixedUpdate()
         {
             var fwdSpeed = trainMovement.GetForwardSpeed();
-            traveling = Mathf.Abs(fwdSpeed) > TrainMonitor.MaxTrainSafeSpeed;
+            //traveling = Mathf.Abs(fwdSpeed) > TrainMonitor.MaxTrainSafeSpeed;
             if (Locked) SetValue(0.0f);
             
             base.FixedUpdate();

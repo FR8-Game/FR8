@@ -15,6 +15,12 @@ namespace FR8.Sockets
         private new Collider[] collider;
         private ISocketable currentBinding;
 
+        public bool CanInteract => !(Object)currentBinding;
+        public string DisplayName => name;
+        public virtual string DisplayValue => string.Empty;
+        public bool OverrideInteractDistance => false;
+        public float InteractDistance => throw new NotImplementedException();
+        
         protected virtual void Awake()
         {
             collider = GetComponentsInChildren<Collider>();
@@ -47,12 +53,6 @@ namespace FR8.Sockets
             foreach (var e in collider) e.enabled = state;
         }
         
-        public bool CanInteract => !(Object)currentBinding;
-        public string DisplayName => name;
-        public virtual string DisplayValue => string.Empty;
-        public bool OverrideInteractDistance => false;
-        public float InteractDistance => throw new NotImplementedException();
-
         public void Nudge(int direction) { }
 
         public void BeginInteract(GameObject interactingObject)

@@ -1,39 +1,51 @@
+using System;
+using FR8.UI.Loading;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
-namespace FR8
+namespace FR8.UI
 {
     public class MainMenu : MonoBehaviour
     {
-        public GameObject mainMenuCanvas;
-        public GameObject mainMenuCamera;
-        public GameObject settingsCanvas;
-        public GameObject settingsCamera;
+        [SerializeField] private Button buttonInstance;
 
-        #region Main Menu
-        public void Play()
+        private void Start()
         {
-            SceneManager.LoadScene("Depot");
+            makeButton("Play", LoadScene("Harry"));
+            makeButton("Quit", Quit);
+            
+            Destroy(buttonInstance.gameObject);
+            
+            Button makeButton(string name, UnityAction callback)
+            {
+                var instance = Instantiate(buttonInstance, buttonInstance.transform.parent);
+                instance.name = name;
+
+                var text = instance.GetComponentInChildren<TMP_Text>();
+                text.text = name;
+
+                instance.onClick.AddListener(callback);
+                return instance;
+            }
         }
 
-    public void SettingsMain()
+        public UnityAction LoadScene(string sceneName)
         {
-            mainMenuCamera.SetActive(false);
-            mainMenuCanvas.SetActive(false);
-            settingsCanvas.SetActive(true);
-            settingsCamera.SetActive(true);
+            var loadScreen = FindObjectOfType<LoadScreen>();
+            
+            return () => loadScreen.LoadScene(sceneName);
         }
 
-        #endregion
-        #region Settings Menu
-        public void ReturnToMainMenu()
+        public void Quit()
         {
-            mainMenuCamera.SetActive(true);
-            mainMenuCanvas.SetActive(true);
-            settingsCanvas.SetActive(false);
-            settingsCamera.SetActive(false);
+#if !UNITY_EDITOR
+            Application.Quit();
+#else
+            UnityEditor.EditorApplication.isPlaying = false;
+#endif
         }
-
-        #endregion
     }
 }

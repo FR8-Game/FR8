@@ -6,29 +6,34 @@ namespace FR8.Rendering
 {
     public sealed class CustomRenderFeatures : ScriptableRendererFeature
     {
-        [SerializeField] private bool renderFog = true;
-        [SerializeField] private bool renderOutline = true;
-        [SerializeField] private bool volumetrics = true;
+        [SerializeField] private FogPass.Settings fogSettings;
+        [SerializeField] private SelectionOutlinePass.Settings outlineSettings;
+        [SerializeField] private LightVolumetricPass.Settings volumetricsSettings;
+        [SerializeField] private MapMarkerPass.Settings mapMarkerSettings;
+        [SerializeField] private CloudPass.Settings cloudSettings;
 
-        [Space]
-        [SerializeField] private bool renderFogOverSkybox;
-        
         private FogPass fogPass;
         private SelectionOutlinePass outlinePass;
         private LightVolumetricPass volumetricPass;
+        private MapMarkerPass mapMarkersPass;
+        private CloudPass cloudPass;
 
         public override void Create()
         {
-            fogPass = new FogPass(renderFogOverSkybox);
-            outlinePass = new SelectionOutlinePass();
-            volumetricPass = new LightVolumetricPass();
+            fogPass = new FogPass(fogSettings);
+            outlinePass = new SelectionOutlinePass(outlineSettings);
+            volumetricPass = new LightVolumetricPass(volumetricsSettings);
+            mapMarkersPass = new MapMarkerPass(mapMarkerSettings);
+            cloudPass = new CloudPass(cloudSettings);
         }
 
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
-            if (renderFog) renderer.EnqueuePass(fogPass);
-            if (renderOutline) renderer.EnqueuePass(outlinePass);
-            if (volumetrics) renderer.EnqueuePass(volumetricPass);
+            fogPass.Enqueue(renderer);
+            outlinePass.Enqueue(renderer);
+            volumetricPass.Enqueue(renderer);
+            mapMarkersPass.Enqueue(renderer);
+            cloudPass.Enqueue(renderer);
         }
     }
 }
