@@ -3,7 +3,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
-using Image = UnityEngine.UI.Image;
 
 namespace FR8.UI.Loading
 {
@@ -19,7 +18,7 @@ namespace FR8.UI.Loading
 
         private UIDocument document;
         private VisualElement root;
-        private VisualElement fill;
+        private ProgressBar fill;
 
         private bool loadingNewLevel;
         private static bool started;
@@ -51,9 +50,9 @@ namespace FR8.UI.Loading
                 
                 if (loadingNewLevel) yield break;
                 loadingNewLevel = true;
-                
-                fill.style.width = 0.0f;
 
+                SetFill(0.0f);
+               
                 yield return StartCoroutine(Fade(v => v, null));
 
                 var operation = SceneManager.LoadSceneAsync(sceneName);
@@ -79,14 +78,6 @@ namespace FR8.UI.Loading
                 yield return null;
             }
 
-            p = 0.0f;
-            while (p < 2.0f)
-            {
-                SetFill(p < 1.0f ? p : 2.0f - p);
-                p += Time.deltaTime / 10.0f;
-                yield return null;
-            }
-
             root.style.opacity = fadeCurve.Evaluate(remap(1.0f));
             finishedCallback?.Invoke();
         }
@@ -94,14 +85,14 @@ namespace FR8.UI.Loading
         public void SetFill(float percent)
         {
             if (fill == null) return;
-            fill.style.width = percent;
+            fill.value = percent;
         }
         
         public void ShowUI(bool state)
         {
             document.enabled = state;
             root = state ? document.rootVisualElement.Q("LoadingScreen") : null;
-            fill = state ? document.rootVisualElement.Q("Fill") : null;
+            fill = state ? document.rootVisualElement.Q<ProgressBar>("ProgressBar") : null;
         }
     }
 }
