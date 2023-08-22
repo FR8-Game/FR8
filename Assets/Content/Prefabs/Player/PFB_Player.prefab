@@ -162,6 +162,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6066431375291976692}
   - component: {fileID: 6758334141463345623}
+  - component: {fileID: 6340694338387009680}
   m_Layer: 7
   m_Name: PFB_Player
   m_TagString: Untagged
@@ -199,14 +200,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adfce35f66e0f914da764fb9c47eba65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  input:
-    inputMap: {fileID: -944628639613478452, guid: badd88ac4cdc31941ad634977f07e0fd, type: 3}
-    mouseSensitivity: 0.3
-    controllerSensitivity: 0.4
   mass: 4
   playerHeight: 1.7
   radius: 0.2
   stepHeight: 0.4
+  input:
+    inputMap: {fileID: -944628639613478452, guid: badd88ac4cdc31941ad634977f07e0fd, type: 3}
+    mouseSensitivity: 0.3
+    controllerSensitivity: 0.4
   groundedMovement:
     maxGroundedSpeed: 4
     accelerationTime: 0.12
@@ -243,8 +244,8 @@ MonoBehaviour:
       currentPosition: 0
       targetPosition: 0
       velocity: 0
-  cameraOffset: {x: 0, y: 1.6, z: 0}
   cameraController:
+    cameraOffset: {x: 0, y: 1.6, z: 0}
     fieldOfView: 80
     zoomFieldOfView: 20
     fovSmoothTime: 0.08
@@ -254,6 +255,20 @@ MonoBehaviour:
       amplitude: {x: 0.3, y: 0, z: 0.5}
       frequency: 2.4
       slope: 0.2
+--- !u!114 &6340694338387009680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6066431375291976688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69c1252c8b7dad74fb3dfcf60bc9c795, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  overlay: {r: 1, g: 1, b: 1, a: 0}
+  sidebar: {r: 1, g: 0.3254902, b: 0, a: 1}
 --- !u!1 &6125957971899221248
 GameObject:
   m_ObjectHideFlags: 0
