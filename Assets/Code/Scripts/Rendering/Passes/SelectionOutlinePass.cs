@@ -4,12 +4,10 @@ using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace FR8.Rendering.Passes
+namespace FR8Runtime.Rendering.Passes
 {
-    public sealed class SelectionOutlinePass : CustomRenderPass
+    public sealed class SelectionOutlinePass : CustomRenderPass<SelectionOutlineSettings>
     {
-        public Settings settings;
-
         private Material whiteMaterial;
         private Material blackMaterial;
         private Material blitMaterial;
@@ -17,12 +15,11 @@ namespace FR8.Rendering.Passes
         private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
         private static readonly int OutlineTarget = Shader.PropertyToID("_OutlineTarget");
 
-        public override bool Enabled => settings.enabled;
+        public override bool Enabled => Settings.active;
         public static List<Renderer> ThisFrame { get; } = new();
 
-        public SelectionOutlinePass(Settings settings)
+        public SelectionOutlinePass()
         {
-            this.settings = settings;
             renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
         }
 
@@ -42,13 +39,14 @@ namespace FR8.Rendering.Passes
             ThisFrame.RemoveAll(e => e.CompareTag("Do Not Outline"));
         }
 
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        public override void OnExecute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             if (!whiteMaterial) return;
             if (!blackMaterial) return;
             if (!blitMaterial) return;
 
             blackMaterial.SetColor(BaseColor, Color.black);
+            blitMaterial.SetColor(BaseColor, Settings.outlineColor.value);
             var data = renderingData;
 
             ExecuteWithCommandBuffer(context, cmd =>
@@ -77,14 +75,14 @@ namespace FR8.Rendering.Passes
         public override void OnCameraCleanup(CommandBuffer cmd)
         {
             cmd.ReleaseTemporaryRT(OutlineTarget);
-            
+
             ThisFrame.Clear();
         }
+    }
 
-        [System.Serializable]
-        public class Settings
-        {
-            public bool enabled = true;
-        }
+    [VolumeComponentMenu("Custom/Selection Outline")]
+    public class SelectionOutlineSettings : VolumeComponent
+    {
+        public ColorParameter outlineColor = new(Color.white);
     }
 }

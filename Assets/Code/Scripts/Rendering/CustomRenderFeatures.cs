@@ -1,17 +1,10 @@
-using FR8.Rendering.Passes;
-using UnityEngine;
+using FR8Runtime.Rendering.Passes;
 using UnityEngine.Rendering.Universal;
 
-namespace FR8.Rendering
+namespace FR8Runtime.Rendering
 {
     public sealed class CustomRenderFeatures : ScriptableRendererFeature
     {
-        [SerializeField] private FogPass.Settings fogSettings;
-        [SerializeField] private SelectionOutlinePass.Settings outlineSettings;
-        [SerializeField] private LightVolumetricPass.Settings volumetricsSettings;
-        [SerializeField] private MapMarkerPass.Settings mapMarkerSettings;
-        [SerializeField] private CloudPass.Settings cloudSettings;
-
         private FogPass fogPass;
         private SelectionOutlinePass outlinePass;
         private LightVolumetricPass volumetricPass;
@@ -20,11 +13,11 @@ namespace FR8.Rendering
 
         public override void Create()
         {
-            fogPass = new FogPass(fogSettings);
-            outlinePass = new SelectionOutlinePass(outlineSettings);
-            volumetricPass = new LightVolumetricPass(volumetricsSettings);
-            mapMarkersPass = new MapMarkerPass(mapMarkerSettings);
-            cloudPass = new CloudPass(cloudSettings);
+            fogPass = new FogPass();
+            outlinePass = new SelectionOutlinePass();
+            volumetricPass = new LightVolumetricPass();
+            mapMarkersPass = new MapMarkerPass();
+            cloudPass = new CloudPass();
         }
 
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)

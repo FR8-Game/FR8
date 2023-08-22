@@ -1,5 +1,6 @@
 using System;
 using FR8.Rendering.Passes;
+using FR8Runtime.Rendering.Passes;
 using UnityEngine;
 
 namespace FR8.Rendering
