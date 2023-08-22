@@ -13,25 +13,6 @@ MonoBehaviour:
   m_Name: CustomRenderFeatures
   m_EditorClassIdentifier: 
   m_Active: 1
-  fogSettings:
-    enabled: 1
-    color: {r: 0.2924528, g: 0.09204782, b: 0.017933436, a: 1}
-    density: 0.555
-    heightFalloffLower: 0
-    heightFalloffUpper: 60
-    renderOverSkybox: 1
-    showFogInSceneView: 1
-  outlineSettings:
-    enabled: 1
-  volumetricsSettings:
-    enabled: 0
-  mapMarkerSettings:
-    enabled: 1
-    markerScale: 1
-  cloudSettings:
-    enabled: 1
-    domeMesh: {fileID: -4592596678803082537, guid: 9cb18f9e22591424c9809955e55f95a2, type: 3}
-    material: {fileID: 2100000, guid: 59a68a055ac19404391c8ef8a5d50618, type: 2}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -106,10 +87,10 @@ MonoBehaviour:
     AfterOpaque: 0
     Source: 1
     NormalSamples: 1
-    Intensity: 0.25
+    Intensity: 0.4
     DirectLightingStrength: 0.25
-    Radius: 0.05
-    SampleCount: 10
+    Radius: 0.1
+    SampleCount: 15
 --- !u!114 &7172154630020702444
 MonoBehaviour:
   m_ObjectHideFlags: 0
