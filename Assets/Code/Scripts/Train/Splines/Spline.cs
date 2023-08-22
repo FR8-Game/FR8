@@ -2,7 +2,7 @@
 
 namespace FR8.Train.Splines
 {
-    public class Spline : ISpline
+    public class Spline
     {
         public Matrix4x4 matrix;
         public float constant = 1.0f;

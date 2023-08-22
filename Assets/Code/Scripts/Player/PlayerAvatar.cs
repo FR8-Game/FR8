@@ -9,34 +9,26 @@ namespace FR8.Player
     [SelectionBase, DisallowMultipleComponent]
     public sealed class PlayerAvatar : MonoBehaviour
     {
-        [Header("Input")]
-        public PlayerInput input;
-        
-        [Header("Physics")]
+        [Header("Configuration")]
         [SerializeField] private float mass = 80.0f;
+
         [SerializeField] private float playerHeight = 1.7f;
         [SerializeField] private float radius = 0.25f;
         [SerializeField] private float stepHeight = 0.5f;
 
+        public PlayerInput input;
         public PlayerGroundedMovement groundedMovement;
         public PlayerInteractionManager interactionManager;
-        
-        [Header("Camera")]
-        public Vector3 cameraOffset = new(0.0f, 1.6f, 0.0f);
         public PlayerCamera cameraController;
-        
-        private ParticleSystem pee;
-        
-        private Pose cameraPose;
+        public PlayerUrination urination;
 
         public event Action EnabledEvent;
         public event Action UpdateEvent;
         public event Action FixedUpdateEvent;
         public event Action DisabledEvent;
-        
+
         public Rigidbody Rigidbody { get; private set; }
-        public Transform CameraTarget { get; private set; }
-        public Ray LookingRay => new(CameraTarget.position, CameraTarget.forward);
+
         public float Radius => radius;
         public float StepHeight => stepHeight;
 
@@ -49,43 +41,24 @@ namespace FR8.Player
             }
         }
 
-        public float MoveSpeed
-        {
-            get
-            {
-                var velocity = groundedMovement.Velocity;
-                return Mathf.Sqrt(velocity.x * velocity.x + velocity.z * velocity.z);
-            }
-        }
-
-        #region Initalization
-
         private void Awake()
         {
             transform.SetParent(null);
-            
-            input.Init();
-            
-            CameraTarget = transform.Find("Camera Target");
-            CameraTarget.transform.localPosition = cameraOffset;
-            CameraTarget.transform.localRotation = Quaternion.identity;
-
-            cameraController.Init(this, CameraTarget);
-            interactionManager.Init(this);
-
-            groundedMovement.Init(this);
-            
-            pee = transform.Find("Pee").GetComponent<ParticleSystem>();
+            InitSubmodules();
         }
 
-        private void OnValidate()
+        private void InitSubmodules()
         {
-            Configure();
+            input.Init();
+            cameraController.Init(this);
+            interactionManager.Init(this);
+            groundedMovement.Init(this);
+            urination.Init(this);
         }
 
         private void OnEnable()
         {
-            Configure();
+            ConfigureAll();
             EnabledEvent?.Invoke();
         }
 
@@ -94,17 +67,15 @@ namespace FR8.Player
             DisabledEvent?.Invoke();
         }
 
-        private void Configure()
+        private void ConfigureAll()
         {
-            Rigidbody = gameObject.GetOrAddComponent<Rigidbody>();
-            
-            Rigidbody.mass = mass;
-            Rigidbody.useGravity = false;
-            Rigidbody.detectCollisions = true;
-            Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
-            Rigidbody.interpolation = RigidbodyInterpolation.None;
-            Rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
+            ConfigureRigidbody();
 
+            ConfigureCollider();
+        }
+
+        private void ConfigureCollider()
+        {
             var groundOffset = stepHeight;
 
             var collider = gameObject.GetOrAddComponent<CapsuleCollider>();
@@ -112,51 +83,62 @@ namespace FR8.Player
             collider.height = playerHeight - groundOffset;
             collider.radius = radius;
             collider.center = Vector3.up * (playerHeight + groundOffset) / 2.0f;
-            if (Application.isPlaying)
-            {
-                var mat = new PhysicMaterial("[PROC] Player Physics Material");
-                mat.bounciness = 0.0f;
-                mat.dynamicFriction = 0.0f;
-                mat.staticFriction = 0.0f;
 
-                mat.bounceCombine = PhysicMaterialCombine.Multiply;
-                mat.frictionCombine = PhysicMaterialCombine.Multiply;
 
-                if (collider.material) Destroy(collider.material);
-                collider.material = mat;
-            }
+            if (collider.material) Destroy(collider.material);
+            collider.material = CreatePlayerPhysicsMaterial();
         }
 
-        #endregion
+        private static PhysicMaterial CreatePlayerPhysicsMaterial()
+        {
+            var mat = new PhysicMaterial("[PROC] Player Physics Material");
+            mat.hideFlags = HideFlags.HideAndDontSave;
+            mat.bounciness = 0.0f;
+            mat.dynamicFriction = 0.0f;
+            mat.staticFriction = 0.0f;
 
-        #region Loop
+            mat.bounceCombine = PhysicMaterialCombine.Multiply;
+            mat.frictionCombine = PhysicMaterialCombine.Multiply;
+            return mat;
+        }
+
+        private void ConfigureRigidbody()
+        {
+            Rigidbody = gameObject.GetOrAddComponent<Rigidbody>();
+
+            Rigidbody.mass = mass;
+            Rigidbody.useGravity = false;
+            Rigidbody.detectCollisions = true;
+            Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+            Rigidbody.interpolation = RigidbodyInterpolation.None;
+            Rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
+        }
 
         private void Update()
         {
             UpdateEvent?.Invoke();
-
-            if (input.Pee && !pee.isEmitting)
-            {
-                pee.Play();
-            }
-
-            if (!input.Pee && pee.isEmitting)
-            {
-                pee.Stop();
-            }
-
-            pee.transform.localRotation = Quaternion.Euler(-cameraController.Yaw * 0.5f, 0.0f, 0.0f);
         }
 
         private void FixedUpdate()
         {
-            Rigidbody.rotation = Quaternion.Euler(0.0f, CameraTarget.eulerAngles.y, 0.0f);
-            CameraTarget.localRotation = Quaternion.identity;
-            CameraTarget.localPosition = cameraOffset;
+            SyncWithCameraTarget();
 
             FixedUpdateEvent?.Invoke();
         }
 
-        #endregion
+        private void SyncWithCameraTarget()
+        {
+            Rigidbody.rotation = Quaternion.Euler(0.0f, cameraController.CameraTarget.eulerAngles.y, 0.0f);
+            cameraController.CameraTarget.localRotation = Quaternion.identity;
+            cameraController.CameraTarget.localPosition = cameraController.cameraOffset;
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.matrix = transform.localToWorldMatrix;
+
+            GizmoExtras.DrawCapsule(Vector3.up * playerHeight / 2.0f, Quaternion.identity, playerHeight, radius);
+        }
     }
 }

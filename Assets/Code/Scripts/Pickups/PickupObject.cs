@@ -110,7 +110,7 @@ namespace FR8.Pickups
             lastTargetRotation = targetRotation;
         }
 
-        private Vector3 GetTargetPosition() => target.CameraTarget.TransformPoint(HoldTranslation);
-        private Quaternion GetTargetRotation() => target.CameraTarget.rotation * HoldRotation;
+        private Vector3 GetTargetPosition() => target.cameraController.CameraTarget.TransformPoint(HoldTranslation);
+        private Quaternion GetTargetRotation() => target.cameraController.CameraTarget.rotation * HoldRotation;
     }
 }

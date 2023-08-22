@@ -61,16 +61,34 @@ namespace FR8.Player.Submodules
         public Vector3 Velocity => IsOnGround && GroundHit.rigidbody ? Rigidbody.velocity - GroundHit.rigidbody.GetPointVelocity(Rigidbody.position) : Rigidbody.velocity;
         public Vector3 Gravity => new Vector3(0.0f, -9.81f, 0.0f) * (Velocity.y > 0.0f && input.Jump ? upGravityScale : downGravityScale);
         public bool Enabled { get; set; }
+        public float MoveSpeed
+        {
+            get
+            {
+                var velocity = Velocity;
+                return Mathf.Sqrt(velocity.x * velocity.x + velocity.z * velocity.z);
+            }
+        }
         
         public void Init(PlayerAvatar avatar)
         {
             this.avatar = avatar;
 
+            SubscribeToEvents(avatar);
+        }
+
+        private void SubscribeToEvents(PlayerAvatar avatar)
+        {
             avatar.UpdateEvent += Update;
             avatar.FixedUpdateEvent += FixedUpdate;
         }
 
         private void Update()
+        {
+            SetJumpTrigger();
+        }
+
+        private void SetJumpTrigger()
         {
             if (input.JumpTriggered) jumpTrigger = true;
         }
@@ -78,12 +96,20 @@ namespace FR8.Player.Submodules
         private void FixedUpdate()
         {
             if (LookForLadder()) return;
+            
             Move();
             Jump();
             CheckForGround();
             ApplyGravity();
             MoveWithGround();
             
+            PlayFootstepAudio();
+            
+            UpdateFlags();
+        }
+
+        private void PlayFootstepAudio()
+        {
             if (IsOnGround)
             {
                 if (!wasOnGround)
@@ -102,19 +128,39 @@ namespace FR8.Player.Submodules
                     }
                 }
             }
+        }
 
+        private void UpdateFlags()
+        {
             wasOnGround = IsOnGround;
         }
-        
+
         private bool LookForLadder()
         {
             if (!Ladder) return false;
 
+            var delta = GetLadderClimbDelta();
+
+            if (TryDismountLadder(delta)) return false;
+
+            jumpTrigger = false;
+
+            IncrementLadderPosition(delta);
+            ApplyLadderCorrectiveForce();
+            return true;
+        }
+
+        private float GetLadderClimbDelta()
+        {
             var dot = -Vector3.Dot(Rigidbody.transform.forward, Ladder.transform.forward);
             var direction = Mathf.Round(input.Move.z) * Mathf.Sign(dot);
             var delta = direction * ladderClimbSpeed * Time.deltaTime;
+            return delta;
+        }
 
-            var overTop = targetLadderPosition + delta > Ladder.Height;
+        private bool WantsToDismount(float delta, out bool overTop)
+        {
+            overTop = targetLadderPosition + delta > Ladder.Height;
             var overBottom = targetLadderPosition + delta < 0.0f;
             var dismount = overTop || overBottom;
             if (jumpTrigger)
@@ -123,24 +169,32 @@ namespace FR8.Player.Submodules
                 Rigidbody.AddForce((Ladder.transform.forward + Vector3.up) * ladderJumpForce, ForceMode.VelocityChange);
             }
 
-            if (dismount)
-            {
-                if (overTop) Rigidbody.AddForce(Vector3.up * ladderJumpForce, ForceMode.VelocityChange);
+            return dismount;
+        }
 
-                Ladder = null;
-                return false;
-            }
+        private bool TryDismountLadder(float delta)
+        {
+            if (!WantsToDismount(delta, out var overTop)) return false;
 
-            jumpTrigger = false;
+            if (overTop) Rigidbody.AddForce(Vector3.up * ladderJumpForce, ForceMode.VelocityChange);
 
+            Ladder = null;
+            return true;
+
+        }
+
+        private void IncrementLadderPosition(float delta)
+        {
             targetLadderPosition += delta;
             targetLadderPosition = Mathf.Clamp(targetLadderPosition, 0.0f, Ladder.Height);
+        }
+
+        private void ApplyLadderCorrectiveForce()
+        {
             var targetPosition = Ladder.ToWorldPos(Mathf.Round(targetLadderPosition / ladderRungDistance) * ladderRungDistance);
 
             var force = (targetPosition - Rigidbody.position) * ladderClimbSpring + (Ladder.Velocity - Rigidbody.velocity) * ladderClimbDamper;
             Rigidbody.AddForce(force);
-
-            return true;
         }
 
         private void CheckForGround()
@@ -154,8 +208,20 @@ namespace FR8.Player.Submodules
             var res = Physics.SphereCastAll(ray, avatar.Radius * 0.25f, distance, ~0, QueryTriggerInteraction.Ignore);
             if (res.Length == 0) return;
 
-            RaycastHit? bestHit = null;
-            foreach (var hit in res)
+            if (!GetValidGroundHit(res, transform, out var bestHit)) return;
+
+            GroundHit = bestHit;
+            IsOnGround = true;
+
+            ApplyGroundSpring(distance);
+        }
+
+        private bool GetValidGroundHit(RaycastHit[] hits, Transform transform, out RaycastHit bestHit)
+        {
+            var res = false;
+            bestHit = default;
+            
+            foreach (var hit in hits)
             {
                 // --- Validation Checks ---
                 // Check that the hit object is not ourselves
@@ -166,23 +232,19 @@ namespace FR8.Player.Submodules
                 if (groundAngle > maxWalkableSlope) continue;
 
                 // Discard result if bestHit is closer.
-                if (bestHit.HasValue && bestHit.Value.distance < hit.distance) continue;
+                if (res && bestHit.distance < hit.distance) continue;
 
+                res = true;
                 bestHit = hit;
             }
 
-            if (!bestHit.HasValue) return;
-
-            GroundHit = bestHit.Value;
-            IsOnGround = true;
-
-            var contraction = 1.0f - GroundHit.distance / distance;
-
-            ApplyGroundSpring(contraction);
+            return res;
         }
 
-        private void ApplyGroundSpring(float contraction)
+        private void ApplyGroundSpring(float distance)
         {
+            var contraction = 1.0f - GroundHit.distance / distance;
+
             if (Time.time - lastJumpTime < 0.08f) return;
 
             var spring = contraction * groundSpring - Velocity.y * groundDamping;
@@ -192,20 +254,32 @@ namespace FR8.Player.Submodules
 
         private void Move()
         {
-            var moveSpeed = maxGroundedSpeed;
-            if (input.Sprint) moveSpeed *= sprintSpeedScalar;
-
-            var target = avatar.MoveDirection * moveSpeed;
+            var moveSpeed = GetTargetMoveVelocity(out var target);
 
             var difference = target - Velocity;
             difference.y = 0.0f;
 
+            var acceleration = GetMoveAcceleration();
+            
+            var force = Vector3.ClampMagnitude(difference, moveSpeed) * acceleration;
+            Rigidbody.AddForce(force, ForceMode.Acceleration);
+        }
+
+        private float GetMoveAcceleration()
+        {
             var acceleration = 1.0f / accelerationTime;
             if (!IsOnGround) acceleration *= 1.0f - airMovePenalty;
             if (input.Sprint) acceleration *= sprintSpeedScalar;
+            return acceleration;
+        }
 
-            var force = Vector3.ClampMagnitude(difference, moveSpeed) * acceleration;
-            Rigidbody.AddForce(force, ForceMode.Acceleration);
+        private float GetTargetMoveVelocity(out Vector3 target)
+        {
+            var moveSpeed = maxGroundedSpeed;
+            if (input.Sprint) moveSpeed *= sprintSpeedScalar;
+
+            target = avatar.MoveDirection * moveSpeed;
+            return moveSpeed;
         }
 
         private void Jump()
@@ -216,11 +290,15 @@ namespace FR8.Player.Submodules
             if (!IsOnGround) return;
             if (!jump) return;
 
+            Rigidbody.AddForce(CalculateJumpForce(), ForceMode.VelocityChange);
+            lastJumpTime = Time.time;
+        }
+
+        private Vector3 CalculateJumpForce()
+        {
             var power = Mathf.Sqrt(Mathf.Max(2.0f * 9.81f * upGravityScale * (jumpHeight - avatar.StepHeight), 0.0f)) - Velocity.y;
             var force = Vector3.up * power;
-
-            Rigidbody.AddForce(force, ForceMode.VelocityChange);
-            lastJumpTime = Time.time;
+            return force;
         }
 
         private void ApplyGravity()

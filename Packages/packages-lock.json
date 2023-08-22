@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.marijnzwemmer.unity-toolbar-extender": {
+      "version": "https://github.com/marijnz/unity-toolbar-extender.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "dbd76ed996483d219c39d240f785b1790aa039ed"
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
@@ -64,9 +71,9 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.render-pipelines.core": {
-      "version": "12.1.7",
-      "depth": 1,
-      "source": "builtin",
+      "version": "file:com.unity.render-pipelines.core",
+      "depth": 0,
+      "source": "embedded",
       "dependencies": {
         "com.unity.ugui": "1.0.0",
         "com.unity.modules.physics": "1.0.0",
@@ -74,9 +81,9 @@
       }
     },
     "com.unity.render-pipelines.universal": {
-      "version": "12.1.7",
+      "version": "file:com.unity.render-pipelines.universal",
       "depth": 0,
-      "source": "builtin",
+      "source": "embedded",
       "dependencies": {
         "com.unity.mathematics": "1.2.1",
         "com.unity.burst": "1.7.3",
@@ -165,6 +172,12 @@
         "com.unity.shadergraph": "12.1.7",
         "com.unity.render-pipelines.core": "12.1.7"
       }
+    },
+    "net.harrybosch03.hbcore": {
+      "version": "file:net.harrybosch03.hbcore",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
     },
     "net.harrybosch03.hierarchycolorator": {
       "version": "file:net.harrybosch03.hierarchycolorator",

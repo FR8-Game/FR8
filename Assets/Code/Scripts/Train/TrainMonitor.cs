@@ -16,12 +16,12 @@ namespace FR8.Train
 
         private TrainCarriage carriage;
         private TrainElectricsController trainElectrics;
-        private DriverNetwork trainDrivers;
+        private DriverNetwork driverNetwork;
 
         private void Awake()
         {
             carriage = GetComponent<TrainCarriage>();
-            trainDrivers = GetComponent<DriverNetwork>();
+            driverNetwork = GetComponent<DriverNetwork>();
             trainElectrics = GetComponent<TrainElectricsController>();
         }
 
@@ -42,10 +42,10 @@ namespace FR8.Train
                 if (cockpitBounds.Contains(point)) return;
             }
 
-            if (!trainElectrics.GetMainFuse()) return;
+            if (!trainElectrics.GetConnected()) return;
             
-            trainElectrics.SetMainFuse(false);
-            trainDrivers.SetValue("Brake", 1.0f);
+            trainElectrics.SetConnected(false);
+            driverNetwork.SetValue("Brake", 1.0f);
             
             var entry = new DialogueEntry()
             {
