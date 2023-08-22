@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace FR8.UI
+namespace FR8Runtime.UI
 {
     public static class UIUtility
     {

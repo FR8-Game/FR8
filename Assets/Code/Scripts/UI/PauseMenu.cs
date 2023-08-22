@@ -2,9 +2,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using Button = UnityEngine.UI.Button;
-using Cursor = FR8.Utility.Cursor;
+using Cursor = FR8Runtime.CodeUtility.Cursor;
 
-namespace FR8.UI
+namespace FR8Runtime.UI
 {
     [SelectionBase]
     [DisallowMultipleComponent]

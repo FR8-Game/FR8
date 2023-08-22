@@ -1,12 +1,9 @@
 ﻿using System;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
-namespace FR8
+namespace FR8Runtime.CodeUtility
 {
     public static class GizmoExtras
     {
@@ -35,7 +32,7 @@ namespace FR8
 
         public static void DrawLine(Vector3 a, Vector3 b) => drawLineAction?.Invoke(a, b, Gizmos.color, Gizmos.matrix);
 
-        public static void DrawCapsule(Vector3 center, Quaternion orientation, float height, float radius)
+        public static void DrawCapsule(Vector3 center, UnityEngine.Quaternion orientation, float height, float radius)
         {
             var right = orientation * Vector3.right;
             var up = orientation * Vector3.up;
@@ -44,13 +41,13 @@ namespace FR8
             var halfHeight = height / 2.0f;
             
             DrawDiscoRectangle(center, orientation, height, radius);
-            DrawDiscoRectangle(center, orientation * Quaternion.Euler(0.0f, 90.0f, 0.0f), height, radius);
+            DrawDiscoRectangle(center, orientation * UnityEngine.Quaternion.Euler(0.0f, 90.0f, 0.0f), height, radius);
             
             DrawCircle(center + up * (halfHeight - radius), right, forward, radius);
             DrawCircle(center - up * (halfHeight - radius), right, forward, radius);
         }
 
-        public static void DrawDiscoRectangle(Vector3 position, Quaternion orientation, float height, float radius)
+        public static void DrawDiscoRectangle(Vector3 position, UnityEngine.Quaternion orientation, float height, float radius)
         {
             var right = orientation * Vector3.right;
             var up = orientation * Vector3.up;

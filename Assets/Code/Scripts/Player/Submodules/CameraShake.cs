@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace FR8.Player.Submodules
+namespace FR8Runtime.Player.Submodules
 {
     [Serializable]
     public class CameraShake

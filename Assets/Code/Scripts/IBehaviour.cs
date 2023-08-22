@@ -1,7 +1,8 @@
 using UnityEngine;
+
 // ReSharper disable InconsistentNaming
 
-namespace FR8
+namespace FR8Runtime
 {
     public interface IBehaviour
     {

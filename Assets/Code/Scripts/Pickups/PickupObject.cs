@@ -1,8 +1,8 @@
-using FR8.Interactions.Drivers.Submodules;
-using FR8.Player;
+using FR8Runtime.Interactions.Drivers.Submodules;
+using FR8Runtime.Player;
 using UnityEngine;
 
-namespace FR8.Pickups
+namespace FR8Runtime.Pickups
 {
     [SelectionBase]
     [DisallowMultipleComponent]
@@ -87,14 +87,14 @@ namespace FR8.Pickups
             var targetRotation = GetTargetRotation();
 
             var targetVelocity = (targetPosition - lastTargetPosition) / Time.deltaTime;
-            var (angle, axis) = Utility.Quaternion.ToAngleAxis(targetRotation * Quaternion.Inverse(lastTargetRotation));
+            var (angle, axis) = CodeUtility.Quaternion.ToAngleAxis(targetRotation * Quaternion.Inverse(lastTargetRotation));
 
             var targetAngularVelocity = axis * angle / Time.deltaTime * Mathf.Deg2Rad;
 
             var force = (targetPosition - Rigidbody.position) * spring + (targetVelocity - Rigidbody.velocity) * damping;
             Rigidbody.AddForce(force - Physics.gravity, ForceMode.Acceleration);
 
-            (angle, axis) = Utility.Quaternion.ToAngleAxis(targetRotation * Quaternion.Inverse(Rigidbody.rotation));
+            (angle, axis) = CodeUtility.Quaternion.ToAngleAxis(targetRotation * Quaternion.Inverse(Rigidbody.rotation));
 
             angle *= Mathf.Deg2Rad;
             if (angle == 0.0f)

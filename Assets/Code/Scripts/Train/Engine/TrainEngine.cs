@@ -1,8 +1,8 @@
-using FR8.Interactions.Drivers;
-using FR8.Train.Electrics;
+using FR8Runtime.Interactions.Drivers;
+using FR8Runtime.Train.Electrics;
 using UnityEngine;
 
-namespace FR8.Train.Engine
+namespace FR8Runtime.Train.Engine
 {
     [SelectionBase]
     [DisallowMultipleComponent]

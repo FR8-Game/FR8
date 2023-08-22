@@ -1,10 +1,9 @@
 ﻿using System;
 using UnityEngine;
 
-namespace FR8
+namespace FR8Runtime.CodeUtility
 {
-    public static partial class Utility
-    {
+    
         public static class Search
         {
             public static int FuzzySearch(Func<int, string> source, int length, string search)
@@ -57,5 +56,4 @@ namespace FR8
                 return best;
             }
         }
-    }
 }

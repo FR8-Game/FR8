@@ -1,9 +1,9 @@
 using System;
-using FR8.Interactions.Drivers.Submodules;
-using FR8.Player;
+using FR8Runtime.Interactions.Drivers.Submodules;
+using FR8Runtime.Player;
 using UnityEngine;
 
-namespace FR8.Interactions
+namespace FR8Runtime.Interactions
 {
     public class Consumables : MonoBehaviour, IInteractable
     {

@@ -1,4 +1,4 @@
-using FR8.Rendering.Volumetrics;
+using FR8Runtime.Rendering.Volumetrics;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using Object = UnityEngine.Object;

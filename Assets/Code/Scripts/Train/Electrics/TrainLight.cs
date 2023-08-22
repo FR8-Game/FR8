@@ -1,9 +1,8 @@
-using FR8.Interactions.Drivables;
-using FR8.Interactions.Drivers;
-using FR8.Level;
+using FR8Runtime.Interactions.Drivers;
+using FR8Runtime.Level;
 using UnityEngine;
 
-namespace FR8.Train.Electrics
+namespace FR8Runtime.Train.Electrics
 {
     public class TrainLight : LightDriver, IElectricDevice
     {

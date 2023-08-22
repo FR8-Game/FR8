@@ -1,8 +1,7 @@
 using System;
 using UnityEngine;
-using Cursor = FR8.Utility.Cursor;
 
-namespace FR8.Player.Submodules
+namespace FR8Runtime.Player.Submodules
 {
     [Serializable]
     public class PlayerCamera
@@ -55,12 +54,12 @@ namespace FR8.Player.Submodules
         private void OnEnable()
         {
             cameraLocked = true;
-            Cursor.Push(CursorLockMode.Locked, ref cursorLockID);
+            CodeUtility.Cursor.Push(CursorLockMode.Locked, ref cursorLockID);
         }
 
         private void OnDisable()
         {
-            Cursor.Pop(ref cursorLockID);
+            CodeUtility.Cursor.Pop(ref cursorLockID);
         }
 
         private void Update()
@@ -74,17 +73,17 @@ namespace FR8.Player.Submodules
             if (cameraLockedThisFrame != wasCameraLocked)
             {
 #if UNITY_EDITOR
-                Cursor.Change(cursorLockID, cameraLockedThisFrame ? CursorLockMode.Locked : CursorLockMode.None);
+                CodeUtility.Cursor.Change(cursorLockID, cameraLockedThisFrame ? CursorLockMode.Locked : CursorLockMode.None);
 #else
                 Cursor.Change(cursorLockID, cameraLocked ? CursorLockMode.Locked : CursorLockMode.Confined);
 #endif
                 if (cameraLockedThisFrame)
                 {
-                    (lastCursorX, lastCursorY) = Cursor.GetPosition();
+                    (lastCursorX, lastCursorY) = CodeUtility.Cursor.GetPosition();
                 }
                 else
                 {
-                    Cursor.SetPosition(lastCursorX, lastCursorY);
+                    CodeUtility.Cursor.SetPosition(lastCursorX, lastCursorY);
                 }
             }
             

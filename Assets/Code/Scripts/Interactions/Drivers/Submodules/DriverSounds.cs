@@ -1,7 +1,7 @@
 using FMODUnity;
 using UnityEngine;
 
-namespace FR8.Interactions.Drivers.Submodules
+namespace FR8Runtime.Interactions.Drivers.Submodules
 {
     [System.Serializable]
     public sealed class DriverSounds

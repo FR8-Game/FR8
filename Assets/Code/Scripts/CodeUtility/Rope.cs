@@ -35,7 +35,7 @@ namespace FR8Runtime.CodeUtility
                 reset = false;
             }
             
-            var force = Physics.gravity;
+            var force = UnityEngine.Physics.gravity;
 
             force += CalculateWindForces();
             force -= velocity.normalized * Mathf.Min(velocity.sqrMagnitude * drag, velocity.magnitude / Time.deltaTime);

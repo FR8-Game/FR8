@@ -1,4 +1,3 @@
-using FR8Runtime.CodeUtility;
 using UnityEngine;
 
 namespace FR8Runtime.Rendering
@@ -18,7 +17,7 @@ namespace FR8Runtime.Rendering
         [SerializeField] private Vector3 endRotation;
 
         [Space]
-        [SerializeField] private Rope rope = new();
+        [SerializeField] private CodeUtility.Rope rope = new();
         [SerializeField] private float length;
         [SerializeField] private float size = 1.0f;
         [SerializeField] private float twist;

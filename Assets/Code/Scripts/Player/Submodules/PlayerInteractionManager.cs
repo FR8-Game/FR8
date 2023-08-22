@@ -1,7 +1,6 @@
 using System;
-using FR8.Interactions.Drivers.Submodules;
-using FR8.Pickups;
-using FR8.Rendering.Passes;
+using FR8Runtime.Interactions.Drivers.Submodules;
+using FR8Runtime.Pickups;
 using FR8Runtime.Rendering.Passes;
 using TMPro;
 using UnityEngine;
@@ -9,14 +8,14 @@ using UnityEngine.InputSystem;
 using Cursor = UnityEngine.Cursor;
 using Object = UnityEngine.Object;
 
-namespace FR8.Player.Submodules
+namespace FR8Runtime.Player.Submodules
 {
     [System.Serializable]
     public class PlayerInteractionManager
     {
         [SerializeField] private float interactionDistance = 2.5f;
         [SerializeField] private TMP_Text readoutText;
-        [SerializeField] private Utility.DampedSpring transition;
+        [SerializeField] private CodeUtility.DampedSpring transition;
 
         private int nudge;
         private bool dragging;

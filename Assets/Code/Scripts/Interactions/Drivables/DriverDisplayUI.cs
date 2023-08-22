@@ -1,9 +1,9 @@
 using System;
-using FR8.Interactions.Drivers;
+using FR8Runtime.Interactions.Drivers;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FR8.Interactions.Drivables
+namespace FR8Runtime.Interactions.Drivables
 {
     [System.Serializable]
     public sealed class DriverDisplayUI

@@ -1,10 +1,8 @@
 using System;
-using FMODUnity;
-using FR8.Level;
-using FR8.Player.Submodules;
+using FR8Runtime.Player.Submodules;
 using UnityEngine;
 
-namespace FR8.Player
+namespace FR8Runtime.Player
 {
     [SelectionBase, DisallowMultipleComponent]
     public sealed class PlayerAvatar : MonoBehaviour
@@ -138,7 +136,7 @@ namespace FR8.Player
             Gizmos.color = Color.yellow;
             Gizmos.matrix = transform.localToWorldMatrix;
 
-            GizmoExtras.DrawCapsule(Vector3.up * playerHeight / 2.0f, Quaternion.identity, playerHeight, radius);
+            CodeUtility.GizmoExtras.DrawCapsule(Vector3.up * playerHeight / 2.0f, Quaternion.identity, playerHeight, radius);
         }
     }
 }

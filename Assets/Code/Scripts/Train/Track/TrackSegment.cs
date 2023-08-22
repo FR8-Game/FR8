@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using FR8.Train.Splines;
-using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.UI;
-
-#if UNITY_EDITOR
+using FR8Runtime.Train.Splines;
 using UnityEditor;
-#endif
+using UnityEngine;
 
-namespace FR8.Train.Track
+namespace FR8Runtime.Train.Track
 {
     [SelectionBase, DisallowMultipleComponent]
     public class TrackSegment : MonoBehaviour
