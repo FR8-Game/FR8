@@ -1,20 +1,19 @@
 using System;
+using FR8.Rendering;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace FR8.Rendering.Passes
+namespace FR8Runtime.Rendering.Passes
 {
-    public class MapMarkerPass : CustomRenderPass
+    public class MapMarkerPass : CustomRenderPass<MapMarkerSettings>
     {
-        public Settings settings;
         private Material material;
 
-        public override bool Enabled => settings.enabled;
+        public override bool Enabled => Settings.active;
 
-        public MapMarkerPass(Settings settings)
+        public MapMarkerPass()
         {
-            this.settings = settings;
             renderPassEvent = RenderPassEvent.BeforeRenderingTransparents;
         }
 
@@ -26,7 +25,7 @@ namespace FR8.Rendering.Passes
             material.hideFlags = HideFlags.HideAndDontSave;
         }
 
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        public override void OnExecute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             ExecuteWithCommandBuffer(context, cmd =>
             {
@@ -55,11 +54,10 @@ namespace FR8.Rendering.Passes
             });
         }
 
-        [Serializable]
-        public class Settings
-        {
-            public bool enabled = true;
-            public float markerScale = 1.0f;
-        }
     }
+        [VolumeComponentMenu("Custom/Map Markers")]
+        public class MapMarkerSettings : VolumeComponent
+        {
+            public FloatParameter markerScale = new(1.0f);
+        }
 }

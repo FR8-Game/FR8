@@ -2,31 +2,27 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace FR8.Rendering.Passes
+namespace FR8Runtime.Rendering.Passes
 {
-    public class CloudPass : CustomRenderPass
+    public class CloudPass : CustomRenderPass<CloudSettings>
     {
-        public Settings settings;
+        public override bool Enabled => Settings.active && Settings.domeMesh.value && Settings.material.value;
 
-        public override bool Enabled => settings.enabled && settings.domeMesh && settings.material;
-
-        public CloudPass(Settings settings)
+        public CloudPass()
         {
-            this.settings = settings;
             renderPassEvent = RenderPassEvent.AfterRenderingSkybox;
         }
-        
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
-        {
-            ExecuteWithCommandBuffer(context, cmd => cmd.DrawMesh(settings.domeMesh, Matrix4x4.identity, settings.material, 0, 0));
-        }
 
-        [System.Serializable]
-        public class Settings
+        public override void OnExecute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
-            public bool enabled;
-            public Mesh domeMesh;
-            public Material material;
+            ExecuteWithCommandBuffer(context, cmd => cmd.DrawMesh(Settings.domeMesh.value, Matrix4x4.identity, Settings.material.value, 0, 0));
         }
+    }
+
+    [VolumeComponentMenu("Custom/Clouds")]
+    public class CloudSettings : VolumeComponent
+    {
+        public VolumeParameter<Mesh> domeMesh = new();
+        public VolumeParameter<Material> material = new();
     }
 }
