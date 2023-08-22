@@ -153,16 +153,18 @@ namespace FR8Runtime.Train.Track
 
         private void OnDrawGizmos()
         {
-            for (var i = 0; i < resolution; i++)
+            BakePoints();
+
+            for (var i = 0; i < points.Count - 1; i++)
             {
-                var p0 = i / (float)resolution;
-                var p1 = (i + 1.0f) / resolution;
+                var a = points[i];
+                var b = points[i + 1];
+                var c = (a + b) / 2.0f;
 
-                var range = p1 - p0;
-                p0 += range * 0.1f;
-                p1 -= range * 0.1f;
-
-                GizmosDrawLine(SamplePoint(p0), SamplePoint(p1), new Color(1.0f, 0.6f, 0.1f, 1.0f));
+                a = (a - c) * 0.9f + c;
+                b = (b - c) * 0.9f + c;
+                
+                GizmosDrawLine(a, b, new Color(1.0f, 0.6f, 0.1f, 1.0f));
             }
 
             if (!closedLoop)

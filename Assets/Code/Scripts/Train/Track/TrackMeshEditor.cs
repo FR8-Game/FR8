@@ -56,7 +56,6 @@ namespace FR8Runtime.Train.Track
 
                 EditorSceneManager.MarkSceneDirty(gameObject.scene);
                 AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
                 
                 Progress.Finish(taskID);
             }
@@ -143,7 +142,7 @@ namespace FR8Runtime.Train.Track
                     startPoint = endPoint;
                     index++;
                 }
-
+                
                 SplitMesh(vertices, normals, indices, uvs, rendererContainer);
 
                 Progress.Remove(taskID);
@@ -151,7 +150,6 @@ namespace FR8Runtime.Train.Track
                 EditorSceneManager.MarkSceneDirty(gameObject.scene);
 
                 AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
             }
         }
 
