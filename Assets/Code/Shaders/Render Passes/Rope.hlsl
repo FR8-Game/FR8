@@ -1,22 +1,38 @@
-float4x4 _RopeData[3];
-
-void GetRopePositionOS_float(float3 inPositionOS, out float3 outPositionOS)
+float3 rotate(float3 v, float a)
 {
-    //float p = inPositionOS.z + 0.5;
-    float p = 0.5;
-    
-    float4x4 a = _RopeData[0];
-    float4x4 b = _RopeData[1];
-    float4x4 c = _RopeData[2];
-
-    float4x4 ab = lerp(a, b, p);
-    float4x4 bc = lerp(b, c, p);
-    float4x4 abc = lerp(ab, bc, p);
-
-    outPositionOS = mul(abc, float4(inPositionOS.xyz, 1.0));
+    float c = cos(a);
+    float s = sin(a);
+    return float3
+    (
+        v.x * c + v.y * s,
+        v.y * c - v.x * s,
+        v.z
+    );
 }
 
-void GetRopePositionOS_half(half3 inPositionOS, out half3 outPositionOS)
+void GetRopePositionOS_float(float3 inPositionOS, float3 inNormalOS, out float3 outPositionOS, out float3 outNormalOS)
 {
-    GetRopePositionOS_float(inPositionOS, outPositionOS);
+    float p = inPositionOS.z + 0.5;
+
+    float3 ropePos = inPositionOS;
+    float angle = p * _Twist;
+    ropePos = rotate(ropePos, angle);
+    ropePos.z = 0.0f;
+
+    float3 normal = rotate(inNormalOS, angle);
+    
+    float3 a = mul(_RopeStart, float4(ropePos, 1.0)).xyz;
+    float3 b = mul(_RopeMid, float4(ropePos, 1.0)).xyz;
+    float3 c = mul(_RopeEnd, float4(ropePos, 1.0)).xyz;
+
+    float3 ab = lerp(a, b, p);
+    float3 bc = lerp(b, c, p);
+
+    outPositionOS = lerp(inPositionOS, lerp(ab, bc, p), _IsRope);
+    outNormalOS = normalize(lerp(inNormalOS, normal, _IsRope));
+}
+
+void GetRopePositionOS_half(half3 inPositionOS, half3 inNormalOS, out half3 outPositionOS, out half3 outNormalOS)
+{
+    GetRopePositionOS_float(inPositionOS, inNormalOS, outPositionOS, outNormalOS);
 }
