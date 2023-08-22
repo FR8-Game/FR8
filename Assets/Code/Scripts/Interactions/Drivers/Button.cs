@@ -27,8 +27,10 @@ namespace FR8.Interactions.Drivers
             sounds.Awake(gameObject);
         }
 
-        private void FixedUpdate()
+        protected override void FixedUpdate()
         {
+            base.FixedUpdate();
+            
             SetValue(state ? 1.0f : 0.0f);
             state = false;
             

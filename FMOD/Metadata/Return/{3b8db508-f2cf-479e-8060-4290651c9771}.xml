@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="MixerReturn" id="{3b8db508-f2cf-479e-8060-4290651c9771}">
+		<property name="name">
+			<value>Train Inside</value>
+		</property>
+		<relationship name="effectChain">
+			<destination>{b22066d3-f3ec-4173-9aac-cb2d7abd782f}</destination>
+		</relationship>
+		<relationship name="panner">
+			<destination>{c0d4a03b-df63-440c-bb2c-92209d2c30cd}</destination>
+		</relationship>
+		<relationship name="output">
+			<destination>{af9d027a-3a1f-49a8-a9ef-4cbe20673632}</destination>
+		</relationship>
+	</object>
+	<object class="MixerBusEffectChain" id="{b22066d3-f3ec-4173-9aac-cb2d7abd782f}">
+		<relationship name="effects">
+			<destination>{a4e84e02-af31-49ef-b657-34bb3909fc52}</destination>
+			<destination>{d0e0f7b2-e167-4d0b-8ea0-82aacdf5f87b}</destination>
+		</relationship>
+	</object>
+	<object class="MixerBusPanner" id="{c0d4a03b-df63-440c-bb2c-92209d2c30cd}" />
+	<object class="MultibandEqEffect" id="{a4e84e02-af31-49ef-b657-34bb3909fc52}">
+		<property name="frequencyA">
+			<value>600</value>
+		</property>
+	</object>
+	<object class="MixerBusFader" id="{d0e0f7b2-e167-4d0b-8ea0-82aacdf5f87b}" />
+</objects>

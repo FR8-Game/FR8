@@ -57,7 +57,7 @@ namespace FR8.Interactions.Drivers
         {
             var avatar = interactingObject.GetComponentInParent<PlayerAvatar>();
             if (!avatar) return;
-            var ray = avatar.LookingRay;
+            var ray = avatar.cameraController.LookingRay;
             
             dragBehaviour.BeginDrag(transform, Value, ray);
         }
@@ -66,7 +66,7 @@ namespace FR8.Interactions.Drivers
         {
             var avatar = interactingObject.GetComponentInParent<PlayerAvatar>();
             if (!avatar) return;
-            var ray = avatar.LookingRay;
+            var ray = avatar.cameraController.LookingRay;
             
             SetValue(dragBehaviour.ContinueDrag(transform, ray));
         }
@@ -83,8 +83,9 @@ namespace FR8.Interactions.Drivers
             animator.Update();
         }
 
-        private void FixedUpdate()
+        protected override void FixedUpdate()
         {
+            base.FixedUpdate();
             animator.FixedUpdate();
         }
 

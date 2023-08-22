@@ -19,9 +19,9 @@ namespace FR8.Player.Submodules
 
             var avatar = playerCamera.Avatar;
             if (!avatar) return;
-            if (!avatar.IsOnGround) return;
+            if (!avatar.groundedMovement.IsOnGround) return;
             
-            var moveSpeed = avatar.MoveSpeed / avatar.maxGroundedSpeed;
+            var moveSpeed = avatar.groundedMovement.MoveSpeed / avatar.groundedMovement.maxGroundedSpeed;
             var shakeAmount = -1.0f / (moveSpeed / slope + 1.0f) + 1.0f;
 
             d += moveSpeed * frequency * Time.deltaTime;

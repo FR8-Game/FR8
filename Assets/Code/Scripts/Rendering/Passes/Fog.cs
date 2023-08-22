@@ -1,53 +1,59 @@
+using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace FR8.Rendering.Passes
+namespace FR8Runtime.Rendering.Passes
 {
-    [VolumeComponentMenuForRenderPipeline("Custom/Fog", typeof(UniversalRenderPipeline))]
-    public sealed class Fog : VolumeComponent, IPostProcessComponent
+    [Serializable]
+    public sealed class FogPass : CustomRenderPass<FogSettings>
     {
-        public bool IsActive() => active && density?.value > 0.0f;
-        public bool IsTileCompatible() => false;
+        private Shader fogShader;
+        private Material fogMaterial;
 
-        [Header("Fog Settings")] public FloatParameter density = new(0.0f, true);
-        public ColorParameter color = new(Color.gray, true);
+        private static readonly int FogColor = Shader.PropertyToID("_FogColor");
+        private static readonly int FogAttenuation = Shader.PropertyToID("_FogAttenuation");
+
+        public override bool Enabled => Settings.active;
+
+        public FogPass()
+        {
+            var renderOverSkybox = Settings && Settings.renderOverSkybox.value;
+            renderPassEvent = renderOverSkybox ? RenderPassEvent.AfterRenderingSkybox : RenderPassEvent.BeforeRenderingSkybox;
+        }
+        
+        public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
+        {
+            fogShader = Shader.Find("Hidden/Fog");
+            if (fogShader) fogMaterial = CoreUtils.CreateEngineMaterial(fogShader);
+            
+            var fogColor = Settings.color;
+            var fogAttenuation = new Vector4
+            {
+                x = Mathf.Pow(Settings.density.value, 10.0f),
+                y = Settings.heightFalloffLower.value,
+                z = Settings.heightFalloffUpper.value
+            };
+
+            cmd.SetGlobalColor(FogColor, fogColor.value);
+            cmd.SetGlobalColor(FogAttenuation, fogAttenuation);
+        }
+
+        public override void OnExecute(ScriptableRenderContext context, ref RenderingData renderingData)
+        {
+            if (renderingData.cameraData.isSceneViewCamera && !Settings.showFogInSceneView.value) return;
+            ExecuteWithCommandBuffer(context, cmd => cmd.DrawProcedural(Matrix4x4.identity, fogMaterial, 0, MeshTopology.Triangles, 3));
+        }
     }
 
-    public sealed class FogPass : ScriptableRenderPass
+    [VolumeComponentMenu("Custom/Fog")]
+    public class FogSettings : VolumeComponent
     {
-        private readonly Shader fogShader = Shader.Find("Hidden/Fog");
-        private readonly Material fogMaterial;
-        
-        private static readonly int Value = Shader.PropertyToID("_Value");
-        private static readonly int Color = Shader.PropertyToID("_Color");
-
-        public FogPass(bool renderOverSkybox)
-        {
-            fogMaterial = CoreUtils.CreateEngineMaterial(fogShader);
-            this.renderPassEvent = renderOverSkybox ? RenderPassEvent.AfterRenderingSkybox : RenderPassEvent.BeforeRenderingSkybox;
-        }
-
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
-        {
-            var stack = VolumeManager.instance.stack;
-            var effect = stack.GetComponent<Fog>();
-            if (!effect.IsActive()) return;
-            
-            var cmd = CommandBufferPool.Get();
-            cmd.Clear();
-            
-            fogMaterial.SetColor(Color, effect.color.value);
-            fogMaterial.SetFloat(Value, effect.density.value);
-
-            using (new ProfilingScope(cmd, new ProfilingSampler("Fog Pass")))
-            {
-                cmd.DrawProcedural(Matrix4x4.identity, fogMaterial, 0, MeshTopology.Triangles, 3);
-            }
-
-            context.ExecuteCommandBuffer(cmd);
-            cmd.Clear();
-            CommandBufferPool.Release(cmd);
-        }
+        public ColorParameter color = new(new Color(1.0f, 1.0f, 1.0f, 0.1f));
+        public ClampedFloatParameter density = new(0.5f, 0.0f, 1.0f);
+        public FloatParameter heightFalloffLower = new(5.0f);
+        public FloatParameter heightFalloffUpper = new(30.0f);
+        public BoolParameter renderOverSkybox = new(false);
+        public BoolParameter showFogInSceneView = new(false);
     }
 }

@@ -2,6 +2,7 @@ using System;
 using FR8.Interactions.Drivers.Submodules;
 using FR8.Pickups;
 using FR8.Rendering.Passes;
+using FR8Runtime.Rendering.Passes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -20,7 +21,7 @@ namespace FR8.Player.Submodules
         private int nudge;
         private bool dragging;
 
-        private IInteractable lookingAt;
+        private IInteractable highlightedObject;
 
         public PickupObject HeldObject { get; private set; }
         public PlayerAvatar Avatar { get; private set; }
@@ -31,72 +32,98 @@ namespace FR8.Player.Submodules
 
             avatar.UpdateEvent += Update;
             avatar.FixedUpdateEvent += FixedUpdate;
-            avatar.DisabledEvent += OnDisable;
         }
 
         public void Update()
         {
-            if (Avatar.input.Press) { }
+            if ((Object)highlightedObject) SelectionOutlinePass.Add(highlightedObject.gameObject);
 
             if (Avatar.input.Nudge != 0) nudge = Avatar.input.Nudge;
         }
 
-        public void OnDisable()
-        {
-            if ((Object)lookingAt) SelectionOutlinePass.RemovePersistant(lookingAt.gameObject);
-        }
-
         public void FixedUpdate()
         {
-            var ray = GetLookingRay();
-            var newLookingAt = dragging ? lookingAt : GetLookingAt();
-            if (HeldObject && !(Object)newLookingAt) newLookingAt = HeldObject;
+            UpdateHighlightedObject();
 
-            if (newLookingAt != lookingAt)
+            if ((Object)highlightedObject)
             {
-                transition.currentPosition = 0.0f;
-                transition.velocity = 0.0f;
-
-                if ((Object)lookingAt) SelectionOutlinePass.RemovePersistant(lookingAt.gameObject);
-                if ((Object)newLookingAt) SelectionOutlinePass.RenderPersistant(newLookingAt.gameObject);
+                ProcessInteractable();
+                UpdateInputFlags();
+            }
+            else
+            {
+                ResetInputFlags();
             }
 
-            lookingAt = newLookingAt;
-            transition.Target(lookingAt != null ? 1.0f : 0.0f).Iterate(Time.deltaTime);
-            var animatePosition = Mathf.Max(0.0f, transition.currentPosition);
-            readoutText.transform.localScale = Vector3.one * animatePosition;
-            readoutText.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, (1.0f - animatePosition) * 20.0f);
+            AnimateUI();
+        }
 
-            if (lookingAt == null)
-            {
-                nudge = 0;
-                dragging = false;
-                return;
-            }
-
-            var alpha = $"<alpha={(lookingAt.CanInteract ? "#FF" : "#80")}>";
-            readoutText.text = $"{alpha}{lookingAt.DisplayName}\n<size=66%>{lookingAt.DisplayValue}";
-
-            if (lookingAt.CanInteract)
-            {
-                ProcessInteractable(lookingAt, ray);
-            }
-
+        private void UpdateInputFlags()
+        {
             nudge = 0;
             dragging = Avatar.input.Drag;
         }
 
-        private void ProcessInteractable(IInteractable driver, Ray ray)
+        private void ResetInputFlags()
         {
+            nudge = 0;
+            dragging = false;
+        }
+
+        private void AnimateUI()
+        {
+            var hasHighlightedObject = (bool)(Object)highlightedObject;
+
+            transition.Target(hasHighlightedObject ? 1.0f : 0.0f).Iterate(Time.deltaTime);
+            var animatePosition = Mathf.Max(0.0f, transition.currentPosition);
+
+            readoutText.transform.localScale = Vector3.one * animatePosition;
+            readoutText.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, (1.0f - animatePosition) * 20.0f);
+
+            if (!hasHighlightedObject) return;
+
+            var alpha = $"<alpha={(highlightedObject.CanInteract ? "#FF" : "#80")}>";
+            readoutText.text = $"{alpha}{highlightedObject.DisplayName}\n<size=66%>{highlightedObject.DisplayValue}";
+        }
+
+        private void UpdateHighlightedObject()
+        {
+            var newHighlightedObject = GetHighlightedObject();
+
+            if (newHighlightedObject != highlightedObject)
+            {
+                transition.currentPosition = 0.0f;
+                transition.velocity = 0.0f;
+            }
+
+            highlightedObject = newHighlightedObject;
+        }
+
+        private IInteractable GetHighlightedObject()
+        {
+            if (dragging) return highlightedObject;
+
+            var lookingAt = GetLookingAt();
+            if ((Object)lookingAt) return lookingAt;
+
+            if (HeldObject) return HeldObject;
+
+            return null;
+        }
+
+        private void ProcessInteractable()
+        {
+            if (!highlightedObject.CanInteract) return;
+
             if (Avatar.input.Drag)
             {
-                if (dragging) driver.ContinueInteract(Avatar.gameObject);
-                else driver.BeginInteract(Avatar.gameObject);
+                if (dragging) highlightedObject.ContinueInteract(Avatar.gameObject);
+                else highlightedObject.BeginInteract(Avatar.gameObject);
             }
 
             if (nudge != 0)
             {
-                driver.Nudge(nudge);
+                highlightedObject.Nudge(nudge);
                 nudge = 0;
             }
         }

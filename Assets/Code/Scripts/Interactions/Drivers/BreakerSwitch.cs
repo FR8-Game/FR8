@@ -7,23 +7,12 @@ namespace FR8.Interactions.Drivers
 {
     public class BreakerSwitch : Switch
     {
-        [SerializeField] private string fuseGroup;
         [SerializeField] private TwoPoseDrivableAnimator indicator;
 
-        private TrainElectricsController electricsController;
-        
         public override void OnValueChanged(float newValue)
         {
             base.OnValueChanged(newValue);
             indicator.SetValue(Value);
-            
-            electricsController.SetFuse(fuseGroup, Value > 0.5f);
-        }
-
-        protected override void Awake()
-        {
-            base.Awake();
-            electricsController = GetComponentInParent<TrainElectricsController>();
         }
 
         protected override void Update()
