@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Skybox_MAT
-  m_Shader: {fileID: -6465566751694194690, guid: ec29da5e71d8b2644bdbc6224eccf8e7, type: 3}
+  m_Name: MAT_MetalRusted
+  m_Shader: {fileID: -6465566751694194690, guid: 954f7bd919a52b040b9085c83d11f0d9, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -44,11 +44,19 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Grunge_Sample:
+        m_Texture: {fileID: 2800000, guid: 1c43ad73e6c27104194f6e9fdd97c516, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Normal_Map:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -92,35 +100,38 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _HorizonBlend: 3.6
     - _Metallic: 0
-    - _NadirBlend: 0.5
+    - _Metalness: 1
+    - _Normal_Intensity: 1
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _Rotation: 0
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
+    - _Smoothness_Brightness: 1
+    - _Smoothness_Contrast: 1
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _StarHeight: 1069.3
-    - _StarPower: 467.97
     - _Surface: 0
+    - _Triplanar: 0
+    - _Triplanar_Blend: 1
+    - _Triplanar_Tiling: 1
     - _WorkflowMode: 1
     - _ZWrite: 1
-    - _ZenithBlend: 0.7
     m_Colors:
+    - _Albedo_High: {r: 0.5943396, g: 0.5943396, b: 0.5943396, a: 0}
+    - _Albedo_Low: {r: 0.254717, g: 0.23188858, b: 0.23188858, a: 0}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _GroundColour: {r: 0.14995982, g: 0.027320892, b: 0.002428216, a: 0}
-    - _HorizonColour: {r: 0.35640025, g: 0.05448028, b: 0.000607054, a: 0}
-    - _SkyColour: {r: 0.90466136, g: 0.69387203, b: 0.49693304, a: 0}
+    - _Offset: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _StarColour: {r: 1, g: 1, b: 1, a: 0}
+    - _Tiling: {r: 1, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
---- !u!114 &1433428834253762916
+--- !u!114 &2835962843976160039
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

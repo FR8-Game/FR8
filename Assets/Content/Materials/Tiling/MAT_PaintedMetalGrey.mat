@@ -1,5 +1,18 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-4447480008034074393
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 5
 --- !u!21 &2100000
 Material:
   serializedVersion: 8
@@ -7,8 +20,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Skybox_MAT
-  m_Shader: {fileID: -6465566751694194690, guid: ec29da5e71d8b2644bdbc6224eccf8e7, type: 3}
+  m_Name: MAT_PaintedMetalGrey
+  m_Shader: {fileID: -6465566751694194690, guid: 954f7bd919a52b040b9085c83d11f0d9, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -44,11 +57,19 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Grunge_Sample:
+        m_Texture: {fileID: 2800000, guid: 2a12c9d20a8a89548b94cf3ef9d33c51, type: 3}
+        m_Scale: {x: 3, y: 3}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Normal_Map:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -92,44 +113,32 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _HorizonBlend: 3.6
     - _Metallic: 0
-    - _NadirBlend: 0.5
+    - _Metalness: 0
+    - _Normal_Intensity: 1
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _Rotation: 0
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
+    - _Smoothness_Brightness: 0.54
+    - _Smoothness_Contrast: 0.076
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _StarHeight: 1069.3
-    - _StarPower: 467.97
     - _Surface: 0
+    - _Triplanar: 0
+    - _Triplanar_Blend: 1
+    - _Triplanar_Tiling: 1
     - _WorkflowMode: 1
     - _ZWrite: 1
-    - _ZenithBlend: 0.7
     m_Colors:
+    - _Albedo_High: {r: 0.7411765, g: 0.7725491, b: 0.8235295, a: 0}
+    - _Albedo_Low: {r: 0.7411765, g: 0.7725491, b: 0.8235295, a: 0}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _GroundColour: {r: 0.14995982, g: 0.027320892, b: 0.002428216, a: 0}
-    - _HorizonColour: {r: 0.35640025, g: 0.05448028, b: 0.000607054, a: 0}
-    - _SkyColour: {r: 0.90466136, g: 0.69387203, b: 0.49693304, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _StarColour: {r: 1, g: 1, b: 1, a: 0}
   m_BuildTextureStacks: []
---- !u!114 &1433428834253762916
-MonoBehaviour:
-  m_ObjectHideFlags: 11
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 5
