@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FR8Runtime.Train.Splines;
 using UnityEditor;
 using UnityEngine;
+using ColorUtility = FR8Runtime.CodeUtility.ColorUtility;
 
 namespace FR8Runtime.Train.Track
 {
@@ -166,12 +167,6 @@ namespace FR8Runtime.Train.Track
                 
                 GizmosDrawLine(a, b, new Color(1.0f, 0.6f, 0.1f, 1.0f));
             }
-
-            if (!closedLoop)
-            {
-                Gizmos.DrawWireCube(knots[0], Vector3.one * 2.0f * 2.0f);
-                Gizmos.DrawWireSphere(knots[^1], 2.0f);
-            }
         }
 
         private void OnDrawGizmosSelected()
@@ -184,6 +179,20 @@ namespace FR8Runtime.Train.Track
 
                 DrawDistanceFromGround(p0);
             }
+
+#if UNITY_EDITOR
+            if (!closedLoop)
+            {
+                var style = new GUIStyle(EditorStyles.boldLabel);
+                style.fontSize = 64;
+                style.alignment = TextAnchor.MiddleCenter;
+
+                style.normal.textColor = new Color(1.0f, 0.5f, 0.0f, 1.0f);
+                Handles.Label(transform.TransformPoint(knots[^1]), "E", style);
+                style.normal.textColor = ColorUtility.Invert(style.normal.textColor);
+                Handles.Label(transform.TransformPoint(knots[0]), "S", style);
+            }
+#endif
 
             DrawExtraKnots();
         }
@@ -317,7 +326,7 @@ namespace FR8Runtime.Train.Track
         {
             var a = points[best];
             var b = points[other];
-            
+
             var v1 = b - a;
             var v2 = point - a;
 
