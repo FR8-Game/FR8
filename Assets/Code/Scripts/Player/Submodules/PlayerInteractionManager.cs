@@ -76,13 +76,16 @@ namespace FR8Runtime.Player.Submodules
             transition.Target(hasHighlightedObject ? 1.0f : 0.0f).Iterate(Time.deltaTime);
             var animatePosition = Mathf.Max(0.0f, transition.currentPosition);
 
-            readoutText.transform.localScale = Vector3.one * animatePosition;
-            readoutText.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, (1.0f - animatePosition) * 20.0f);
+            if (readoutText)
+            {
+                readoutText.transform.localScale = Vector3.one * animatePosition;
+                readoutText.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, (1.0f - animatePosition) * 20.0f);
+                
+                if (!hasHighlightedObject) return;
 
-            if (!hasHighlightedObject) return;
-
-            var alpha = $"<alpha={(highlightedObject.CanInteract ? "#FF" : "#80")}>";
-            readoutText.text = $"{alpha}{highlightedObject.DisplayName}\n<size=66%>{highlightedObject.DisplayValue}";
+                var alpha = $"<alpha={(highlightedObject.CanInteract ? "#FF" : "#80")}>";
+                readoutText.text = $"{alpha}{highlightedObject.DisplayName}\n<size=66%>{highlightedObject.DisplayValue}";
+            }
         }
 
         private void UpdateHighlightedObject()

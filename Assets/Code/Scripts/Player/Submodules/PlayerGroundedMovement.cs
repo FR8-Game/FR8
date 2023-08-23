@@ -54,6 +54,21 @@ namespace FR8Runtime.Player.Submodules
         public Rigidbody Rigidbody => avatar.Rigidbody;
         public PlayerInput input => avatar.input;
 
+        private const float GroundCheckRayLength = 1.0f;
+        private float GroundCheckRadius => avatar.Radius * 0.25f;
+        
+        public float GroundCheckHeightOffset
+        {
+            get
+            {
+                var maxDistance = GroundCheckRayLength - GroundCheckRadius;
+                
+                var downForce = -Physics.gravity.y * downGravityScale;
+                var compression = downForce / groundSpring;
+                var distance = maxDistance - (1.0f - compression) * maxDistance;
+                return distance;
+            }
+        }
         public bool IsOnGround { get; private set; }
         public RaycastHit GroundHit { get; private set; }
         public Ladder Ladder { get; private set; }
@@ -199,12 +214,12 @@ namespace FR8Runtime.Player.Submodules
         private void CheckForGround()
         {
             var transform = avatar.transform;
-            var distance = 1.0f - avatar.Radius;
+            var distance = GroundCheckRayLength - GroundCheckRadius;
             IsOnGround = false;
 
-            var ray = new Ray(transform.position + Vector3.up, Vector3.down);
+            var ray = new Ray(transform.position + Vector3.up * (1.0f - GroundCheckHeightOffset), Vector3.down);
 
-            var res = Physics.SphereCastAll(ray, avatar.Radius * 0.25f, distance, ~0, QueryTriggerInteraction.Ignore);
+            var res = Physics.SphereCastAll(ray, GroundCheckRadius, distance, ~0, QueryTriggerInteraction.Ignore);
             if (res.Length == 0) return;
 
             if (!GetValidGroundHit(res, transform, out var bestHit)) return;
@@ -242,8 +257,8 @@ namespace FR8Runtime.Player.Submodules
 
         private void ApplyGroundSpring(float distance)
         {
-            var contraction = 1.0f - GroundHit.distance / distance;
-
+            var contraction = GroundCheckRayLength - GroundHit.distance / distance;
+            
             if (Time.time - lastJumpTime < 0.08f) return;
 
             var spring = contraction * groundSpring - Velocity.y * groundDamping;

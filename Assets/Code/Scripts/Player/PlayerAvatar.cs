@@ -9,7 +9,6 @@ namespace FR8Runtime.Player
     {
         [Header("Configuration")]
         [SerializeField] private float mass = 80.0f;
-
         [SerializeField] private float playerHeight = 1.7f;
         [SerializeField] private float radius = 0.25f;
         [SerializeField] private float stepHeight = 0.5f;
