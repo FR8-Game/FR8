@@ -1,9 +1,12 @@
-﻿using FR8.Train.Track;
+﻿using System;
+using FR8Runtime.Train.Track;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace FR8Editor.Inspector
 {
+    [CanEditMultipleObjects]
     [CustomEditor(typeof(TrackSegment))]
     public class TrackSegmentEditor : Editor
     {
@@ -11,26 +14,25 @@ namespace FR8Editor.Inspector
         {
             base.OnInspectorGUI();
 
-            var trackSegment = target as TrackSegment;
-            if (!trackSegment) return;
-
-            if (GUILayout.Button("Zero Origin", GUILayout.Height(30)))
+            if (GUILayout.Button(Count("Zero Track Origin{0}"), GUILayout.Height(30)))
             {
-                ShiftTransform(trackSegment, Vector3.zero, "Zero Track Origin");
+                ExecuteAll(s => ShiftTransform(s, Vector3.zero, "Zero Track Origin"));
             }
 
-            if (GUILayout.Button("Center Origin", GUILayout.Height(30)))
+            if (GUILayout.Button(Count("Center Track Origin{0}"), GUILayout.Height(30)))
             {
-                if (trackSegment.Knots.Count > 0)
+                ExecuteAll(s =>
                 {
-                    var bounds = new Bounds(trackSegment.transform.TransformPoint(trackSegment.Knots[0]), Vector3.zero);
-                    for (var i = 1; i < trackSegment.Knots.Count; i++)
+                    if (s.Knots.Count <= 0) return;
+
+                    var bounds = new Bounds(s.transform.TransformPoint(s.Knots[0]), Vector3.zero);
+                    for (var i = 1; i < s.Knots.Count; i++)
                     {
-                        bounds.Encapsulate(trackSegment.transform.TransformPoint(trackSegment.Knots[i]));
+                        bounds.Encapsulate(s.transform.TransformPoint(s.Knots[i]));
                     }
 
-                    ShiftTransform(trackSegment, bounds.center, "Center Track Origin");
-                }
+                    ShiftTransform(s, bounds.center, "Center Track Origin");
+                });
             }
         }
 
@@ -62,8 +64,19 @@ namespace FR8Editor.Inspector
             {
                 var worldPos = trackSegment.transform.TransformPoint(trackSegment.Knots[i]);
                 worldPos = Handles.PositionHandle(worldPos, Quaternion.identity);
+
                 trackSegment.Knots[i] = trackSegment.transform.InverseTransformPoint(worldPos);
             }
         }
+
+        private void ExecuteAll(Action<TrackSegment> segment)
+        {
+            foreach (var target in targets)
+            {
+                segment(target as TrackSegment);
+            }
+        }
+
+        public string Count(string template) => string.Format(template, targets.Length > 1 ? $" [{targets.Length}]" : string.Empty);
     }
 }

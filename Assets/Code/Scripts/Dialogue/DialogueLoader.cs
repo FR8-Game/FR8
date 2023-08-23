@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FR8.Dialogue
+namespace FR8Runtime.Dialogue
 {
     public class DialogueLoader : MonoBehaviour
     {

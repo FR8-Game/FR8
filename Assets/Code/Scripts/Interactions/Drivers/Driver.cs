@@ -1,66 +1,69 @@
-using FR8.Interactions.Drivers.DragBehaviours;
+﻿using System;
+using FR8Runtime.Interactions.Drivers.Submodules;
 using UnityEngine;
 
-namespace FR8.Interactions.Drivers
+namespace FR8Runtime.Interactions.Drivers
 {
-    /// <summary>
-    /// A base classed used to make a interactable control that provides a one dimensional, decimal value like a slider or a dial.
-    /// </summary>
     [SelectionBase, DisallowMultipleComponent]
     public abstract class Driver : MonoBehaviour, IDriver
     {
-        // The Name Used when the player mouses over the object.
-        [SerializeField] protected float initialValue;
-
-        protected DriverGroup driverGroup;
-        protected DriverDragBehaviour dragBehaviour;
-
+        [SerializeField] private string key;
+        [SerializeField] private string displayName;
+        [SerializeField] private float defaultValue;
+        
+        private DriverNetwork driverNetwork;
+        
         public virtual bool CanInteract => true;
-        public virtual string DisplayName => driverGroup ? driverGroup.GroupName : name;
-        public abstract string DisplayValue { get; }
-        public virtual float Value
+        public virtual string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
+        public virtual string DisplayValue => $"{Mathf.RoundToInt(Value * 100.0f)}%";
+        
+        public bool OverrideInteractDistance => false;
+        public float InteractDistance => throw new NotImplementedException();
+        
+        public float Value { get; private set; }
+        public string Key => key;
+        
+        public virtual void OnValueChanged(float newValue)
         {
-            get => driverGroup ? driverGroup.Value : 0.0f;
-            set
-            {
-                if (driverGroup) driverGroup.SetValue(value);
-            }
+            Value = newValue;
         }
+
+        protected virtual void SetValue(float newValue)
+        {
+            if (string.IsNullOrEmpty(key))
+            {
+                OnValueChanged(newValue);
+                return;
+            }
+
+            if (driverNetwork) driverNetwork.SetValue(key, newValue);
+        }
+
+        public abstract void Nudge(int direction);
+
+        public abstract void BeginInteract(GameObject interactingObject);
+
+        public abstract void ContinueInteract(GameObject interactingObject);
 
         protected virtual void Awake()
         {
-            dragBehaviour = GetComponent<DriverDragBehaviour>();
+            driverNetwork = GetComponentInParent<DriverNetwork>();
         }
 
-        protected virtual void Start()
+        protected void Start()
         {
-            Value = initialValue;
+            SetValue(defaultValue);
         }
-
-        public virtual void Nudge(int direction) { }
-
-        public virtual void Press() { }
-
-        public void BeginDrag(Ray ray)
+        
+        protected virtual void FixedUpdate()
         {
-            if (dragBehaviour) dragBehaviour.BeginDrag(Value, ray);
-        }
-
-        public void ContinueDrag(Ray ray)
-        {
-            if (dragBehaviour) Value = dragBehaviour.ContinueDrag(ray);
-        }
-
-        public virtual void ValueUpdated() { }
-
-        public void SetDriverGroup(DriverGroup group)
-        {
-            driverGroup = group;
-        }
-
-        protected virtual void OnValidate()
-        {
-            ValueUpdated();
+            var newValue = driverNetwork.GetValue(key);
+            
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            if (newValue != Value)
+            {
+                OnValueChanged(newValue);
+            }
         }
     }
 }

@@ -1,14 +1,17 @@
-using FR8.Interactions.Drivers;
-using FR8.Player;
+using FR8Runtime.Interactions.Drivers.Submodules;
+using FR8Runtime.Player;
 using UnityEngine;
 
-namespace FR8.Pickups
+namespace FR8Runtime.Pickups
 {
     [SelectionBase]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Rigidbody))]
     public class PickupObject : MonoBehaviour, IInteractable
     {
+        public const int DefaultLayer = 0;
+        public const int PickupLayer = 8;
+
         [SerializeField] private string displayName;
         [SerializeField] private PickupPose pickupPose;
         [SerializeField] private Vector3 additionalTranslation;
@@ -16,77 +19,98 @@ namespace FR8.Pickups
 
         [SerializeField] private float spring = 300.0f;
         [SerializeField] private float damping = 18.0f;
-        [SerializeField] private float error = 1800;
         [SerializeField] private float torqueScaling = 1.0f;
 
-        private new Rigidbody rigidbody;
-        private PlayerGroundedAvatar target;
-        
-        private Vector3 translationError;
-        private Vector3 rotationError;
+        private PlayerAvatar target;
 
-        // private Vector3 holdPosition, holdVelocity;
-        // private Quaternion holdRotation;
-        // private Vector3 holdAngularVelocity;
-        
-        public bool CanInteract => !target;
+        private Vector3 lastTargetPosition;
+        private Quaternion lastTargetRotation;
+
+        public Rigidbody Rigidbody { get; private set; }
+        public virtual bool CanInteract => true;
         public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
-        public string DisplayValue => target ? "Drop" : "Pickup";
-        public Vector3 HoldTranslation => (pickupPose ? pickupPose.holdTranslation : Vector3.zero) + additionalTranslation;
-        public Quaternion HoldRotation => Quaternion.Euler(pickupPose ? pickupPose.holdRotation : Vector3.zero) * Quaternion.Euler(additionalRotation);
-        
-        private void Awake()
+        public virtual string DisplayValue => target ? "Drop" : "Pickup";
+        public bool Held => target;
+
+        public bool OverrideInteractDistance => false;
+        public float InteractDistance => throw new System.NotImplementedException();
+
+        public void Nudge(int direction) { }
+
+        public void BeginInteract(GameObject interactingObject)
         {
-            rigidbody = GetComponent<Rigidbody>();
+            var avatar = interactingObject.GetComponentInParent<PlayerAvatar>();
+            if (!avatar) return;
+            if (target && avatar != target) return;
+
+            if (Held) target.interactionManager.Drop();
+            else avatar.interactionManager.Pickup(this);
         }
 
-        private void FixedUpdate()
+        public virtual PickupObject Pickup(PlayerAvatar target)
+        {
+            this.target = target;
+            
+            Rigidbody.detectCollisions = false;
+            lastTargetPosition = GetTargetPosition();
+            lastTargetRotation = GetTargetRotation();
+
+            return this;
+        }
+
+        public virtual PickupObject Drop(PlayerAvatar target)
+        {
+            this.target = null;
+            Rigidbody.detectCollisions = true;
+            
+            return null;
+        }
+
+        public void ContinueInteract(GameObject interactingObject) { }
+
+        public Vector3 HoldTranslation => (pickupPose ? pickupPose.holdTranslation : Vector3.zero) + additionalTranslation;
+        public Quaternion HoldRotation => Quaternion.Euler(pickupPose ? pickupPose.holdRotation : Vector3.zero) * Quaternion.Euler(additionalRotation);
+
+        protected virtual void Awake()
+        {
+            Rigidbody = GetComponent<Rigidbody>();
+            Rigidbody.gameObject.layer = PickupLayer;
+
+            transform.SetParent(null);
+        }
+
+        protected virtual void FixedUpdate()
         {
             if (!target) return;
-            
-            var targetPosition = target.CameraTarget.TransformPoint(HoldTranslation);
-            var targetRotation = target.CameraTarget.rotation * HoldRotation;
 
-            var force = (targetPosition - rigidbody.position) * spring - rigidbody.velocity * damping + translationError * error;
-            rigidbody.AddForce(force - Physics.gravity, ForceMode.Acceleration);
+            var targetPosition = GetTargetPosition();
+            var targetRotation = GetTargetRotation();
 
-            var deltaRotation = (targetRotation * Quaternion.Inverse(rigidbody.rotation));
-            if (deltaRotation.w < 0.0f) deltaRotation = Quaternion.Inverse(deltaRotation);
-            deltaRotation.ToAngleAxis(out var angle, out var axis);
-            if (Mathf.Abs(angle) > 180.0f) angle = 360.0f - angle;
-            
+            var targetVelocity = (targetPosition - lastTargetPosition) / Time.deltaTime;
+            var (angle, axis) = CodeUtility.QuaternionUtility.ToAngleAxis(targetRotation * Quaternion.Inverse(lastTargetRotation));
+
+            var targetAngularVelocity = axis * angle / Time.deltaTime * Mathf.Deg2Rad;
+
+            var force = (targetPosition - Rigidbody.position) * spring + (targetVelocity - Rigidbody.velocity) * damping;
+            Rigidbody.AddForce(force - Physics.gravity, ForceMode.Acceleration);
+
+            (angle, axis) = CodeUtility.QuaternionUtility.ToAngleAxis(targetRotation * Quaternion.Inverse(Rigidbody.rotation));
+
             angle *= Mathf.Deg2Rad;
             if (angle == 0.0f)
             {
                 axis = Vector3.up;
                 angle = 0.0f;
             }
-            
-            var torque = (axis * angle * spring - rigidbody.angularVelocity * damping + rotationError * error) * torqueScaling;
-            rigidbody.AddTorque(torque, ForceMode.Acceleration);
 
-            translationError += (targetPosition - rigidbody.position) * Time.deltaTime;
-            rotationError += axis * angle * Time.deltaTime;
+            var torque = (axis * angle * spring + (targetAngularVelocity - Rigidbody.angularVelocity) * damping) * torqueScaling;
+            Rigidbody.AddTorque(torque, ForceMode.Acceleration);
+
+            lastTargetPosition = targetPosition;
+            lastTargetRotation = targetRotation;
         }
 
-        public PickupObject Pickup(PlayerGroundedAvatar target)
-        {
-            if (this.target) return null;
-            if (!target) return null;
-            
-            this.target = target;
-            rigidbody.detectCollisions = false;
-            return this;
-        }
-
-        public PickupObject Drop()
-        {
-            if (!target) return null;
-            
-            rigidbody.detectCollisions = true;
-            
-            target = null;
-            return null;
-        }
+        private Vector3 GetTargetPosition() => target.cameraController.CameraTarget.TransformPoint(HoldTranslation);
+        private Quaternion GetTargetRotation() => target.cameraController.CameraTarget.rotation * HoldRotation;
     }
 }

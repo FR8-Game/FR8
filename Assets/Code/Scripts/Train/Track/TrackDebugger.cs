@@ -1,20 +1,19 @@
 using UnityEngine;
 
-namespace FR8.Train.Track
+namespace FR8Runtime.Train.Track
 {
     public class TrackDebugger : MonoBehaviour
     {
         [SerializeField] private TrackSegment segment;
         [SerializeField][Range(0.0f, 1.0f)] private float t;
         [SerializeField] private bool useClosestPoint;
-        [SerializeField] private bool debugDrawSteps = true;
         [SerializeField] private bool roundToKnot;
 
         private void OnDrawGizmos()
         {
             if (!segment) return;
 
-            if (useClosestPoint) t = segment.GetClosestPoint(transform.position, debugDrawSteps);
+            if (useClosestPoint) t = segment.GetClosestPoint(transform.position);
 
             var p = segment.SamplePoint(t);
             var v = segment.SampleVelocity(t);

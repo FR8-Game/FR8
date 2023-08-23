@@ -1,35 +1,58 @@
-using System.Collections.Generic;
-using FR8.Train.Signals;
+﻿using FR8Runtime.Interactions.Drivables;
+using FR8Runtime.Interactions.Drivers.Submodules;
 using UnityEngine;
 
-namespace FR8.Interactions.Drivers
+namespace FR8Runtime.Interactions.Drivers
 {
-    [SelectionBase, DisallowMultipleComponent]
-    public class Button : MonoBehaviour, IInteractable
+    public class Button : Driver
     {
-        [SerializeField] private string displayName = "Button";
-        [SerializeField] private List<Signal> pressSignalList;
+        [SerializeField] private TwoPoseDrivableAnimator animator;
+        [SerializeField] private bool testValue;
+        [SerializeField] private DriverSounds sounds;
 
-        public virtual bool CanInteract => true;
-        public virtual string DisplayName => displayName;
-        public virtual string DisplayValue => "Press";
-        
-        public void Nudge(int direction)
+        private bool state;
+
+        public override string DisplayValue => state ? "Pressed" : "Press";
+
+        public override void OnValueChanged(float newValue)
         {
-            Press();
+            base.OnValueChanged(newValue);
+            animator.SetValue(newValue);
+            sounds.SetValue(newValue, 2);
         }
 
-        public virtual void Press()
+        protected override void Awake()
         {
-            pressSignalList.Raise();
+            base.Awake();
+            sounds.Awake(gameObject);
         }
 
-        public void BeginDrag(Ray ray)
+        protected override void FixedUpdate()
         {
+            base.FixedUpdate();
+            
+            SetValue(state ? 1.0f : 0.0f);
+            state = false;
+            
+            animator.FixedUpdate();
         }
 
-        public void ContinueDrag(Ray ray)
+        private void Update()
         {
+            animator.Update();
+        }
+
+        private void OnValidate()
+        {
+            animator.OnValidate(testValue ? 1.0f : 0.0f);
+        }
+
+        public override void Nudge(int direction) { }
+
+        public override void BeginInteract(GameObject interactingObject) { }
+        public override void ContinueInteract(GameObject interactingObject)
+        {
+            state = true;
         }
     }
 }

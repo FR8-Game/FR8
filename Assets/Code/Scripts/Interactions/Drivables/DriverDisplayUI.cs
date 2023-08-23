@@ -1,35 +1,46 @@
-using FR8.Interactions.Drivers;
+using System;
+using FR8Runtime.Interactions.Drivers;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FR8.Interactions.Drivables
+namespace FR8Runtime.Interactions.Drivables
 {
-    [DisallowMultipleComponent]
-    [RequireComponent(typeof(Image))]
-    public sealed class DriverDisplayUI : MonoBehaviour, IDrivable
+    [System.Serializable]
+    public sealed class DriverDisplayUI
     {
-        [SerializeField] private Vector2 inputRange = Vector2.right;
-        [SerializeField] private Vector2 outputRange = Vector2.right;
-        [SerializeField] private float testValue;
-        
-        private Image image;
+        [SerializeField] private Image image;
+        [SerializeField] private Vector2 inputRange = Vector2.up;
+        [SerializeField] private Vector2 outputRange = Vector2.up;
 
-        private void Awake()
+        private Func<RadialDisplay.DisplayMode> displayMode;
+
+        public void Awake(Func<RadialDisplay.DisplayMode> displayMode)
         {
-            image = GetComponent<Image>();
+            this.displayMode = displayMode;
         }
-        
-        public void SetValue(DriverGroup group, float value)
+
+        public void SetValue(float newValue)
         {
-            var p = Mathf.InverseLerp(inputRange.x, inputRange.y, value);
-            var val = Mathf.Lerp(outputRange.x, outputRange.y, p);
+            var p = displayMode() switch
+            {
+                RadialDisplay.DisplayMode.Percentage => newValue, 
+                _ => Mathf.InverseLerp(inputRange.x, inputRange.y, newValue),
+            };
+            SetValueNormalized(p);
+        }
+
+        public void SetValueNormalized(float percent)
+        {
+            if (!image) return;
+            
+            var val = Mathf.Lerp(outputRange.x, outputRange.y, percent);
             image.fillAmount = val;
         }
-        
-        private void OnValidate()
+
+        public void OnValidate(float testValue)
         {
-            image = GetComponent<Image>();
-            SetValue(null, testValue);
+            if (!image) return;
+            SetValue(testValue);
         }
     }
 }

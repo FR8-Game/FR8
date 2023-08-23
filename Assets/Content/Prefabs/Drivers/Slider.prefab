@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 3539575262749145341}
   - component: {fileID: 4569393889627437722}
   - component: {fileID: 4709530868518966466}
-  - component: {fileID: 5756719351563343285}
   m_Layer: 0
   m_Name: Slider
   m_TagString: Untagged
@@ -100,26 +99,6 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 5964940218898284536, guid: 7ede8a74de1e7ba428f59b3f63c8b624, type: 3}
---- !u!114 &5756719351563343285
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1697740958110516345}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 13b9bab282324f44b938b466582ce752, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  displayName: Slider
-  nudgeStep: 8
-  displayRange: {x: 0, y: 100}
-  displayTemplate: '{0:N1}%'
-  displayText: {fileID: 0}
-  handle: {fileID: 7759265547127319851}
-  slidePoseA: {x: 0, y: 0.012849, z: -0.10118}
-  slidePoseB: {x: 0, y: 0.012849, z: 0.10118}
 --- !u!1 &5075021056106354868
 GameObject:
   m_ObjectHideFlags: 0

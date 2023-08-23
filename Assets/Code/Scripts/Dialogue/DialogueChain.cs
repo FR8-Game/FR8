@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using FR8.Train.Signals;
-using FR8.Utility;
+using FR8Runtime.Train.Signals;
 using UnityEngine;
 
-namespace FR8.Dialogue
+namespace FR8Runtime.Dialogue
 {
     [CreateAssetMenu(menuName = "Dialogue/Dialogue Chain")]
     public class DialogueChain : ScriptableObject
@@ -20,28 +19,6 @@ namespace FR8.Dialogue
         public void Queue()
         {
             foreach (var e in list) DialogueListener.QueueDialogue(e);
-        }
-
-        public static DialogueChain CreateFromString(string[] list, string headerSeparator, DialogueSource[] sourceList)
-        {
-            var instance = CreateInstance<DialogueChain>();
-
-            foreach (var text in list)
-            {
-                var entry = new DialogueEntry();
-                
-                var splitPoint = text.IndexOf(headerSeparator);
-                var header = text[..splitPoint];
-                var body = text[splitPoint..];
-                
-                var source = sourceList[Search.FuzzySearch(i => sourceList[i].title, sourceList.Length, header)];
-                entry.source = source;
-                entry.body = body;
-                
-                instance.list.Add(entry);
-            }
-
-            return instance;
         }
     }
 }
