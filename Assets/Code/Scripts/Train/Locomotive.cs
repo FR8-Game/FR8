@@ -1,8 +1,14 @@
 using FR8Runtime.Interactions.Drivers;
+using FR8Runtime.Train.Electrics;
+using FR8Runtime.Train.Engine;
 using UnityEngine;
 
 namespace FR8Runtime.Train
 {
+    [SelectionBase]
+    [DisallowMultipleComponent]
+    [RequireComponent(typeof(TrainEngine), typeof(TrainElectricsController), typeof(TrainGasTurbine))]
+    [RequireComponent(typeof(DriverNetwork), typeof(TrainMonitor), typeof(LocomotiveAudio))]
     public class Locomotive : TrainCarriage
     {
         [SerializeField] private float brakeConstant = 4.0f;
