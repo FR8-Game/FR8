@@ -1,13 +1,13 @@
 ﻿using System.Collections;
-using FR8.Interactions.Drivables;
-using FR8.Train.Electrics;
+using FR8Runtime.Interactions.Drivables;
+using FR8Runtime.Train.Electrics;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace FR8.Interactions.Drivers
+namespace FR8Runtime.Interactions.Drivers
 {
     [SelectionBase, DisallowMultipleComponent]
-    public sealed class RadialDisplay : MonoBehaviour, IDrivable, IElectricDevice
+    public sealed class RadialDisplay : MonoBehaviour, IElectricDevice
     {
         [SerializeField] private string key;
         [SerializeField] private string fuseGroup = "Dash";
@@ -31,25 +31,17 @@ namespace FR8.Interactions.Drivers
         private bool powered;
         private bool warmingUp;
 
+        private DriverNetwork driverNetwork;
+
         public string DisplayValue => Mathf.RoundToInt(Value * 100.0f).ToString();
         public float Value { get; private set; }
-        public string Key => key;
-        public string FuseGroup => fuseGroup;
 
         private void Awake()
         {
+            driverNetwork = GetComponentInParent<DriverNetwork>();
+            
             displayText.Awake(() => displayMode);
             displayUI.Awake(() => displayMode);
-        }
-
-        public void OnValueChanged(float newValue)
-        {
-            Value = newValue;
-
-            if (warmingUp) return;
-            
-            displayText.SetValue(newValue);
-            displayUI.SetValue(newValue);
         }
 
         private void OnValidate()
@@ -62,20 +54,28 @@ namespace FR8.Interactions.Drivers
 
         private void FixedUpdate()
         {
-            group.alpha += ((powered ? 1.0f : 0.0f) - group.alpha) * 2.0f * Time.deltaTime / fadeTime;
+            UpdatePowerState();
+            Value = driverNetwork.GetValue(key);
+            displayText.SetValue(Value);
+            displayUI.SetValue(Value);
+
+            if (group) group.alpha += ((powered ? 1.0f : 0.0f) - group.alpha) * 2.0f * Time.deltaTime / fadeTime;
             
             displayText.FixedUpdate();
         }
         
-        public void SetConnected(bool connected)
+        public void UpdatePowerState()
         {
-            if (powered == connected) return;
-            
-            group.interactable = connected;
-            group.blocksRaycasts = connected;
-            powered = connected;
+            var powered = driverNetwork.GetValue(TrainElectricsController.MainFuse) > 0.5f
+                && driverNetwork.GetValue(fuseGroup) > 0.5f;
 
-            if (connected)
+            if (this.powered == powered) return;
+            
+            group.interactable = powered;
+            group.blocksRaycasts = powered;
+            this.powered = powered;
+
+            if (powered)
             {
                 StartCoroutine(PowerUpRoutine());
             }

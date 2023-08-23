@@ -1,9 +1,8 @@
-﻿
-using FR8.Interactions.Drivables;
-using FR8.Interactions.Drivers.Submodules;
+﻿using FR8Runtime.Interactions.Drivables;
+using FR8Runtime.Interactions.Drivers.Submodules;
 using UnityEngine;
 
-namespace FR8.Interactions.Drivers
+namespace FR8Runtime.Interactions.Drivers
 {
     public class Switch : Driver
     {
@@ -50,8 +49,9 @@ namespace FR8.Interactions.Drivers
             animator.Update();
         }
 
-        protected virtual void FixedUpdate()
+        protected override void FixedUpdate()
         {
+            base.FixedUpdate();
             animator.FixedUpdate();
         }
 

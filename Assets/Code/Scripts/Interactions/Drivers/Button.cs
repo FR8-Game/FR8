@@ -1,8 +1,8 @@
-﻿using FR8.Interactions.Drivables;
-using FR8.Interactions.Drivers.Submodules;
+﻿using FR8Runtime.Interactions.Drivables;
+using FR8Runtime.Interactions.Drivers.Submodules;
 using UnityEngine;
 
-namespace FR8.Interactions.Drivers
+namespace FR8Runtime.Interactions.Drivers
 {
     public class Button : Driver
     {
@@ -27,8 +27,10 @@ namespace FR8.Interactions.Drivers
             sounds.Awake(gameObject);
         }
 
-        private void FixedUpdate()
+        protected override void FixedUpdate()
         {
+            base.FixedUpdate();
+            
             SetValue(state ? 1.0f : 0.0f);
             state = false;
             

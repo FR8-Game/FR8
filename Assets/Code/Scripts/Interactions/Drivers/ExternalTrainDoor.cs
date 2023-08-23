@@ -1,7 +1,6 @@
-using FR8.Train;
-using UnityEngine;
+using FR8Runtime.Train;
 
-namespace FR8.Interactions.Drivers
+namespace FR8Runtime.Interactions.Drivers
 {
     public class ExternalTrainDoor : Door
     {
@@ -30,7 +29,7 @@ namespace FR8.Interactions.Drivers
         protected override void FixedUpdate()
         {
             var fwdSpeed = trainMovement.GetForwardSpeed();
-            traveling = Mathf.Abs(fwdSpeed) > TrainMonitor.MaxTrainSafeSpeed;
+            //traveling = Mathf.Abs(fwdSpeed) > TrainMonitor.MaxTrainSafeSpeed;
             if (Locked) SetValue(0.0f);
             
             base.FixedUpdate();

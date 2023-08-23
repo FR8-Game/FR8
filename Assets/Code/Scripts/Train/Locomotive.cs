@@ -1,7 +1,7 @@
-using FR8.Interactions.Drivers;
+using FR8Runtime.Interactions.Drivers;
 using UnityEngine;
 
-namespace FR8.Train
+namespace FR8Runtime.Train
 {
     public class Locomotive : TrainCarriage
     {
@@ -16,8 +16,8 @@ namespace FR8.Train
         private float engineVelocity;
         private float enginePower;
 
-        public float Brake => driverNetwork.Read(BrakeKey);
-        public int Gear => Mathf.RoundToInt(driverNetwork.Read(GearKey));
+        public float Brake => driverNetwork.GetValue(BrakeKey);
+        public int Gear => Mathf.RoundToInt(driverNetwork.GetValue(GearKey));
 
         protected override void Configure()
         {

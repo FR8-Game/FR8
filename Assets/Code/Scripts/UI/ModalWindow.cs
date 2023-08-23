@@ -1,9 +1,10 @@
 using System.Collections;
+using FR8Runtime.CodeUtility;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace FR8.UI
+namespace FR8Runtime.UI
 {
     [SelectionBase]
     [DisallowMultipleComponent]
@@ -56,14 +57,14 @@ namespace FR8.UI
 
         private void Start()
         {
-            StartCoroutine(Utility.UITween.BounceIn(window, 0.2f));
+            StartCoroutine(CodeUtility.UITween.BounceIn(window, 0.2f));
         }
 
         private void Hide()
         {
             IEnumerator routine()
             {
-                yield return StartCoroutine(Utility.UITween.BounceOut(window, 0.2f));
+                yield return StartCoroutine(CodeUtility.UITween.BounceOut(window, 0.2f));
                 Destroy(gameObject);
             }
 

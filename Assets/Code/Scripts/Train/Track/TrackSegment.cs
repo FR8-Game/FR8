@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using FR8.Train.Splines;
-using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.UI;
-
-#if UNITY_EDITOR
+using FR8Runtime.Train.Splines;
 using UnityEditor;
-#endif
+using UnityEngine;
+using ColorUtility = FR8Runtime.CodeUtility.ColorUtility;
 
-namespace FR8.Train.Track
+namespace FR8Runtime.Train.Track
 {
     [SelectionBase, DisallowMultipleComponent]
     public class TrackSegment : MonoBehaviour
@@ -92,17 +88,7 @@ namespace FR8.Train.Track
                     if (train.Segment != other) continue;
                     if (!trainMetadata.ContainsKey(train)) continue;
 
-                    var knotPercent = other.GetKnotPercent(connection.knotIndex);
-
-                    var lastSign = difference(other.GetClosestPoint(trainMetadata[train]), knotPercent, other.closedLoop) > 0.0f;
-                    var d0 = difference(other.GetClosestPoint(train.Rigidbody.position), knotPercent, other.closedLoop);  
-                    var sign = d0 > 0.0f;
-                    var switchSign = connection.handleScale > 0.0f;
-
-                    if (sign == switchSign && lastSign != switchSign)
-                    {
-                        train.Segment = this;
-                    }
+                    TryExplicitJump(other, connection, train);
                 }
             }
 
@@ -110,29 +96,39 @@ namespace FR8.Train.Track
             {
                 if (train.Segment != this) continue;
 
-                var p = GetClosestPoint(train.Rigidbody.position);
-                switch (type)
-                {
-                    case ConnectionType.Start:
-                    {
-                        if (p < 0.0f)
-                        {
-                            train.Segment = connection.segment;
-                        }
-                        break;
-                    }
-                    case ConnectionType.End:
-                    {
-                        if (p > 1.0f)
-                        {
-                            train.Segment = connection.segment;
-                        }
-                        break;
-                    }
-                    default: throw new ArgumentOutOfRangeException(nameof(type), type, null);
-                }
+                TryImplicitJump(type, train, connection);
             }
+        }
 
+        private void TryImplicitJump(ConnectionType type, TrainCarriage train, Connection connection)
+        {
+            var p = GetClosestPoint(train.Rigidbody.position);
+            switch (type)
+            {
+                case ConnectionType.Start:
+                {
+                    if (p < 0.0f)
+                    {
+                        train.Segment = connection.segment;
+                    }
+
+                    break;
+                }
+                case ConnectionType.End:
+                {
+                    if (p > 1.0f)
+                    {
+                        train.Segment = connection.segment;
+                    }
+
+                    break;
+                }
+                default: throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+
+        private void TryExplicitJump(TrackSegment other, Connection connection, TrainCarriage train)
+        {
             float difference(float p0, float p1, bool loop)
             {
                 var diff = p0 - p1;
@@ -142,61 +138,67 @@ namespace FR8.Train.Track
                 if (diff < -0.5f) diff += 1.0f;
                 return diff;
             }
+
+            var knotPercent = other.GetKnotPercent(connection.knotIndex);
+
+            var lastSign = difference(other.GetClosestPoint(trainMetadata[train]), knotPercent, other.closedLoop) > 0.0f;
+            var d0 = difference(other.GetClosestPoint(train.Rigidbody.position), knotPercent, other.closedLoop);
+            var sign = d0 > 0.0f;
+            var switchSign = connection.handleScale > 0.0f;
+
+            if (sign == switchSign && lastSign != switchSign)
+            {
+                train.Segment = this;
+            }
         }
 
         private void OnDrawGizmos()
         {
-            for (var i = 0; i < resolution; i++)
+            BakePoints();
+
+            for (var i = 0; i < points.Count - 1; i++)
             {
-                var p0 = i / (float)resolution;
-                var p1 = (i + 1.0f) / resolution;
+                var a = points[i];
+                var b = points[i + 1];
+                var c = (a + b) / 2.0f;
 
-                var range = p1 - p0;
-                p0 += range * 0.1f;
-                p1 -= range * 0.1f;
-
-                GizmosDrawLine(SamplePoint(p0), SamplePoint(p1), new Color(1.0f, 0.6f, 0.1f, 1.0f), true);
+                a = (a - c) * 0.9f + c;
+                b = (b - c) * 0.9f + c;
+                
+                GizmosDrawLine(a, b, new Color(1.0f, 0.6f, 0.1f, 1.0f));
             }
-
-            Gizmos.color = Color.white;
-            for (var i = 1; i < knots.Count - 1; i++)
-            {
-                var knot = knots[i];
-                Gizmos.DrawWireSphere(knot, 0.4f);
-            }
-
-            Gizmos.DrawWireCube(knots[0], Vector3.one * 2.0f * 2.0f);
-            Gizmos.DrawWireSphere(knots[^1], 2.0f);
         }
 
         private void OnDrawGizmosSelected()
         {
-            for (var i = 0; i < KnotCount() - 1; i++)
-            {
-                var p0 = Knot(i);
-                var p1 = Knot(i + 1);
-                GizmosDrawLine(p0, p1, new Color(1.0f, 1.0f, 1.0f, 0.4f), false);
-            }
+            DrawLineBetweenKnots();
 
             for (var p = 0.0f; p < 1.0f; p += 3.0f / resolution)
             {
                 var p0 = SamplePoint(p);
 
-                if (Physics.Raycast(p0, Vector3.down, out var hit))
-                {
-                    var radius = Mathf.Min(2.0f, hit.distance * 2.0f);
-                    GizmosDrawLine(p0, hit.point, new Color(0.4f, 1.0f, 0.2f, 1.0f), false);
-                    Handles.DrawWireArc(hit.point, Vector3.up, Vector3.right, 360.0f, radius);
-                }
-
-                if (Physics.Raycast(p0, Vector3.up, out hit))
-                {
-                    var radius = Mathf.Min(2.0f, hit.distance * 20.0f);
-                    GizmosDrawLine(p0, hit.point, new Color(0.4f, 1.0f, 0.2f, 1.0f), false);
-                    Handles.DrawWireArc(hit.point, Vector3.up, Vector3.right, 360.0f, radius);
-                }
+                DrawDistanceFromGround(p0);
             }
 
+#if UNITY_EDITOR
+            if (!closedLoop)
+            {
+                var style = new GUIStyle(EditorStyles.boldLabel);
+                style.fontSize = 64;
+                style.alignment = TextAnchor.MiddleCenter;
+
+                style.normal.textColor = new Color(1.0f, 0.5f, 0.0f, 1.0f);
+                Handles.Label(transform.TransformPoint(knots[^1]), "E", style);
+                style.normal.textColor = ColorUtility.Invert(style.normal.textColor);
+                Handles.Label(transform.TransformPoint(knots[0]), "S", style);
+            }
+#endif
+
+            DrawExtraKnots();
+        }
+
+        private void DrawExtraKnots()
+        {
             Gizmos.color = new Color(1.0f, 1.0f, 1.0f, 0.4f);
             if (startConnection)
             {
@@ -213,26 +215,40 @@ namespace FR8.Train.Track
             }
         }
 
-        private void GizmosDrawLine(Vector3 a, Vector3 b, Color color, bool occlude)
+        private void DrawLineBetweenKnots()
+        {
+            for (var i = 0; i < KnotCount() - 1; i++)
+            {
+                var p0 = Knot(i);
+                var p1 = Knot(i + 1);
+                GizmosDrawLine(p0, p1, new Color(1.0f, 1.0f, 1.0f, 0.4f));
+            }
+        }
+
+        private void DrawDistanceFromGround(Vector3 p0)
+        {
+            if (Physics.Raycast(p0, Vector3.down, out var hit))
+            {
+                var radius = Mathf.Min(2.0f, hit.distance * 2.0f);
+                GizmosDrawLine(p0, hit.point, new Color(0.4f, 1.0f, 0.2f, 1.0f));
+                Handles.DrawWireArc(hit.point, Vector3.up, Vector3.right, 360.0f, radius);
+            }
+
+            if (Physics.Raycast(p0, Vector3.up, out hit))
+            {
+                var radius = Mathf.Min(2.0f, hit.distance * 20.0f);
+                GizmosDrawLine(p0, hit.point, new Color(0.4f, 1.0f, 0.2f, 1.0f));
+                Handles.DrawWireArc(hit.point, Vector3.up, Vector3.right, 360.0f, radius);
+            }
+        }
+
+        private void GizmosDrawLine(Vector3 a, Vector3 b, Color color)
         {
             const float width = 4.0f;
 
 #if UNITY_EDITOR
             Handles.color = color;
-
-            if (occlude)
-            {
-                Handles.zTest = CompareFunction.LessEqual;
-                Handles.DrawAAPolyLine(width, a, b);
-                Handles.color = new Color(1.0f - color.r, 1.0f - color.g, 1.0f - color.b, color.a * 0.1f);
-                Handles.zTest = CompareFunction.Greater;
-                Handles.DrawAAPolyLine(width, a, b);
-            }
-            else
-            {
-                Handles.zTest = CompareFunction.Always;
-                Handles.DrawAAPolyLine(width, a, b);
-            }
+            Handles.DrawAAPolyLine(width, a, b);
 #endif
         }
 
@@ -302,7 +318,27 @@ namespace FR8.Train.Track
         {
             if (points == null) BakePoints();
 
-            var best = 0;
+            FindClosestPair(point, out var best, out var other);
+            return InterpolatePoints(point, best, other);
+        }
+
+        private float InterpolatePoints(Vector3 point, int best, int other)
+        {
+            var a = points[best];
+            var b = points[other];
+
+            var v1 = b - a;
+            var v2 = point - a;
+
+            var dot = Vector3.Dot(v1.normalized, v2) / v1.magnitude;
+
+            var closest = Mathf.LerpUnclamped(best / (points.Count - 1.0f), other / (points.Count - 1.0f), dot);
+            return closest;
+        }
+
+        private void FindClosestPair(Vector3 point, out int best, out int other)
+        {
+            best = 0;
             var bestScore = float.MaxValue;
             for (var i = 0; i < points.Count; i++)
             {
@@ -313,22 +349,12 @@ namespace FR8.Train.Track
                 bestScore = score;
             }
 
-            var other = best + 1;
+            other = best + 1;
             if (other == points.Count)
             {
                 other--;
                 best--;
             }
-
-            var a = points[best];
-            var b = points[other];
-
-            var v1 = b - a;
-            var v2 = point - a;
-
-            var dot = Vector3.Dot(v1.normalized, v2) / v1.magnitude;
-
-            return Mathf.LerpUnclamped(best / (points.Count - 1.0f), other / (points.Count - 1.0f), dot);
         }
 
         public float GetKnotPercent(int index)

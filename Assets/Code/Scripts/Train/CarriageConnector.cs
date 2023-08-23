@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using FR8.Interactions.Drivers;
+using FR8Runtime.Interactions.Drivers;
 using UnityEngine;
 
-namespace FR8.Train
+namespace FR8Runtime.Train
 {
     public class CarriageConnector : Driver
     {
@@ -43,72 +43,92 @@ namespace FR8.Train
             all.Remove(this);
         }
 
-        private void FixedUpdate()
+        protected override void FixedUpdate()
         {
+            base.FixedUpdate();
             var engaged = Value > 0.5f;
 
-            if (magnetFX)
-            {
-                magnetFXPercent += ((engaged ? 1.0f : 0.0f) - magnetFXPercent) * fxTransitionSpeed * Time.deltaTime;
-                magnetFX.transform.localScale = magnetFXScale * magnetFXPercent;
-            }
+            UpdateFX(engaged);
 
-            if (!engaged)
-            {
-                if (connection)
-                {
-                    connection.SetValue(0.0f);
-                }
-                connection = null;
-                return;
-            }
+            if (!engaged) return;
 
             if (connection)
             {
                 if (connection.Value < 0.5f)
                 {
+                    SetValue(0.0f);
                     connection = null;
                     return;
                 }
                 
-                var displacement = connection.anchor.position - anchor.position;
-
-                var mass = rigidbody.mass;
-                var otherMass = connection.rigidbody.mass;
-                var totalMass = mass + otherMass;
-
-                var force = displacement * settings.connectionForce;
-                force -= rigidbody.velocity * settings.connectionDamping;
-                force *= mass * (mass / totalMass);
-
-                force = transform.forward * Vector3.Dot(transform.forward, force);
-
-                rigidbody.AddForce(force);
-                connection.rigidbody.AddForce(-force);
-
-                var direction = connection.transform.position - transform.position;
-                var orientation = Quaternion.LookRotation(direction, rigidbody.transform.up);
-                //transform.rotation = orientation;
+                ApplyForce();
+                UpdateOrientation();
+                
                 return;
             }
 
             var connectorsInRange = GetAllConnectorsInRange();
             foreach (var other in connectorsInRange)
             {
-                Debug.DrawLine(anchor.position, other.anchor.position, Color.blue);
                 var vector = other.anchor.position - anchor.position;
                 var dist = vector.magnitude;
                 var direction = vector / dist;
 
                 if (other.Value < 0.5f) continue;
-                if (dist < settings.connectionDistance)
-                {
-                    Connect(other);
-                    return;
-                }
+                if (TryConnect(dist, other)) break;
 
-                var force = direction * settings.forceScale * settings.forceFalloff.Evaluate(dist / settings.forceRange);
-                rigidbody.AddForce(force);
+                ApplyMagneticForce(direction, dist);
+            }
+        }
+
+        private bool TryConnect(float dist, CarriageConnector other)
+        {
+            if (dist < settings.connectionDistance)
+            {
+                Connect(other);
+                return true;
+            }
+
+            return false;
+        }
+
+        private void ApplyMagneticForce(Vector3 direction, float dist)
+        {
+            var force = direction * settings.forceScale * settings.forceFalloff.Evaluate(dist / settings.forceRange);
+            rigidbody.AddForce(force);
+        }
+
+        private void UpdateOrientation()
+        {
+            var direction = connection.transform.position - transform.position;
+            var orientation = Quaternion.LookRotation(direction, rigidbody.transform.up);
+            //transform.rotation = orientation;
+        }
+
+        private void ApplyForce()
+        {
+            var displacement = connection.anchor.position - anchor.position;
+
+            var mass = rigidbody.mass;
+            var otherMass = connection.rigidbody.mass;
+            var totalMass = mass + otherMass;
+
+            var force = displacement * settings.connectionForce;
+            force -= rigidbody.velocity * settings.connectionDamping;
+            force *= mass * (mass / totalMass);
+
+            force = transform.forward * Vector3.Dot(transform.forward, force);
+
+            rigidbody.AddForce(force);
+            connection.rigidbody.AddForce(-force);
+        }
+
+        private void UpdateFX(bool engaged)
+        {
+            if (magnetFX)
+            {
+                magnetFXPercent += ((engaged ? 1.0f : 0.0f) - magnetFXPercent) * fxTransitionSpeed * Time.deltaTime;
+                magnetFX.transform.localScale = magnetFXScale * magnetFXPercent;
             }
         }
 
@@ -144,7 +164,7 @@ namespace FR8.Train
 
         private void OnValidate()
         {
-            if (!anchor) anchor = Utility.Hierarchy.FindOrCreate(transform, new Regex(@".*(anchor|connect|point).*", RegexOptions.Compiled | RegexOptions.IgnoreCase), "Anchor");
+            if (!anchor) anchor = CodeUtility.HierarchyUtility.FindOrCreate(transform, new Regex(@".*(anchor|connect|point).*", RegexOptions.Compiled | RegexOptions.IgnoreCase), "Anchor");
         }
 
         private void OnDrawGizmosSelected()
