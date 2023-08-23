@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace FR8Runtime.CodeUtility
 {
-    public static class Cursor
+    public static class CursorUtility
     {
         private static readonly List<CursorLockMode> LockStack = new();
 

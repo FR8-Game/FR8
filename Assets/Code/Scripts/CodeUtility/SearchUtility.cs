@@ -4,7 +4,7 @@ using UnityEngine;
 namespace FR8Runtime.CodeUtility
 {
     
-        public static class Search
+        public static class SearchUtility
         {
             public static int FuzzySearch(Func<int, string> source, int length, string search)
             {

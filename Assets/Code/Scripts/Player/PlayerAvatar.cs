@@ -136,7 +136,7 @@ namespace FR8Runtime.Player
             Gizmos.color = Color.yellow;
             Gizmos.matrix = transform.localToWorldMatrix;
 
-            CodeUtility.GizmoExtras.DrawCapsule(Vector3.up * playerHeight / 2.0f, Quaternion.identity, playerHeight, radius);
+            CodeUtility.GizmoUtility.DrawCapsule(Vector3.up * playerHeight / 2.0f, Quaternion.identity, playerHeight, radius);
         }
     }
 }

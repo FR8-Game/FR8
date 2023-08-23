@@ -2,7 +2,7 @@
 
 namespace FR8Runtime.CodeUtility
 {
-    public static class Curves
+    public static class CurvesUtility
     {
         public static float SmootherStep(float x) => x * x * x * (3.0f * x * (2.0f * x - 5.0f) + 10.0f);
 

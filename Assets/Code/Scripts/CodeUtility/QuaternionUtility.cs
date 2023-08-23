@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace FR8Runtime.CodeUtility
 {
-    public static class Quaternion
+    public static class QuaternionUtility
     {
         public static (float, Vector3) ToAngleAxis(UnityEngine.Quaternion q)
         {

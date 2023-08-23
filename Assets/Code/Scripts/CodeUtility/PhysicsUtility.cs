@@ -2,13 +2,13 @@
 
 namespace FR8Runtime.CodeUtility
 {
-    public static class Physics
+    public static class PhysicsUtility
     {
         public static (Vector3, Vector3) CalculateDampedSpring(SpringBody current, SpringBody target, SpringSettings settings)
         {
             var force = (target.position - current.position) * settings.spring + (target.velocity - current.velocity) * settings.damper;
 
-            var (angle, axis) = Quaternion.ToAngleAxis(target.rotation * UnityEngine.Quaternion.Inverse(current.rotation));
+            var (angle, axis) = QuaternionUtility.ToAngleAxis(target.rotation * UnityEngine.Quaternion.Inverse(current.rotation));
             var torque = (axis * angle * Mathf.Deg2Rad) * settings.spring + (target.angularVelocity - current.angularVelocity) * settings.damper;
             torque *= settings.torqueScale;
 

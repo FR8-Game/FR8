@@ -54,12 +54,12 @@ namespace FR8Runtime.Player.Submodules
         private void OnEnable()
         {
             cameraLocked = true;
-            CodeUtility.Cursor.Push(CursorLockMode.Locked, ref cursorLockID);
+            CodeUtility.CursorUtility.Push(CursorLockMode.Locked, ref cursorLockID);
         }
 
         private void OnDisable()
         {
-            CodeUtility.Cursor.Pop(ref cursorLockID);
+            CodeUtility.CursorUtility.Pop(ref cursorLockID);
         }
 
         private void Update()
@@ -73,17 +73,17 @@ namespace FR8Runtime.Player.Submodules
             if (cameraLockedThisFrame != wasCameraLocked)
             {
 #if UNITY_EDITOR
-                CodeUtility.Cursor.Change(cursorLockID, cameraLockedThisFrame ? CursorLockMode.Locked : CursorLockMode.None);
+                CodeUtility.CursorUtility.Change(cursorLockID, cameraLockedThisFrame ? CursorLockMode.Locked : CursorLockMode.None);
 #else
                 Cursor.Change(cursorLockID, cameraLocked ? CursorLockMode.Locked : CursorLockMode.Confined);
 #endif
                 if (cameraLockedThisFrame)
                 {
-                    (lastCursorX, lastCursorY) = CodeUtility.Cursor.GetPosition();
+                    (lastCursorX, lastCursorY) = CodeUtility.CursorUtility.GetPosition();
                 }
                 else
                 {
-                    CodeUtility.Cursor.SetPosition(lastCursorX, lastCursorY);
+                    CodeUtility.CursorUtility.SetPosition(lastCursorX, lastCursorY);
                 }
             }
             

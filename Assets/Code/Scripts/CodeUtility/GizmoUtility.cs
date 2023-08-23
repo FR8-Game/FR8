@@ -5,7 +5,7 @@ using UnityEngine.Rendering;
 
 namespace FR8Runtime.CodeUtility
 {
-    public static class GizmoExtras
+    public static class GizmoUtility
     {
         public static int resolution = 32;
         

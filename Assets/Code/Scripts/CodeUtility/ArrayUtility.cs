@@ -2,7 +2,7 @@
 
 namespace FR8Runtime.CodeUtility
 {
-    public static class Array
+    public static class ArrayUtility
     {
         public static IndexOperation<T> IndexFallback<T>(T fallback) => (array, index) => IndexFallback(array, index, fallback);
 

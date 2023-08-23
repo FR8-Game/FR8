@@ -1,8 +1,8 @@
+using FR8Runtime.CodeUtility;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using Button = UnityEngine.UI.Button;
-using Cursor = FR8Runtime.CodeUtility.Cursor;
 
 namespace FR8Runtime.UI
 {
@@ -46,11 +46,11 @@ namespace FR8Runtime.UI
 
             if (paused)
             {
-                Cursor.Push(CursorLockMode.None, ref cursorLockID);
+                CursorUtility.Push(CursorLockMode.None, ref cursorLockID);
             }
             else
             {
-                Cursor.Pop(ref cursorLockID);
+                CursorUtility.Pop(ref cursorLockID);
             }
         }
 

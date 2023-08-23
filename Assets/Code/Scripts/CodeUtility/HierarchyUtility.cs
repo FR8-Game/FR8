@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace FR8Runtime.CodeUtility
 {
-    public class Hierarchy
+    public class HierarchyUtility
     {
         public static Transform FindOrCreate(Transform parent, string name)
         {

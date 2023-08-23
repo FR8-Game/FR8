@@ -77,13 +77,13 @@ namespace FR8Runtime.CodeUtility
 
         public static void ApplyForce(Rigidbody body, Vector3 position, UnityEngine.Quaternion rotation, Vector3 velocity, Vector3 angularVelocity, float spring, float damper, float torqueScale, bool ignoreMass)
         {
-            var current = new Physics.SpringBody(body);
-            var target = new Physics.SpringBody(position, rotation, velocity, angularVelocity);
-            var settings = new Physics.SpringSettings(spring, damper, torqueScale);
+            var current = new PhysicsUtility.SpringBody(body);
+            var target = new PhysicsUtility.SpringBody(position, rotation, velocity, angularVelocity);
+            var settings = new PhysicsUtility.SpringSettings(spring, damper, torqueScale);
 
             var forceMode = ignoreMass ? ForceMode.Acceleration : ForceMode.Force;
 
-            var (force, torque) = Physics.CalculateDampedSpring(current, target, settings);
+            var (force, torque) = PhysicsUtility.CalculateDampedSpring(current, target, settings);
             body.AddForce(force, forceMode);
             body.AddTorque(torque, forceMode);
         }

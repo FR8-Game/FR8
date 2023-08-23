@@ -164,7 +164,7 @@ namespace FR8Runtime.Train
 
         private void OnValidate()
         {
-            if (!anchor) anchor = CodeUtility.Hierarchy.FindOrCreate(transform, new Regex(@".*(anchor|connect|point).*", RegexOptions.Compiled | RegexOptions.IgnoreCase), "Anchor");
+            if (!anchor) anchor = CodeUtility.HierarchyUtility.FindOrCreate(transform, new Regex(@".*(anchor|connect|point).*", RegexOptions.Compiled | RegexOptions.IgnoreCase), "Anchor");
         }
 
         private void OnDrawGizmosSelected()

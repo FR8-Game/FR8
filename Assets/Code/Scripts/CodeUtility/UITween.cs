@@ -8,12 +8,12 @@ namespace FR8Runtime.CodeUtility
     {
         public static IEnumerator BounceIn(CanvasGroup group, float duration)
         {
-            return BuildTween(group, duration, _ => Vector2.zero, p => (1.0f - Curves.Bounce(p)) * 30.0f, Curves.Bounce, _ => 1.0f);
+            return BuildTween(group, duration, _ => Vector2.zero, p => (1.0f - CurvesUtility.Bounce(p)) * 30.0f, CurvesUtility.Bounce, _ => 1.0f);
         }
 
         public static IEnumerator BounceOut(CanvasGroup group, float duration)
         {
-            return BuildTween(group, duration, _ => Vector2.zero, p => (1.0f - Curves.Bounce(1.0f - p)) * 30.0f, p => Curves.Bounce(1.0f - p), _ => 1.0f);
+            return BuildTween(group, duration, _ => Vector2.zero, p => (1.0f - CurvesUtility.Bounce(1.0f - p)) * 30.0f, p => CurvesUtility.Bounce(1.0f - p), _ => 1.0f);
         }
 
         public static IEnumerator BuildTween(CanvasGroup group, float duration, Func<float, Vector2> position, Func<float, float> rotation, Func<float, float> scale, Func<float, float> alpha)

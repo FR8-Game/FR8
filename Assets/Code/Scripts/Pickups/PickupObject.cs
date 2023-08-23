@@ -87,14 +87,14 @@ namespace FR8Runtime.Pickups
             var targetRotation = GetTargetRotation();
 
             var targetVelocity = (targetPosition - lastTargetPosition) / Time.deltaTime;
-            var (angle, axis) = CodeUtility.Quaternion.ToAngleAxis(targetRotation * Quaternion.Inverse(lastTargetRotation));
+            var (angle, axis) = CodeUtility.QuaternionUtility.ToAngleAxis(targetRotation * Quaternion.Inverse(lastTargetRotation));
 
             var targetAngularVelocity = axis * angle / Time.deltaTime * Mathf.Deg2Rad;
 
             var force = (targetPosition - Rigidbody.position) * spring + (targetVelocity - Rigidbody.velocity) * damping;
             Rigidbody.AddForce(force - Physics.gravity, ForceMode.Acceleration);
 
-            (angle, axis) = CodeUtility.Quaternion.ToAngleAxis(targetRotation * Quaternion.Inverse(Rigidbody.rotation));
+            (angle, axis) = CodeUtility.QuaternionUtility.ToAngleAxis(targetRotation * Quaternion.Inverse(Rigidbody.rotation));
 
             angle *= Mathf.Deg2Rad;
             if (angle == 0.0f)

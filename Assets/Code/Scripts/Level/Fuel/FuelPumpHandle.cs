@@ -10,7 +10,7 @@ namespace FR8Runtime.Level.Fuel
     [SelectionBase, DisallowMultipleComponent]
     public class FuelPumpHandle : PickupObject, ISocketable
     {
-        public static readonly CodeUtility.Physics.SpringSettings SpringSettings = new()
+        public static readonly CodeUtility.PhysicsUtility.SpringSettings SpringSettings = new()
         {
             spring = 300.0f,
             damper = 18.0f,
