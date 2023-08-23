@@ -59,7 +59,7 @@ namespace FR8Runtime.Interactions.Drivers
             displayText.SetValue(Value);
             displayUI.SetValue(Value);
 
-            group.alpha += ((powered ? 1.0f : 0.0f) - group.alpha) * 2.0f * Time.deltaTime / fadeTime;
+            if (group) group.alpha += ((powered ? 1.0f : 0.0f) - group.alpha) * 2.0f * Time.deltaTime / fadeTime;
             
             displayText.FixedUpdate();
         }

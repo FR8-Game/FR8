@@ -31,6 +31,8 @@ namespace FR8Runtime.Interactions.Drivables
 
         public void SetValueNormalized(float percent)
         {
+            if (!image) return;
+            
             var val = Mathf.Lerp(outputRange.x, outputRange.y, percent);
             image.fillAmount = val;
         }

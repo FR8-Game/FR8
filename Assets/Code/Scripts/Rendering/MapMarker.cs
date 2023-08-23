@@ -8,6 +8,7 @@ namespace FR8Runtime.Rendering
     public class MapMarker : MonoBehaviour
     {
         [SerializeField] private Color markerColor;
+        [SerializeField] private bool drawGizmos;
         
         private MeshFilter filter;
         
@@ -32,7 +33,7 @@ namespace FR8Runtime.Rendering
 
         private void OnDrawGizmosSelected()
         {
-            return;
+            if (!drawGizmos) return;
             
             var filter = GetComponent<MeshFilter>();
             if (!filter) return;
