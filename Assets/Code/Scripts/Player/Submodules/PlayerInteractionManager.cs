@@ -15,7 +15,7 @@ namespace FR8Runtime.Player.Submodules
     public class PlayerInteractionManager
     {
         [SerializeField] private float interactionDistance = 2.5f;
-        [SerializeField] private CodeUtility.DampedSpring transition;
+        [SerializeField] private DampedSpring transition;
 
         private TMP_Text readoutText;
         private int nudge;
@@ -26,6 +26,9 @@ namespace FR8Runtime.Player.Submodules
         public PickupObject HeldObject { get; private set; }
         public PlayerAvatar Avatar { get; private set; }
 
+        public event Action<PickupObject> PickupEvent;
+        public event Action<PickupObject> DropEvent;
+        
         public void Init(PlayerAvatar avatar)
         {
             Avatar = avatar;
@@ -138,11 +141,14 @@ namespace FR8Runtime.Player.Submodules
             if (HeldObject) return null;
 
             HeldObject = pickup.Pickup(Avatar);
+            
+            PickupEvent?.Invoke(HeldObject);
             return this;
         }
 
         public PlayerInteractionManager Drop()
         {
+            DropEvent?.Invoke(HeldObject);
             HeldObject = HeldObject.Drop(Avatar);
             return null;
         }

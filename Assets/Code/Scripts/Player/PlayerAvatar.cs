@@ -1,4 +1,5 @@
 using System;
+using FR8Runtime.Pickups;
 using FR8Runtime.Player.Submodules;
 using UnityEngine;
 
@@ -17,6 +18,7 @@ namespace FR8Runtime.Player
         public PlayerGroundedMovement groundedMovement;
         public PlayerInteractionManager interactionManager;
         public PlayerCamera cameraController;
+        public PlayerInventory inventory;
         public PlayerUrination urination;
 
         public event Action EnabledEvent;
@@ -50,6 +52,7 @@ namespace FR8Runtime.Player
             cameraController.Init(this);
             interactionManager.Init(this);
             groundedMovement.Init(this);
+            inventory.Init(this);
             urination.Init(this);
         }
 

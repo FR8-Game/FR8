@@ -25,8 +25,8 @@ namespace FR8Runtime.Player.Submodules
         private InputActionReference grabCamAction;
         private InputActionReference zoomCamAction;
         private InputActionReference peeAction;
-
-
+        private InputActionReference[] hotbarActions;
+        
         public Vector3 Move
         {
             get
@@ -49,6 +49,19 @@ namespace FR8Runtime.Player.Submodules
         public bool ZoomCam => zoomCamAction.Switch();
         public bool Sprint => sprintAction.Switch();
         public bool Pee => peeAction.Switch();
+        
+        public int SwitchHotbar
+        {
+            get
+            {
+                for (var i = 0; i < hotbarActions.Length; i++)
+                {
+                    var action = hotbarActions[i];
+                    if (action.action?.WasPerformedThisFrame() ?? false) return i;
+                }
+                return -1;
+            }
+        }
 
         public Vector2 GetLookFrameDelta(bool forceMouseDelta)
         {
@@ -96,6 +109,12 @@ namespace FR8Runtime.Player.Submodules
             grabCamAction = bind("GrabCam");
             zoomCamAction = bind("ZoomCam");
             peeAction = bind("Pee");
+
+            hotbarActions = new InputActionReference[PlayerInventory.HotbarSize];
+            for (var i = 0; i < hotbarActions.Length; i++)
+            {
+                hotbarActions[i] = bind($"Hotbar.{i + 1}");
+            }
             
             // Set Camera
             mainCamera = Camera.main;

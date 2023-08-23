@@ -7,6 +7,12 @@ namespace FR8Runtime.CodeUtility
     {
         public static T Find<T>(Transform root, string path, bool log = true)
         {
+            var t = Find(root, path, log);
+            return t ? t.GetComponent<T>() : default;
+        }
+        
+        public static Transform Find(Transform root, string path, bool log = true)
+        {
             var find = root.Find(path);
             if (!find)
             {
@@ -14,7 +20,7 @@ namespace FR8Runtime.CodeUtility
                 return default;
             }
             
-            return find.GetComponent<T>();
+            return find;
         }
     }
 }
