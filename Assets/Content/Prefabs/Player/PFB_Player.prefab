@@ -231,10 +231,9 @@ MonoBehaviour:
         Data3: 0
         Data4: 0
       Path: 
-    footstepFrequency: 0
+    footstepFrequency: 1
   interactionManager:
     interactionDistance: 2.5
-    readoutText: {fileID: 0}
     transition:
       springConstant: 350
       dampingConstant: 25
@@ -252,8 +251,9 @@ MonoBehaviour:
     nearPlane: 0.2
     farPlane: 1000
     shakeModule:
-      amplitude: {x: 2, y: 0, z: 2}
-      frequency: 1
+      cosAmplitude: {x: 0, y: 0, z: 0}
+      sinAmplitude: {x: 0.06, y: 0, z: 0}
+      frequency: 1.8
       slope: 0.2
 --- !u!114 &6340694338387009680
 MonoBehaviour:
