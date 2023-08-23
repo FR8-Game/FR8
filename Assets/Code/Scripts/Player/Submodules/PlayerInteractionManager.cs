@@ -1,4 +1,5 @@
 using System;
+using FR8Runtime.CodeUtility;
 using FR8Runtime.Interactions.Drivers.Submodules;
 using FR8Runtime.Pickups;
 using FR8Runtime.Rendering.Passes;
@@ -14,9 +15,9 @@ namespace FR8Runtime.Player.Submodules
     public class PlayerInteractionManager
     {
         [SerializeField] private float interactionDistance = 2.5f;
-        [SerializeField] private TMP_Text readoutText;
         [SerializeField] private CodeUtility.DampedSpring transition;
 
+        private TMP_Text readoutText;
         private int nudge;
         private bool dragging;
 
@@ -31,6 +32,8 @@ namespace FR8Runtime.Player.Submodules
 
             avatar.UpdateEvent += Update;
             avatar.FixedUpdateEvent += FixedUpdate;
+            
+            readoutText = FindUtility.Find<TMP_Text>(avatar.transform, "UI/Interaction/Text");
         }
 
         public void Update()
