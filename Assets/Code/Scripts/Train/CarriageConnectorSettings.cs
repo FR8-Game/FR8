@@ -1,7 +1,7 @@
 ﻿
 using UnityEngine;
 
-namespace FR8.Train
+namespace FR8Runtime.Train
 {
     [CreateAssetMenu(menuName = "Config/Train/Carriage Connector Settings")]
     public class CarriageConnectorSettings : ScriptableObject

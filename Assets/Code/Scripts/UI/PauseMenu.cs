@@ -1,10 +1,10 @@
+using FR8Runtime.CodeUtility;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using Button = UnityEngine.UI.Button;
-using Cursor = FR8.Utility.Cursor;
 
-namespace FR8.UI
+namespace FR8Runtime.UI
 {
     [SelectionBase]
     [DisallowMultipleComponent]
@@ -46,11 +46,11 @@ namespace FR8.UI
 
             if (paused)
             {
-                Cursor.Push(CursorLockMode.None, ref cursorLockID);
+                CursorUtility.Push(CursorLockMode.None, ref cursorLockID);
             }
             else
             {
-                Cursor.Pop(ref cursorLockID);
+                CursorUtility.Pop(ref cursorLockID);
             }
         }
 

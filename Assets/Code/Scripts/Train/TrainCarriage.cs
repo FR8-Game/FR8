@@ -1,7 +1,7 @@
-using FR8.Train.Track;
+using FR8Runtime.Train.Track;
 using UnityEngine;
 
-namespace FR8.Train
+namespace FR8Runtime.Train
 {
     [SelectionBase]
     [DisallowMultipleComponent]
@@ -119,7 +119,7 @@ namespace FR8.Train
             axis.Normalize();
             if (!float.IsFinite(axis.x) || !float.IsFinite(axis.y) || !float.IsFinite(axis.z)) axis = Vector3.zero;
 
-            var deltaRotation = axis * angle * Mathf.Rad2Deg;
+            var deltaRotation = axis * angle * Mathf.Deg2Rad;
             return deltaRotation;
         }
 

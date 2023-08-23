@@ -1,12 +1,10 @@
-using System;
-using FR8.UI.Loading;
+using FR8Runtime.UI.Loading;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-namespace FR8.UI
+namespace FR8Runtime.UI
 {
     public class MainMenu : MonoBehaviour
     {

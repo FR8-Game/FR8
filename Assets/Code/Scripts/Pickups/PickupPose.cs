@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace FR8.Pickups
+namespace FR8Runtime.Pickups
 {
     [CreateAssetMenu(menuName = "Config/Pickup Pose")]
     public class PickupPose : ScriptableObject

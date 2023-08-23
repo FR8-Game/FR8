@@ -1,9 +1,7 @@
-﻿
-using FR8.Interactions.Drivables;
-using FR8.Train.Electrics;
+﻿using FR8Runtime.Interactions.Drivables;
 using UnityEngine;
 
-namespace FR8.Interactions.Drivers
+namespace FR8Runtime.Interactions.Drivers
 {
     public class BreakerSwitch : Switch
     {

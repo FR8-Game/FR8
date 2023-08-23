@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using FR8.Train.Splines;
-using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.UI;
-
-#if UNITY_EDITOR
+using FR8Runtime.Train.Splines;
 using UnityEditor;
-#endif
+using UnityEngine;
+using ColorUtility = FR8Runtime.CodeUtility.ColorUtility;
 
-namespace FR8.Train.Track
+namespace FR8Runtime.Train.Track
 {
     [SelectionBase, DisallowMultipleComponent]
     public class TrackSegment : MonoBehaviour
@@ -158,22 +154,18 @@ namespace FR8.Train.Track
 
         private void OnDrawGizmos()
         {
-            for (var i = 0; i < resolution; i++)
+            BakePoints();
+
+            for (var i = 0; i < points.Count - 1; i++)
             {
-                var p0 = i / (float)resolution;
-                var p1 = (i + 1.0f) / resolution;
+                var a = points[i];
+                var b = points[i + 1];
+                var c = (a + b) / 2.0f;
 
-                var range = p1 - p0;
-                p0 += range * 0.1f;
-                p1 -= range * 0.1f;
-
-                GizmosDrawLine(SamplePoint(p0), SamplePoint(p1), new Color(1.0f, 0.6f, 0.1f, 1.0f));
-            }
-
-            if (!closedLoop)
-            {
-                Gizmos.DrawWireCube(knots[0], Vector3.one * 2.0f * 2.0f);
-                Gizmos.DrawWireSphere(knots[^1], 2.0f);
+                a = (a - c) * 0.9f + c;
+                b = (b - c) * 0.9f + c;
+                
+                GizmosDrawLine(a, b, new Color(1.0f, 0.6f, 0.1f, 1.0f));
             }
         }
 
@@ -187,6 +179,20 @@ namespace FR8.Train.Track
 
                 DrawDistanceFromGround(p0);
             }
+
+#if UNITY_EDITOR
+            if (!closedLoop)
+            {
+                var style = new GUIStyle(EditorStyles.boldLabel);
+                style.fontSize = 64;
+                style.alignment = TextAnchor.MiddleCenter;
+
+                style.normal.textColor = new Color(1.0f, 0.5f, 0.0f, 1.0f);
+                Handles.Label(transform.TransformPoint(knots[^1]), "E", style);
+                style.normal.textColor = ColorUtility.Invert(style.normal.textColor);
+                Handles.Label(transform.TransformPoint(knots[0]), "S", style);
+            }
+#endif
 
             DrawExtraKnots();
         }
@@ -320,7 +326,7 @@ namespace FR8.Train.Track
         {
             var a = points[best];
             var b = points[other];
-            
+
             var v1 = b - a;
             var v2 = point - a;
 

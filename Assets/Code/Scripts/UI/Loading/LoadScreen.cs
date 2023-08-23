@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
-namespace FR8.UI.Loading
+namespace FR8Runtime.UI.Loading
 {
     [SelectionBase, DisallowMultipleComponent]
     [RequireComponent(typeof(UIDocument))]

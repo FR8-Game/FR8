@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace FR8.Train.Splines
+namespace FR8Runtime.Train.Splines
 {
     public class Spline
     {

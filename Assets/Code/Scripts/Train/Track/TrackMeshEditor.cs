@@ -4,13 +4,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using FR8.Rendering;
+using FR8Runtime.Rendering;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace FR8.Train.Track
+namespace FR8Runtime.Train.Track
 {
     [InitializeOnLoad]
     public sealed partial class TrackMesh
@@ -56,7 +56,6 @@ namespace FR8.Train.Track
 
                 EditorSceneManager.MarkSceneDirty(gameObject.scene);
                 AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
                 
                 Progress.Finish(taskID);
             }
@@ -143,7 +142,7 @@ namespace FR8.Train.Track
                     startPoint = endPoint;
                     index++;
                 }
-
+                
                 SplitMesh(vertices, normals, indices, uvs, rendererContainer);
 
                 Progress.Remove(taskID);
@@ -151,7 +150,6 @@ namespace FR8.Train.Track
                 EditorSceneManager.MarkSceneDirty(gameObject.scene);
 
                 AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
             }
         }
 

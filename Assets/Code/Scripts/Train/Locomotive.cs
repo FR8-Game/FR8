@@ -1,7 +1,7 @@
-using FR8.Interactions.Drivers;
+using FR8Runtime.Interactions.Drivers;
 using UnityEngine;
 
-namespace FR8.Train
+namespace FR8Runtime.Train
 {
     public class Locomotive : TrainCarriage
     {

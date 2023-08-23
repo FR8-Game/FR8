@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FR8.Interactions.Drivers.Submodules
+namespace FR8Runtime.Interactions.Drivers.Submodules
 {
     public interface IInteractable : IBehaviour
     {

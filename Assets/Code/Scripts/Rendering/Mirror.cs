@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FR8.Rendering
+namespace FR8Runtime.Rendering
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(RenderTexture))]

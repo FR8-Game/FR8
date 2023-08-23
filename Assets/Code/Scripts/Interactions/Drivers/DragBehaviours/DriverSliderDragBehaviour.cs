@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FR8.Interactions.Drivers.DragBehaviours
+namespace FR8Runtime.Interactions.Drivers.DragBehaviours
 {
     [System.Serializable]
     public sealed class DriverSliderDragBehaviour : DriverDragBehaviour

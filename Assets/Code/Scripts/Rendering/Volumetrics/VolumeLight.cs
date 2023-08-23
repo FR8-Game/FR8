@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace FR8.Rendering.Volumetrics
+namespace FR8Runtime.Rendering.Volumetrics
 {
     [RequireComponent(typeof(Light))]
     public class VolumeLight : MonoBehaviour

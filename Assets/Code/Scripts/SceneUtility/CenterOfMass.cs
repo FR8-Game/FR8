@@ -1,10 +1,10 @@
 using UnityEngine;
 
-namespace FR8.SceneUtility
+namespace FR8Runtime.SceneUtility
 {
     public class CenterOfMass : MonoBehaviour
     {
-        private void Awake()
+        private void Start()
         {
             var rb = GetComponentInParent<Rigidbody>();
             rb.centerOfMass = rb.transform.InverseTransformPoint(transform.position);
