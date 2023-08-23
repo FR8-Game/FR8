@@ -1,8 +1,8 @@
-﻿using FR8.Interactions.Drivables;
-using FR8.Interactions.Drivers.Submodules;
+﻿using FR8Runtime.Interactions.Drivables;
+using FR8Runtime.Interactions.Drivers.Submodules;
 using UnityEngine;
 
-namespace FR8.Interactions.Drivers
+namespace FR8Runtime.Interactions.Drivers
 {
     [SelectionBase, DisallowMultipleComponent]
     public class Door : MonoBehaviour, IDriver
@@ -10,13 +10,12 @@ namespace FR8.Interactions.Drivers
         [SerializeField] private bool testValue;
         [SerializeField] private TwoPoseDrivableAnimator animator;
 
-        private bool state;
-
         public string Key => string.Empty;
         public virtual bool CanInteract => true;
         public string DisplayName => "Door";
-        public virtual string DisplayValue => state ? "Open" : "Closed";
-        
+        public virtual string DisplayValue => Open ? "Open" : "Closed";
+        public bool Open { get; private set; }
+
         public bool OverrideInteractDistance => false;
         public float InteractDistance => throw new System.NotImplementedException();
         
@@ -29,8 +28,8 @@ namespace FR8.Interactions.Drivers
 
         protected virtual void SetValue(float newValue)
         {
-            state = newValue > 0.5f;
-            animator.SetValue(state ? 1.0f : 0.0f);
+            Open = newValue > 0.5f;
+            animator.SetValue(Open ? 1.0f : 0.0f);
         }
 
         public void Nudge(int direction)
@@ -40,7 +39,7 @@ namespace FR8.Interactions.Drivers
 
         public void BeginInteract(GameObject interactingObject)
         {
-            SetValue(state ? 0.0f : 1.0f);
+            SetValue(Open ? 0.0f : 1.0f);
         }
 
         public void ContinueInteract(GameObject interactingObject)

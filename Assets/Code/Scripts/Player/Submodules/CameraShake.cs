@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace FR8.Player.Submodules
+namespace FR8Runtime.Player.Submodules
 {
     [Serializable]
     public class CameraShake
@@ -21,7 +21,7 @@ namespace FR8.Player.Submodules
             if (!avatar) return;
             if (!avatar.groundedMovement.IsOnGround) return;
             
-            var moveSpeed = avatar.MoveSpeed / avatar.groundedMovement.maxGroundedSpeed;
+            var moveSpeed = avatar.groundedMovement.MoveSpeed / avatar.groundedMovement.maxGroundedSpeed;
             var shakeAmount = -1.0f / (moveSpeed / slope + 1.0f) + 1.0f;
 
             d += moveSpeed * frequency * Time.deltaTime;

@@ -20,8 +20,9 @@ Shader "Hidden/Fog"
         Pass
         {
             HLSLPROGRAM
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SurfaceInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/surfaceInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
+            #include "Fog.hlsl"
 
             #pragma vertex vert
             #pragma fragment frag
@@ -63,23 +64,15 @@ Shader "Hidden/Fog"
                 return o;
             }
 
-            float3 _Color;
-            float _Value;
-
             TEXTURECUBE(_Noise);
             SAMPLER(sampler_Noise);
 
             float4 frag(Varyings input) : SV_Target
             {
-                float depth = SampleSceneDepth(input.uv);
-                float3 pos = ComputeWorldSpacePosition(input.uv, depth, UNITY_MATRIX_I_VP);
-                float dist = length(pos - _WorldSpaceCameraPos) / 100.0f;
-
-                float fog = pow(2.71, -(dist * dist) * _Value);
-                fog = clamp(1.0f - fog, 0.0, 1.0);
-                clip(fog);
-
-                return float4(pow(_Color, 1), fog);
+                float4 fog = getFogColorSS(input.uv);
+                clip(fog.a);
+                
+                return fog;
             }
             ENDHLSL
         }

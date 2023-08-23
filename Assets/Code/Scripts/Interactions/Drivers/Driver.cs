@@ -1,7 +1,8 @@
-﻿using FR8.Interactions.Drivers.Submodules;
+﻿using System;
+using FR8Runtime.Interactions.Drivers.Submodules;
 using UnityEngine;
 
-namespace FR8.Interactions.Drivers
+namespace FR8Runtime.Interactions.Drivers
 {
     [SelectionBase, DisallowMultipleComponent]
     public abstract class Driver : MonoBehaviour, IDriver
@@ -17,7 +18,7 @@ namespace FR8.Interactions.Drivers
         public virtual string DisplayValue => $"{Mathf.RoundToInt(Value * 100.0f)}%";
         
         public bool OverrideInteractDistance => false;
-        public float InteractDistance => throw new System.NotImplementedException();
+        public float InteractDistance => throw new NotImplementedException();
         
         public float Value { get; private set; }
         public string Key => key;
@@ -52,6 +53,17 @@ namespace FR8.Interactions.Drivers
         protected void Start()
         {
             SetValue(defaultValue);
+        }
+        
+        protected virtual void FixedUpdate()
+        {
+            var newValue = driverNetwork.GetValue(key);
+            
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            if (newValue != Value)
+            {
+                OnValueChanged(newValue);
+            }
         }
     }
 }

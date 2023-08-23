@@ -4,12 +4,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using FR8Runtime.Rendering;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace FR8.Train.Track
+namespace FR8Runtime.Train.Track
 {
     [InitializeOnLoad]
     public sealed partial class TrackMesh
@@ -32,30 +33,17 @@ namespace FR8.Train.Track
             
             IEnumerator routine()
             {
-                string dir;
                 for (var i = 0; i < rendererContainer.childCount; i++)
                 {
                     Progress.Report(taskID, i / (float)rendererContainer.childCount);
                     
                     var child = rendererContainer.GetChild(i);
-                    
-                    var filter = child.GetComponent<MeshFilter>();
-                    var mesh = filter.sharedMesh;
-                    if (mesh && AssetDatabase.IsMainAsset(mesh))
-                    {
-                        var path = AssetDatabase.GetAssetPath(mesh);
-                        dir = Path.GetDirectoryName(path);
-                        AssetDatabase.DeleteAsset(path);
-                        if (!Directory.EnumerateFileSystemEntries(dir).Any())
-                        {
-                            AssetDatabase.DeleteAsset(dir);
-                        }
-                    }
+                    DeleteTrackSegment(child);
 
                     yield return null;
                 }
 
-                dir = $"{Path.GetDirectoryName(gameObject.scene.path)}/{gameObject.scene.name}";
+                var dir = $"{Path.GetDirectoryName(gameObject.scene.path)}/{gameObject.scene.name}";
                 if (!Directory.EnumerateFileSystemEntries(dir).Any())
                 {
                     AssetDatabase.DeleteAsset(dir);
@@ -68,9 +56,24 @@ namespace FR8.Train.Track
 
                 EditorSceneManager.MarkSceneDirty(gameObject.scene);
                 AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
                 
                 Progress.Finish(taskID);
+            }
+        }
+
+        private static void DeleteTrackSegment(Transform child)
+        {
+            var filter = child.GetComponent<MeshFilter>();
+            var mesh = filter.sharedMesh;
+            if (mesh && AssetDatabase.IsMainAsset(mesh))
+            {
+                var path = AssetDatabase.GetAssetPath(mesh);
+                var dir = Path.GetDirectoryName(path);
+                AssetDatabase.DeleteAsset(path);
+                if (!Directory.EnumerateFileSystemEntries(dir).Any())
+                {
+                    AssetDatabase.DeleteAsset(dir);
+                }
             }
         }
 
@@ -78,11 +81,7 @@ namespace FR8.Train.Track
         {
             Clear();
 
-            var rendererContainer = new GameObject("Renderers").transform;
-            rendererContainer.SetParent(transform);
-            rendererContainer.localPosition = Vector3.zero;
-            rendererContainer.localRotation = Quaternion.identity;
-
+            var rendererContainer = GetRendererContainer();
             var segment = GetComponent<TrackSegment>();
 
             var vertices = new List<Vector3>();
@@ -143,7 +142,7 @@ namespace FR8.Train.Track
                     startPoint = endPoint;
                     index++;
                 }
-
+                
                 SplitMesh(vertices, normals, indices, uvs, rendererContainer);
 
                 Progress.Remove(taskID);
@@ -151,29 +150,43 @@ namespace FR8.Train.Track
                 EditorSceneManager.MarkSceneDirty(gameObject.scene);
 
                 AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
             }
+        }
+
+        private Transform GetRendererContainer()
+        {
+            var rendererContainer = new GameObject("Renderers").transform;
+            rendererContainer.SetParent(transform);
+            rendererContainer.localPosition = Vector3.zero;
+            rendererContainer.localRotation = Quaternion.identity;
+            return rendererContainer;
         }
 
         private void SplitMesh(List<Vector3> vertices, List<Vector3> normals, List<int> indices, List<Vector2> uvs, Transform rendererContainer)
         {
+            var mesh = CompileMesh(vertices, normals, indices, uvs);
+            
             var filter = new GameObject().AddComponent<MeshFilter>();
-            var renderer = filter.gameObject.AddComponent<MeshRenderer>();
-            var collider = filter.gameObject.AddComponent<MeshCollider>();
-
-            renderer.sharedMaterials = new[] { material };
-
             filter.transform.SetParent(rendererContainer);
             filter.transform.SetAsLastSibling();
-
-            var index = filter.transform.GetSiblingIndex();
-
-            filter.gameObject.name = $"Track Mesh Renderer.{index}";
+            filter.sharedMesh = mesh;
+            filter.gameObject.name = mesh.name;
             filter.transform.localPosition = Vector3.up * verticalOffset;
             filter.transform.localRotation = Quaternion.identity;
+            
+            var renderer = filter.gameObject.AddComponent<MeshRenderer>();
+            renderer.sharedMaterials = new[] { material };
+            
+            var collider = filter.gameObject.AddComponent<MeshCollider>();
+            collider.sharedMesh = mesh;
+            
+            var marker = filter.gameObject.AddComponent<MapMarker>();
+            marker.MarkerColor = Color.green;
+        }
 
+        private Mesh CompileMesh(List<Vector3> vertices, List<Vector3> normals, List<int> indices, List<Vector2> uvs)
+        {
             var mesh = new Mesh();
-            mesh.name = $"[PROC] {name}.Mesh.{index}";
             mesh.SetVertices(vertices.ToArray());
             mesh.SetNormals(normals.ToArray());
             mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
@@ -187,16 +200,13 @@ namespace FR8.Train.Track
             }
 
             mesh.name = $"Track Mesh.{(uint)mesh.GetHashCode()}.asset";
-            filter.name = mesh.name;
             AssetDatabase.CreateAsset(mesh, $"{directory}{mesh.name}");
 
             vertices.Clear();
             normals.Clear();
             indices.Clear();
             uvs.Clear();
-
-            filter.sharedMesh = mesh;
-            collider.sharedMesh = mesh;
+            return mesh;
         }
 
         private float FindNextPoint(TrackSegment segment, float startPoint, float segmentSize)

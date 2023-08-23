@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace FR8.Rendering.Volumetrics
+namespace FR8Runtime.Rendering.Volumetrics
 {
     [RequireComponent(typeof(Light))]
     public class VolumeLight : MonoBehaviour
@@ -22,10 +22,31 @@ namespace FR8.Rendering.Volumetrics
             if (!material) GetMaterial();
             if (!light) light = GetComponent<Light>();
 
+            UpdateMaterialProperties();
+
+            cmd.DrawProcedural(transform.localToWorldMatrix, material, -1, MeshTopology.Triangles, 6 * resolution);
+        }
+
+        private void UpdateMaterialProperties()
+        {
+            material.SetVector(LightData, GetLightData());
+            material.SetFloat(Density, density / 100.0f);
+            material.SetInt(Resolution, resolution);
+            
+            material.SetVector(LightColor, GetLightColor());
+        }
+
+        private Color GetLightColor()
+        {
+            return light.color * light.intensity * (light.useColorTemperature ? Mathf.CorrelatedColorTemperatureToRGB(light.colorTemperature) : Color.white);
+        }
+
+        private Vector4 GetLightData()
+        {
             var innerCos = Mathf.Cos(Mathf.Deg2Rad * 0.5f * light.innerSpotAngle);
             var outerCos = Mathf.Cos(Mathf.Deg2Rad * 0.5f * light.spotAngle);
             var angleRangeInv = 1.0f / Mathf.Max(innerCos - outerCos, 0.001f);
-            
+
             var lightData = light.type switch
             {
                 LightType.Spot => new Vector4
@@ -45,14 +66,7 @@ namespace FR8.Rendering.Volumetrics
                 LightType.Disc => Vector4.zero,
                 _ => throw new ArgumentOutOfRangeException()
             };
-            material.SetVector(LightData, lightData);
-            material.SetFloat(Density, density / 100.0f);
-            material.SetInt(Resolution, resolution);
-
-            var lightColor = light.color * light.intensity * (light.useColorTemperature ? Mathf.CorrelatedColorTemperatureToRGB(light.colorTemperature) : Color.white);
-            material.SetVector(LightColor, lightColor);
-
-            cmd.DrawProcedural(transform.localToWorldMatrix, material, -1, MeshTopology.Triangles, 6 * resolution);
+            return lightData;
         }
 
         private void GetMaterial()

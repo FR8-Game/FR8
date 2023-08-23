@@ -1,10 +1,10 @@
-﻿using FR8.Interactions.Drivables;
-using FR8.Interactions.Drivers.DragBehaviours;
-using FR8.Interactions.Drivers.Submodules;
-using FR8.Player;
+﻿using FR8Runtime.Interactions.Drivables;
+using FR8Runtime.Interactions.Drivers.DragBehaviours;
+using FR8Runtime.Interactions.Drivers.Submodules;
+using FR8Runtime.Player;
 using UnityEngine;
 
-namespace FR8.Interactions.Drivers
+namespace FR8Runtime.Interactions.Drivers
 {
     [SelectionBase, DisallowMultipleComponent]
     public class ControlStick : Driver
@@ -45,7 +45,7 @@ namespace FR8.Interactions.Drivers
         {
             var avatar = interactingObject.GetComponentInParent<PlayerAvatar>();
             if (!avatar) return;
-            var ray = avatar.LookingRay;
+            var ray = avatar.cameraController.LookingRay;
 
             dragBehaviour.BeginDrag(transform, Value, ray);
         }
@@ -54,7 +54,7 @@ namespace FR8.Interactions.Drivers
         {
             var avatar = interactingObject.GetComponentInParent<PlayerAvatar>();
             if (!avatar) return;
-            var ray = avatar.LookingRay;
+            var ray = avatar.cameraController.LookingRay;
 
             SetValue(dragBehaviour.ContinueDrag(transform, ray));
         }
@@ -71,8 +71,9 @@ namespace FR8.Interactions.Drivers
             animator.Update();
         }
 
-        protected virtual void FixedUpdate()
+        protected override void FixedUpdate()
         {
+            base.FixedUpdate();
             animator.FixedUpdate();
         }
 

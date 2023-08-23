@@ -1,34 +1,36 @@
-using FR8.Interactions.Drivables;
-using FR8.Level;
+using FR8Runtime.Interactions.Drivers;
+using FR8Runtime.Level;
 using UnityEngine;
 
-namespace FR8.Train.Electrics
+namespace FR8Runtime.Train.Electrics
 {
-    public class TrainLight : LightDriver, IElectricDevice, IDrivable
+    public class TrainLight : LightDriver, IElectricDevice
     {
-        [SerializeField] private string key;
         [SerializeField] private string fuseGroup = "Lights";
         [SerializeField] private float powerDrawWatts = 40.0f;
         [SerializeField] private float threshold = 0.5f;
         
         private bool driverState;
-        private bool connected;
-
-        public string Key => key;
+        private DriverNetwork driverNetwork;
+        
         public string FuseGroup => fuseGroup;
 
-        public void SetConnected(bool connected)
+        protected override void Awake()
         {
-            this.connected = connected;
+            base.Awake();
+
+            driverNetwork = GetComponentInParent<DriverNetwork>();
         }
 
         protected override void FixedUpdate()
         {
-            state = connected && driverState;
+            var switchState = driverNetwork.GetValue(fuseGroup) > threshold;
+            var fuseState = driverNetwork.GetValue(TrainElectricsController.MainFuse) > 0.5f;
+            
+            state = fuseState && driverState;
             base.FixedUpdate();
         }
 
         public float CalculatePowerDraw() => state ? powerDrawWatts / 1000.0f : 0.0f;
-        public void OnValueChanged(float newValue) => driverState = newValue > threshold;
     }
 }

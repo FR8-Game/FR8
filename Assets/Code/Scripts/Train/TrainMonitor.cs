@@ -1,10 +1,10 @@
-﻿using FR8.Dialogue;
-using FR8.Interactions.Drivers;
-using FR8.Player;
-using FR8.Train.Electrics;
+﻿using FR8Runtime.Dialogue;
+using FR8Runtime.Interactions.Drivers;
+using FR8Runtime.Player;
+using FR8Runtime.Train.Electrics;
 using UnityEngine;
 
-namespace FR8.Train
+namespace FR8Runtime.Train
 {
     [SelectionBase, DisallowMultipleComponent]
     public class TrainMonitor : MonoBehaviour
@@ -16,12 +16,12 @@ namespace FR8.Train
 
         private TrainCarriage carriage;
         private TrainElectricsController trainElectrics;
-        private DriverNetwork trainDrivers;
+        private DriverNetwork driverNetwork;
 
         private void Awake()
         {
             carriage = GetComponent<TrainCarriage>();
-            trainDrivers = GetComponent<DriverNetwork>();
+            driverNetwork = GetComponent<DriverNetwork>();
             trainElectrics = GetComponent<TrainElectricsController>();
         }
 
@@ -42,10 +42,10 @@ namespace FR8.Train
                 if (cockpitBounds.Contains(point)) return;
             }
 
-            if (!trainElectrics.GetMainFuse()) return;
+            if (!trainElectrics.GetConnected()) return;
             
-            trainElectrics.SetMainFuse(false);
-            trainDrivers.SetValue("Brake", 1.0f);
+            trainElectrics.SetConnected(false);
+            driverNetwork.SetValue("Brake", 1.0f);
             
             var entry = new DialogueEntry()
             {
