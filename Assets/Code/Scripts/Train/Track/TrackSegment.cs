@@ -3,26 +3,21 @@ using System.Collections.Generic;
 using FR8Runtime.Train.Splines;
 using UnityEditor;
 using UnityEngine;
-using ColorUtility = FR8Runtime.CodeUtility.ColorUtility;
 
 namespace FR8Runtime.Train.Track
 {
     [SelectionBase, DisallowMultipleComponent]
     public class TrackSegment : MonoBehaviour
     {
-        [SerializeField] private List<Vector3> knots = new()
-        {
-            new Vector3(0.0f, 0.0f, -15.0f),
-            new Vector3(0.0f, 0.0f, -5.0f),
-            new Vector3(0.0f, 0.0f, 5.0f),
-            new Vector3(0.0f, 0.0f, 15.0f),
-        };
+        public const float ConnectionDistance = 3.0f;
 
+        [SerializeField] [HideInInspector] private List<Vector3> knots;
+        
         [SerializeField] private int resolution = 100;
         [SerializeField] private bool closedLoop;
 
-        [SerializeField] private Connection startConnection;
-        [SerializeField] private Connection endConnection;
+        private Connection startConnection = new();
+        private Connection endConnection = new();
 
         private float totalLength;
 
@@ -32,7 +27,6 @@ namespace FR8Runtime.Train.Track
         public Connection StartConnection => startConnection;
         public Connection EndConnection => endConnection;
         public int Resolution => resolution;
-        public List<Vector3> Knots => knots;
 
         public static readonly Spline.SplineProfile SplineProfile = Spline.CatmullRom;
 
@@ -139,12 +133,12 @@ namespace FR8Runtime.Train.Track
                 return diff;
             }
 
-            var knotPercent = other.GetKnotPercent(connection.knotIndex);
+            var knotPercent = connection.t;
 
             var lastSign = difference(other.GetClosestPoint(trainMetadata[train]), knotPercent, other.closedLoop) > 0.0f;
             var d0 = difference(other.GetClosestPoint(train.Rigidbody.position), knotPercent, other.closedLoop);
             var sign = d0 > 0.0f;
-            var switchSign = connection.handleScale > 0.0f;
+            var switchSign = connection.direction > 0.0f;
 
             if (sign == switchSign && lastSign != switchSign)
             {
@@ -152,7 +146,7 @@ namespace FR8Runtime.Train.Track
             }
         }
 
-        private void OnDrawGizmos()
+        private void OnDrawGizmosSelected()
         {
             BakePoints();
 
@@ -164,55 +158,11 @@ namespace FR8Runtime.Train.Track
 
                 a = (a - c) * 0.9f + c;
                 b = (b - c) * 0.9f + c;
-                
+
                 GizmosDrawLine(a, b, new Color(1.0f, 0.6f, 0.1f, 1.0f));
             }
-        }
-
-        private void OnDrawGizmosSelected()
-        {
+            
             DrawLineBetweenKnots();
-
-            for (var p = 0.0f; p < 1.0f; p += 3.0f / resolution)
-            {
-                var p0 = SamplePoint(p);
-
-                DrawDistanceFromGround(p0);
-            }
-
-#if UNITY_EDITOR
-            if (!closedLoop)
-            {
-                var style = new GUIStyle(EditorStyles.boldLabel);
-                style.fontSize = 64;
-                style.alignment = TextAnchor.MiddleCenter;
-
-                style.normal.textColor = new Color(1.0f, 0.5f, 0.0f, 1.0f);
-                Handles.Label(transform.TransformPoint(knots[^1]), "E", style);
-                style.normal.textColor = ColorUtility.Invert(style.normal.textColor);
-                Handles.Label(transform.TransformPoint(knots[0]), "S", style);
-            }
-#endif
-
-            DrawExtraKnots();
-        }
-
-        private void DrawExtraKnots()
-        {
-            Gizmos.color = new Color(1.0f, 1.0f, 1.0f, 0.4f);
-            if (startConnection)
-            {
-                Gizmos.DrawSphere(Knot(0), 0.2f);
-                Gizmos.DrawSphere(Knot(1), 0.2f);
-                Gizmos.DrawSphere(Knot(2), 0.2f);
-            }
-
-            if (endConnection)
-            {
-                Gizmos.DrawSphere(Knot(KnotCount() - 1), 0.2f);
-                Gizmos.DrawSphere(Knot(KnotCount() - 2), 0.2f);
-                Gizmos.DrawSphere(Knot(KnotCount() - 3), 0.2f);
-            }
         }
 
         private void DrawLineBetweenKnots()
@@ -254,35 +204,44 @@ namespace FR8Runtime.Train.Track
 
         public Vector3 Knot(int i)
         {
+            var container = KnotContainer();
+            var childCount = container.childCount;
+
             if (closedLoop)
             {
-                return transform.TransformPoint(knots[(i % knots.Count + knots.Count) % knots.Count]);
+                return transform.GetChild((i % childCount + childCount) % childCount).position;
             }
 
-            //if (startConnection && i == 0) return startConnection.KnotForwardTangent;
-            if (startConnection && i == 0) return startConnection.Knot;
-            if (startConnection && i == 1) return startConnection.KnotBackTangent;
+            if (i == 0)
+            {
+                if (startConnection) return startConnection.Knot;
 
-            var end = startConnection ? knots.Count + Connection.AdditionalKnotsPerConnection : knots.Count;
+                var a = container.GetChild(0).position;
+                var b = container.GetChild(1).position;
+                return 2.0f * a - b;
+            }
 
-            //if (endConnection && i == end) return endConnection.KnotForwardTangent;
-            if (endConnection && i == end) return endConnection.Knot;
-            if (endConnection && i == end + 1) return endConnection.KnotBackTangent;
+            if (i == childCount + 1)
+            {
+                if (endConnection) return endConnection.Knot;
 
-            return transform.TransformPoint(knots[startConnection ? i - Connection.AdditionalKnotsPerConnection : i]);
+                var a = container.GetChild(childCount - 2).position;
+                var b = container.GetChild(childCount - 1).position;
+                return 2.0f * a - b;
+            }
+
+            return container.GetChild(i - 1).position;
         }
 
         public Vector3 KnotVelocity(int index) => SampleVelocity(GetKnotPercent(index));
 
         public int KnotCount()
         {
-            if (closedLoop) return knots.Count + 3;
+            var container = KnotContainer();
+            var childCount = container.childCount;
 
-            var c = knots.Count;
-            if (startConnection) c += Connection.AdditionalKnotsPerConnection;
-            if (endConnection) c += Connection.AdditionalKnotsPerConnection;
-
-            return c;
+            if (closedLoop) return childCount + 3;
+            return childCount + 2;
         }
 
         public Vector3 SamplePoint(float t) => Sample(t, (spline, t) => spline.EvaluatePoint(t));
@@ -309,9 +268,27 @@ namespace FR8Runtime.Train.Track
 
         public void OnValidate()
         {
-            resolution = Mathf.Max(resolution, knots.Count);
+            OnKnotsChanged();
+
+            var childCount = KnotContainer().childCount;
+
+            resolution = Mathf.Max(resolution, childCount);
             startConnection.OnValidate();
             endConnection.OnValidate();
+
+            if (knots?.Count > 0)
+            {
+                var container = KnotContainer(true);
+                for (var i = 0; i < knots.Count; i++)
+                {
+                    var knot = new GameObject($"Knot.{i + 1}").transform;
+                    knot.SetParent(container);
+                    knot.localPosition = knots[i];
+                    knot.localRotation = Quaternion.identity;
+                    knot.localScale = Vector3.one;
+                }
+                knots.Clear();
+            }
         }
 
         public float GetClosestPoint(Vector3 point)
@@ -370,39 +347,97 @@ namespace FR8Runtime.Train.Track
             return i;
         }
 
+        public bool ConnectedTo(TrackSegment other)
+        {
+            if (startConnection.segment == other) return true;
+            if (endConnection.segment == other) return true;
+
+            return false;
+        }
+        
+        public void OnKnotsChanged()
+        {
+            var segments = FindObjectsOfType<TrackSegment>();
+
+            var container = KnotContainer();
+            var childCount = container.childCount;
+
+            updateEnd(0, 1, startConnection);
+            updateEnd(childCount - 1, childCount - 2, endConnection);
+
+            void updateEnd(int i, int p, Connection connection)
+            {
+                connection.segment = null;
+
+                var knot = container.GetChild(i);
+                var d0 = knot.position - container.GetChild(p).position;
+
+                foreach (var s in segments)
+                {
+                    if (s == this) continue;
+                    if (s.ConnectedTo(this)) continue;
+
+                    var t = s.GetClosestPoint(knot.position);
+                    var closestPoint = s.SamplePoint(t);
+                    if ((knot.position - closestPoint).sqrMagnitude > ConnectionDistance * ConnectionDistance) continue;
+
+                    connection.segment = s;
+                    connection.t = t;
+
+                    var d1 = s.SampleVelocity(t);
+                    connection.direction = (int)Mathf.Sign(Vector3.Dot(d0, d1));
+
+                    knot.position = closestPoint;
+                    break;
+                }
+            }
+        }
+
+        public Transform KnotContainer(bool empty = false)
+        {
+            var container = transform.Find("Knots");
+            if (container) return container;
+
+            container = new GameObject("Knots").transform;
+            container.SetParent(transform);
+
+            container.localPosition = Vector3.zero;
+            container.localRotation = Quaternion.identity;
+            container.localScale = Vector3.one;
+
+            container.SetAsFirstSibling();
+
+            if (empty) return container;
+            
+            for (var i = 0; i < 4; i++)
+            {
+                var knot = new GameObject($"Knot.{i + 1}").transform;
+
+                knot.SetParent(container);
+
+                knot.localPosition = Vector3.forward * (i - 1.5f);
+                knot.localRotation = Quaternion.identity;
+                knot.localScale = Vector3.one;
+            }
+
+            return container;
+        }
+
         [Serializable]
         public class Connection
         {
-            public const int AdditionalKnotsPerConnection = 2;
+            public const int AdditionalKnotsPerConnection = 1;
 
             public TrackSegment segment;
-            public int knotIndex;
-            public int handleScale = 1;
+            public float t;
+            public int direction;
             public bool connectionActive;
 
-            public Vector3 Knot => segment.Knot(knotIndex);
-            public Vector3 KnotBackTangent => Knot - Velocity;
-            public Vector3 Velocity => segment.KnotVelocity(knotIndex) * handleScale;
+            public Vector3 Knot => segment.SamplePoint(t) + segment.SampleVelocity(t) * direction;
 
-            public void OnValidate()
-            {
-                if (segment)
-                {
-                    if (!segment.closedLoop) knotIndex = Mathf.Clamp(knotIndex, 0, segment.knots.Count - 1);
-                }
+            public void OnValidate() { }
 
-                handleScale = Mathf.Clamp(handleScale, -1, 1);
-            }
-
-            public static implicit operator bool(Connection connection)
-            {
-                if (connection == null) return false;
-                if (!connection.segment) return false;
-                if (connection.handleScale == 0.0f) return false;
-                if (connection.knotIndex < 1 || connection.knotIndex > connection.segment.knots.Count - 2) return true;
-
-                return true;
-            }
+            public static implicit operator bool(Connection connection) => connection.segment;
         }
 
         private enum ConnectionType
