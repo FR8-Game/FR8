@@ -11,8 +11,8 @@ namespace FR8Runtime.Train.Track
     {
         public const float ConnectionDistance = 3.0f;
 
-        [SerializeField] [HideInInspector] private List<Vector3> knots;
-        
+        [SerializeField] private List<Vector3> knots;
+
         [SerializeField] private int resolution = 100;
         [SerializeField] private bool closedLoop;
 
@@ -161,7 +161,7 @@ namespace FR8Runtime.Train.Track
 
                 GizmosDrawLine(a, b, new Color(1.0f, 0.6f, 0.1f, 1.0f));
             }
-            
+
             DrawLineBetweenKnots();
         }
 
@@ -275,20 +275,22 @@ namespace FR8Runtime.Train.Track
             resolution = Mathf.Max(resolution, childCount);
             startConnection.OnValidate();
             endConnection.OnValidate();
+        }
 
-            if (knots?.Count > 0)
+        [ContextMenu("Update Legacy Knots")]
+        public void UpdateLegacyKnots()
+        {
+            var container = KnotContainer(true);
+            for (var i = 0; i < knots.Count; i++)
             {
-                var container = KnotContainer(true);
-                for (var i = 0; i < knots.Count; i++)
-                {
-                    var knot = new GameObject($"Knot.{i + 1}").transform;
-                    knot.SetParent(container);
-                    knot.localPosition = knots[i];
-                    knot.localRotation = Quaternion.identity;
-                    knot.localScale = Vector3.one;
-                }
-                knots.Clear();
+                var knot = new GameObject($"Knot.{i + 1}").transform;
+                knot.SetParent(container);
+                knot.localPosition = knots[i];
+                knot.localRotation = Quaternion.identity;
+                knot.localScale = Vector3.one;
             }
+
+            knots.Clear();
         }
 
         public float GetClosestPoint(Vector3 point)
@@ -354,7 +356,7 @@ namespace FR8Runtime.Train.Track
 
             return false;
         }
-        
+
         public void OnKnotsChanged()
         {
             var segments = FindObjectsOfType<TrackSegment>();
@@ -408,7 +410,7 @@ namespace FR8Runtime.Train.Track
             container.SetAsFirstSibling();
 
             if (empty) return container;
-            
+
             for (var i = 0; i < 4; i++)
             {
                 var knot = new GameObject($"Knot.{i + 1}").transform;
