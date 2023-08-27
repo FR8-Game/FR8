@@ -155,7 +155,10 @@ namespace FR8Runtime.Train.Track
 
         private Transform GetRendererContainer()
         {
-            var rendererContainer = new GameObject("Renderers").transform;
+            var rendererContainer = transform.Find("Renderers");
+            if (rendererContainer) return rendererContainer;
+            
+            rendererContainer = new GameObject("Renderers").transform;
             rendererContainer.SetParent(transform);
             rendererContainer.localPosition = Vector3.zero;
             rendererContainer.localRotation = Quaternion.identity;
@@ -226,9 +229,9 @@ namespace FR8Runtime.Train.Track
 
         private void OnValidate()
         {
-            if (transform.childCount == 0) return;
-
-            foreach (Transform child in transform.GetChild(0))
+            var container = GetRendererContainer();
+            
+            foreach (Transform child in container)
             {
                 child.localPosition = Vector3.up * verticalOffset;
                 child.localRotation = Quaternion.identity;

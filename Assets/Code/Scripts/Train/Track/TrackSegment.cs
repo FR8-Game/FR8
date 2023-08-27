@@ -28,7 +28,7 @@ namespace FR8Runtime.Train.Track
         public Connection EndConnection => endConnection;
         public int Resolution => resolution;
 
-        public static readonly Spline.SplineProfile SplineProfile = Spline.CatmullRom;
+        public static readonly Spline.SplineProfile SplineProfile = Spline.Cubic;
 
         private void Awake()
         {
@@ -205,32 +205,7 @@ namespace FR8Runtime.Train.Track
         public Vector3 Knot(int i)
         {
             var container = KnotContainer();
-            var childCount = container.childCount;
-
-            if (closedLoop)
-            {
-                return transform.GetChild((i % childCount + childCount) % childCount).position;
-            }
-
-            if (i == 0)
-            {
-                if (startConnection) return startConnection.Knot;
-
-                var a = container.GetChild(0).position;
-                var b = container.GetChild(1).position;
-                return 2.0f * a - b;
-            }
-
-            if (i == childCount + 1)
-            {
-                if (endConnection) return endConnection.Knot;
-
-                var a = container.GetChild(childCount - 2).position;
-                var b = container.GetChild(childCount - 1).position;
-                return 2.0f * a - b;
-            }
-
-            return container.GetChild(i - 1).position;
+            return container.GetChild(i).position;
         }
 
         public Vector3 KnotVelocity(int index) => SampleVelocity(GetKnotPercent(index));
@@ -238,30 +213,35 @@ namespace FR8Runtime.Train.Track
         public int KnotCount()
         {
             var container = KnotContainer();
-            var childCount = container.childCount;
-
-            if (closedLoop) return childCount + 3;
-            return childCount + 2;
+            return container.childCount;
         }
 
         public Vector3 SamplePoint(float t) => Sample(t, (spline, t) => spline.EvaluatePoint(t));
         public Vector3 SampleTangent(float t) => SampleVelocity(t).normalized;
         public Vector3 SampleVelocity(float t) => Sample(t, (spline, t) => spline.EvaluateVelocity(t));
 
-        public T Sample<T>(float t, Func<Spline, float, T> callback) => Sample(Knot, KnotCount(), closedLoop ? t % 1.0f : Mathf.Clamp01(t), callback);
-
-        private static T Sample<T>(Func<int, Vector3> knots, int knotCount, float t, Func<Spline, float, T> callback)
+        public T Sample<T>(float t, Func<Spline, float, T> callback)
         {
-            if (knotCount < 4) return default;
+            t = Mathf.Clamp01(t);
+            
+            var container = KnotContainer();
+            var knotCount = container.childCount;
+            
+            if (knotCount < 2) return default;
 
-            t *= knotCount - 3;
+            t *= knotCount - 1;
             var i0 = Mathf.FloorToInt(t);
-            if (i0 >= knotCount - 4) i0 = knotCount - 4;
+            if (i0 >= knotCount - 2) i0 = knotCount - 2;
 
-            var p0 = knots(i0 + 0);
-            var p1 = knots(i0 + 1);
-            var p2 = knots(i0 + 2);
-            var p3 = knots(i0 + 3);
+            var k0 = container.GetChild(i0);
+            var k1 = container.GetChild(i0 + 1);
+
+            var l = (k1.position - k0.position).magnitude;
+            
+            var p0 = k0.position;
+            var p1 = k0.position + k0.forward * l / 3.0f;
+            var p2 = k1.position - k1.forward * l / 3.0f;
+            var p3 = k1.position;
 
             return callback(SplineProfile(p0, p1, p2, p3), t - i0);
         }
@@ -280,7 +260,7 @@ namespace FR8Runtime.Train.Track
         [ContextMenu("Update Legacy Knots")]
         public void UpdateLegacyKnots()
         {
-            var container = KnotContainer(true);
+            var container = KnotContainer();
             for (var i = 0; i < knots.Count; i++)
             {
                 var knot = new GameObject($"Knot.{i + 1}").transform;
@@ -390,12 +370,17 @@ namespace FR8Runtime.Train.Track
                     connection.direction = (int)Mathf.Sign(Vector3.Dot(d0, d1));
 
                     knot.position = closestPoint;
+
+                    var tangent = s.SampleTangent(t);
+                    if (Vector3.Dot(tangent, knot.forward) < 0.0f) tangent *= -1.0f;
+                    knot.rotation = Quaternion.LookRotation(tangent, Vector3.up);
+                    
                     break;
                 }
             }
         }
 
-        public Transform KnotContainer(bool empty = false)
+        public Transform KnotContainer()
         {
             var container = transform.Find("Knots");
             if (container) return container;
@@ -409,33 +394,22 @@ namespace FR8Runtime.Train.Track
 
             container.SetAsFirstSibling();
 
-            if (empty) return container;
-
-            for (var i = 0; i < 4; i++)
-            {
-                var knot = new GameObject($"Knot.{i + 1}").transform;
-
-                knot.SetParent(container);
-
-                knot.localPosition = Vector3.forward * (i - 1.5f);
-                knot.localRotation = Quaternion.identity;
-                knot.localScale = Vector3.one;
-            }
-
             return container;
         }
 
         [Serializable]
         public class Connection
         {
-            public const int AdditionalKnotsPerConnection = 1;
+            public const int AdditionalKnotsPerConnection = 3;
 
             public TrackSegment segment;
             public float t;
             public int direction;
             public bool connectionActive;
 
-            public Vector3 Knot => segment.SamplePoint(t) + segment.SampleVelocity(t) * direction;
+            public Vector3 Knot0 => segment.SamplePoint(t) - segment.SampleVelocity(t) * direction / 3.0f;
+            public Vector3 Knot1 => segment.SamplePoint(t);
+            public Vector3 Knot2 => segment.SamplePoint(t) + segment.SampleVelocity(t) * direction / 3.0f;
 
             public void OnValidate() { }
 
