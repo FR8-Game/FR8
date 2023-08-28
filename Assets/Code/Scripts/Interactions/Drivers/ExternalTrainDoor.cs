@@ -1,37 +1,25 @@
-﻿using FR8.Train;
-using FR8.Train.Electrics;
-using UnityEngine;
+using FR8Runtime.Train;
 
-namespace FR8.Interactions.Drivers
+namespace FR8Runtime.Interactions.Drivers
 {
-    public class ExternalTrainDoor : Door, IElectricDevice
+    public class ExternalTrainDoor : Door
     {
-        private const float MovementThreshold = 5.0f;
-        
-        private bool connected;
         private bool traveling;
         private TrainCarriage trainMovement;
         
         public string FuseGroup => null;
 
-        public bool Locked => traveling || connected;
+        public bool Locked => traveling;
         public override bool CanInteract => !Locked;
         public override string DisplayValue
         {
             get
             {
                 if (traveling) return "Locked [Train is in Motion]";
-                if (connected) return "Locked [Train is Powered]";
                 return base.DisplayValue;
             }
         }
         
-        public void SetConnected(bool connected)
-        {
-            this.connected = connected;
-            if (Locked) SetValue(0.0f);
-        }
-
         protected override void Awake()
         {
             base.Awake();
@@ -41,7 +29,7 @@ namespace FR8.Interactions.Drivers
         protected override void FixedUpdate()
         {
             var fwdSpeed = trainMovement.GetForwardSpeed();
-            traveling = Mathf.Abs(fwdSpeed) > MovementThreshold;
+            //traveling = Mathf.Abs(fwdSpeed) > TrainMonitor.MaxTrainSafeSpeed;
             if (Locked) SetValue(0.0f);
             
             base.FixedUpdate();
@@ -51,7 +39,5 @@ namespace FR8.Interactions.Drivers
         {
             base.SetValue(Locked ? 0.0f : newValue);
         }
-
-        public float CalculatePowerDraw() => 0.0f;
     }
 }

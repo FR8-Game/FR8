@@ -4,36 +4,29 @@ using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace FR8.Rendering.Passes
+namespace FR8Runtime.Rendering.Passes
 {
-    public sealed class SelectionOutlinePass : ScriptableRenderPass
+    public sealed class SelectionOutlinePass : CustomRenderPass<SelectionOutlineSettings>
     {
-        private static readonly int OutlineTarget = Shader.PropertyToID("_OutlineTarget");
-
         private Material whiteMaterial;
         private Material blackMaterial;
         private Material blitMaterial;
 
+        private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
+        private static readonly int OutlineTarget = Shader.PropertyToID("_OutlineTarget");
+
+        public override bool Enabled => Settings.active;
         public static List<Renderer> ThisFrame { get; } = new();
-        public static List<Renderer> Persistant { get; } = new();
 
         public SelectionOutlinePass()
         {
             renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
         }
 
-        public static void RenderThisFrame(GameObject gameObject) => ThisFrame.AddRange(gameObject.GetComponentsInChildren<Renderer>());
-        public static void RenderPersistant(GameObject gameObject) => Persistant.AddRange(gameObject.GetComponentsInChildren<Renderer>());
-
-        public static void RemovePersistant(GameObject gameObject)
-        {
-            foreach (var r in gameObject.GetComponentsInChildren<Renderer>()) Persistant.Remove(r);
-        }
+        public static void Add(GameObject gameObject) => ThisFrame.AddRange(gameObject.GetComponentsInChildren<Renderer>());
 
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
-            base.OnCameraSetup(cmd, ref renderingData);
-
             var desc = renderingData.cameraData.cameraTargetDescriptor;
             desc.depthBufferBits = 32;
             desc.depthStencilFormat = GraphicsFormat.D32_SFloat_S8_UInt;
@@ -43,42 +36,53 @@ namespace FR8.Rendering.Passes
             if (!blackMaterial) blackMaterial = new Material(Shader.Find("Unlit/OutlineObject"));
             if (!blitMaterial) blitMaterial = new Material(Shader.Find("Hidden/OutlineBlit"));
 
-            Persistant.RemoveAll(e => !e);
+            ThisFrame.RemoveAll(e => e.CompareTag("Do Not Outline"));
         }
 
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        public override void OnExecute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             if (!whiteMaterial) return;
             if (!blackMaterial) return;
             if (!blitMaterial) return;
-            
-            blackMaterial.SetColor("_BaseColor", Color.black);
 
-            var cmd = CommandBufferPool.Get("Selection Outline");
-            cmd.Clear();
-            cmd.BeginSample("Selection Outline");
+            blackMaterial.SetColor(BaseColor, Color.black);
+            blitMaterial.SetColor(BaseColor, Settings.outlineColor.value);
+            var data = renderingData;
 
-            cmd.SetRenderTarget(OutlineTarget);
-            cmd.ClearRenderTarget(true, true, Color.clear);
+            ExecuteWithCommandBuffer(context, cmd =>
+            {
+                cmd.SetRenderTarget(OutlineTarget);
+                cmd.ClearRenderTarget(true, true, Color.clear);
 
-            foreach (var r in ThisFrame) cmd.DrawRenderer(r, whiteMaterial, 0, 0);
-            foreach (var r in Persistant) cmd.DrawRenderer(r, whiteMaterial, 0, 0);
-            
-            cmd.SetRenderTarget(renderingData.cameraData.renderer.cameraColorTarget);
-            cmd.DrawProcedural(Matrix4x4.identity, blitMaterial, 0, MeshTopology.Triangles, 3);
+                foreach (var r in ThisFrame)
+                {
+                    DrawRenderer(cmd, r);
+                }
 
-            cmd.EndSample("Selection Outline");
-            context.ExecuteCommandBuffer(cmd);
-            CommandBufferPool.Release(cmd);
+                cmd.SetRenderTarget(data.cameraData.renderer.cameraColorTarget);
+                cmd.DrawProcedural(Matrix4x4.identity, blitMaterial, 0, MeshTopology.Triangles, 3);
+            });
+        }
 
-            ThisFrame.Clear();
+        private void DrawRenderer(CommandBuffer cmd, Renderer renderer)
+        {
+            for (var i = 0; i < renderer.sharedMaterials.Length; i++)
+            {
+                cmd.DrawRenderer(renderer, whiteMaterial, i, 0);
+            }
         }
 
         public override void OnCameraCleanup(CommandBuffer cmd)
         {
-            base.OnCameraCleanup(cmd);
-
             cmd.ReleaseTemporaryRT(OutlineTarget);
+
+            ThisFrame.Clear();
         }
+    }
+
+    [VolumeComponentMenu("Custom/Selection Outline")]
+    public class SelectionOutlineSettings : VolumeComponent
+    {
+        public ColorParameter outlineColor = new(Color.white);
     }
 }

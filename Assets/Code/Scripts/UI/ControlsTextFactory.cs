@@ -1,10 +1,8 @@
-using System;
 using System.Text;
 using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-namespace FR8.UI
+namespace FR8Runtime.UI
 {
     [RequireComponent(typeof(TMP_Text))]
     public class ControlsTextFactory : MonoBehaviour

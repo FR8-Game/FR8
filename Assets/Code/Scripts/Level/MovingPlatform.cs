@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FR8.Level
+namespace FR8Runtime.Level
 {
     [SelectionBase]
     [DisallowMultipleComponent]

@@ -1,28 +1,34 @@
 using FMODUnity;
 using UnityEngine;
 
-namespace FR8.Interactions.Drivers.Submodules
+namespace FR8Runtime.Interactions.Drivers.Submodules
 {
     [System.Serializable]
     public sealed class DriverSounds
     {
+        public EventReference clickEvent;
+        
+        private GameObject gameObject;
         private float lastValue;
-        private StudioEventEmitter emitter;
-
+        
         public void Awake(GameObject gameObject)
         {
-            emitter = gameObject.GetComponent<StudioEventEmitter>();
+            this.gameObject = gameObject;
         }
-        
+
         public void SetValue(float newValue, int steps)
         {
-            if (!emitter) return;
-            
             var index = Mathf.RoundToInt(newValue * steps);
             var lastIndex = Mathf.RoundToInt(lastValue * steps);
 
-            if (index != lastIndex) emitter.Play();
-
+            if (index != lastIndex)
+            {
+                var sound = RuntimeManager.CreateInstance(clickEvent);
+                sound.set3DAttributes(gameObject.To3DAttributes());
+                sound.start();
+                sound.release();
+            }
+            
             lastValue = newValue;
         }
     }

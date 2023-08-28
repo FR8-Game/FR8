@@ -1,13 +1,14 @@
-﻿using System;
-using FR8.Interactions.Drivables;
+﻿using FR8Runtime.Interactions.Drivables;
+using FR8Runtime.Interactions.Drivers.Submodules;
 using UnityEngine;
 
-namespace FR8.Interactions.Drivers
+namespace FR8Runtime.Interactions.Drivers
 {
     public class Button : Driver
     {
         [SerializeField] private TwoPoseDrivableAnimator animator;
         [SerializeField] private bool testValue;
+        [SerializeField] private DriverSounds sounds;
 
         private bool state;
 
@@ -17,10 +18,19 @@ namespace FR8.Interactions.Drivers
         {
             base.OnValueChanged(newValue);
             animator.SetValue(newValue);
+            sounds.SetValue(newValue, 2);
         }
 
-        private void FixedUpdate()
+        protected override void Awake()
         {
+            base.Awake();
+            sounds.Awake(gameObject);
+        }
+
+        protected override void FixedUpdate()
+        {
+            base.FixedUpdate();
+            
             SetValue(state ? 1.0f : 0.0f);
             state = false;
             
@@ -39,8 +49,8 @@ namespace FR8.Interactions.Drivers
 
         public override void Nudge(int direction) { }
 
-        public override void BeginDrag(Ray ray) { }
-        public override void ContinueDrag(Ray ray)
+        public override void BeginInteract(GameObject interactingObject) { }
+        public override void ContinueInteract(GameObject interactingObject)
         {
             state = true;
         }

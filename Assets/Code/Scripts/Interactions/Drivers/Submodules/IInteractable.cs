@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+using UnityEngine;
 
-namespace FR8.Interactions.Drivers.Submodules
+namespace FR8Runtime.Interactions.Drivers.Submodules
 {
     public interface IInteractable : IBehaviour
     {
@@ -14,7 +14,7 @@ namespace FR8.Interactions.Drivers.Submodules
         
         void Nudge(int direction);
         
-        void BeginDrag(Ray ray);
-        void ContinueDrag(Ray ray);
+        void BeginInteract(GameObject interactingObject);
+        void ContinueInteract(GameObject interactingObject);
     }
 }

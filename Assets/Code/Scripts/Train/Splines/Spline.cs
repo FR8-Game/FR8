@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
-namespace FR8.Train.Splines
+namespace FR8Runtime.Train.Splines
 {
-    public class Spline : ISpline
+    public class Spline
     {
         public Matrix4x4 matrix;
         public float constant = 1.0f;
@@ -94,6 +94,14 @@ namespace FR8.Train.Splines
             return (p0, p1, p2, p3) => new Spline(profile, constant, p0, p1, p2, p3);
         }
 
+        public static readonly SplineProfile Cubic = CreateSplineProfile(new Matrix4x4
+        (
+            new Vector4( 1.0f,  0.0f,  0.0f,  0.0f),
+            new Vector4(-3.0f,  3.0f,  0.0f,  0.0f),
+            new Vector4( 3.0f, -6.0f,  3.0f,  0.0f),
+            new Vector4(-1.0f,  3.0f, -3.0f,  1.0f)
+        ), 1.0f);
+        
         public static readonly SplineProfile BSpline = CreateSplineProfile(new Matrix4x4
         (
             new Vector4(1.0f, 4.0f, 1.0f, 0.0f),

@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using FR8Runtime.CodeUtility;
+using UnityEngine;
 
-namespace FR8.Interactions.Drivables
+namespace FR8Runtime.Interactions.Drivables
 {
     [System.Serializable]
     public class TwoPoseDrivableAnimator
@@ -12,7 +13,7 @@ namespace FR8.Interactions.Drivables
 
         [Header("HANDLE SETTINGS")]
         [Space]
-        [SerializeField] private Utility.DampedSpring animationSpring;
+        [SerializeField] private DampedSpring animationSpring;
         
         [Header("POSE PARAMETERS")]
         [Space]
@@ -42,7 +43,7 @@ namespace FR8.Interactions.Drivables
         private void SetPosition(float position)
         {
             if (handle && animatePosition) handle.localPosition = Vector3.LerpUnclamped(slidePoseAPosition, slidePoseBPosition, position);
-            if (handle && animateRotation) handle.localRotation = Quaternion.Euler(Vector3.LerpUnclamped(slidePoseARotation, slidePoseBRotation, position));
+            if (handle && animateRotation) handle.localRotation = UnityEngine.Quaternion.Euler(Vector3.LerpUnclamped(slidePoseARotation, slidePoseBRotation, position));
         }
 
         public void OnValidate(float testValue)
