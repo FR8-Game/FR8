@@ -12,7 +12,7 @@ namespace FR8Runtime.Player
         public PlayerInteractionManager interactionManager;
         public PlayerCamera cameraController;
         public PlayerVitality vitality;
-        public PlayerVitalityFX vitalityFX;
+        public PlayerUI ui;
         public PlayerInventory inventory;
         public PlayerUrination urination;
 
@@ -50,7 +50,7 @@ namespace FR8Runtime.Player
             groundedMovement.Init(this);
             inventory.Init(this);
             vitality.Init(this);
-            vitalityFX.Init(this);
+            ui.Init(this);
             urination.Init(this);
         }
 
@@ -90,7 +90,7 @@ namespace FR8Runtime.Player
 
         public void OnValidate()
         {
-            vitalityFX.OnValidate(this);
+            ui.OnValidate(this);
         }
     }
 }

@@ -19,7 +19,7 @@ namespace FR8Runtime.Player
             All.Remove(this);
         }
 
-        private void OnDrawGizmos()
+        private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.cyan;
             Gizmos.matrix = transform.localToWorldMatrix;

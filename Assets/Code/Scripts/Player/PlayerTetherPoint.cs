@@ -74,7 +74,7 @@ namespace FR8Runtime.Player
             angleLimit = Mathf.Clamp(angleLimit, 0.0f, 180.0f);
         }
 
-        private void OnDrawGizmos()
+        private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.cyan;
             Gizmos.matrix = transform.localToWorldMatrix;

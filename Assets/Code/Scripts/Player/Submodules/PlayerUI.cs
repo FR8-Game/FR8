@@ -1,12 +1,13 @@
 ﻿using System;
 using FR8Runtime.CodeUtility;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace FR8Runtime.Player.Submodules
 {
     [Serializable]
-    public class PlayerVitalityFX
+    public class PlayerUI
     {
         [SerializeField] private Color healthColor = Color.red;
         [SerializeField] private Color shieldColor = Color.cyan;
@@ -19,18 +20,22 @@ namespace FR8Runtime.Player.Submodules
         [Space]
         [Range(0.0f, 1.0f)] [SerializeField] private float vignetteMaxAlpha = 0.3f;
 
+        private PlayerAvatar avatar;
+        
         private GameObject deathMenu;
         private Image vignette;
         private Image healthBar;
         private Image shieldBar;
-        private PlayerAvatar avatar;
 
-        private const string RootPath = "UI/Vitality";
-        private const string CoverPath = RootPath + "/Death";
-        private const string VignettePath = RootPath + "/Vignette";
-        private const string HealthBarPath = RootPath + "/Stats/Health";
-        private const string ShieldBarPath = RootPath + "/Stats/Shields";
-
+        private TMP_Text longText;
+        private TMP_Text latText;
+        
+        private const string VitalityRootPath = "UI/Vitality";
+        private const string CoverPath = VitalityRootPath + "/Death";
+        private const string VignettePath = VitalityRootPath + "/Vignette";
+        private const string HealthBarPath = VitalityRootPath + "/Stats/Health";
+        private const string ShieldBarPath = VitalityRootPath + "/Stats/Shields";
+        
         public void Init(PlayerAvatar avatar)
         {
             this.avatar = avatar;
@@ -43,6 +48,9 @@ namespace FR8Runtime.Player.Submodules
             vignette = FindUtility.Find<Image>(avatar.transform, VignettePath);
             healthBar = FindUtility.Find<Image>(avatar.transform, $"{HealthBarPath}/Fill");
             shieldBar = FindUtility.Find<Image>(avatar.transform, $"{ShieldBarPath}/Fill");
+            
+            longText = FindUtility.Find<TMP_Text>(avatar.transform, "UI/Space Info/Long");
+            latText = FindUtility.Find<TMP_Text>(avatar.transform, "UI/Space Info/Lat");
 
             SetupDeathUI();
 
@@ -99,6 +107,9 @@ namespace FR8Runtime.Player.Submodules
             {
                 vignette.color = new Color(healthColor.r, healthColor.g, healthColor.b, alpha * vignetteMaxAlpha);
             }
+
+            longText.text = $"<mspace=1e>LONG : {avatar.transform.position.x / 100.0f:N2}";
+            latText.text = $"<mspace=1e>LAT : {avatar.transform.position.z / 100.0f:N2}";
         }
     }
 }
