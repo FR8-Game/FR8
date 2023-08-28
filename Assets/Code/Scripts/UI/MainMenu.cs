@@ -1,5 +1,4 @@
-using FR8Runtime.UI.Loading;
-using TMPro;
+using FR8Runtime.CodeUtility;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -12,38 +11,15 @@ namespace FR8Runtime.UI
 
         private void Start()
         {
-            makeButton("Play", LoadScene("Game Scene"));
-            makeButton("Quit", Quit);
-            
-            Destroy(buttonInstance.gameObject);
-            
-            Button makeButton(string name, UnityAction callback)
-            {
-                var instance = Instantiate(buttonInstance, buttonInstance.transform.parent);
-                instance.name = name;
-
-                var text = instance.GetComponentInChildren<TMP_Text>();
-                text.text = name;
-
-                instance.onClick.AddListener(callback);
-                return instance;
-            }
+            CodeUtility.UIUtility.MakeButtonList(buttonInstance,
+                ("Play", LoadScene(SceneUtility.Scene.Game)),
+                ("Quit", SceneUtility.Quit)
+            );
         }
 
-        public UnityAction LoadScene(string sceneName)
+        public UnityAction LoadScene(SceneUtility.Scene scene)
         {
-            var loadScreen = FindObjectOfType<LoadScreen>();
-            
-            return () => loadScreen.LoadScene(sceneName);
-        }
-
-        public void Quit()
-        {
-#if !UNITY_EDITOR
-            Application.Quit();
-#else
-            UnityEditor.EditorApplication.isPlaying = false;
-#endif
+            return () => SceneUtility.LoadScene(scene);
         }
     }
 }

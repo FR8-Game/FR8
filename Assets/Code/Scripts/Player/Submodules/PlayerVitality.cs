@@ -1,47 +1,136 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
+using FR8Runtime.UI;
 using UnityEngine;
+using UnityEngine.Rendering;
+using Object = UnityEngine.Object;
 
 namespace FR8Runtime.Player.Submodules
 {
     [Serializable]
     public class PlayerVitality
     {
-        public int maxShields;
-        public int maxHealth;
-        [SerializeField] private int currentHealth;
-        [SerializeField] private int currentShields;
+        public int maxHealth = 100;
+        public float shieldDuration = 100;
+        public float shieldRegenRate = 3.0f;
+
+        [Space]
+        public DamageInstance exposureDamageInstance = new(25);
+
+        public float exposureDamageFrequency = 4.0f;
+
+        private List<PlayerSpawnPoint> spawnPointStack = new();
+        private int currentHealth;
+        private float currentShields;
+
+        private IVitalityBooster vitalityBooster;
+        private float shieldRegenBuffer;
 
         public int CurrentHealth => currentHealth;
-        public int CurrentShields => currentShields;
-        public bool Alive { get; private set; }
+        public float CurrentShields => currentShields;
+        public bool IsAlive { get; private set; }
+        public float LastDamageTime { get; private set; }
+        public bool Exposed => !(Object)vitalityBooster;
 
-        public event Action<HealthType, DamageInstance> DamageEvent;
-        public event Action<HealthType, int> RegenerateEvent;
+        private float exposureTimer;
 
-        public void Init()
+        private PlayerAvatar avatar;
+
+        public event Action<DamageInstance> DamageEvent;
+        public event Action<int> RegenerateEvent;
+        public event Action ReviveEvent;
+        public event Action HealthChangeEvent;
+        public event Action IsAliveChangedEvent;
+
+        public void Init(PlayerAvatar avatar)
         {
-            Alive = true;
-            currentHealth = maxHealth;
-            currentShields = maxShields;
+            this.avatar = avatar;
+
+            avatar.FixedUpdateEvent += FixedUpdate;
+
+            LastDamageTime = float.MinValue;
+            Revive();
         }
-        
-        public void Damage(DamageInstance damageInstance)
+
+        public void FixedUpdate()
         {
-            DamageEvent?.Invoke(currentShields > 0 ? HealthType.Shields : HealthType.Health, damageInstance);
-                
-            var damage = CalculateDamage(damageInstance);
-            
-            if (currentShields > 0)
+            GetExposed();
+
+            if (Exposed)
             {
-                currentShields -= damage;
+                if (currentShields >= 0.0f)
+                {
+                    currentShields -= Time.deltaTime;
+                    HealthChangeEvent?.Invoke();
+                }
+                else
+                {
+                    exposureTimer += Time.deltaTime;
+                    var exposureTime = 1.0f / exposureDamageFrequency;
+                    while (exposureTimer > exposureTime)
+                    {
+                        Damage(exposureDamageInstance);
+                        exposureTimer -= exposureTime;
+                    }
+                }
             }
             else
             {
-                currentHealth -= damage;
+                shieldRegenBuffer += shieldRegenRate * Time.deltaTime;
+                var shieldRegen = Mathf.FloorToInt(shieldRegenBuffer);
+                shieldRegenBuffer -= shieldRegen;
+                RegenerateShields();
             }
+        }
+
+        private void GetExposed()
+        {
+            if (checkType(PlayerSafeZone.All)) return;
+            if (checkType(PlayerTetherPoint.All.OrderBy(e => (e.transform.position - avatar.Center).magnitude))) return;
+
+            if ((Object)vitalityBooster)
+            {
+                vitalityBooster.Unbind(avatar);
+                vitalityBooster = null;
+            }
+
+            bool checkType<T>(IEnumerable<T> list) where T : IVitalityBooster
+            {
+                foreach (var e in list)
+                {
+                    if (!e.CanUse(avatar)) continue;
+                    if ((IVitalityBooster)e == vitalityBooster) return true;
+
+                    if ((Object)vitalityBooster)
+                    {
+                        vitalityBooster.Unbind(avatar);
+                    }
+
+                    vitalityBooster = e;
+                    vitalityBooster.Bind(avatar);
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        public void Damage(DamageInstance damageInstance)
+        {
+            if (!IsAlive) return;
+
+            var damage = CalculateDamage(damageInstance);
+            LastDamageTime = Time.time;
+
+            currentHealth -= damage;
 
             if (currentShields < 0) currentShields = 0;
             if (currentHealth < 0) currentHealth = 0;
+
+            DamageEvent?.Invoke(damageInstance);
+            HealthChangeEvent?.Invoke();
 
             if (currentHealth == 0)
             {
@@ -51,7 +140,13 @@ namespace FR8Runtime.Player.Submodules
 
         private void Die()
         {
-            Alive = false;
+            if (!IsAlive) return;
+
+            IsAlive = false;
+            Cursor.lockState = CursorLockMode.None;
+            IsAliveChangedEvent?.Invoke();
+
+            Pause.SetPaused(true);
         }
 
         private int CalculateDamage(DamageInstance damageInstance)
@@ -59,36 +154,76 @@ namespace FR8Runtime.Player.Submodules
             return Mathf.FloorToInt(damageInstance.amount);
         }
 
-        public void RegenerateShields(float fAmount)
+        public void RegenerateShields()
         {
-            currentHealth = Regenerate(fAmount, currentHealth, maxHealth, v => RegenerateEvent?.Invoke(HealthType.Shields, v));
+            currentShields += (shieldDuration * 1.1f - currentShields) * shieldRegenRate * Time.deltaTime;
+            currentShields = Mathf.Min(currentShields, shieldDuration);
+            HealthChangeEvent?.Invoke();
         }
 
         public void RegenerateHealth(float fAmount)
         {
-            currentHealth = Regenerate(fAmount, currentHealth, maxHealth, v => RegenerateEvent?.Invoke(HealthType.Health, v));
-        }
-        
-        private static int Regenerate(float fAmount, int current, int max, Action<int> eventCallback)
-        {
+            if (!IsAlive) return;
+
             var amount = Mathf.FloorToInt(fAmount);
-            
-            eventCallback?.Invoke(amount);
-            
-            current += amount;
-            if (current > max) current = max;
-            return current;
+
+            currentHealth += amount;
+            if (currentHealth > maxHealth) currentHealth = maxHealth;
+
+            RegenerateEvent?.Invoke(amount);
+            HealthChangeEvent?.Invoke();
         }
 
-        public enum HealthType
+        public void Revive()
         {
-            Health, Shields,
+            if (IsAlive) return;
+
+            currentHealth = maxHealth;
+            currentShields = shieldDuration;
+            IsAlive = true;
+
+            var (spawnPosition, spawnOrientation) = GetSpawnPoint();
+            var rb = avatar.Rigidbody;
+
+            rb.transform.position = spawnPosition;
+            rb.transform.rotation = spawnOrientation;
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+
+            ReviveEvent?.Invoke();
+            HealthChangeEvent?.Invoke();
+            IsAliveChangedEvent?.Invoke();
+
+            Pause.SetPaused(false);
         }
-        
+
+        public (Vector3, Quaternion) GetSpawnPoint()
+        {
+            for (var i = spawnPointStack.Count; i > 0; i--)
+            {
+                var p = spawnPointStack[i - 1];
+                if (p.enabled) return (p.Position, p.Orientation);
+            }
+
+            if (PlayerSpawnPoint.Default)
+            {
+                return (PlayerSpawnPoint.Default.Position, PlayerSpawnPoint.Default.Orientation);
+            }
+
+            return (Vector3.zero, Quaternion.identity);
+        }
+
         [Serializable]
         public class DamageInstance
         {
             public float amount;
+
+            public DamageInstance() { }
+
+            public DamageInstance(int amount)
+            {
+                this.amount = amount;
+            }
         }
     }
 }

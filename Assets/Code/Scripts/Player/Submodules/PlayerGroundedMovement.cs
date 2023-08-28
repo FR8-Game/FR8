@@ -7,6 +7,12 @@ namespace FR8Runtime.Player.Submodules
     [System.Serializable]
     public sealed class PlayerGroundedMovement
     {
+        [Header("Collision")]
+        [SerializeField] private float mass = 80.0f;
+        [SerializeField] private float collisionHeight = 1.7f;
+        [SerializeField] private float collisionRadius = 0.25f;
+        [SerializeField] private float stepHeight = 0.5f;
+        
         [Header("Movement")]
         public float maxGroundedSpeed = 4.0f;
         public float accelerationTime = 0.12f;
@@ -55,7 +61,7 @@ namespace FR8Runtime.Player.Submodules
         public PlayerInput input => avatar.input;
 
         private const float GroundCheckRayLength = 1.0f;
-        private float GroundCheckRadius => avatar.Radius * 0.25f;
+        private float GroundCheckRadius => collisionRadius * 0.25f;
         
         public float GroundCheckHeightOffset
         {
@@ -69,6 +75,12 @@ namespace FR8Runtime.Player.Submodules
                 return distance;
             }
         }
+
+        public float Mass => mass;
+        public float CollisionRadius => collisionRadius;
+        public float CollisionHeight => collisionHeight;
+        public float StepHeight => stepHeight;
+        
         public bool IsOnGround { get; private set; }
         public RaycastHit GroundHit { get; private set; }
         public Ladder Ladder { get; private set; }
@@ -89,6 +101,53 @@ namespace FR8Runtime.Player.Submodules
             this.avatar = avatar;
 
             SubscribeToEvents(avatar);
+            ConfigureAll();
+        }
+        
+        private void ConfigureAll()
+        {
+            ConfigureRigidbody();
+
+            ConfigureCollider();
+        }
+
+        private void ConfigureRigidbody()
+        {
+            Rigidbody.mass = mass;
+            Rigidbody.useGravity = false;
+            Rigidbody.detectCollisions = true;
+            Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+            Rigidbody.interpolation = RigidbodyInterpolation.None;
+            Rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
+        }
+        
+        public void ConfigureCollider()
+        {
+            var gameObject = avatar.gameObject;
+            var groundOffset = stepHeight;
+
+            var collider = gameObject.GetOrAddComponent<CapsuleCollider>();
+            collider.enabled = true;
+            collider.height = collisionHeight - groundOffset;
+            collider.radius = collisionRadius;
+            collider.center = Vector3.up * (collisionHeight + groundOffset) / 2.0f;
+
+
+            if (collider.material) Object.Destroy(collider.material);
+            collider.material = CreatePlayerPhysicsMaterial();
+        }
+        
+        private static PhysicMaterial CreatePlayerPhysicsMaterial()
+        {
+            var mat = new PhysicMaterial("[PROC] Player Physics Material");
+            mat.hideFlags = HideFlags.HideAndDontSave;
+            mat.bounciness = 0.0f;
+            mat.dynamicFriction = 0.0f;
+            mat.staticFriction = 0.0f;
+
+            mat.bounceCombine = PhysicMaterialCombine.Multiply;
+            mat.frictionCombine = PhysicMaterialCombine.Multiply;
+            return mat;
         }
 
         private void SubscribeToEvents(PlayerAvatar avatar)
@@ -310,7 +369,7 @@ namespace FR8Runtime.Player.Submodules
 
         private Vector3 CalculateJumpForce()
         {
-            var power = Mathf.Sqrt(Mathf.Max(2.0f * 9.81f * upGravityScale * (jumpHeight - avatar.StepHeight), 0.0f)) - Velocity.y;
+            var power = Mathf.Sqrt(Mathf.Max(2.0f * 9.81f * upGravityScale * (jumpHeight - stepHeight), 0.0f)) - Velocity.y;
             var force = Vector3.up * power;
             return force;
         }
@@ -348,6 +407,16 @@ namespace FR8Runtime.Player.Submodules
         {
             Ladder = ladder;
             targetLadderPosition = ladder.FromWorldPos(Rigidbody.position);
+        }
+        
+        public void DrawGizmos(PlayerAvatar avatar)
+        {
+            var transform = avatar.transform;
+            
+            Gizmos.color = Color.yellow;
+            Gizmos.matrix = transform.localToWorldMatrix;
+
+            CodeUtility.GizmoUtility.DrawCapsule(Vector3.up * collisionHeight / 2.0f, Quaternion.identity, collisionHeight, collisionRadius);
         }
     }
 }
