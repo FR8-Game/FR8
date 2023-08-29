@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using FR8Runtime.Train.Splines;
 using UnityEditor;
@@ -7,13 +8,17 @@ using UnityEngine;
 namespace FR8Runtime.Train.Track
 {
     [SelectionBase, DisallowMultipleComponent]
-    public class TrackSegment : MonoBehaviour
+    public class TrackSegment : MonoBehaviour, System.Collections.Generic.IEnumerable<Transform>
     {
         public const float ConnectionDistance = 3.0f;
+        public static readonly Spline.SplineProfile SplineProfile = Spline.Cubic;
 
-        [SerializeField] private List<Vector3> knots;
+        [SerializeField] [HideInInspector] private List<Vector3> knots;
+        [SerializeField] private TrackJunction junctionPrefab;
 
+        [Space]
         [SerializeField] private int resolution = 100;
+
         [SerializeField] private bool closedLoop;
 
         private Connection startConnection = new();
@@ -27,21 +32,23 @@ namespace FR8Runtime.Train.Track
         public Connection StartConnection => startConnection;
         public Connection EndConnection => endConnection;
         public int Resolution => resolution;
-
-        public static readonly Spline.SplineProfile SplineProfile = Spline.Cubic;
+        public int Count => KnotContainer().childCount;
 
         private void Awake()
         {
             BakePoints();
         }
 
-        private void BakePoints()
+        private void Start()
         {
-            points = new List<Vector3>();
-            for (var i = 0; i < resolution; i++)
+            if (startConnection)
             {
-                var p = i / (resolution - 1.0f);
-                points.Add(SamplePoint(p));
+                junctionPrefab.SpawnFromPrefab(this, this[0]);
+            }
+
+            if (endConnection)
+            {
+                junctionPrefab.SpawnFromPrefab(this, this[FromEnd(1)]);
             }
         }
 
@@ -52,6 +59,68 @@ namespace FR8Runtime.Train.Track
             UpdateConnection(trains, ConnectionType.Start);
             UpdateConnection(trains, ConnectionType.End);
             UpdateTrainMetadata(trains);
+        }
+
+        public void DrawGizmos(bool main, Color selectedColor, Color otherColor)
+        {
+            BakePoints();
+            var linePoints = new List<Vector3>();
+
+            foreach (var e in points)
+            {
+                linePoints.Add(e);
+            }
+
+            GizmosDrawLine(main ? selectedColor : otherColor, 1.0f, linePoints.ToArray());
+            DrawLineBetweenKnots();
+        }
+        
+        private void DrawLineBetweenKnots()
+        {
+            var points = new List<Vector3>();
+            foreach (Transform t in this)
+            {
+                points.Add(t.position);
+            }
+
+            GizmosDrawLine(new Color(1.0f, 1.0f, 1.0f, 0.4f), 0.3f, points.ToArray());
+        }
+        
+        private void DrawDistanceFromGround(Vector3 p0)
+        {
+            if (Physics.Raycast(p0, Vector3.down, out var hit))
+            {
+                var radius = Mathf.Min(2.0f, hit.distance * 2.0f);
+                GizmosDrawLine(new Color(0.4f, 1.0f, 0.2f, 1.0f), 1.0f, p0, hit.point);
+                Handles.DrawWireArc(hit.point, Vector3.up, Vector3.right, 360.0f, radius);
+            }
+
+            if (Physics.Raycast(p0, Vector3.up, out hit))
+            {
+                var radius = Mathf.Min(2.0f, hit.distance * 20.0f);
+                GizmosDrawLine(new Color(0.4f, 1.0f, 0.2f, 1.0f), 1.0f, p0, hit.point);
+                Handles.DrawWireArc(hit.point, Vector3.up, Vector3.right, 360.0f, radius);
+            }
+        }
+        
+        private void GizmosDrawLine(Color color, float width = 1.0f, params Vector3[] points)
+        {
+#if UNITY_EDITOR
+            width *= 4.0f;
+
+            Handles.color = color;
+            Handles.DrawPolyLine(points);
+#endif
+        }
+
+        private void BakePoints()
+        {
+            points = new List<Vector3>();
+            for (var i = 0; i < resolution; i++)
+            {
+                var p = i / (resolution - 1.0f);
+                points.Add(SamplePoint(p));
+            }
         }
 
         private void UpdateTrainMetadata(TrainCarriage[] trains)
@@ -145,76 +214,10 @@ namespace FR8Runtime.Train.Track
                 train.Segment = this;
             }
         }
-
-        private void OnDrawGizmosSelected()
-        {
-            BakePoints();
-
-            for (var i = 0; i < points.Count - 1; i++)
-            {
-                var a = points[i];
-                var b = points[i + 1];
-                var c = (a + b) / 2.0f;
-
-                a = (a - c) * 0.9f + c;
-                b = (b - c) * 0.9f + c;
-
-                GizmosDrawLine(a, b, new Color(1.0f, 0.6f, 0.1f, 1.0f));
-            }
-
-            DrawLineBetweenKnots();
-        }
-
-        private void DrawLineBetweenKnots()
-        {
-            for (var i = 0; i < KnotCount() - 1; i++)
-            {
-                var p0 = Knot(i);
-                var p1 = Knot(i + 1);
-                GizmosDrawLine(p0, p1, new Color(1.0f, 1.0f, 1.0f, 0.4f));
-            }
-        }
-
-        private void DrawDistanceFromGround(Vector3 p0)
-        {
-            if (Physics.Raycast(p0, Vector3.down, out var hit))
-            {
-                var radius = Mathf.Min(2.0f, hit.distance * 2.0f);
-                GizmosDrawLine(p0, hit.point, new Color(0.4f, 1.0f, 0.2f, 1.0f));
-                Handles.DrawWireArc(hit.point, Vector3.up, Vector3.right, 360.0f, radius);
-            }
-
-            if (Physics.Raycast(p0, Vector3.up, out hit))
-            {
-                var radius = Mathf.Min(2.0f, hit.distance * 20.0f);
-                GizmosDrawLine(p0, hit.point, new Color(0.4f, 1.0f, 0.2f, 1.0f));
-                Handles.DrawWireArc(hit.point, Vector3.up, Vector3.right, 360.0f, radius);
-            }
-        }
-
-        private void GizmosDrawLine(Vector3 a, Vector3 b, Color color)
-        {
-            const float width = 4.0f;
-
-#if UNITY_EDITOR
-            Handles.color = color;
-            Handles.DrawAAPolyLine(width, a, b);
-#endif
-        }
-
-        public Vector3 Knot(int i)
-        {
-            var container = KnotContainer();
-            return container.GetChild(i).position;
-        }
-
+        
         public Vector3 KnotVelocity(int index) => SampleVelocity(GetKnotPercent(index));
 
-        public int KnotCount()
-        {
-            var container = KnotContainer();
-            return container.childCount;
-        }
+        public int FromEnd(int i) => Count - i;
 
         public Vector3 SamplePoint(float t) => Sample(t, (spline, t) => spline.EvaluatePoint(t));
         public Vector3 SampleTangent(float t) => SampleVelocity(t).normalized;
@@ -223,10 +226,10 @@ namespace FR8Runtime.Train.Track
         public T Sample<T>(float t, Func<Spline, float, T> callback)
         {
             t = Mathf.Clamp01(t);
-            
+
             var container = KnotContainer();
             var knotCount = container.childCount;
-            
+
             if (knotCount < 2) return default;
 
             t *= knotCount - 1;
@@ -237,7 +240,7 @@ namespace FR8Runtime.Train.Track
             var k1 = container.GetChild(i0 + 1);
 
             var l = (k1.position - k0.position).magnitude;
-            
+
             var p0 = k0.position;
             var p1 = k0.position + k0.forward * l / 3.0f;
             var p2 = k1.position - k1.forward * l / 3.0f;
@@ -318,14 +321,14 @@ namespace FR8Runtime.Train.Track
 
         public float GetKnotPercent(int index)
         {
-            return (index - 1.0f) / (KnotCount() - 2.0f);
+            return (index - 1.0f) / FromEnd(2);
         }
 
         public int GetKnotIndex(float t)
         {
             t = Mathf.Clamp(t, 0.0f, 0.99999f);
 
-            var i = Mathf.FloorToInt(t * (KnotCount() - 2)) + 1;
+            var i = Mathf.FloorToInt(t * FromEnd(2)) + 1;
             return i;
         }
 
@@ -374,7 +377,7 @@ namespace FR8Runtime.Train.Track
                     var tangent = s.SampleTangent(t);
                     if (Vector3.Dot(tangent, knot.forward) < 0.0f) tangent *= -1.0f;
                     knot.rotation = Quaternion.LookRotation(tangent, Vector3.up);
-                    
+
                     break;
                 }
             }
@@ -395,6 +398,14 @@ namespace FR8Runtime.Train.Track
             container.SetAsFirstSibling();
 
             return container;
+        }
+
+        public void UpdateKnotNames()
+        {
+            foreach (Transform knot in KnotContainer())
+            {
+                knot.name = $"Knot.{knot.GetSiblingIndex() + 1}";
+            }
         }
 
         [Serializable]
@@ -421,5 +432,26 @@ namespace FR8Runtime.Train.Track
             Start,
             End,
         }
+
+        public void AddKnot()
+        {
+            var container = KnotContainer();
+            var knot = new GameObject("Knot").transform;
+            knot.SetParent(container);
+            knot.SetAsLastSibling();
+
+            if (container.childCount > 1)
+            {
+                var previous = container.GetChild(container.childCount - 1);
+                knot.position = previous.position + previous.forward;
+            }
+
+            UpdateKnotNames();
+        }
+
+        public Transform this[int index] => KnotContainer().GetChild(index);
+        
+        public IEnumerator GetEnumerator() => KnotContainer().GetEnumerator();
+        IEnumerator<Transform> IEnumerable<Transform>.GetEnumerator() => (IEnumerator<Transform>)KnotContainer().GetEnumerator();
     }
 }

@@ -11,5 +11,7 @@ namespace FR8Runtime.CodeUtility
             b = 1.0f - color.b,
             a = invertAlpha ? 1.0f - color.a : color.a
         };
+
+        public static Color ScaleAlpha(Color color, float alphaScale) => new Color(color.r, color.g, color.b, color.a * alphaScale);
     }
 }

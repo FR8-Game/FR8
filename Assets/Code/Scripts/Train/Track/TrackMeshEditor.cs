@@ -1,63 +1,57 @@
 ﻿#if UNITY_EDITOR
 
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FR8Runtime.Rendering;
-using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace FR8Runtime.Train.Track
 {
-    [InitializeOnLoad]
     public sealed partial class TrackMesh
     {
         private const int NextPointSubResolution = 10;
+        private const int RasterizeResolution = 100;
 
-        [SerializeField] private Mesh baseMesh;
-        [SerializeField] private Material material;
-        [SerializeField] private bool optimize;
-        [SerializeField] private int segmentsPerSplit = 15;
-        [SerializeField] private float verticalOffset;
+        public Mesh baseMesh;
+        public Material material;
+        public bool optimize;
+        public int segmentsPerSplit = 15;
+        public float verticalOffset;
+
+        private List<Vector3> trackPoints;
+        private List<Vector3> trackVelocities;
+        
+        public static void ExecuteAndRefreshAssets(Action callback)
+        {
+            callback();
+            EditorSceneManager.MarkAllScenesDirty();
+            AssetDatabase.Refresh();
+        }
 
         public partial void Clear()
         {
             var rendererContainer = transform.Find("Renderers");
             if (!rendererContainer) return;
 
-            var taskID = Progress.Start($"Clearing {name}");
-            EditorCoroutineUtility.StartCoroutine(routine(), gameObject);
-            
-            IEnumerator routine()
+            for (var i = 0; i < rendererContainer.childCount; i++)
             {
-                for (var i = 0; i < rendererContainer.childCount; i++)
-                {
-                    Progress.Report(taskID, i / (float)rendererContainer.childCount);
-                    
-                    var child = rendererContainer.GetChild(i);
-                    DeleteTrackSegment(child);
+                var child = rendererContainer.GetChild(i);
+                DeleteTrackSegment(child);
+            }
 
-                    yield return null;
-                }
+            var dir = $"{Path.GetDirectoryName(gameObject.scene.path)}/{gameObject.scene.name}";
+            if (!Directory.EnumerateFileSystemEntries(dir).Any())
+            {
+                AssetDatabase.DeleteAsset(dir);
+            }
 
-                var dir = $"{Path.GetDirectoryName(gameObject.scene.path)}/{gameObject.scene.name}";
-                if (!Directory.EnumerateFileSystemEntries(dir).Any())
-                {
-                    AssetDatabase.DeleteAsset(dir);
-                }
-
-                if (rendererContainer)
-                {
-                    DestroyImmediate(rendererContainer.gameObject);
-                }
-
-                EditorSceneManager.MarkSceneDirty(gameObject.scene);
-                AssetDatabase.SaveAssets();
-                
-                Progress.Finish(taskID);
+            if (rendererContainer)
+            {
+                DestroyImmediate(rendererContainer.gameObject);
             }
         }
 
@@ -65,24 +59,30 @@ namespace FR8Runtime.Train.Track
         {
             var filter = child.GetComponent<MeshFilter>();
             var mesh = filter.sharedMesh;
+            var toDelete = new List<string>();
+
             if (mesh && AssetDatabase.IsMainAsset(mesh))
             {
                 var path = AssetDatabase.GetAssetPath(mesh);
                 var dir = Path.GetDirectoryName(path);
-                AssetDatabase.DeleteAsset(path);
+                toDelete.Add(path);
                 if (!Directory.EnumerateFileSystemEntries(dir).Any())
                 {
-                    AssetDatabase.DeleteAsset(dir);
+                    toDelete.Add(dir);
                 }
             }
+
+            AssetDatabase.DeleteAssets(toDelete.ToArray(), new List<string>());
         }
 
         public partial void BakeMesh()
         {
             Clear();
-
+            
             var rendererContainer = GetRendererContainer();
             var segment = GetComponent<TrackSegment>();
+            
+            RasterizeTrack(segment);
 
             var vertices = new List<Vector3>();
             var normals = new List<Vector3>();
@@ -94,70 +94,85 @@ namespace FR8Runtime.Train.Track
             var segmentSize = baseMesh.bounds.size.z;
 
             var index = 0;
-            EditorCoroutineUtility.StartCoroutine(progress(), gameObject);
 
-            IEnumerator progress()
+            var taskID = Progress.Start($"[{name}] Baking Track Mesh");
+
+            while (endPoint < 1.0f)
             {
-                var taskID = Progress.Start($"[{name}] Baking Track Mesh");
-
-                while (endPoint < 1.0f)
+                if (index != 0 && index % segmentsPerSplit == 0)
                 {
-                    if (index != 0 && index % segmentsPerSplit == 0)
-                    {
-                        Progress.Report(taskID, endPoint);
-                        SplitMesh(vertices, normals, indices, uvs, rendererContainer);
-                        yield return null;
-                    }
-
-                    endPoint = FindNextPoint(segment, startPoint, segmentSize);
-
-                    var indexBase = vertices.Count;
-
-                    foreach (var v0 in baseMesh.vertices)
-                    {
-                        var p2 = Mathf.Lerp(startPoint, endPoint, Mathf.InverseLerp(baseMesh.bounds.min.z, baseMesh.bounds.max.z, v0.z));
-
-                        var t = segment.SamplePoint(p2);
-                        var r = Quaternion.LookRotation(segment.SampleTangent(p2));
-                        var v2 = r * new Vector3(v0.x, v0.y, 0.0f) + t;
-
-                        vertices.Add(transform.InverseTransformPoint(v2));
-                    }
-
-                    foreach (var n in baseMesh.normals)
-                    {
-                        normals.Add(transform.InverseTransformDirection(n).normalized);
-                    }
-
-                    foreach (var t in baseMesh.triangles)
-                    {
-                        indices.Add(indexBase + t);
-                    }
-
-                    foreach (var uv in baseMesh.uv)
-                    {
-                        uvs.Add(uv);
-                    }
-
-                    startPoint = endPoint;
-                    index++;
+                    Progress.Report(taskID, endPoint);
+                    SplitMesh(vertices, normals, indices, uvs, rendererContainer);
                 }
-                
-                SplitMesh(vertices, normals, indices, uvs, rendererContainer);
 
-                Progress.Remove(taskID);
-                Debug.Log($"Finished Baking {name}");
-                EditorSceneManager.MarkSceneDirty(gameObject.scene);
+                endPoint = FindNextPoint(startPoint, segmentSize);
 
-                AssetDatabase.SaveAssets();
+                var indexBase = vertices.Count;
+
+                foreach (var v0 in baseMesh.vertices)
+                {
+                    var p2 = Mathf.Lerp(startPoint, endPoint, Mathf.InverseLerp(baseMesh.bounds.min.z, baseMesh.bounds.max.z, v0.z));
+
+                    var t = segment.SamplePoint(p2);
+                    var r = Quaternion.LookRotation(segment.SampleTangent(p2));
+                    var v2 = r * new Vector3(v0.x, v0.y, 0.0f) + t;
+
+                    vertices.Add(transform.InverseTransformPoint(v2));
+                }
+
+                foreach (var n in baseMesh.normals)
+                {
+                    normals.Add(transform.InverseTransformDirection(n).normalized);
+                }
+
+                foreach (var t in baseMesh.triangles)
+                {
+                    indices.Add(indexBase + t);
+                }
+
+                foreach (var uv in baseMesh.uv)
+                {
+                    uvs.Add(uv);
+                }
+
+                startPoint = endPoint;
+                index++;
             }
+
+            SplitMesh(vertices, normals, indices, uvs, rendererContainer);
+
+            Progress.Remove(taskID);
+            Debug.Log($"Finished Baking {name}");
         }
 
+        private void RasterizeTrack(TrackSegment segment)
+        {
+            trackPoints = new List<Vector3>();
+            trackVelocities = new List<Vector3>();
+
+            var length = 0.0f;
+            for (var i = 0; i < segment.Count - 1; i++)
+            {
+                var a = segment[i].position;
+                var b = segment[i + 1].position;
+
+                length += (b - a).magnitude;
+            }
+
+            var resolution = Mathf.Ceil(length * RasterizeResolution);
+            for (var i = 0; i < resolution; i++)
+            {
+                var p = (i - 1.0f) / resolution;
+                trackPoints.Add(segment.SamplePoint(p));
+                trackVelocities.Add(segment.SampleVelocity(p));
+            }
+        }
+        
         private Transform GetRendererContainer()
         {
             var rendererContainer = transform.Find("Renderers");
             if (rendererContainer) return rendererContainer;
-            
+
             rendererContainer = new GameObject("Renderers").transform;
             rendererContainer.SetParent(transform);
             rendererContainer.localPosition = Vector3.zero;
@@ -168,7 +183,7 @@ namespace FR8Runtime.Train.Track
         private void SplitMesh(List<Vector3> vertices, List<Vector3> normals, List<int> indices, List<Vector2> uvs, Transform rendererContainer)
         {
             var mesh = CompileMesh(vertices, normals, indices, uvs);
-            
+
             var filter = new GameObject().AddComponent<MeshFilter>();
             filter.transform.SetParent(rendererContainer);
             filter.transform.SetAsLastSibling();
@@ -176,13 +191,13 @@ namespace FR8Runtime.Train.Track
             filter.gameObject.name = mesh.name;
             filter.transform.localPosition = Vector3.up * verticalOffset;
             filter.transform.localRotation = Quaternion.identity;
-            
+
             var renderer = filter.gameObject.AddComponent<MeshRenderer>();
             renderer.sharedMaterials = new[] { material };
-            
+
             var collider = filter.gameObject.AddComponent<MeshCollider>();
             collider.sharedMesh = mesh;
-            
+
             var marker = filter.gameObject.AddComponent<MapMarker>();
             marker.MarkerColor = Color.green;
         }
@@ -212,25 +227,29 @@ namespace FR8Runtime.Train.Track
             return mesh;
         }
 
-        private float FindNextPoint(TrackSegment segment, float startPoint, float segmentSize)
+        private float FindNextPoint(float startPoint, float segmentSize)
         {
-            var start = segment.SamplePoint(startPoint);
-            var step = 1.0f / (segment.Resolution * NextPointSubResolution);
-            for (var p = startPoint + step; p <= 1.0f; p += step)
-            {
-                var end = segment.SamplePoint(p);
+            var i = Mathf.FloorToInt(startPoint * trackPoints.Count);
+            var j = i + 1;
 
-                var dist = (end - start).magnitude;
-                if (dist > segmentSize) return p;
+            var length = 0.0f;
+            
+            for (; j < trackPoints.Count; j++)
+            {
+                var a = trackPoints[j - 1];
+                var b = trackPoints[j];
+                length += (b - a).magnitude;
+
+                if (length > segmentSize) break;
             }
 
-            return 1.0f;
+            return j / (float)trackPoints.Count;
         }
 
         private void OnValidate()
         {
             var container = GetRendererContainer();
-            
+
             foreach (Transform child in container)
             {
                 child.localPosition = Vector3.up * verticalOffset;
