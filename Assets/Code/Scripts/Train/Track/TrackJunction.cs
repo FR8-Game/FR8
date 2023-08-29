@@ -1,4 +1,5 @@
 using System;
+using FMOD;
 using FR8Runtime.Interactions.Drivers.Submodules;
 using UnityEngine;
 
@@ -7,12 +8,14 @@ namespace FR8Runtime.Train.Track
     public class TrackJunction : MonoBehaviour, IInteractable
     {
         [SerializeField] private TrackSegment segment;
-        [SerializeField] private ConnectionEnd connectionEnd;
         [SerializeField] private Transform primaryIndicator;
         [SerializeField] private Transform secondaryIndicator;
         [SerializeField] private CodeUtility.DampedSpring animationSpring;
         [SerializeField] private bool flip;
         [SerializeField] private bool testActive;
+        
+        [Space]
+        [SerializeField] private ConnectionEnd connectionEnd;
 
         private bool state;
 
@@ -22,6 +25,16 @@ namespace FR8Runtime.Train.Track
         public bool OverrideInteractDistance => true;
         public float InteractDistance => float.MaxValue;
 
+        public TrackJunction SpawnFromPrefab(TrackSegment segment, Transform knot)
+        {
+            var instance = Instantiate(this);
+            instance.segment = segment;
+            instance.transform.position = knot.position;
+            instance.transform.rotation = RotationOffset(knot.rotation);
+            
+            return instance;
+        }
+        
         private void OnValidate()
         {
             if (segment)
@@ -31,8 +44,50 @@ namespace FR8Runtime.Train.Track
                 var tangent = segment.SampleTangent(t);
                 transform.rotation = Quaternion.LookRotation(tangent, Vector3.up);
             }
+            
+            FindConnectionEnd();
 
             Animate(testActive ? 1.0f : 0.0f);
+        }
+
+        private void Start()
+        {
+            if (!segment)
+            {
+                gameObject.SetActive(false);
+                return;
+            }
+            
+            FindConnectionEnd();
+            var knot = segment[connectionEnd switch 
+            {
+                ConnectionEnd.Start => 0,
+                ConnectionEnd.End => segment.FromEnd(1),
+                _ => throw new ArgumentOutOfRangeException()
+            }];
+            
+            transform.position = knot.position;
+            transform.rotation = RotationOffset(knot.rotation);
+        }
+
+        private Quaternion RotationOffset(Quaternion origin) => connectionEnd switch 
+        {
+            ConnectionEnd.Start => Quaternion.identity,
+            ConnectionEnd.End => Quaternion.Euler(0.0f, 180.0f, 0.0f) * origin,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+        
+        private void FindConnectionEnd()
+        {
+            if (!segment) return;
+            
+            var knotStart = segment[0].position;
+            var knotEnd = segment[segment.FromEnd(1)].position;
+
+            var sd = (knotStart - transform.position).magnitude;
+            var ed = (knotEnd - transform.position).magnitude;
+
+            connectionEnd = sd < ed ? ConnectionEnd.Start : ConnectionEnd.End;
         }
 
         private void FixedUpdate()

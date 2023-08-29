@@ -39,17 +39,17 @@ namespace FR8Runtime.Player.Submodules
         }
 
         public bool JumpTriggered => jumpInput.action?.WasPerformedThisFrame() ?? false;
-        public bool Jump => jumpInput.Switch();
+        public bool Jump => jumpInput.State();
         public Vector2 LookFrameDelta => GetLookFrameDelta(false);
 
         public int Nudge => Mathf.Clamp(Mathf.RoundToInt(nudgeAction.action?.ReadValue<float>() ?? 0.0f), -1, 1);
         public bool Press => pressAction.action?.WasPerformedThisFrame() ?? false;
-        public bool Drag => pressAction.Switch();
+        public bool Drag => pressAction.State();
         public bool FreeCam => freeCamAction.action?.WasPerformedThisFrame() ?? false;
-        public bool GrabCam => grabCamAction.Switch();
-        public bool ZoomCam => zoomCamAction.Switch();
-        public bool Sprint => sprintAction.Switch();
-        public bool Pee => peeAction.Switch();
+        public bool GrabCam => grabCamAction.State();
+        public bool ZoomCam => zoomCamAction.State();
+        public bool Sprint => sprintAction.State();
+        public bool Pee => peeAction.State();
         
         public int SwitchHotbar
         {
@@ -63,6 +63,8 @@ namespace FR8Runtime.Player.Submodules
                 return -1;
             }
         }
+
+        public bool Crouch => crouchAction.State();
 
         public Vector2 GetLookFrameDelta(bool forceMouseDelta)
         {

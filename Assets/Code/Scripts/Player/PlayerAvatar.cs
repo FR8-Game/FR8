@@ -80,7 +80,7 @@ namespace FR8Runtime.Player
         {
             Rigidbody.rotation = Quaternion.Euler(0.0f, cameraController.CameraTarget.eulerAngles.y, 0.0f);
             cameraController.CameraTarget.localRotation = Quaternion.identity;
-            cameraController.CameraTarget.localPosition = cameraController.cameraOffset;
+            cameraController.CameraTarget.localPosition = groundedMovement.cameraOffset;
         }
 
         private void OnDrawGizmos()
