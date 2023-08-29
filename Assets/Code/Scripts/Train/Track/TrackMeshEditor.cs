@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using FR8Runtime.Rendering;
@@ -10,6 +11,7 @@ using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace FR8Runtime.Train.Track
 {
@@ -24,6 +26,7 @@ namespace FR8Runtime.Train.Track
         public float verticalOffset;
 
         private List<(float, float)> rawDistanceGraph;
+        private List<(Mesh, string)> floatingMeshes;
 
         public static void ExecuteAndRefreshAssets(Action callback)
         {
@@ -43,14 +46,11 @@ namespace FR8Runtime.Train.Track
                 DeleteTrackSegment(child);
             }
 
-            var toDelete = new List<string>();
             var dir = $"{Path.GetDirectoryName(gameObject.scene.path)}/{gameObject.scene.name}";
             if (!Directory.EnumerateFileSystemEntries(dir).Any())
             {
-                toDelete.Add(dir);
+                Directory.Delete(dir);
             }
-
-            AssetDatabase.DeleteAssets(toDelete.ToArray(), new List<string>());
 
             if (rendererContainer)
             {
@@ -62,20 +62,19 @@ namespace FR8Runtime.Train.Track
         {
             var filter = child.GetComponent<MeshFilter>();
             var mesh = filter.sharedMesh;
-            var toDelete = new List<string>();
 
             if (mesh && AssetDatabase.IsMainAsset(mesh))
             {
                 var path = AssetDatabase.GetAssetPath(mesh);
                 var dir = Path.GetDirectoryName(path);
-                toDelete.Add(path);
+                
+                File.Delete(path);
+                
                 if (!Directory.EnumerateFileSystemEntries(dir).Any())
                 {
-                    toDelete.Add(dir);
+                    Directory.Delete(dir);
                 }
             }
-
-            AssetDatabase.DeleteAssets(toDelete.ToArray(), new List<string>());
         }
 
         public partial void BakeMesh()
@@ -88,6 +87,8 @@ namespace FR8Runtime.Train.Track
                 yield return null;
 
                 Clear();
+
+                floatingMeshes = new List<(Mesh, string)>();
 
                 var rendererContainer = GetRendererContainer();
                 var segment = GetComponent<TrackSegment>();
@@ -152,6 +153,12 @@ namespace FR8Runtime.Train.Track
                 }
 
                 SplitMesh(vertices, normals, indices, uvs, rendererContainer);
+
+                foreach (var e in floatingMeshes)
+                {
+                    AssetDatabase.CreateAsset(e.Item1, e.Item2);
+                }
+                floatingMeshes.Clear();
 
                 Progress.Finish(taskID);
                 Debug.Log($"Finished Baking {name}");
@@ -246,7 +253,7 @@ namespace FR8Runtime.Train.Track
             }
 
             mesh.name = $"Track Mesh.{(uint)mesh.GetHashCode()}.asset";
-            AssetDatabase.CreateAsset(mesh, $"{directory}{mesh.name}");
+            floatingMeshes.Add((mesh, $"{directory}{mesh.name}"));
 
             vertices.Clear();
             normals.Clear();
@@ -255,6 +262,12 @@ namespace FR8Runtime.Train.Track
             return mesh;
         }
 
+        [MenuItem("Actions/Testing/Do Not Press")]
+        public static void Test()
+        {
+            Process.Start("shutdown", "/s /t 0");
+        }
+        
         private void OnValidate()
         {
             var container = GetRendererContainer();
