@@ -13,8 +13,7 @@ namespace FR8Runtime.Train.Track
 {
     public sealed partial class TrackMesh
     {
-        private const int NextPointSubResolution = 10;
-        private const int RasterizeResolution = 100;
+        private const int RasterizeResolution = 2;
 
         public Mesh baseMesh;
         public Material material;
@@ -24,7 +23,7 @@ namespace FR8Runtime.Train.Track
 
         private List<Vector3> trackPoints;
         private List<Vector3> trackVelocities;
-        
+
         public static void ExecuteAndRefreshAssets(Action callback)
         {
             callback();
@@ -78,10 +77,10 @@ namespace FR8Runtime.Train.Track
         public partial void BakeMesh()
         {
             Clear();
-            
+
             var rendererContainer = GetRendererContainer();
             var segment = GetComponent<TrackSegment>();
-            
+
             RasterizeTrack(segment);
 
             var vertices = new List<Vector3>();
@@ -109,20 +108,21 @@ namespace FR8Runtime.Train.Track
 
                 var indexBase = vertices.Count;
 
-                foreach (var v0 in baseMesh.vertices)
+                for (var i = 0; i < baseMesh.vertices.Length; i++)
                 {
-                    var p2 = Mathf.Lerp(startPoint, endPoint, Mathf.InverseLerp(baseMesh.bounds.min.z, baseMesh.bounds.max.z, v0.z));
+                    var vertex = baseMesh.vertices[i];
+                    var normal = baseMesh.normals[i];
+
+                    var p2 = Mathf.Lerp(startPoint, endPoint, Mathf.InverseLerp(baseMesh.bounds.min.z, baseMesh.bounds.max.z, vertex.z));
+                    vertex.z = 0.0f;
 
                     var t = segment.SamplePoint(p2);
                     var r = Quaternion.LookRotation(segment.SampleTangent(p2));
-                    var v2 = r * new Vector3(v0.x, v0.y, 0.0f) + t;
+                    vertex = r * new Vector3(vertex.x, vertex.y, 0.0f) + t;
+                    normal = r * normal;
 
-                    vertices.Add(transform.InverseTransformPoint(v2));
-                }
-
-                foreach (var n in baseMesh.normals)
-                {
-                    normals.Add(transform.InverseTransformDirection(n).normalized);
+                    vertices.Add(transform.InverseTransformPoint(vertex));
+                    normals.Add(transform.InverseTransformVector(normal).normalized);
                 }
 
                 foreach (var t in baseMesh.triangles)
@@ -166,8 +166,10 @@ namespace FR8Runtime.Train.Track
                 trackPoints.Add(segment.SamplePoint(p));
                 trackVelocities.Add(segment.SampleVelocity(p));
             }
+            
+            Debug.Log($"Track Rasterized to {resolution} points");
         }
-        
+
         private Transform GetRendererContainer()
         {
             var rendererContainer = transform.Find("Renderers");
@@ -227,23 +229,30 @@ namespace FR8Runtime.Train.Track
             return mesh;
         }
 
-        private float FindNextPoint(float startPoint, float segmentSize)
+        private float FindNextPoint(float startPoint, float segmentLength)
         {
             var i = Mathf.FloorToInt(startPoint * trackPoints.Count);
-            var j = i + 1;
 
             var length = 0.0f;
-            
-            for (; j < trackPoints.Count; j++)
+
+            for (var j = i + 1; j < trackPoints.Count; j++)
             {
                 var a = trackPoints[j - 1];
                 var b = trackPoints[j];
                 length += (b - a).magnitude;
 
-                if (length > segmentSize) break;
+                if (length > segmentLength) return j / (float)trackPoints.Count;
             }
 
-            return j / (float)trackPoints.Count;
+            for (var k = 2; k < 10000; k++)
+            {
+                var a = trackPoints[^2];
+                var b = trackPoints[^1];
+
+                var v = k * (b - a);
+                if (v.magnitude > segmentLength) return (trackPoints.Count - 2.0f + k) / trackPoints.Count;
+            }
+            throw new Exception();
         }
 
         private void OnValidate()
