@@ -14,7 +14,6 @@ namespace FR8Runtime.Player.Submodules
         private const float GimbalLockOffset = 1.0f;
         private const float YawRange = 180.0f - GimbalLockOffset;
 
-        public Vector3 cameraOffset = new(0.0f, 1.6f, 0.0f);
         [SerializeField] private float fieldOfView = 70.0f;
         [SerializeField] private float zoomFieldOfView = 35.0f;
         [SerializeField] private float fovSmoothTime = 0.2f;
@@ -50,7 +49,6 @@ namespace FR8Runtime.Player.Submodules
             Avatar.FixedUpdateEvent += FixedUpdate;
 
             CameraTarget = avatar.transform.Find("Camera Target");
-            CameraTarget.transform.localPosition = cameraOffset;
             CameraTarget.transform.localRotation = Quaternion.identity;
             
             Cursor.lockState = CursorLockMode.Locked;

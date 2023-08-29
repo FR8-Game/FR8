@@ -1804,6 +1804,8 @@ MonoBehaviour:
     collisionHeight: 1.7
     collisionRadius: 0.25
     stepHeight: 0.5
+    crouchHeight: 1
+    cameraOffset: {x: 0, y: 1.6, z: 0}
     maxGroundedSpeed: 4
     accelerationTime: 0.12
     sprintSpeedScalar: 2
@@ -1839,7 +1841,6 @@ MonoBehaviour:
       targetPosition: 0
       velocity: 0
   cameraController:
-    cameraOffset: {x: 0, y: 1.6, z: 0}
     fieldOfView: 70
     zoomFieldOfView: 20
     fovSmoothTime: 0.06

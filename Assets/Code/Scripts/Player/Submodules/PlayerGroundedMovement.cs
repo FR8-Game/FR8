@@ -1,6 +1,8 @@
 ﻿using FMODUnity;
+using FR8Runtime.CodeUtility;
 using FR8Runtime.Level;
 using UnityEngine;
+using UnityEngine.Splines;
 
 namespace FR8Runtime.Player.Submodules
 {
@@ -12,7 +14,9 @@ namespace FR8Runtime.Player.Submodules
         [SerializeField] private float collisionHeight = 1.7f;
         [SerializeField] private float collisionRadius = 0.25f;
         [SerializeField] private float stepHeight = 0.5f;
-        
+        [SerializeField] private float crouchHeight = 0.6f;
+        [SerializeField] public Vector3 cameraOffset = new(0.0f, 1.6f, 0.0f);
+
         [Header("Movement")]
         public float maxGroundedSpeed = 4.0f;
         public float accelerationTime = 0.12f;
@@ -48,6 +52,8 @@ namespace FR8Runtime.Player.Submodules
         
         private bool jumpTrigger;
         private float lastJumpTime;
+
+        private float crouchPercentRaw;
         
         private Rigidbody lastGroundObject;
         private Vector3 lastGroundVelocity;
@@ -80,8 +86,9 @@ namespace FR8Runtime.Player.Submodules
         public float CollisionRadius => collisionRadius;
         public float CollisionHeight => collisionHeight;
         public float StepHeight => stepHeight;
-        
+
         public bool IsOnGround { get; private set; }
+        public float CrouchPercent => CurvesUtility.SmootherStep(crouchPercentRaw);
         public RaycastHit GroundHit { get; private set; }
         public Ladder Ladder { get; private set; }
         public Vector3 Velocity => IsOnGround && GroundHit.rigidbody ? Rigidbody.velocity - GroundHit.rigidbody.GetPointVelocity(Rigidbody.position) : Rigidbody.velocity;
@@ -107,7 +114,6 @@ namespace FR8Runtime.Player.Submodules
         private void ConfigureAll()
         {
             ConfigureRigidbody();
-
             ConfigureCollider();
         }
 
@@ -126,11 +132,13 @@ namespace FR8Runtime.Player.Submodules
             var gameObject = avatar.gameObject;
             var groundOffset = stepHeight;
 
+            var height = Mathf.Lerp(collisionHeight, crouchHeight, CrouchPercent);
+            
             var collider = gameObject.GetOrAddComponent<CapsuleCollider>();
             collider.enabled = true;
-            collider.height = collisionHeight - groundOffset;
+            collider.height = height - groundOffset;
             collider.radius = collisionRadius;
-            collider.center = Vector3.up * (collisionHeight + groundOffset) / 2.0f;
+            collider.center = Vector3.up * (height + groundOffset) / 2.0f;
 
 
             if (collider.material) Object.Destroy(collider.material);
@@ -169,7 +177,8 @@ namespace FR8Runtime.Player.Submodules
         private void FixedUpdate()
         {
             if (LookForLadder()) return;
-            
+
+            Crouch();
             Move();
             Jump();
             CheckForGround();
@@ -179,6 +188,18 @@ namespace FR8Runtime.Player.Submodules
             PlayFootstepAudio();
             
             UpdateFlags();
+        }
+
+        private void Crouch()
+        {
+            ConfigureCollider();
+
+            var isCrouching = input.Crouch;
+
+            crouchPercentRaw += ((isCrouching ? 1.0f : 0.0f) - crouchPercentRaw) * 6.0f * Time.deltaTime;
+            
+            var offset = Vector3.down * (collisionHeight - crouchHeight);
+            avatar.cameraController.CameraTarget.localPosition = cameraOffset + offset * CrouchPercent;
         }
 
         private void PlayFootstepAudio()
