@@ -1,10 +1,12 @@
 ﻿#if UNITY_EDITOR
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FR8Runtime.Rendering;
+using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -13,16 +15,15 @@ namespace FR8Runtime.Train.Track
 {
     public sealed partial class TrackMesh
     {
-        private const int RasterizeResolution = 2;
+        private const int DistanceSamples = 1024;
+        private const int meshesPerFile = 8;
 
         public Mesh baseMesh;
         public Material material;
         public bool optimize;
-        public int segmentsPerSplit = 15;
         public float verticalOffset;
 
-        private List<Vector3> trackPoints;
-        private List<Vector3> trackVelocities;
+        private List<(float, float)> rawDistanceGraph;
 
         public static void ExecuteAndRefreshAssets(Action callback)
         {
@@ -42,11 +43,14 @@ namespace FR8Runtime.Train.Track
                 DeleteTrackSegment(child);
             }
 
+            var toDelete = new List<string>();
             var dir = $"{Path.GetDirectoryName(gameObject.scene.path)}/{gameObject.scene.name}";
             if (!Directory.EnumerateFileSystemEntries(dir).Any())
             {
-                AssetDatabase.DeleteAsset(dir);
+                toDelete.Add(dir);
             }
+
+            AssetDatabase.DeleteAssets(toDelete.ToArray(), new List<string>());
 
             if (rendererContainer)
             {
@@ -76,98 +80,117 @@ namespace FR8Runtime.Train.Track
 
         public partial void BakeMesh()
         {
-            Clear();
+            EditorCoroutineUtility.StartCoroutine(routine(), gameObject);
 
-            var rendererContainer = GetRendererContainer();
-            var segment = GetComponent<TrackSegment>();
-
-            RasterizeTrack(segment);
-
-            var vertices = new List<Vector3>();
-            var normals = new List<Vector3>();
-            var indices = new List<int>();
-            var uvs = new List<Vector2>();
-
-            var startPoint = 0.0f;
-            var endPoint = 0.0f;
-            var segmentSize = baseMesh.bounds.size.z;
-
-            var index = 0;
-
-            var taskID = Progress.Start($"[{name}] Baking Track Mesh");
-
-            while (endPoint < 1.0f)
+            IEnumerator routine()
             {
-                if (index != 0 && index % segmentsPerSplit == 0)
+                var taskID = Progress.Start($"Baking {name} Track Mesh");
+                yield return null;
+
+                Clear();
+
+                var rendererContainer = GetRendererContainer();
+                var segment = GetComponent<TrackSegment>();
+
+                BakeConversionGraph(segment);
+
+                var vertices = new List<Vector3>();
+                var normals = new List<Vector3>();
+                var indices = new List<int>();
+                var uvs = new List<Vector2>();
+
+                var meshCount = 0;
+                var meshLength = baseMesh.bounds.size.z;
+
+                var workingLength = 0.0f;
+                var totalLength = rawDistanceGraph[^1].Item2;
+                var t0 = 0.0f;
+                var t1 = 0.0f;
+
+                while (workingLength < totalLength)
                 {
-                    Progress.Report(taskID, endPoint);
-                    SplitMesh(vertices, normals, indices, uvs, rendererContainer);
+                    t0 = t1;
+                    t1 = SamplePercentFromDistance(workingLength + meshLength);
+                    workingLength += meshLength;
+
+                    meshCount++;
+                    var indexBase = vertices.Count;
+
+                    for (var k = 0; k < baseMesh.vertices.Length; k++)
+                    {
+                        var vertex = baseMesh.vertices[k];
+                        var normal = baseMesh.normals[k];
+
+                        var p2 = Mathf.Lerp(t0, t1, Mathf.InverseLerp(baseMesh.bounds.min.z, baseMesh.bounds.max.z, vertex.z));
+                        vertex.z = 0.0f;
+
+                        var t = segment.SamplePoint(p2);
+                        var r = Quaternion.LookRotation(segment.SampleTangent(p2));
+                        vertex = r * new Vector3(vertex.x, vertex.y, 0.0f) + t;
+                        normal = r * normal;
+
+                        vertices.Add(transform.InverseTransformPoint(vertex));
+                        normals.Add(transform.InverseTransformVector(normal).normalized);
+                    }
+
+                    foreach (var t in baseMesh.triangles)
+                    {
+                        indices.Add(indexBase + t);
+                    }
+
+                    foreach (var uv in baseMesh.uv)
+                    {
+                        uvs.Add(uv);
+                    }
+
+                    if (meshCount % meshesPerFile == 0 && meshCount != 0)
+                    {
+                        SplitMesh(vertices, normals, indices, uvs, rendererContainer);
+                        Progress.Report(taskID, t0);
+                        yield return null;
+                    }
                 }
 
-                endPoint = FindNextPoint(startPoint, segmentSize);
+                SplitMesh(vertices, normals, indices, uvs, rendererContainer);
 
-                var indexBase = vertices.Count;
-
-                for (var i = 0; i < baseMesh.vertices.Length; i++)
-                {
-                    var vertex = baseMesh.vertices[i];
-                    var normal = baseMesh.normals[i];
-
-                    var p2 = Mathf.Lerp(startPoint, endPoint, Mathf.InverseLerp(baseMesh.bounds.min.z, baseMesh.bounds.max.z, vertex.z));
-                    vertex.z = 0.0f;
-
-                    var t = segment.SamplePoint(p2);
-                    var r = Quaternion.LookRotation(segment.SampleTangent(p2));
-                    vertex = r * new Vector3(vertex.x, vertex.y, 0.0f) + t;
-                    normal = r * normal;
-
-                    vertices.Add(transform.InverseTransformPoint(vertex));
-                    normals.Add(transform.InverseTransformVector(normal).normalized);
-                }
-
-                foreach (var t in baseMesh.triangles)
-                {
-                    indices.Add(indexBase + t);
-                }
-
-                foreach (var uv in baseMesh.uv)
-                {
-                    uvs.Add(uv);
-                }
-
-                startPoint = endPoint;
-                index++;
+                Progress.Finish(taskID);
+                Debug.Log($"Finished Baking {name}");
             }
-
-            SplitMesh(vertices, normals, indices, uvs, rendererContainer);
-
-            Progress.Remove(taskID);
-            Debug.Log($"Finished Baking {name}");
         }
 
-        private void RasterizeTrack(TrackSegment segment)
+        private float SamplePercentFromDistance(float distance)
         {
-            trackPoints = new List<Vector3>();
-            trackVelocities = new List<Vector3>();
-
-            var length = 0.0f;
-            for (var i = 0; i < segment.Count - 1; i++)
+            var i = 0;
+            for (; i < rawDistanceGraph.Count - 1; i++)
             {
-                var a = segment[i].position;
-                var b = segment[i + 1].position;
-
-                length += (b - a).magnitude;
+                if (rawDistanceGraph[i].Item2 > distance) break;
             }
 
-            var resolution = Mathf.Ceil(length * RasterizeResolution);
-            for (var i = 0; i < resolution; i++)
-            {
-                var p = (i - 1.0f) / resolution;
-                trackPoints.Add(segment.SamplePoint(p));
-                trackVelocities.Add(segment.SampleVelocity(p));
-            }
+            var j = i;
+            i--;
+
+            var a = rawDistanceGraph[i];
+            var b = rawDistanceGraph[j];
+
+            return Mathf.Lerp(a.Item1, b.Item1, Mathf.InverseLerp(a.Item2, b.Item2, distance));
+        }
+
+        private void BakeConversionGraph(TrackSegment segment)
+        {
+            rawDistanceGraph = new List<(float, float)>();
             
-            Debug.Log($"Track Rasterized to {resolution} points");
+            var distance = 0.0f;
+            var lastPoint = segment.SamplePoint(0.0f);
+            for (var i = 0; i < DistanceSamples; i++)
+            {
+                var t = i / (DistanceSamples - 1.0f);
+                var point = segment.SamplePoint(t);
+
+                distance += (point - lastPoint).magnitude;
+                rawDistanceGraph.Add((t, distance));
+
+                lastPoint = point;
+            }
         }
 
         private Transform GetRendererContainer()
@@ -184,6 +207,9 @@ namespace FR8Runtime.Train.Track
 
         private void SplitMesh(List<Vector3> vertices, List<Vector3> normals, List<int> indices, List<Vector2> uvs, Transform rendererContainer)
         {
+            if (vertices.Count == 0) return;
+            if (indices.Count == 0) return;
+
             var mesh = CompileMesh(vertices, normals, indices, uvs);
 
             var filter = new GameObject().AddComponent<MeshFilter>();
@@ -227,32 +253,6 @@ namespace FR8Runtime.Train.Track
             indices.Clear();
             uvs.Clear();
             return mesh;
-        }
-
-        private float FindNextPoint(float startPoint, float segmentLength)
-        {
-            var i = Mathf.FloorToInt(startPoint * trackPoints.Count);
-
-            var length = 0.0f;
-
-            for (var j = i + 1; j < trackPoints.Count; j++)
-            {
-                var a = trackPoints[j - 1];
-                var b = trackPoints[j];
-                length += (b - a).magnitude;
-
-                if (length > segmentLength) return j / (float)trackPoints.Count;
-            }
-
-            for (var k = 2; k < 10000; k++)
-            {
-                var a = trackPoints[^2];
-                var b = trackPoints[^1];
-
-                var v = k * (b - a);
-                if (v.magnitude > segmentLength) return (trackPoints.Count - 2.0f + k) / trackPoints.Count;
-            }
-            throw new Exception();
         }
 
         private void OnValidate()

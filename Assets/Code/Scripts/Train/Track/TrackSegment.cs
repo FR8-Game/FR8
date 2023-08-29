@@ -321,7 +321,7 @@ namespace FR8Runtime.Train.Track
 
         public float GetKnotPercent(int index)
         {
-            return (index - 1.0f) / FromEnd(2);
+            return index / (float)Count;
         }
 
         public int GetKnotIndex(float t)
