@@ -30,12 +30,12 @@ namespace FR8Runtime.Player.Submodules
             var c = Mathf.Abs(Mathf.Cos(d * Mathf.PI)) * shakeAmount;
             var s = Mathf.Sin(d * Mathf.PI) * shakeAmount;
 
-            translationalOffset += new Vector3()
+            rotationalOffset *= Quaternion.Euler(new Vector3()
             {
                 x = c * cosAmplitude.x + s * sinAmplitude.x,
                 y = c * cosAmplitude.y + s * sinAmplitude.y,
                 z = c * cosAmplitude.z + s * sinAmplitude.z,
-            };
+            });
         }
     }
 }
