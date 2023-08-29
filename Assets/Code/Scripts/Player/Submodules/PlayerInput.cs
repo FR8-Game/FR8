@@ -13,6 +13,7 @@ namespace FR8Runtime.Player.Submodules
         [SerializeField] private float controllerSensitivity = 0.4f;
 
         private Camera mainCamera;
+        private PlayerAvatar avatar;
         
         private InputActionReference moveInput;
         private InputActionReference jumpInput;
@@ -91,8 +92,10 @@ namespace FR8Runtime.Player.Submodules
 
         private float GetFovSensitivity() => Mathf.Tan(mainCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
 
-        public void Init()
+        public void Init(PlayerAvatar avatar)
         {
+            this.avatar = avatar;
+            
             // Local Functions
             InputActionReference bind(string name) => InputActionReference.Create(inputMap.FindAction(name));
 
@@ -118,6 +121,14 @@ namespace FR8Runtime.Player.Submodules
             
             // Set Camera
             mainCamera = Camera.main;
+
+            avatar.vitality.IsAliveChangedEvent += IsAliveChanged;
+        }
+
+        private void IsAliveChanged()
+        {
+            if (avatar.vitality.IsAlive) inputMap.Enable();
+            else inputMap.Disable();
         }
     }
 }
