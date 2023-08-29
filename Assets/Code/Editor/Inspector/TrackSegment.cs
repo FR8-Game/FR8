@@ -1,5 +1,5 @@
 ﻿using System;
-using FR8.Train.Track;
+using FR8Runtime.Train.Track;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -23,12 +23,15 @@ namespace FR8Editor.Inspector
             {
                 ExecuteAll(s =>
                 {
-                    if (s.Knots.Count <= 0) return;
+                    var knots = s.KnotContainer();
+                    var knotCount = knots.childCount;
+                    
+                    if (knotCount <= 0) return;
 
-                    var bounds = new Bounds(s.transform.TransformPoint(s.Knots[0]), Vector3.zero);
-                    for (var i = 1; i < s.Knots.Count; i++)
+                    var bounds = new Bounds(knots.GetChild(0).position, Vector3.zero);
+                    for (var i = 1; i < knotCount; i++)
                     {
-                        bounds.Encapsulate(s.transform.TransformPoint(s.Knots[i]));
+                        bounds.Encapsulate(knots.GetChild(i).position);
                     }
 
                     ShiftTransform(s, bounds.center, "Center Track Origin");
@@ -40,32 +43,21 @@ namespace FR8Editor.Inspector
         {
             Undo.RecordObjects(new Object[] { segment.transform, segment }, undoText);
 
-            var worldPoints = new Vector3[segment.Knots.Count];
+            var knots = segment.KnotContainer();
+            var knotCount = knots.childCount;
+            
+            var worldPoints = new Vector3[knotCount];
 
             for (var i = 0; i < worldPoints.Length; i++)
             {
-                worldPoints[i] = segment.transform.TransformPoint(segment.Knots[i]);
+                worldPoints[i] = knots.GetChild(i).position;
             }
 
             segment.transform.position = newPosition;
 
             for (var i = 0; i < worldPoints.Length; i++)
             {
-                segment.Knots[i] = segment.transform.InverseTransformPoint(worldPoints[i]);
-            }
-        }
-
-        private void OnSceneGUI()
-        {
-            var trackSegment = target as TrackSegment;
-
-            Undo.RecordObject(trackSegment, "Moved Track Segment");
-            for (var i = 0; i < trackSegment.Knots.Count; i++)
-            {
-                var worldPos = trackSegment.transform.TransformPoint(trackSegment.Knots[i]);
-                worldPos = Handles.PositionHandle(worldPos, Quaternion.identity);
-
-                trackSegment.Knots[i] = trackSegment.transform.InverseTransformPoint(worldPos);
+                knots.GetChild(i).position = worldPoints[i];
             }
         }
 

@@ -1,7 +1,7 @@
-using FR8.Player;
+using FR8Runtime.Player;
 using UnityEngine;
 
-namespace FR8.Level
+namespace FR8Runtime.Level
 {
     public class Ladder : MonoBehaviour
     {
@@ -17,6 +17,15 @@ namespace FR8.Level
         private void Awake()
         {
             ParentRigidbody = GetComponent<Rigidbody>();
+
+            if (!GetComponent<Collider>())
+            {
+                var collider = gameObject.AddComponent<BoxCollider>();
+                collider.isTrigger = true;
+
+                collider.center = Vector3.up * (height / 2.0f - heightOffset) + Vector3.forward * normalOffset;
+                collider.size = new Vector3(0.5f, height, 0.5f);
+            }
         }
 
         public float FromWorldPos(Vector3 position)

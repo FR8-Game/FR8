@@ -2,7 +2,7 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 
-namespace FR8.UI
+namespace FR8Runtime.UI
 {
     [RequireComponent(typeof(TMP_Text))]
     public class ControlsTextFactory : MonoBehaviour

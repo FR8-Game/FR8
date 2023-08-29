@@ -1,8 +1,8 @@
 ﻿using System;
-using FR8.Interactions.Drivers.Submodules;
+using FR8Runtime.Interactions.Drivers.Submodules;
 using UnityEngine;
 
-namespace FR8.Level.Fuel
+namespace FR8Runtime.Level.Fuel
 {
     [SelectionBase, DisallowMultipleComponent]
     public class FuelPump : MonoBehaviour, IInteractable
@@ -14,9 +14,9 @@ namespace FR8.Level.Fuel
         [SerializeField] private float rotationStep = 11.25f;
         [SerializeField] private float refuelRate = 2.0f;
 
-        [SerializeField] private Utility.DampedSpring rotationSpring;
+        [SerializeField] private CodeUtility.DampedSpring rotationSpring;
 
-        private Rope rope;
+        private CodeUtility.Rope rope;
         private LineRenderer lines;
         private FuelPumpHandle handle;
 
@@ -26,7 +26,7 @@ namespace FR8.Level.Fuel
             handle = GetComponentInChildren<FuelPumpHandle>();
             handle.Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
 
-            rope = new Rope();
+            rope = new CodeUtility.Rope();
         }
 
         private void Start()
@@ -109,7 +109,7 @@ namespace FR8.Level.Fuel
             if (handle)
             {
                 handle.transform.position = handleAnchor.transform.position + Vector3.down * maxRange;
-                handle.transform.rotation = Quaternion.identity;
+                handle.transform.rotation = UnityEngine.Quaternion.identity;
             }
         }
 

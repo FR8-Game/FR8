@@ -1,4 +1,4 @@
-﻿namespace FR8.Train.Electrics
+﻿namespace FR8Runtime.Train.Electrics
 {
     public interface IElectricDevice : IBehaviour
     {

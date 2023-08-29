@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FR8.Train.Track
+namespace FR8Runtime.Train.Track
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(TrackSegment))]

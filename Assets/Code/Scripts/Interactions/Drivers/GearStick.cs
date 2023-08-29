@@ -1,10 +1,10 @@
-﻿using FR8.Interactions.Drivables;
-using FR8.Interactions.Drivers.DragBehaviours;
-using FR8.Interactions.Drivers.Submodules;
-using FR8.Player;
+﻿using FR8Runtime.Interactions.Drivables;
+using FR8Runtime.Interactions.Drivers.DragBehaviours;
+using FR8Runtime.Interactions.Drivers.Submodules;
+using FR8Runtime.Player;
 using UnityEngine;
 
-namespace FR8.Interactions.Drivers
+namespace FR8Runtime.Interactions.Drivers
 {
     [SelectionBase, DisallowMultipleComponent]
     public sealed class GearStick : Driver

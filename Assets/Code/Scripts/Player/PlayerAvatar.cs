@@ -1,25 +1,19 @@
 using System;
-using FMODUnity;
-using FR8.Level;
-using FR8.Player.Submodules;
+using FR8Runtime.Player.Submodules;
 using UnityEngine;
 
-namespace FR8.Player
+namespace FR8Runtime.Player
 {
     [SelectionBase, DisallowMultipleComponent]
     public sealed class PlayerAvatar : MonoBehaviour
     {
-        [Header("Configuration")]
-        [SerializeField] private float mass = 80.0f;
-
-        [SerializeField] private float playerHeight = 1.7f;
-        [SerializeField] private float radius = 0.25f;
-        [SerializeField] private float stepHeight = 0.5f;
-
         public PlayerInput input;
         public PlayerGroundedMovement groundedMovement;
         public PlayerInteractionManager interactionManager;
         public PlayerCamera cameraController;
+        public PlayerVitality vitality;
+        public PlayerUI ui;
+        public PlayerInventory inventory;
         public PlayerUrination urination;
 
         public event Action EnabledEvent;
@@ -28,9 +22,8 @@ namespace FR8.Player
         public event Action DisabledEvent;
 
         public Rigidbody Rigidbody { get; private set; }
-
-        public float Radius => radius;
-        public float StepHeight => stepHeight;
+        public Vector3 Center => transform.position + Vector3.up * groundedMovement.CollisionHeight / 2.0f;
+        public bool IsAlive => vitality.IsAlive;
 
         public Vector3 MoveDirection
         {
@@ -43,75 +36,32 @@ namespace FR8.Player
 
         private void Awake()
         {
+            Rigidbody = gameObject.GetOrAddComponent<Rigidbody>();
+            
             transform.SetParent(null);
             InitSubmodules();
         }
 
         private void InitSubmodules()
         {
-            input.Init();
+            input.Init(this);
             cameraController.Init(this);
             interactionManager.Init(this);
             groundedMovement.Init(this);
+            inventory.Init(this);
+            vitality.Init(this);
+            ui.Init(this);
             urination.Init(this);
         }
 
         private void OnEnable()
         {
-            ConfigureAll();
             EnabledEvent?.Invoke();
         }
 
         private void OnDisable()
         {
             DisabledEvent?.Invoke();
-        }
-
-        private void ConfigureAll()
-        {
-            ConfigureRigidbody();
-
-            ConfigureCollider();
-        }
-
-        private void ConfigureCollider()
-        {
-            var groundOffset = stepHeight;
-
-            var collider = gameObject.GetOrAddComponent<CapsuleCollider>();
-            collider.enabled = true;
-            collider.height = playerHeight - groundOffset;
-            collider.radius = radius;
-            collider.center = Vector3.up * (playerHeight + groundOffset) / 2.0f;
-
-
-            if (collider.material) Destroy(collider.material);
-            collider.material = CreatePlayerPhysicsMaterial();
-        }
-
-        private static PhysicMaterial CreatePlayerPhysicsMaterial()
-        {
-            var mat = new PhysicMaterial("[PROC] Player Physics Material");
-            mat.hideFlags = HideFlags.HideAndDontSave;
-            mat.bounciness = 0.0f;
-            mat.dynamicFriction = 0.0f;
-            mat.staticFriction = 0.0f;
-
-            mat.bounceCombine = PhysicMaterialCombine.Multiply;
-            mat.frictionCombine = PhysicMaterialCombine.Multiply;
-            return mat;
-        }
-
-        private void ConfigureRigidbody()
-        {
-            Rigidbody = gameObject.GetOrAddComponent<Rigidbody>();
-
-            Rigidbody.mass = mass;
-            Rigidbody.useGravity = false;
-            Rigidbody.detectCollisions = true;
-            Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
-            Rigidbody.interpolation = RigidbodyInterpolation.None;
-            Rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
         }
 
         private void Update()
@@ -135,10 +85,12 @@ namespace FR8.Player
 
         private void OnDrawGizmos()
         {
-            Gizmos.color = Color.yellow;
-            Gizmos.matrix = transform.localToWorldMatrix;
+            groundedMovement.DrawGizmos(this);
+        }
 
-            GizmoExtras.DrawCapsule(Vector3.up * playerHeight / 2.0f, Quaternion.identity, playerHeight, radius);
+        public void OnValidate()
+        {
+            ui.OnValidate(this);
         }
     }
 }

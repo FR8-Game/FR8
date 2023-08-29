@@ -1,5 +1,3 @@
-using System;
-using FR8.Rendering;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;

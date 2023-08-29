@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
-namespace FR8.UI.Loading
+namespace FR8Runtime.UI.Loading
 {
     [SelectionBase, DisallowMultipleComponent]
     [RequireComponent(typeof(UIDocument))]
@@ -40,7 +40,7 @@ namespace FR8.UI.Loading
             StartCoroutine(Fade(v => 1.0f - v, () => root.SetEnabled(false)));
         }
 
-        public void LoadScene(string sceneName)
+        public void LoadScene(int buildIndex)
         {
             StartCoroutine(routine());
 
@@ -55,7 +55,7 @@ namespace FR8.UI.Loading
                
                 yield return StartCoroutine(Fade(v => v, null));
 
-                var operation = SceneManager.LoadSceneAsync(sceneName);
+                var operation = SceneManager.LoadSceneAsync(buildIndex);
                 while (!operation.isDone)
                 {
                     SetFill(operation.progress);

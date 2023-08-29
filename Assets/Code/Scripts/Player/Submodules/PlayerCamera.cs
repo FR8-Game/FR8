@@ -1,8 +1,12 @@
 using System;
+using FR8Runtime.UI;
 using UnityEngine;
-using Cursor = FR8.Utility.Cursor;
 
-namespace FR8.Player.Submodules
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+namespace FR8Runtime.Player.Submodules
 {
     [Serializable]
     public class PlayerCamera
@@ -42,31 +46,30 @@ namespace FR8.Player.Submodules
 
             Camera = Camera.main;
 
-            Avatar.EnabledEvent += OnEnable;
-            Avatar.DisabledEvent += OnDisable;
             Avatar.UpdateEvent += Update;
             Avatar.FixedUpdateEvent += FixedUpdate;
-            
+
             CameraTarget = avatar.transform.Find("Camera Target");
             CameraTarget.transform.localPosition = cameraOffset;
             CameraTarget.transform.localRotation = Quaternion.identity;
-        }
-
-        private void OnEnable()
-        {
-            cameraLocked = true;
-            Cursor.Push(CursorLockMode.Locked, ref cursorLockID);
-        }
-
-        private void OnDisable()
-        {
-            Cursor.Pop(ref cursorLockID);
+            
+            Cursor.lockState = CursorLockMode.Locked;
         }
 
         private void Update()
         {
+            if (Pause.Paused) return;
             if (!Avatar) return;
-            
+            if (!Avatar.IsAlive) return;
+
+            if (!Avatar.IsAlive)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                return;
+            }
+
+            Cursor.lockState = CursorLockMode.Locked;
+
             // Check if cursor is free, or camera has been grabbed.
             if (Avatar.input.FreeCam) cameraLocked = !cameraLocked;
 
@@ -74,28 +77,28 @@ namespace FR8.Player.Submodules
             if (cameraLockedThisFrame != wasCameraLocked)
             {
 #if UNITY_EDITOR
-                Cursor.Change(cursorLockID, cameraLockedThisFrame ? CursorLockMode.Locked : CursorLockMode.None);
+                Cursor.lockState = cameraLockedThisFrame ? CursorLockMode.Locked : CursorLockMode.None;
 #else
-                Cursor.Change(cursorLockID, cameraLocked ? CursorLockMode.Locked : CursorLockMode.Confined);
+                Cursor.lockState = cameraLocked ? CursorLockMode.Locked : CursorLockMode.None;
 #endif
                 if (cameraLockedThisFrame)
                 {
-                    (lastCursorX, lastCursorY) = Cursor.GetPosition();
+                    //(lastCursorX, lastCursorY) = CodeUtility.CursorUtility.GetPosition();
                 }
                 else
                 {
-                    Cursor.SetPosition(lastCursorX, lastCursorY);
+                    //CodeUtility.CursorUtility.SetPosition(lastCursorX, lastCursorY);
                 }
             }
-            
+
             wasCameraLocked = cameraLockedThisFrame;
             delta += Avatar.input.LookFrameDelta;
 
             zoomCamera = Avatar.input.ZoomCam;
-            
+
             Camera.transform.rotation = CameraTarget.transform.rotation;
-            
-             // Update additional camera variables.
+
+            // Update additional camera variables.
             Camera.transform.position = CameraTarget.position + Camera.transform.rotation * translationOffset;
             Camera.fieldOfView = Mathf.SmoothDamp(Camera.fieldOfView, zoomCamera ? zoomFieldOfView : fieldOfView, ref fovVelocity, fovSmoothTime);
             Camera.nearClipPlane = nearPlane;
@@ -107,17 +110,27 @@ namespace FR8.Player.Submodules
             // Get delta rotation input from controller
             var delta = this.delta;
             this.delta = Vector2.zero;
-            
+
             // Apply input and clamp camera's yaw
             Yaw = Mathf.Clamp(Yaw + delta.y, -YawRange / 2.0f, YawRange / 2.0f);
-            
+
             shakeModule.GetOffsets(this, out translationOffset, out var rotationalOffset);
             CameraTarget.transform.rotation = Quaternion.Euler(-Yaw, CameraTarget.transform.eulerAngles.y + delta.x, 0.0f) * rotationalOffset;
         }
-        
+
         public void SetCameraLock(bool state)
         {
             cameraLocked = state;
+        }
+
+        public void OnDrawGizmos(PlayerAvatar avatar)
+        {
+#if UNITY_EDITOR
+            if (CameraTarget)
+            {
+                Handles.DrawLine(CameraTarget.position, CameraTarget.position + CameraTarget.forward * 0.5f);
+            }
+#endif
         }
     }
 }

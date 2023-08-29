@@ -1,8 +1,8 @@
 ﻿using System;
-using FR8.Interactions.Drivers.Submodules;
+using FR8Runtime.Interactions.Drivers.Submodules;
 using UnityEngine;
 
-namespace FR8.Interactions.Drivers
+namespace FR8Runtime.Interactions.Drivers
 {
     [SelectionBase, DisallowMultipleComponent]
     public abstract class Driver : MonoBehaviour, IDriver
@@ -53,6 +53,7 @@ namespace FR8.Interactions.Drivers
         protected void Start()
         {
             SetValue(defaultValue);
+            OnValueChanged(defaultValue);
         }
         
         protected virtual void FixedUpdate()

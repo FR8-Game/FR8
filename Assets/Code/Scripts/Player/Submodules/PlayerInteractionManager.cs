@@ -1,7 +1,7 @@
 using System;
-using FR8.Interactions.Drivers.Submodules;
-using FR8.Pickups;
-using FR8.Rendering.Passes;
+using FR8Runtime.CodeUtility;
+using FR8Runtime.Interactions.Drivers.Submodules;
+using FR8Runtime.Pickups;
 using FR8Runtime.Rendering.Passes;
 using TMPro;
 using UnityEngine;
@@ -9,15 +9,15 @@ using UnityEngine.InputSystem;
 using Cursor = UnityEngine.Cursor;
 using Object = UnityEngine.Object;
 
-namespace FR8.Player.Submodules
+namespace FR8Runtime.Player.Submodules
 {
     [System.Serializable]
     public class PlayerInteractionManager
     {
         [SerializeField] private float interactionDistance = 2.5f;
-        [SerializeField] private TMP_Text readoutText;
-        [SerializeField] private Utility.DampedSpring transition;
+        [SerializeField] private DampedSpring transition;
 
+        private TMP_Text readoutText;
         private int nudge;
         private bool dragging;
 
@@ -26,12 +26,17 @@ namespace FR8.Player.Submodules
         public PickupObject HeldObject { get; private set; }
         public PlayerAvatar Avatar { get; private set; }
 
+        public event Action<PickupObject> PickupEvent;
+        public event Action<PickupObject> DropEvent;
+        
         public void Init(PlayerAvatar avatar)
         {
             Avatar = avatar;
 
             avatar.UpdateEvent += Update;
             avatar.FixedUpdateEvent += FixedUpdate;
+            
+            readoutText = FindUtility.Find<TMP_Text>(avatar.transform, "UI/Interaction/Text");
         }
 
         public void Update()
@@ -77,13 +82,16 @@ namespace FR8.Player.Submodules
             transition.Target(hasHighlightedObject ? 1.0f : 0.0f).Iterate(Time.deltaTime);
             var animatePosition = Mathf.Max(0.0f, transition.currentPosition);
 
-            readoutText.transform.localScale = Vector3.one * animatePosition;
-            readoutText.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, (1.0f - animatePosition) * 20.0f);
+            if (readoutText)
+            {
+                readoutText.transform.localScale = Vector3.one * animatePosition;
+                readoutText.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, (1.0f - animatePosition) * 20.0f);
+                
+                if (!hasHighlightedObject) return;
 
-            if (!hasHighlightedObject) return;
-
-            var alpha = $"<alpha={(highlightedObject.CanInteract ? "#FF" : "#80")}>";
-            readoutText.text = $"{alpha}{highlightedObject.DisplayName}\n<size=66%>{highlightedObject.DisplayValue}";
+                var alpha = $"<alpha={(highlightedObject.CanInteract ? "#FF" : "#80")}>";
+                readoutText.text = $"{alpha}{highlightedObject.DisplayName}\n<size=66%>{highlightedObject.DisplayValue}";
+            }
         }
 
         private void UpdateHighlightedObject()
@@ -133,11 +141,14 @@ namespace FR8.Player.Submodules
             if (HeldObject) return null;
 
             HeldObject = pickup.Pickup(Avatar);
+            
+            PickupEvent?.Invoke(HeldObject);
             return this;
         }
 
         public PlayerInteractionManager Drop()
         {
+            DropEvent?.Invoke(HeldObject);
             HeldObject = HeldObject.Drop(Avatar);
             return null;
         }

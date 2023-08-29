@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using FMODUnity;
-using FR8.Train.Signals;
+using FR8Runtime.Train.Signals;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace FR8
+namespace FR8Runtime
 {
     public static class Extensions
     {
