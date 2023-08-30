@@ -18,7 +18,6 @@ namespace FR8Runtime.Train.Track
     public sealed partial class TrackMesh
     {
         private const int DistanceSamples = 1024;
-        private const int meshesPerFile = 8;
 
         public Mesh baseMesh;
         public Material material;
@@ -107,6 +106,9 @@ namespace FR8Runtime.Train.Track
                 var totalLength = rawDistanceGraph[^1].Item2;
                 var t0 = 0.0f;
                 var t1 = 0.0f;
+
+                var meshesPerFile = (ushort.MaxValue / baseMesh.vertexCount) - 1;
+                Debug.Log(meshesPerFile);
 
                 while (workingLength < totalLength)
                 {
