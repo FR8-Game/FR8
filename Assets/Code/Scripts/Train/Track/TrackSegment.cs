@@ -8,7 +8,7 @@ using UnityEngine;
 namespace FR8Runtime.Train.Track
 {
     [SelectionBase, DisallowMultipleComponent]
-    public class TrackSegment : MonoBehaviour, System.Collections.Generic.IEnumerable<Transform>
+    public class TrackSegment : MonoBehaviour, IEnumerable<Transform>
     {
         public const float ConnectionDistance = 3.0f;
         public static readonly Spline.SplineProfile SplineProfile = Spline.Cubic;
@@ -223,30 +223,26 @@ namespace FR8Runtime.Train.Track
         public Vector3 SampleTangent(float t) => SampleVelocity(t).normalized;
         public Vector3 SampleVelocity(float t) => Sample(t, (spline, t) => spline.EvaluateVelocity(t));
 
-        public T Sample<T>(float t, Func<Spline, float, T> callback)
+        public T Sample<T>(float t, Func<Spline, float, T> callback) => Sample(t, callback, i => (this[i].position, this[i].forward), Count);
+        public static T Sample<T>(float t, Func<Spline, float, T> callback, Func<int, (Vector3, Vector3)> list, int count)
         {
             t = Mathf.Clamp01(t);
 
-            var container = KnotContainer();
-            var knotCount = container.childCount;
+            if (count < 2) return default;
 
-            if (knotCount < 2) return default;
-
-            t *= knotCount - 1;
+            t *= count - 1;
             var i0 = Mathf.FloorToInt(t);
-            if (i0 >= knotCount - 2) i0 = knotCount - 2;
+            if (i0 >= count - 2) i0 = count - 2;
 
-            var k0 = container.GetChild(i0);
-            var k1 = container.GetChild(i0 + 1);
+            var (knotPos0, knotFwd0) = list(i0);
+            var (knotPos1, knotFwd1) = list(i0 + 1);
 
-            var l = (k1.position - k0.position).magnitude;
+            var l = (knotPos1 - knotPos0).magnitude;
 
-            var p0 = k0.position;
-            var p1 = k0.position + k0.forward * l / 3.0f;
-            var p2 = k1.position - k1.forward * l / 3.0f;
-            var p3 = k1.position;
+            var p1 = knotPos0 + knotFwd0 * l / 3.0f;
+            var p2 = knotPos1 - knotFwd1 * l / 3.0f;
 
-            return callback(SplineProfile(p0, p1, p2, p3), t - i0);
+            return callback(SplineProfile(knotPos0, p1, p2, knotPos1), t - i0);
         }
 
         public void OnValidate()
