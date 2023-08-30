@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace FR8Runtime.CodeUtility
+namespace HBCore.Utility
 {
     public static class ColorUtility
     {
@@ -12,6 +12,7 @@ namespace FR8Runtime.CodeUtility
             a = invertAlpha ? 1.0f - color.a : color.a
         };
 
-        public static Color ScaleAlpha(Color color, float alphaScale) => new Color(color.r, color.g, color.b, color.a * alphaScale);
+        public static Color Gray(float gray, float alpha = 1.0f) => new(gray, gray, gray, alpha);
+        public static Color ScaleAlpha(Color color, float alphaScale) => new(color.r, color.g, color.b, color.a * alphaScale);
     }
 }

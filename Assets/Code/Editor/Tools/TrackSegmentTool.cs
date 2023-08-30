@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEditor.EditorTools;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using ColorUtility = FR8Runtime.CodeUtility.ColorUtility;
+using ColorUtility = HBCore.Utility.ColorUtility;
 
 namespace FR8Editor.Tools
 {
