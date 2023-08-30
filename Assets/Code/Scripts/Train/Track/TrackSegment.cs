@@ -14,7 +14,7 @@ namespace FR8Runtime.Train.Track
         public static readonly Spline.SplineProfile SplineProfile = Spline.Cubic;
 
         [SerializeField] [HideInInspector] private List<Vector3> knots;
-        [SerializeField] private TrackJunction junctionPrefab;
+        public TrackJunction junctionPrefab;
 
         [Space]
         [SerializeField] private int resolution = 100;
