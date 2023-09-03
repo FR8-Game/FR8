@@ -27,8 +27,6 @@ namespace FR8Editor
             var currentScene = AssetDatabase.AssetPathToGUID(SceneManager.GetActiveScene().path);
             var menu = new GenericMenu();
 
-            var debug = "";
-            
             if (EditorGUILayout.DropdownButton(new GUIContent("Switch Scenes"), FocusType.Passive, GUILayout.Width(120)))
             {
                 var otherScenes = GetAllScenes(buildScenes);
@@ -38,8 +36,6 @@ namespace FR8Editor
                 listScenes(otherScenes);
 
                 menu.ShowAsContext();
-                
-                Debug.Log(debug);
             }
 
             void listScenes(IEnumerable<string> list)
