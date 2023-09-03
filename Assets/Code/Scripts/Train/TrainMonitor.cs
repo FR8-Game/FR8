@@ -64,6 +64,7 @@ namespace FR8Runtime.Train
         private void OnEnable()
         {
             trainElectrics.FuseBlown += OnFuseBlown;
+            GetShapes();
         }
 
         private void OnDisable()
