@@ -8,7 +8,7 @@ using UnityEngine;
 namespace FR8Runtime.Train.Track
 {
     [SelectionBase, DisallowMultipleComponent]
-    public class TrackSegment : MonoBehaviour, System.Collections.Generic.IEnumerable<Transform>
+    public class TrackSegment : MonoBehaviour, IEnumerable<Transform>
     {
         public const float ConnectionDistance = 3.0f;
         public static readonly Spline.SplineProfile SplineProfile = Spline.Cubic;
@@ -74,7 +74,7 @@ namespace FR8Runtime.Train.Track
             GizmosDrawLine(main ? selectedColor : otherColor, 1.0f, linePoints.ToArray());
             DrawLineBetweenKnots();
         }
-        
+
         private void DrawLineBetweenKnots()
         {
             var points = new List<Vector3>();
@@ -85,7 +85,7 @@ namespace FR8Runtime.Train.Track
 
             GizmosDrawLine(new Color(1.0f, 1.0f, 1.0f, 0.4f), 0.3f, points.ToArray());
         }
-        
+
         private void DrawDistanceFromGround(Vector3 p0)
         {
             if (Physics.Raycast(p0, Vector3.down, out var hit))
@@ -102,7 +102,7 @@ namespace FR8Runtime.Train.Track
                 Handles.DrawWireArc(hit.point, Vector3.up, Vector3.right, 360.0f, radius);
             }
         }
-        
+
         private void GizmosDrawLine(Color color, float width = 1.0f, params Vector3[] points)
         {
 #if UNITY_EDITOR
@@ -214,7 +214,7 @@ namespace FR8Runtime.Train.Track
                 train.Segment = this;
             }
         }
-        
+
         public Vector3 KnotVelocity(int index) => SampleVelocity(GetKnotPercent(index));
 
         public int FromEnd(int i) => Count - i;
@@ -223,34 +223,33 @@ namespace FR8Runtime.Train.Track
         public Vector3 SampleTangent(float t) => SampleVelocity(t).normalized;
         public Vector3 SampleVelocity(float t) => Sample(t, (spline, t) => spline.EvaluateVelocity(t));
 
-        public T Sample<T>(float t, Func<Spline, float, T> callback)
+        public T Sample<T>(float t, Func<Spline, float, T> callback) => Sample(t, callback, i => (this[i].position, this[i].forward), Count);
+
+        public static T Sample<T>(float t, Func<Spline, float, T> callback, Func<int, (Vector3, Vector3)> list, int count)
         {
             t = Mathf.Clamp01(t);
 
-            var container = KnotContainer();
-            var knotCount = container.childCount;
+            if (count < 2) return default;
 
-            if (knotCount < 2) return default;
-
-            t *= knotCount - 1;
+            t *= count - 1;
             var i0 = Mathf.FloorToInt(t);
-            if (i0 >= knotCount - 2) i0 = knotCount - 2;
+            if (i0 >= count - 2) i0 = count - 2;
 
-            var k0 = container.GetChild(i0);
-            var k1 = container.GetChild(i0 + 1);
+            var (knotPos0, knotFwd0) = list(i0);
+            var (knotPos1, knotFwd1) = list(i0 + 1);
 
-            var l = (k1.position - k0.position).magnitude;
+            var l = (knotPos1 - knotPos0).magnitude;
 
-            var p0 = k0.position;
-            var p1 = k0.position + k0.forward * l / 3.0f;
-            var p2 = k1.position - k1.forward * l / 3.0f;
-            var p3 = k1.position;
+            var p1 = knotPos0 + knotFwd0 * l / 3.0f;
+            var p2 = knotPos1 - knotFwd1 * l / 3.0f;
 
-            return callback(SplineProfile(p0, p1, p2, p3), t - i0);
+            return callback(SplineProfile(knotPos0, p1, p2, knotPos1), t - i0);
         }
 
         public void OnValidate()
         {
+            if (!Valid(this)) return;
+
             OnKnotsChanged();
 
             var childCount = KnotContainer().childCount;
@@ -359,6 +358,7 @@ namespace FR8Runtime.Train.Track
 
                 foreach (var s in segments)
                 {
+                    if (!Valid(s)) continue;
                     if (s == this) continue;
                     if (s.ConnectedTo(this)) continue;
 
@@ -450,8 +450,17 @@ namespace FR8Runtime.Train.Track
         }
 
         public Transform this[int index] => KnotContainer().GetChild(index);
-        
+
         public IEnumerator GetEnumerator() => KnotContainer().GetEnumerator();
         IEnumerator<Transform> IEnumerable<Transform>.GetEnumerator() => (IEnumerator<Transform>)KnotContainer().GetEnumerator();
+
+        public static bool Valid(TrackSegment segment)
+        {
+            if (!segment) return false;
+            if (!segment.KnotContainer()) return false;
+            if (segment.Count < 2) return false;
+
+            return true;
+        }
     }
 }

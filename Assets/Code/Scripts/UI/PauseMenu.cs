@@ -1,10 +1,9 @@
-using System;
 using FR8Runtime.CodeUtility;
 using FR8Runtime.Player;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using Button = UnityEngine.UI.Button;
+using UnityEngine.UI;
 
 namespace FR8Runtime.UI
 {

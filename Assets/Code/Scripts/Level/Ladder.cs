@@ -1,4 +1,4 @@
-using FR8Runtime.Player;
+using FR8Runtime.Player.Submodules;
 using UnityEngine;
 
 namespace FR8Runtime.Level
@@ -59,11 +59,11 @@ namespace FR8Runtime.Level
 
         private void OnTriggerEnter(Collider other)
         {
-            var player = other.transform.GetComponentInParent<PlayerAvatar>();
-            if (!player) return;
-            if (player.groundedMovement.Ladder) return;
+            var movement = other.transform.GetComponentInParent<PlayerGroundedMovement>();
+            if (!movement) return;
+            if (movement.Ladder) return;
 
-            player.groundedMovement.SetLadder(this);
+            movement.SetLadder(this);
         }
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using FMOD;
 using FR8Runtime.Interactions.Drivers.Submodules;
 using UnityEngine;
 
@@ -42,7 +41,8 @@ namespace FR8Runtime.Train.Track
                 var t = connectionEnd == ConnectionEnd.Start ? 0.0f : 1.0f;
                 transform.position = segment.SamplePoint(t);
                 var tangent = segment.SampleTangent(t);
-                transform.rotation = Quaternion.LookRotation(tangent, Vector3.up);
+                
+                transform.rotation = tangent.magnitude > 0.5f ? Quaternion.LookRotation(tangent, Vector3.up) : Quaternion.identity;
             }
             
             FindConnectionEnd();
@@ -79,8 +79,8 @@ namespace FR8Runtime.Train.Track
         
         private void FindConnectionEnd()
         {
-            if (!segment) return;
-            
+            if (!TrackSegment.Valid(segment)) return;
+
             var knotStart = segment[0].position;
             var knotEnd = segment[segment.FromEnd(1)].position;
 

@@ -19,10 +19,13 @@ namespace FR8Runtime.Player.Submodules
             rotationalOffset = Quaternion.identity;
 
             var avatar = playerCamera.Avatar;
-            if (!avatar) return;
-            if (!avatar.groundedMovement.IsOnGround) return;
+            var movement = avatar.GetComponent<PlayerGroundedMovement>();
             
-            var moveSpeed = avatar.groundedMovement.MoveSpeed / avatar.groundedMovement.maxGroundedSpeed;
+            if (!avatar) return;
+            if (!movement) return;
+            if (!movement.IsOnGround) return;
+            
+            var moveSpeed = movement.MoveSpeed / movement.maxGroundedSpeed;
             var shakeAmount = -1.0f / (moveSpeed / slope + 1.0f) + 1.0f;
 
             d += moveSpeed * frequency * Time.deltaTime;
