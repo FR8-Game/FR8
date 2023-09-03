@@ -57,6 +57,12 @@ namespace FR8Runtime.Player
         private static void FindDefaultSpawnPoint()
         {
             var spawnPoints = FindObjectsOfType<PlayerSpawnPoint>();
+            if (spawnPoints.Length == 0)
+            {
+                Default = null;
+                return;
+            }
+            
             foreach (var e in spawnPoints)
             {
                 if (Default != e) e.defaultSpawn = false;
