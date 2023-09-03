@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace FR8.Player.Submodules
+namespace FR8Runtime.Player.Submodules
 {
     [System.Serializable]
     public class PlayerUrination

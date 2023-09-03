@@ -1,15 +1,15 @@
-﻿using FR8.Pickups;
-using FR8.Player;
-using FR8.Sockets;
-using FR8.Train.Electrics;
+﻿using FR8Runtime.Pickups;
+using FR8Runtime.Player;
+using FR8Runtime.Sockets;
+using FR8Runtime.Train.Electrics;
 using UnityEngine;
 
-namespace FR8.Level.Fuel
+namespace FR8Runtime.Level.Fuel
 {
     [SelectionBase, DisallowMultipleComponent]
     public class FuelPumpHandle : PickupObject, ISocketable
     {
-        public static readonly Utility.Physics.SpringSettings SpringSettings = new()
+        public static readonly CodeUtility.PhysicsUtility.SpringSettings SpringSettings = new()
         {
             spring = 300.0f,
             damper = 18.0f,
@@ -40,7 +40,7 @@ namespace FR8.Level.Fuel
             if (!CurrentBinding) return;
 
             var target = CurrentBinding.transform;
-            Utility.DampedSpring.ApplyForce(Rigidbody, target.position, target.rotation, SpringSettings.spring, SpringSettings.damper, SpringSettings.torqueScale, true);
+            CodeUtility.DampedSpring.ApplyForce(Rigidbody, target.position, target.rotation, SpringSettings.spring, SpringSettings.damper, SpringSettings.torqueScale, true);
         }
 
         public ISocketable Bind(SocketManager manager)

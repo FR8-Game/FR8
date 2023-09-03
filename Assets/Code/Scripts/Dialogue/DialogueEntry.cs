@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace FR8.Dialogue
+namespace FR8Runtime.Dialogue
 {
     [System.Serializable]
     public class DialogueEntry

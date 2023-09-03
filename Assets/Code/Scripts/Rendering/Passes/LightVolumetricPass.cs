@@ -1,22 +1,18 @@
-using System;
-using FR8.Rendering.Volumetrics;
+using FR8Runtime.Rendering.Volumetrics;
+using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-using Object = UnityEngine.Object;
 
-namespace FR8.Rendering.Passes
+namespace FR8Runtime.Rendering.Passes
 {
-    public class LightVolumetricPass : CustomRenderPass
+    public class LightVolumetricPass : CustomRenderPass<VolumetricsSettings>
     {
-        public Settings settings;
-
         private VolumeLight[] lights;
 
-        public override bool Enabled => settings.enabled;
+        public override bool Enabled => Settings.active;
 
-        public LightVolumetricPass(Settings settings)
+        public LightVolumetricPass()
         {
-            this.settings = settings;
             renderPassEvent = RenderPassEvent.BeforeRenderingTransparents;
         }
 
@@ -25,7 +21,7 @@ namespace FR8.Rendering.Passes
             lights = Object.FindObjectsOfType<VolumeLight>();
         }
 
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        public override void OnExecute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             ExecuteWithCommandBuffer(context, cmd =>
             {
@@ -35,11 +31,8 @@ namespace FR8.Rendering.Passes
                 }
             });
         }
-
-        [Serializable]
-        public class Settings
-        {
-            public bool enabled;
-        }
     }
+
+    [VolumeComponentMenu("Custom/Volumetrics")]
+    public class VolumetricsSettings : VolumeComponent { }
 }

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FR8.Rendering
+namespace FR8Runtime.Rendering
 {
     [ExecuteAlways]
     public class MapTable : MonoBehaviour

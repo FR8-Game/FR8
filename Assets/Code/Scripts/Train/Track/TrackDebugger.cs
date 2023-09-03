@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FR8.Train.Track
+namespace FR8Runtime.Train.Track
 {
     public class TrackDebugger : MonoBehaviour
     {
@@ -21,7 +21,7 @@ namespace FR8.Train.Track
             if (roundToKnot)
             {
                 var i = segment.GetKnotIndex(t);
-                p = segment.Knot(i);
+                p = segment[i].position;
                 v = segment.KnotVelocity(i);
             }
             

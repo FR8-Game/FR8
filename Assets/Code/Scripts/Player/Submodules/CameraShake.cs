@@ -1,12 +1,13 @@
 using System;
 using UnityEngine;
 
-namespace FR8.Player.Submodules
+namespace FR8Runtime.Player.Submodules
 {
     [Serializable]
     public class CameraShake
     {
-        [SerializeField] private Vector3 amplitude = new(2.0f, 0.0f, 2.0f);
+        [SerializeField] private Vector3 cosAmplitude = new(0.0f, 0.0f, 0.0f);
+        [SerializeField] private Vector3 sinAmplitude = new(0.0f, 0.0f, 0.0f);
         [SerializeField] private float frequency = 1.0f;
         [SerializeField] private float slope = 0.2f;
 
@@ -18,17 +19,26 @@ namespace FR8.Player.Submodules
             rotationalOffset = Quaternion.identity;
 
             var avatar = playerCamera.Avatar;
-            if (!avatar) return;
-            if (!avatar.groundedMovement.IsOnGround) return;
+            var movement = avatar.GetComponent<PlayerGroundedMovement>();
             
-            var moveSpeed = avatar.groundedMovement.MoveSpeed / avatar.groundedMovement.maxGroundedSpeed;
+            if (!avatar) return;
+            if (!movement) return;
+            if (!movement.IsOnGround) return;
+            
+            var moveSpeed = movement.MoveSpeed / movement.maxGroundedSpeed;
             var shakeAmount = -1.0f / (moveSpeed / slope + 1.0f) + 1.0f;
 
             d += moveSpeed * frequency * Time.deltaTime;
 
-            var x = Mathf.Abs(Mathf.Cos(d)) * shakeAmount;
-            var y = Mathf.Sin(d * Mathf.PI) * shakeAmount;
-            rotationalOffset = Quaternion.Euler(amplitude.x * x, amplitude.y * y, amplitude.z * y);
+            var c = Mathf.Abs(Mathf.Cos(d * Mathf.PI)) * shakeAmount;
+            var s = Mathf.Sin(d * Mathf.PI) * shakeAmount;
+
+            rotationalOffset *= Quaternion.Euler(new Vector3()
+            {
+                x = c * cosAmplitude.x + s * sinAmplitude.x,
+                y = c * cosAmplitude.y + s * sinAmplitude.y,
+                z = c * cosAmplitude.z + s * sinAmplitude.z,
+            });
         }
     }
 }

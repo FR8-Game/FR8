@@ -1,36 +1,22 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
-namespace FR8.UI
+namespace FR8Runtime.UI
 {
     public static class Pause
-    {
-        private static int pauseStack;
-        private static float timeScale;
-        private static CursorLockMode cursorLockMode;
+    {   
+        public static bool Paused { get; private set; }
+        public static event Action PausedStateChangedEvent;
 
-        public static void Push()
+        public static void TogglePaused() => SetPaused(!Paused);
+        public static void SetPaused(bool state)
         {
-            if (pauseStack == 0)
-            {
-                timeScale = Time.timeScale;
-                cursorLockMode = Cursor.lockState;
-                
-                Time.timeScale = 0.0f;
-                Cursor.lockState = CursorLockMode.None;
-            }
-            
-            pauseStack++;
-        }
+            if (Paused == state) return;
 
-        public static void Pop()
-        {
-            if (pauseStack == 1)
-            {
-                Time.timeScale = timeScale;
-                Cursor.lockState = cursorLockMode;
-            }
-            
-            pauseStack--;
+            Paused = state;
+            Time.timeScale = state ? 0.0f : 1.0f;
+
+            PausedStateChangedEvent?.Invoke();
         }
     }
 }

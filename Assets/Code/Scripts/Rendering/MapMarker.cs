@@ -1,13 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FR8.Rendering
+namespace FR8Runtime.Rendering
 {
     [ExecuteAlways]
     [RequireComponent(typeof(MeshFilter))]
     public class MapMarker : MonoBehaviour
     {
         [SerializeField] private Color markerColor;
+        [SerializeField] private bool drawGizmos;
         
         private MeshFilter filter;
         
@@ -32,13 +33,15 @@ namespace FR8.Rendering
 
         private void OnDrawGizmosSelected()
         {
+            if (!drawGizmos) return;
+            
             var filter = GetComponent<MeshFilter>();
             if (!filter) return;
 
             var mesh = filter.sharedMesh;
             if (!mesh) return;
 
-            Gizmos.color = markerColor;
+            Gizmos.color = new Color(markerColor.r, markerColor.g, markerColor.b, markerColor.a * 0.2f);
             Gizmos.matrix = transform.localToWorldMatrix;
             Gizmos.DrawWireMesh(mesh);
         }

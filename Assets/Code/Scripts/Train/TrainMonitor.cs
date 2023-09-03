@@ -1,10 +1,12 @@
-﻿using FR8.Dialogue;
-using FR8.Interactions.Drivers;
-using FR8.Player;
-using FR8.Train.Electrics;
+﻿using System.Collections.Generic;
+using FR8Runtime.Dialogue;
+using FR8Runtime.Interactions.Drivers;
+using FR8Runtime.Player;
+using FR8Runtime.Shapes;
+using FR8Runtime.Train.Electrics;
 using UnityEngine;
 
-namespace FR8.Train
+namespace FR8Runtime.Train
 {
     [SelectionBase, DisallowMultipleComponent]
     public class TrainMonitor : MonoBehaviour
@@ -12,11 +14,12 @@ namespace FR8.Train
         public const float MaxTrainSafeSpeed = 10.0f / 3.6f;
         
         [SerializeField] private DialogueSource source;
-        [SerializeField] private Bounds cockpitBounds;
 
         private TrainCarriage carriage;
         private TrainElectricsController trainElectrics;
         private DriverNetwork driverNetwork;
+
+        private List<Shape> shapes = new();
 
         private void Awake()
         {
@@ -38,8 +41,10 @@ namespace FR8.Train
             var players = FindObjectsOfType<PlayerAvatar>();
             foreach (var p in players)
             {
-                var point = transform.InverseTransformPoint(p.transform.position);
-                if (cockpitBounds.Contains(point)) return;
+                foreach (var s in shapes)
+                {
+                    if (s.ContainsPoint(p.getCenter())) return;
+                }
             }
 
             if (!trainElectrics.GetConnected()) return;
@@ -59,6 +64,7 @@ namespace FR8.Train
         private void OnEnable()
         {
             trainElectrics.FuseBlown += OnFuseBlown;
+            GetShapes();
         }
 
         private void OnDisable()
@@ -79,10 +85,17 @@ namespace FR8.Train
 
         private void OnDrawGizmosSelected()
         {
-            Gizmos.color = Color.red;
-            Gizmos.matrix = transform.localToWorldMatrix;
-            
-            Gizmos.DrawWireCube(cockpitBounds.center, cockpitBounds.size);
+            GetShapes();
+
+            foreach (var e in shapes)
+            {
+                e.DrawGizmos();
+            }
+        }
+
+        private void GetShapes()
+        {
+            Shape.FindShapes(shapes, transform, "Shapes/Cockpit", true, true);
         }
     }
 }

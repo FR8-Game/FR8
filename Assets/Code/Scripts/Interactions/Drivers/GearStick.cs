@@ -1,10 +1,10 @@
-﻿using FR8.Interactions.Drivables;
-using FR8.Interactions.Drivers.DragBehaviours;
-using FR8.Interactions.Drivers.Submodules;
-using FR8.Player;
+﻿using FR8Runtime.Interactions.Drivables;
+using FR8Runtime.Interactions.Drivers.DragBehaviours;
+using FR8Runtime.Interactions.Drivers.Submodules;
+using FR8Runtime.Player;
 using UnityEngine;
 
-namespace FR8.Interactions.Drivers
+namespace FR8Runtime.Interactions.Drivers
 {
     [SelectionBase, DisallowMultipleComponent]
     public sealed class GearStick : Driver
@@ -57,7 +57,7 @@ namespace FR8.Interactions.Drivers
         {
             var avatar = interactingObject.GetComponentInParent<PlayerAvatar>();
             if (!avatar) return;
-            var ray = avatar.cameraController.LookingRay;
+            var ray = avatar.cameraController.LookRay;
             
             dragBehaviour.BeginDrag(transform, Value, ray);
         }
@@ -66,7 +66,7 @@ namespace FR8.Interactions.Drivers
         {
             var avatar = interactingObject.GetComponentInParent<PlayerAvatar>();
             if (!avatar) return;
-            var ray = avatar.cameraController.LookingRay;
+            var ray = avatar.cameraController.LookRay;
             
             SetValue(dragBehaviour.ContinueDrag(transform, ray));
         }

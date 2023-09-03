@@ -1,10 +1,9 @@
 ﻿using System.Collections;
-using FR8.Interactions.Drivables;
-using FR8.Train.Electrics;
+using FR8Runtime.Interactions.Drivables;
+using FR8Runtime.Train.Electrics;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
-namespace FR8.Interactions.Drivers
+namespace FR8Runtime.Interactions.Drivers
 {
     [SelectionBase, DisallowMultipleComponent]
     public sealed class RadialDisplay : MonoBehaviour, IElectricDevice
@@ -59,7 +58,7 @@ namespace FR8.Interactions.Drivers
             displayText.SetValue(Value);
             displayUI.SetValue(Value);
 
-            group.alpha += ((powered ? 1.0f : 0.0f) - group.alpha) * 2.0f * Time.deltaTime / fadeTime;
+            if (group) group.alpha += ((powered ? 1.0f : 0.0f) - group.alpha) * 2.0f * Time.deltaTime / fadeTime;
             
             displayText.FixedUpdate();
         }

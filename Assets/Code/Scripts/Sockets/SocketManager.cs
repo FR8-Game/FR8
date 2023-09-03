@@ -1,11 +1,11 @@
 using System;
 using System.Text.RegularExpressions;
-using FR8.Interactions.Drivers.Submodules;
-using FR8.Player;
+using FR8Runtime.Interactions.Drivers.Submodules;
+using FR8Runtime.Player;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace FR8.Sockets
+namespace FR8Runtime.Sockets
 {
     [System.Serializable]
     public class SocketManager : MonoBehaviour, IInteractable

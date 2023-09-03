@@ -2,73 +2,55 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
 
-namespace FR8.UI.Loading
+namespace FR8Runtime.UI.Loading
 {
     [SelectionBase, DisallowMultipleComponent]
+    [RequireComponent(typeof(UIDocument))]
     public sealed class LoadScreen : MonoBehaviour
     {
         [SerializeField] private float fadeTime = 0.5f;
         [SerializeField] private AnimationCurve fadeCurve = AnimationCurve.EaseInOut(0.0f, 0.0f, 1.0f, 1.0f);
 
-        [Space]
-        [SerializeField] private RectTransform content;
-
         [SerializeField] private float contentBobFrequency;
         [SerializeField] private float contentBobAmplitude;
-        [SerializeField] private Image fill;
 
-        private Canvas canvas;
-        private CanvasGroup group;
+        private UIDocument document;
+        private VisualElement root;
+        private ProgressBar fill;
 
         private bool loadingNewLevel;
 
-        private static bool started;
-
         private void Awake()
         {
-            canvas = GetComponentInChildren<Canvas>();
-            group = canvas.GetComponentInChildren<CanvasGroup>();
+            document = GetComponent<UIDocument>();
         }
 
         private void Start()
         {
-            group.blocksRaycasts = false;
-
-            if (!started)
-            {
-                group.alpha = 0.0f;
-                started = true;
-                return;
-            }
-
-            StartCoroutine(Fade(v => 1.0f - v));
+            StartCoroutine(Fade(v => 1.0f - v, () => root.SetEnabled(false)));
         }
 
-        private void Update()
-        {
-            content.anchoredPosition = Vector3.up * Mathf.Sin(Time.time * contentBobFrequency * Mathf.PI) * contentBobAmplitude;
-        }
-
-        public void LoadScene(string sceneName)
+        public void LoadScene(int buildIndex)
         {
             StartCoroutine(routine());
 
             IEnumerator routine()
             {
+                ShowUI(true);
+                
                 if (loadingNewLevel) yield break;
                 loadingNewLevel = true;
 
-                group.blocksRaycasts = true;
-                fill.fillAmount = 0.0f;
+                SetFill(0.0f);
+               
+                yield return StartCoroutine(Fade(v => v, null));
 
-                yield return StartCoroutine(Fade(v => v));
-
-                var operation = SceneManager.LoadSceneAsync(sceneName);
+                var operation = SceneManager.LoadSceneAsync(buildIndex);
                 while (!operation.isDone)
                 {
-                    fill.fillAmount = operation.progress;
+                    SetFill(operation.progress);
                     yield return null;
                 }
 
@@ -76,18 +58,33 @@ namespace FR8.UI.Loading
             }
         }
 
-        private IEnumerator Fade(Func<float, float> remap)
+        private IEnumerator Fade(Func<float, float> remap, Action finishedCallback)
         {
+            ShowUI(true);
+
             var p = 0.0f;
             while (p < 1.0f)
             {
-                group.alpha = fadeCurve.Evaluate(remap(p));
-
+                root.style.opacity = fadeCurve.Evaluate(remap(p));
                 p += Time.deltaTime / fadeTime;
                 yield return null;
             }
 
-            group.alpha = fadeCurve.Evaluate(remap(1.0f));
+            root.style.opacity = fadeCurve.Evaluate(remap(1.0f));
+            finishedCallback?.Invoke();
+        }
+
+        public void SetFill(float percent)
+        {
+            if (fill == null) return;
+            fill.value = percent;
+        }
+        
+        public void ShowUI(bool state)
+        {
+            document.enabled = state;
+            root = state ? document.rootVisualElement.Q("LoadingScreen") : null;
+            fill = state ? document.rootVisualElement.Q<ProgressBar>("ProgressBar") : null;
         }
     }
 }
