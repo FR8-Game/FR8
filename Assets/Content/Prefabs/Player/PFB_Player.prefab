@@ -1078,7 +1078,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &8958627133240513610
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1799,36 +1799,6 @@ MonoBehaviour:
     inputMap: {fileID: -944628639613478452, guid: badd88ac4cdc31941ad634977f07e0fd, type: 3}
     mouseSensitivity: 0.3
     controllerSensitivity: 0.4
-  groundedMovement:
-    mass: 80
-    collisionHeight: 1.7
-    collisionRadius: 0.25
-    stepHeight: 0.5
-    crouchHeight: 1
-    cameraOffset: {x: 0, y: 1.6, z: 0}
-    maxGroundedSpeed: 4
-    accelerationTime: 0.12
-    sprintSpeedScalar: 2
-    airMovePenalty: 0.8
-    jumpHeight: 2.5
-    maxWalkableSlope: 40
-    groundSpring: 500
-    groundDamping: 25
-    downGravityScale: 3
-    upGravityScale: 2
-    ladderClimbSpeed: 5
-    ladderRungDistance: 0.4
-    ladderClimbSpring: 6000
-    ladderClimbDamper: 800
-    ladderJumpForce: 5
-    footstepSound:
-      Guid:
-        Data1: 0
-        Data2: 0
-        Data3: 0
-        Data4: 0
-      Path: 
-    footstepFrequency: 1
   interactionManager:
     interactionDistance: 2.5
     transition:

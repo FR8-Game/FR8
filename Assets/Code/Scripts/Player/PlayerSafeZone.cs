@@ -1,17 +1,19 @@
 using System.Collections.Generic;
+using FR8Runtime.Shapes;
 using UnityEngine;
 
 namespace FR8Runtime.Player
 {
     public class PlayerSafeZone : MonoBehaviour, IVitalityBooster
     {
-        [SerializeField] private Bounds bounds;
-
         public static readonly List<PlayerSafeZone> All = new();
+
+        private List<Shape> shapes = new();
 
         private void OnEnable()
         {
             All.Add(this);
+            GetShapes();
         }
 
         private void OnDisable()
@@ -19,15 +21,23 @@ namespace FR8Runtime.Player
             All.Remove(this);
         }
 
-        private void OnDrawGizmosSelected()
+        private void GetShapes()
         {
-            Gizmos.color = Color.cyan;
-            Gizmos.matrix = transform.localToWorldMatrix;
-            
-            Gizmos.DrawWireCube(bounds.center, bounds.size);
+            shapes.Clear();
+            shapes.AddRange(GetComponentsInChildren<Shape>());
         }
 
-        public bool CanUse(PlayerAvatar avatar) => bounds.Contains(transform.InverseTransformPoint(avatar.Center));
+        public bool CanUse(PlayerAvatar avatar)
+        {
+            var center = avatar.getCenter();
+            foreach (var e in shapes)
+            {
+                if (e.ContainsPoint(center)) return true;
+            }
+
+            return false;
+        }
+
         public void Bind(PlayerAvatar avatar) { }
         public void Unbind(PlayerAvatar avatar) { }
     }

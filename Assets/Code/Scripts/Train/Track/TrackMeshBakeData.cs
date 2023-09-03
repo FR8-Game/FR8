@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
-using Unity.Android.Types;
 using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;

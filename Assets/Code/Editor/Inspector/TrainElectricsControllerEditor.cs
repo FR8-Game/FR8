@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using FR8Runtime.Train.Electrics;
+﻿using FR8Runtime.Train.Electrics;
 using UnityEditor;
 using UnityEngine;
 

@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
 using FR8Runtime.UI;
 using UnityEngine;
-using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 
 namespace FR8Runtime.Player.Submodules
@@ -88,7 +85,6 @@ namespace FR8Runtime.Player.Submodules
         private void GetExposed()
         {
             if (checkType(PlayerSafeZone.All)) return;
-            if (checkType(PlayerTetherPoint.All.OrderBy(e => (e.transform.position - avatar.Center).magnitude))) return;
 
             if ((Object)vitalityBooster)
             {
@@ -183,12 +179,9 @@ namespace FR8Runtime.Player.Submodules
             IsAlive = true;
 
             var (spawnPosition, spawnOrientation) = GetSpawnPoint();
-            var rb = avatar.Rigidbody;
 
-            rb.transform.position = spawnPosition;
-            rb.transform.rotation = spawnOrientation;
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
+            avatar.transform.position = spawnPosition;
+            avatar.transform.rotation = spawnOrientation;
 
             ReviveEvent?.Invoke();
             HealthChangeEvent?.Invoke();

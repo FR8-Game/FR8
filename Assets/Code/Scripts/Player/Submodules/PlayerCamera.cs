@@ -1,7 +1,6 @@
 using System;
 using FR8Runtime.UI;
 using UnityEngine;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -33,24 +32,20 @@ namespace FR8Runtime.Player.Submodules
 
         private int cursorLockID;
 
-        public Transform CameraTarget { get; private set; }
-        public Ray LookingRay => new(CameraTarget.position, CameraTarget.forward);
+        public Ray LookRay => Avatar.Head ? new(Avatar.Head.position, Avatar.Head.forward) : default;
         public float Yaw { get; private set; }
         public Camera Camera { get; private set; }
         public PlayerAvatar Avatar { get; private set; }
 
         public void Init(PlayerAvatar avatar)
         {
-            this.Avatar = avatar;
+            Avatar = avatar;
 
             Camera = Camera.main;
 
             Avatar.UpdateEvent += Update;
             Avatar.FixedUpdateEvent += FixedUpdate;
 
-            CameraTarget = avatar.transform.Find("Camera Target");
-            CameraTarget.transform.localRotation = Quaternion.identity;
-            
             Cursor.lockState = CursorLockMode.Locked;
         }
 
@@ -81,11 +76,11 @@ namespace FR8Runtime.Player.Submodules
 #endif
                 if (cameraLockedThisFrame)
                 {
-                    //(lastCursorX, lastCursorY) = CodeUtility.CursorUtility.GetPosition();
+                    (lastCursorX, lastCursorY) = CodeUtility.CursorUtility.GetPosition();
                 }
                 else
                 {
-                    //CodeUtility.CursorUtility.SetPosition(lastCursorX, lastCursorY);
+                    CodeUtility.CursorUtility.SetPosition(lastCursorX, lastCursorY);
                 }
             }
 
@@ -94,10 +89,10 @@ namespace FR8Runtime.Player.Submodules
 
             zoomCamera = Avatar.input.ZoomCam;
 
-            Camera.transform.rotation = CameraTarget.transform.rotation;
+            Camera.transform.rotation = Avatar.Head.transform.rotation;
 
             // Update additional camera variables.
-            Camera.transform.position = CameraTarget.position + Camera.transform.rotation * translationOffset;
+            Camera.transform.position = Avatar.Head.position + Camera.transform.rotation * translationOffset;
             Camera.fieldOfView = Mathf.SmoothDamp(Camera.fieldOfView, zoomCamera ? zoomFieldOfView : fieldOfView, ref fovVelocity, fovSmoothTime);
             Camera.nearClipPlane = nearPlane;
             Camera.farClipPlane = farPlane;
@@ -113,7 +108,7 @@ namespace FR8Runtime.Player.Submodules
             Yaw = Mathf.Clamp(Yaw + delta.y, -YawRange / 2.0f, YawRange / 2.0f);
 
             shakeModule.GetOffsets(this, out translationOffset, out var rotationalOffset);
-            CameraTarget.transform.rotation = Quaternion.Euler(-Yaw, CameraTarget.transform.eulerAngles.y + delta.x, 0.0f) * rotationalOffset;
+            Avatar.Head.transform.rotation = Quaternion.Euler(-Yaw, Avatar.Head.transform.eulerAngles.y + delta.x, 0.0f) * rotationalOffset;
         }
 
         public void SetCameraLock(bool state)
@@ -124,10 +119,7 @@ namespace FR8Runtime.Player.Submodules
         public void OnDrawGizmos(PlayerAvatar avatar)
         {
 #if UNITY_EDITOR
-            if (CameraTarget)
-            {
-                Handles.DrawLine(CameraTarget.position, CameraTarget.position + CameraTarget.forward * 0.5f);
-            }
+            Handles.DrawLine(LookRay.GetPoint(0.0f), LookRay.GetPoint(0.5f));
 #endif
         }
     }

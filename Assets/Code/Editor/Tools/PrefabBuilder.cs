@@ -1,8 +1,5 @@
 using System.Collections.Generic;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Text.RegularExpressions;
-using System.Transactions;
 using FR8Runtime.Pickups;
 using UnityEditor;
 using UnityEngine;

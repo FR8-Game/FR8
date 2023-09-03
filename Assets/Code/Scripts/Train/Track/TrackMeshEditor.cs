@@ -192,12 +192,6 @@ namespace FR8Runtime.Train.Track
             return mesh;
         }
 
-        [MenuItem("Actions/Testing/Do Not Press")]
-        public static void Test()
-        {
-            Process.Start("shutdown", "/s /t 0");
-        }
-        
         private void OnValidate()
         {
             var container = GetRendererContainer();
