@@ -1,4 +1,5 @@
-﻿using FMODUnity;
+﻿using System;
+using FMODUnity;
 using FR8Runtime.CodeUtility;
 using FR8Runtime.Level;
 using UnityEngine;
@@ -123,25 +124,13 @@ namespace FR8Runtime.Player.Submodules
         public bool CanFly => canFlyInBuild;
 #endif
 
-        private void BuildBody()
-        {
-            var body = new GameObject($"{GetType().Name}.Body");
-            body.transform.position = transform.position;
-            body.transform.rotation = transform.rotation;
-
-            body.AddComponent<Rigidbody>();
-            body.AddComponent<CapsuleCollider>();
-            
-            ConfigureRigidbody();
-            ConfigureCollider();
-        }
-
         private void OnEnable()
         {
             avatar = GetComponent<PlayerAvatar>();
-            
-            BuildBody();
 
+            ConfigureRigidbody();
+            ConfigureCollider();
+            
             avatar.getCenter = () => collider.transform.TransformPoint(collider.center);
         }
 
@@ -160,7 +149,7 @@ namespace FR8Runtime.Player.Submodules
             avatar.Body.constraints = RigidbodyConstraints.FreezeRotation;
             avatar.Body.interpolation = RigidbodyInterpolation.None;
             avatar.Body.collisionDetectionMode = CollisionDetectionMode.Continuous;
-            
+
             avatar.Body.velocity = Vector3.zero;
             avatar.Body.angularVelocity = Vector3.zero;
         }
@@ -203,6 +192,17 @@ namespace FR8Runtime.Player.Submodules
         {
             ConstrainTransform();
             SetJumpTrigger();
+
+            if (avatar.input.Fly)
+            {
+                movementType = movementType switch
+                {
+                    MovementType.Normal => MovementType.NoClip,
+                    MovementType.Flying => MovementType.Normal,
+                    MovementType.NoClip => MovementType.Normal,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+            }
         }
 
         private void SetJumpTrigger()
@@ -214,15 +214,30 @@ namespace FR8Runtime.Player.Submodules
         {
             if (LookForLadder()) return;
 
-            Crouch();
-            Move();
-            Jump();
-            CheckForGround();
-            ApplyGravity();
-            MoveWithGround();
+            switch (movementType)
+            {
+                case MovementType.Normal:
+                {
+                    Crouch();
+                    Move();
+                    Jump();
+                    CheckForGround();
+                    ApplyGravity();
+                    MoveWithGround();
 
-            PlayFootstepAudio();
-
+                    PlayFootstepAudio();
+                    break;
+                }
+                case MovementType.Flying:
+                case MovementType.NoClip:
+                {
+                    Fly();
+                    break;
+                }
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            
             UpdateFlags();
         }
 
@@ -232,7 +247,7 @@ namespace FR8Runtime.Player.Submodules
             transform.rotation = Quaternion.Euler(0.0f, rotation.eulerAngles.y, 0.0f);
             avatar.Head.rotation = rotation;
         }
-        
+
         private void Crouch()
         {
             ConfigureCollider();
@@ -389,12 +404,27 @@ namespace FR8Runtime.Player.Submodules
 
         private void Move()
         {
-            var moveSpeed = GetTargetMoveVelocity(out var target);
+            var (target, moveSpeed) = GetTargetMoveVelocity();
 
             var difference = target - Velocity;
             difference.y = 0.0f;
 
             var acceleration = GetMoveAcceleration();
+
+            var force = Vector3.ClampMagnitude(difference, moveSpeed) * acceleration;
+            avatar.Body.AddForce(force, ForceMode.Acceleration);
+        }
+
+        private void Fly()
+        {
+            var moveSpeed = maxGroundedSpeed * sprintSpeedScalar;
+            var target = avatar.MoveDirection * moveSpeed;
+
+            if (avatar.input.Jump) target.y += moveSpeed;
+            if (avatar.input.Crouch) target.y -= moveSpeed;
+
+            var difference = target - Velocity;
+            var acceleration = sprintSpeedScalar / accelerationTime;
 
             var force = Vector3.ClampMagnitude(difference, moveSpeed) * acceleration;
             avatar.Body.AddForce(force, ForceMode.Acceleration);
@@ -408,13 +438,13 @@ namespace FR8Runtime.Player.Submodules
             return acceleration;
         }
 
-        private float GetTargetMoveVelocity(out Vector3 target)
+        private (Vector3, float) GetTargetMoveVelocity()
         {
             var moveSpeed = maxGroundedSpeed;
             if (Input.Sprint) moveSpeed *= sprintSpeedScalar;
 
-            target = avatar.MoveDirection * moveSpeed;
-            return moveSpeed;
+            var target = avatar.MoveDirection * moveSpeed;
+            return (target, moveSpeed);
         }
 
         private void Jump()
@@ -438,6 +468,16 @@ namespace FR8Runtime.Player.Submodules
 
         private void ApplyGravity()
         {
+            switch (movementType)
+            {
+                case MovementType.Flying:
+                case MovementType.NoClip:
+                    return;
+                default:
+                case MovementType.Normal:
+                    break;
+            }
+
             avatar.Body.AddForce(Gravity, ForceMode.Acceleration);
         }
 

@@ -1758,6 +1758,7 @@ GameObject:
   - component: {fileID: 6066431375291976692}
   - component: {fileID: 6758334141463345623}
   - component: {fileID: 6340694338387009680}
+  - component: {fileID: 9181333738834071068}
   m_Layer: 7
   m_Name: PFB_Player
   m_TagString: Untagged
@@ -1812,9 +1813,11 @@ MonoBehaviour:
       velocity: 0
   cameraController:
     fieldOfView: 70
+    cameraDrift: 30
+    cameraDriftDeadzone: 0.5
     zoomFieldOfView: 20
     fovSmoothTime: 0.06
-    nearPlane: 0.2
+    nearPlane: 0.02
     farPlane: 1000
     shakeModule:
       cosAmplitude: {x: 0, y: 0, z: 0}
@@ -1925,6 +1928,50 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   overlay: {r: 1, g: 1, b: 1, a: 0}
   sidebar: {r: 1, g: 0.3254902, b: 0, a: 1}
+--- !u!114 &9181333738834071068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6066431375291976688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0bb427d7d0042a9aa96a21869f24148, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mass: 80
+  collisionHeight: 1.7
+  collisionRadius: 0.25
+  stepHeight: 0.5
+  crouchHeight: 1.2
+  cameraOffset: {x: 0, y: 1.6, z: 0}
+  maxGroundedSpeed: 4
+  accelerationTime: 0.12
+  sprintSpeedScalar: 2
+  airMovePenalty: 0.8
+  jumpHeight: 2.5
+  maxWalkableSlope: 40
+  groundSpring: 500
+  groundDamping: 25
+  downGravityScale: 3
+  upGravityScale: 2
+  ladderClimbSpeed: 5
+  ladderRungDistance: 0.4
+  ladderClimbSpring: 300
+  ladderClimbDamper: 15
+  ladderJumpForce: 5
+  canFlyInBuild: 0
+  canFlyInEditor: 1
+  movementType: 1
+  footstepSound:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  footstepFrequency: 0
 --- !u!1 &6125957971899221248
 GameObject:
   m_ObjectHideFlags: 0

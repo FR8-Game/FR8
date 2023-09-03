@@ -1,6 +1,9 @@
 using System;
+using FR8Runtime.Save;
 using FR8Runtime.UI;
 using UnityEngine;
+using UnityEngine.InputSystem;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -13,7 +16,10 @@ namespace FR8Runtime.Player.Submodules
         private const float GimbalLockOffset = 1.0f;
         private const float YawRange = 180.0f - GimbalLockOffset;
 
+
         [SerializeField] private float fieldOfView = 70.0f;
+        [SerializeField] private float cameraDrift = 0.0f;
+        [SerializeField] private float cameraDriftDeadzone = 0.0f;
         [SerializeField] private float zoomFieldOfView = 35.0f;
         [SerializeField] private float fovSmoothTime = 0.2f;
         [SerializeField] private float nearPlane = 0.2f;
@@ -24,7 +30,7 @@ namespace FR8Runtime.Player.Submodules
         private bool zoomCamera;
         private bool cameraLocked;
         private bool wasCameraLocked;
-
+        
         private Vector3 translationOffset;
 
         private int lastCursorX, lastCursorY;
@@ -46,7 +52,8 @@ namespace FR8Runtime.Player.Submodules
             Avatar.UpdateEvent += Update;
             Avatar.FixedUpdateEvent += FixedUpdate;
 
-            Cursor.lockState = CursorLockMode.Locked;
+            cameraLocked = true;
+            wasCameraLocked = !cameraLocked;
         }
 
         private void Update()
@@ -61,19 +68,14 @@ namespace FR8Runtime.Player.Submodules
                 return;
             }
 
-            Cursor.lockState = CursorLockMode.Locked;
-
             // Check if cursor is free, or camera has been grabbed.
             if (Avatar.input.FreeCam) cameraLocked = !cameraLocked;
-
             var cameraLockedThisFrame = cameraLocked || Avatar.input.GrabCam;
+
+            Cursor.lockState = cameraLockedThisFrame ? CursorLockMode.Locked : CursorLockMode.None;
+
             if (cameraLockedThisFrame != wasCameraLocked)
             {
-#if UNITY_EDITOR
-                Cursor.lockState = cameraLockedThisFrame ? CursorLockMode.Locked : CursorLockMode.None;
-#else
-                Cursor.lockState = cameraLocked ? CursorLockMode.Locked : CursorLockMode.None;
-#endif
                 if (cameraLockedThisFrame)
                 {
                     (lastCursorX, lastCursorY) = CodeUtility.CursorUtility.GetPosition();
@@ -85,7 +87,23 @@ namespace FR8Runtime.Player.Submodules
             }
 
             wasCameraLocked = cameraLockedThisFrame;
-            delta += Avatar.input.LookFrameDelta;
+
+            if (cameraLockedThisFrame)
+            {
+                delta += Avatar.input.LookFrameDelta;
+            }
+            else
+            {
+                var mouse = Mouse.current;
+                if (mouse != null)
+                {
+                    var normalizedCursorPos = Mouse.current.position.ReadValue() / new Vector2(Screen.width, Screen.height);
+                    normalizedCursorPos = normalizedCursorPos * 2.0f - Vector2.one;
+
+                    var drift = cameraDrift * Mathf.Max(0.0f, (normalizedCursorPos.magnitude - cameraDriftDeadzone) / (1.0f - cameraDriftDeadzone));
+                    delta += normalizedCursorPos.normalized * drift * Time.deltaTime;
+                }
+            }
 
             zoomCamera = Avatar.input.ZoomCam;
 
@@ -115,7 +133,7 @@ namespace FR8Runtime.Player.Submodules
         {
             cameraLocked = state;
         }
-
+        
         public void OnDrawGizmos(PlayerAvatar avatar)
         {
 #if UNITY_EDITOR
