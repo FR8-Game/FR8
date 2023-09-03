@@ -19,8 +19,8 @@ namespace FR8Runtime
             return res;
         }
 
-        public static bool Switch(this InputActionReference reference, float deadzone = 0.5f) => reference.action.Switch(deadzone);
-        public static bool Switch(this InputAction action, float deadzone = 0.5f) => action.ReadValue<float>() > deadzone;
+        public static bool State(this InputActionReference reference, float deadzone = 0.5f) => reference.action.State(deadzone);
+        public static bool State(this InputAction action, float deadzone = 0.5f) => action.ReadValue<float>() > deadzone;
         
         private static bool SoftMatch(string a, string b)
         {

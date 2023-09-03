@@ -6,21 +6,24 @@ namespace FR8Runtime.Rendering
     public class RopeRenderer : MonoBehaviour
     {
         [Space]
-        [SerializeField] private Transform startTarget;
+        public Transform startTarget;
 
-        [SerializeField] private Vector3 startTranslation;
-        [SerializeField] private Vector3 startRotation;
-
-        [Space]
-        [SerializeField] private Transform endTarget;
-        [SerializeField] private Vector3 endTranslation;
-        [SerializeField] private Vector3 endRotation;
+        public Vector3 startTranslation;
+        public Vector3 startRotation;
 
         [Space]
-        [SerializeField] private CodeUtility.Rope rope = new();
-        [SerializeField] private float length;
-        [SerializeField] private float size = 1.0f;
-        [SerializeField] private float twist;
+        public Transform endTarget;
+        public Vector3 endTranslation;
+        public Vector3 endRotation;
+
+        [Space]
+        public CodeUtility.Rope rope = new();
+        public float slack;
+        public float lengthSmoothing;
+        public float size = 1.0f;
+        public float twist;
+
+        private float length;
 
         private new Renderer renderer;
         private MaterialPropertyBlock propertyBlock;
@@ -33,6 +36,19 @@ namespace FR8Runtime.Rendering
 
         private Transform StartTarget => startTarget ? startTarget : transform;
         public Transform EndTarget => endTarget ? endTarget : transform;
+
+        private void OnEnable()
+        {
+            if (!renderer) renderer = GetComponent<MeshRenderer>();
+            if (renderer) renderer.enabled = true;
+            
+        }
+
+        private void OnDisable()
+        {
+            if (!renderer) renderer = GetComponent<MeshRenderer>();
+            if (renderer) renderer.enabled = false;
+        }
 
         private void FixedUpdate()
         {
@@ -54,8 +70,13 @@ namespace FR8Runtime.Rendering
         {
             var start = StartTarget.TransformPoint(startTranslation);
             var end = EndTarget.TransformPoint(endTranslation);
-            var length = (end - start).magnitude + Mathf.Max(0.0f, this.length);
+            var tLength = (end - start).magnitude + Mathf.Max(0.0f, slack);
 
+            if (lengthSmoothing > Time.deltaTime) length += (tLength - length) * Mathf.Min(Time.deltaTime / lengthSmoothing, 1.0f);
+            else length = tLength;
+            
+            if (tLength > length) length = tLength;
+            
             rope.Update(start, end, length);
         }
 
@@ -85,11 +106,17 @@ namespace FR8Runtime.Rendering
             propertyBlock.SetMatrix(RopeMid, transform.worldToLocalMatrix * mid);
             propertyBlock.SetMatrix(RopeEnd, transform.worldToLocalMatrix * end);
             renderer.SetPropertyBlock(propertyBlock);
+
+            var bounds = new Bounds(rope.Start, Vector3.zero);
+            bounds.Encapsulate(rope.Mid);
+            bounds.Encapsulate(rope.End);
+            bounds.Expand(1.0f);
+            renderer.bounds = bounds;
         }
 
         private void OnValidate()
         {
-            length = Mathf.Max(0.0f, length);
+            slack = Mathf.Max(0.0f, slack);
         }
 
         private void OnDrawGizmos()

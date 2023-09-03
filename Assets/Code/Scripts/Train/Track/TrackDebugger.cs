@@ -21,7 +21,7 @@ namespace FR8Runtime.Train.Track
             if (roundToKnot)
             {
                 var i = segment.GetKnotIndex(t);
-                p = segment.Knot(i);
+                p = segment[i].position;
                 v = segment.KnotVelocity(i);
             }
             

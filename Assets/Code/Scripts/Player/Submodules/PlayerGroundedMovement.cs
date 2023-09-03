@@ -1,80 +1,114 @@
-﻿using FMODUnity;
+﻿using System;
+using FMODUnity;
+using FR8Runtime.CodeUtility;
 using FR8Runtime.Level;
 using UnityEngine;
 
 namespace FR8Runtime.Player.Submodules
 {
-    [System.Serializable]
-    public sealed class PlayerGroundedMovement
+    [SelectionBase]
+    [DisallowMultipleComponent]
+    [RequireComponent(typeof(PlayerAvatar))]
+    public sealed class PlayerGroundedMovement : MonoBehaviour
     {
+        [Header("Collision")]
+        [SerializeField] private float mass = 80.0f;
+
+        [SerializeField] private float collisionHeight = 1.7f;
+        [SerializeField] private float collisionRadius = 0.25f;
+        [SerializeField] private float stepHeight = 0.5f;
+        [SerializeField] private float crouchHeight = 0.6f;
+        [SerializeField] public Vector3 cameraOffset = new(0.0f, 1.6f, 0.0f);
+
         [Header("Movement")]
         public float maxGroundedSpeed = 4.0f;
+
         public float accelerationTime = 0.12f;
         public float sprintSpeedScalar = 2.0f;
 
         [Range(0.0f, 1.0f)]
         public float airMovePenalty = 0.8f;
+
         public float jumpHeight = 2.5f;
-        
+
         [Range(90.0f, 0.0f)]
         public float maxWalkableSlope = 40.0f;
 
         [Space]
         public float groundSpring = 500.0f;
+
         public float groundDamping = 25.0f;
 
         [Space]
         public float downGravityScale = 3.0f;
+
         public float upGravityScale = 2.0f;
 
         [Space]
         public float ladderClimbSpeed = 5.0f;
+
         public float ladderRungDistance = 0.4f;
         public float ladderClimbSpring = 300.0f;
         public float ladderClimbDamper = 15.0f;
         public float ladderJumpForce = 5.0f;
-        
+
+        [Space]
+        public bool canFlyInBuild = false;
+
+        public bool canFlyInEditor = true;
+        public MovementType movementType = MovementType.Normal;
+
         [Header("Audio")]
         public EventReference footstepSound;
+
         public float footstepFrequency;
-        
+
         private PlayerAvatar avatar;
-        
+        private CapsuleCollider collider;
+
         private bool jumpTrigger;
         private float lastJumpTime;
-        
+
+        private float crouchPercentRaw;
+
         private Rigidbody lastGroundObject;
         private Vector3 lastGroundVelocity;
         private bool wasOnGround;
-        
-        private float targetLadderPosition;
 
+        private float targetLadderPosition;
         private float footstepCounter;
 
-        public Rigidbody Rigidbody => avatar.Rigidbody;
-        public PlayerInput input => avatar.input;
+        public PlayerInput Input => avatar.input;
 
         private const float GroundCheckRayLength = 1.0f;
-        private float GroundCheckRadius => avatar.Radius * 0.25f;
-        
+        private float GroundCheckRadius => collisionRadius * 0.25f;
+
         public float GroundCheckHeightOffset
         {
             get
             {
                 var maxDistance = GroundCheckRayLength - GroundCheckRadius;
-                
+
                 var downForce = -Physics.gravity.y * downGravityScale;
                 var compression = downForce / groundSpring;
                 var distance = maxDistance - (1.0f - compression) * maxDistance;
                 return distance;
             }
         }
+
+        public float Mass => mass;
+        public float CollisionRadius => collisionRadius;
+        public float CollisionHeight => collisionHeight;
+        public float StepHeight => stepHeight;
+
         public bool IsOnGround { get; private set; }
+        public float CrouchPercent => CurvesUtility.SmootherStep(crouchPercentRaw);
         public RaycastHit GroundHit { get; private set; }
         public Ladder Ladder { get; private set; }
-        public Vector3 Velocity => IsOnGround && GroundHit.rigidbody ? Rigidbody.velocity - GroundHit.rigidbody.GetPointVelocity(Rigidbody.position) : Rigidbody.velocity;
-        public Vector3 Gravity => new Vector3(0.0f, -9.81f, 0.0f) * (Velocity.y > 0.0f && input.Jump ? upGravityScale : downGravityScale);
+        public Vector3 Velocity => IsOnGround && GroundHit.rigidbody ? avatar.Body.velocity - GroundHit.rigidbody.GetPointVelocity(avatar.Body.position) : avatar.Body.velocity;
+        public Vector3 Gravity => new Vector3(0.0f, -9.81f, 0.0f) * (Velocity.y > 0.0f && Input.Jump ? upGravityScale : downGravityScale);
         public bool Enabled { get; set; }
+
         public float MoveSpeed
         {
             get
@@ -83,43 +117,147 @@ namespace FR8Runtime.Player.Submodules
                 return Mathf.Sqrt(velocity.x * velocity.x + velocity.z * velocity.z);
             }
         }
-        
-        public void Init(PlayerAvatar avatar)
-        {
-            this.avatar = avatar;
 
-            SubscribeToEvents(avatar);
+#if UNITY_EDITOR
+        public bool CanFly => canFlyInEditor;
+#else
+        public bool CanFly => canFlyInBuild;
+#endif
+
+        private void OnEnable()
+        {
+            avatar = GetComponent<PlayerAvatar>();
+
+            ConfigureRigidbody();
+            ConfigureCollider();
+            
+            avatar.getCenter = () => collider.transform.TransformPoint(collider.center);
         }
 
-        private void SubscribeToEvents(PlayerAvatar avatar)
+        private void OnDisable()
         {
-            avatar.UpdateEvent += Update;
-            avatar.FixedUpdateEvent += FixedUpdate;
+            avatar.Body.isKinematic = true;
+            Destroy(collider);
+        }
+
+        private void ConfigureRigidbody()
+        {
+            avatar.Body.mass = mass;
+            avatar.Body.isKinematic = false;
+            avatar.Body.useGravity = false;
+            avatar.Body.detectCollisions = true;
+            avatar.Body.constraints = RigidbodyConstraints.FreezeRotation;
+            avatar.Body.interpolation = RigidbodyInterpolation.None;
+            avatar.Body.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
+            avatar.Body.velocity = Vector3.zero;
+            avatar.Body.angularVelocity = Vector3.zero;
+        }
+
+        public void ConfigureCollider()
+        {
+            var gameObject = avatar.gameObject;
+            var groundOffset = stepHeight;
+
+            var height = Mathf.Lerp(collisionHeight, crouchHeight, CrouchPercent);
+
+            if (!collider)
+            {
+                collider = gameObject.AddComponent<CapsuleCollider>();
+                if (collider.material) Destroy(collider.material);
+                collider.material = CreatePlayerPhysicsMaterial();
+            }
+
+            collider.enabled = true;
+            collider.height = height - groundOffset;
+            collider.height = height - groundOffset;
+            collider.radius = collisionRadius;
+            collider.center = Vector3.up * (height + groundOffset) / 2.0f;
+        }
+
+        private static PhysicMaterial CreatePlayerPhysicsMaterial()
+        {
+            var mat = new PhysicMaterial("[PROC] Player Physics Material");
+            mat.hideFlags = HideFlags.HideAndDontSave;
+            mat.bounciness = 0.0f;
+            mat.dynamicFriction = 0.0f;
+            mat.staticFriction = 0.0f;
+
+            mat.bounceCombine = PhysicMaterialCombine.Multiply;
+            mat.frictionCombine = PhysicMaterialCombine.Multiply;
+            return mat;
         }
 
         private void Update()
         {
+            ConstrainTransform();
             SetJumpTrigger();
+
+            if (avatar.input.Fly)
+            {
+                movementType = movementType switch
+                {
+                    MovementType.Normal => MovementType.NoClip,
+                    MovementType.Flying => MovementType.Normal,
+                    MovementType.NoClip => MovementType.Normal,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+            }
         }
 
         private void SetJumpTrigger()
         {
-            if (input.JumpTriggered) jumpTrigger = true;
+            if (Input.JumpTriggered) jumpTrigger = true;
         }
 
         private void FixedUpdate()
         {
             if (LookForLadder()) return;
-            
-            Move();
-            Jump();
-            CheckForGround();
-            ApplyGravity();
-            MoveWithGround();
-            
-            PlayFootstepAudio();
+
+            switch (movementType)
+            {
+                case MovementType.Normal:
+                {
+                    Crouch();
+                    Move();
+                    Jump();
+                    CheckForGround();
+                    ApplyGravity();
+                    MoveWithGround();
+
+                    PlayFootstepAudio();
+                    break;
+                }
+                case MovementType.Flying:
+                case MovementType.NoClip:
+                {
+                    Fly();
+                    break;
+                }
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
             
             UpdateFlags();
+        }
+
+        private void ConstrainTransform()
+        {
+            var rotation = avatar.Head.rotation;
+            transform.rotation = Quaternion.Euler(0.0f, rotation.eulerAngles.y, 0.0f);
+            avatar.Head.rotation = rotation;
+        }
+
+        private void Crouch()
+        {
+            ConfigureCollider();
+
+            var isCrouching = Input.Crouch;
+
+            crouchPercentRaw += ((isCrouching ? 1.0f : 0.0f) - crouchPercentRaw) * 6.0f * Time.deltaTime;
+
+            var offset = Vector3.down * (collisionHeight - crouchHeight);
+            avatar.Head.localPosition = cameraOffset + offset * CrouchPercent;
         }
 
         private void PlayFootstepAudio()
@@ -166,8 +304,8 @@ namespace FR8Runtime.Player.Submodules
 
         private float GetLadderClimbDelta()
         {
-            var dot = -Vector3.Dot(Rigidbody.transform.forward, Ladder.transform.forward);
-            var direction = Mathf.Round(input.Move.z) * Mathf.Sign(dot);
+            var dot = -Vector3.Dot(avatar.Body.transform.forward, Ladder.transform.forward);
+            var direction = Mathf.Round(Input.Move.z) * Mathf.Sign(dot);
             var delta = direction * ladderClimbSpeed * Time.deltaTime;
             return delta;
         }
@@ -180,7 +318,7 @@ namespace FR8Runtime.Player.Submodules
             if (jumpTrigger)
             {
                 dismount = true;
-                Rigidbody.AddForce((Ladder.transform.forward + Vector3.up) * ladderJumpForce, ForceMode.VelocityChange);
+                avatar.Body.AddForce((Ladder.transform.forward + Vector3.up) * ladderJumpForce, ForceMode.VelocityChange);
             }
 
             return dismount;
@@ -190,11 +328,10 @@ namespace FR8Runtime.Player.Submodules
         {
             if (!WantsToDismount(delta, out var overTop)) return false;
 
-            if (overTop) Rigidbody.AddForce(Vector3.up * ladderJumpForce, ForceMode.VelocityChange);
+            if (overTop) avatar.Body.AddForce(Vector3.up * ladderJumpForce, ForceMode.VelocityChange);
 
             Ladder = null;
             return true;
-
         }
 
         private void IncrementLadderPosition(float delta)
@@ -207,13 +344,12 @@ namespace FR8Runtime.Player.Submodules
         {
             var targetPosition = Ladder.ToWorldPos(Mathf.Round(targetLadderPosition / ladderRungDistance) * ladderRungDistance);
 
-            var force = (targetPosition - Rigidbody.position) * ladderClimbSpring + (Ladder.Velocity - Rigidbody.velocity) * ladderClimbDamper;
-            Rigidbody.AddForce(force);
+            var force = (targetPosition - avatar.Body.position) * ladderClimbSpring + (Ladder.Velocity - avatar.Body.velocity) * ladderClimbDamper;
+            avatar.Body.AddForce(force);
         }
 
         private void CheckForGround()
         {
-            var transform = avatar.transform;
             var distance = GroundCheckRayLength - GroundCheckRadius;
             IsOnGround = false;
 
@@ -222,7 +358,7 @@ namespace FR8Runtime.Player.Submodules
             var res = Physics.SphereCastAll(ray, GroundCheckRadius, distance, ~0, QueryTriggerInteraction.Ignore);
             if (res.Length == 0) return;
 
-            if (!GetValidGroundHit(res, transform, out var bestHit)) return;
+            if (!GetValidGroundHit(res, out var bestHit)) return;
 
             GroundHit = bestHit;
             IsOnGround = true;
@@ -230,11 +366,11 @@ namespace FR8Runtime.Player.Submodules
             ApplyGroundSpring(distance);
         }
 
-        private bool GetValidGroundHit(RaycastHit[] hits, Transform transform, out RaycastHit bestHit)
+        private bool GetValidGroundHit(RaycastHit[] hits, out RaycastHit bestHit)
         {
             var res = false;
             bestHit = default;
-            
+
             foreach (var hit in hits)
             {
                 // --- Validation Checks ---
@@ -258,42 +394,57 @@ namespace FR8Runtime.Player.Submodules
         private void ApplyGroundSpring(float distance)
         {
             var contraction = GroundCheckRayLength - GroundHit.distance / distance;
-            
+
             if (Time.time - lastJumpTime < 0.08f) return;
 
             var spring = contraction * groundSpring - Velocity.y * groundDamping;
             var force = Vector3.up * spring;
-            Rigidbody.AddForce(force, ForceMode.Acceleration);
+            avatar.Body.AddForce(force, ForceMode.Acceleration);
         }
 
         private void Move()
         {
-            var moveSpeed = GetTargetMoveVelocity(out var target);
+            var (target, moveSpeed) = GetTargetMoveVelocity();
 
             var difference = target - Velocity;
             difference.y = 0.0f;
 
             var acceleration = GetMoveAcceleration();
-            
+
             var force = Vector3.ClampMagnitude(difference, moveSpeed) * acceleration;
-            Rigidbody.AddForce(force, ForceMode.Acceleration);
+            avatar.Body.AddForce(force, ForceMode.Acceleration);
+        }
+
+        private void Fly()
+        {
+            var moveSpeed = maxGroundedSpeed * sprintSpeedScalar;
+            var target = avatar.MoveDirection * moveSpeed;
+
+            if (avatar.input.Jump) target.y += moveSpeed;
+            if (avatar.input.Crouch) target.y -= moveSpeed;
+
+            var difference = target - Velocity;
+            var acceleration = sprintSpeedScalar / accelerationTime;
+
+            var force = Vector3.ClampMagnitude(difference, moveSpeed) * acceleration;
+            avatar.Body.AddForce(force, ForceMode.Acceleration);
         }
 
         private float GetMoveAcceleration()
         {
             var acceleration = 1.0f / accelerationTime;
             if (!IsOnGround) acceleration *= 1.0f - airMovePenalty;
-            if (input.Sprint) acceleration *= sprintSpeedScalar;
+            if (Input.Sprint) acceleration *= sprintSpeedScalar;
             return acceleration;
         }
 
-        private float GetTargetMoveVelocity(out Vector3 target)
+        private (Vector3, float) GetTargetMoveVelocity()
         {
             var moveSpeed = maxGroundedSpeed;
-            if (input.Sprint) moveSpeed *= sprintSpeedScalar;
+            if (Input.Sprint) moveSpeed *= sprintSpeedScalar;
 
-            target = avatar.MoveDirection * moveSpeed;
-            return moveSpeed;
+            var target = avatar.MoveDirection * moveSpeed;
+            return (target, moveSpeed);
         }
 
         private void Jump()
@@ -304,20 +455,30 @@ namespace FR8Runtime.Player.Submodules
             if (!IsOnGround) return;
             if (!jump) return;
 
-            Rigidbody.AddForce(CalculateJumpForce(), ForceMode.VelocityChange);
+            avatar.Body.AddForce(CalculateJumpForce(), ForceMode.VelocityChange);
             lastJumpTime = Time.time;
         }
 
         private Vector3 CalculateJumpForce()
         {
-            var power = Mathf.Sqrt(Mathf.Max(2.0f * 9.81f * upGravityScale * (jumpHeight - avatar.StepHeight), 0.0f)) - Velocity.y;
+            var power = Mathf.Sqrt(Mathf.Max(2.0f * 9.81f * upGravityScale * (jumpHeight - stepHeight), 0.0f)) - Velocity.y;
             var force = Vector3.up * power;
             return force;
         }
 
         private void ApplyGravity()
         {
-            Rigidbody.AddForce(Gravity, ForceMode.Acceleration);
+            switch (movementType)
+            {
+                case MovementType.Flying:
+                case MovementType.NoClip:
+                    return;
+                default:
+                case MovementType.Normal:
+                    break;
+            }
+
+            avatar.Body.AddForce(Gravity, ForceMode.Acceleration);
         }
 
         private void MoveWithGround()
@@ -326,7 +487,7 @@ namespace FR8Runtime.Player.Submodules
 
             if (groundObject)
             {
-                var velocity = groundObject.GetPointVelocity(Rigidbody.position);
+                var velocity = groundObject.GetPointVelocity(avatar.Body.position);
                 if (groundObject == lastGroundObject)
                 {
                     var deltaVelocity = velocity - lastGroundVelocity;
@@ -334,8 +495,8 @@ namespace FR8Runtime.Player.Submodules
 
                     var force = deltaVelocity / Time.deltaTime;
 
-                    Rigidbody.AddForce(force, ForceMode.Acceleration);
-                    Rigidbody.MoveRotation(Rigidbody.rotation * Quaternion.Euler(deltaRotation));
+                    avatar.Body.AddForce(force, ForceMode.Acceleration);
+                    avatar.Body.MoveRotation(avatar.Body.rotation * Quaternion.Euler(deltaRotation));
                 }
 
                 lastGroundVelocity = velocity;
@@ -343,11 +504,26 @@ namespace FR8Runtime.Player.Submodules
 
             lastGroundObject = groundObject;
         }
-        
+
         public void SetLadder(Ladder ladder)
         {
             Ladder = ladder;
-            targetLadderPosition = ladder.FromWorldPos(Rigidbody.position);
+            targetLadderPosition = ladder.FromWorldPos(avatar.Body.position);
+        }
+
+        public void OnDrawGizmos()
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.matrix = transform.localToWorldMatrix;
+
+            GizmoUtility.DrawCapsule(Vector3.up * collisionHeight / 2.0f, Quaternion.identity, collisionHeight, collisionRadius);
+        }
+
+        public enum MovementType
+        {
+            Normal = 0b1 << 0,
+            Flying = 0b1 << 1,
+            NoClip = 0b1 << 2,
         }
     }
 }
