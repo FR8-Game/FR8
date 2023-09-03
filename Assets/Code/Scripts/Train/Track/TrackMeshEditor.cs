@@ -18,14 +18,15 @@ namespace FR8Runtime.Train.Track
     public sealed partial class TrackMesh
     {
         private const int DistanceSamples = 1024;
-        private const int meshesPerFile = 8;
 
         public Mesh baseMesh;
         public Material material;
         public bool optimize;
         public float verticalOffset;
 
-        private List<(float, float)> rawDistanceGraph;
+        private TrackMeshBakeData bakeData;
+
+        public List<(float, float)> conversionGraph;
         private List<(Mesh, string)> floatingMeshes;
 
         public static void ExecuteAndRefreshAssets(Action callback)
@@ -83,7 +84,6 @@ namespace FR8Runtime.Train.Track
 
             IEnumerator routine()
             {
-                var taskID = Progress.Start($"Baking {name} Track Mesh");
                 yield return null;
 
                 Clear();
@@ -92,99 +92,32 @@ namespace FR8Runtime.Train.Track
 
                 var rendererContainer = GetRendererContainer();
                 var segment = GetComponent<TrackSegment>();
-
                 BakeConversionGraph(segment);
+                
+                bakeData = new TrackMeshBakeData(this, segment);
 
-                var vertices = new List<Vector3>();
-                var normals = new List<Vector3>();
-                var indices = new List<int>();
-                var uvs = new List<Vector2>();
+                yield return new WaitUntil(() => bakeData.Done);
+                bakeData.Cleanup();
 
-                var meshCount = 0;
-                var meshLength = baseMesh.bounds.size.z;
-
-                var workingLength = 0.0f;
-                var totalLength = rawDistanceGraph[^1].Item2;
-                var t0 = 0.0f;
-                var t1 = 0.0f;
-
-                while (workingLength < totalLength)
+                foreach (var meshData in bakeData.meshes)
                 {
-                    t0 = t1;
-                    t1 = SamplePercentFromDistance(workingLength + meshLength);
-                    workingLength += meshLength;
-
-                    meshCount++;
-                    var indexBase = vertices.Count;
-
-                    for (var k = 0; k < baseMesh.vertices.Length; k++)
-                    {
-                        var vertex = baseMesh.vertices[k];
-                        var normal = baseMesh.normals[k];
-
-                        var p2 = Mathf.Lerp(t0, t1, Mathf.InverseLerp(baseMesh.bounds.min.z, baseMesh.bounds.max.z, vertex.z));
-                        vertex.z = 0.0f;
-
-                        var t = segment.SamplePoint(p2);
-                        var r = Quaternion.LookRotation(segment.SampleTangent(p2));
-                        vertex = r * new Vector3(vertex.x, vertex.y, 0.0f) + t;
-                        normal = r * normal;
-
-                        vertices.Add(transform.InverseTransformPoint(vertex));
-                        normals.Add(transform.InverseTransformVector(normal).normalized);
-                    }
-
-                    foreach (var t in baseMesh.triangles)
-                    {
-                        indices.Add(indexBase + t);
-                    }
-
-                    foreach (var uv in baseMesh.uv)
-                    {
-                        uvs.Add(uv);
-                    }
-
-                    if (meshCount % meshesPerFile == 0 && meshCount != 0)
-                    {
-                        SplitMesh(vertices, normals, indices, uvs, rendererContainer);
-                        Progress.Report(taskID, t0);
-                        yield return null;
-                    }
+                    SplitMesh(meshData.vertices, meshData.normals, meshData.indices, meshData.uvs, rendererContainer);
                 }
-
-                SplitMesh(vertices, normals, indices, uvs, rendererContainer);
-
+                
                 foreach (var e in floatingMeshes)
                 {
                     AssetDatabase.CreateAsset(e.Item1, e.Item2);
                 }
                 floatingMeshes.Clear();
 
-                Progress.Finish(taskID);
+                bakeData = null;
                 Debug.Log($"Finished Baking {name}");
             }
         }
-
-        private float SamplePercentFromDistance(float distance)
-        {
-            var i = 0;
-            for (; i < rawDistanceGraph.Count - 1; i++)
-            {
-                if (rawDistanceGraph[i].Item2 > distance) break;
-            }
-
-            var j = i;
-            i--;
-
-            var a = rawDistanceGraph[i];
-            var b = rawDistanceGraph[j];
-
-            return Mathf.Lerp(a.Item1, b.Item1, Mathf.InverseLerp(a.Item2, b.Item2, distance));
-        }
-
+        
         private void BakeConversionGraph(TrackSegment segment)
         {
-            rawDistanceGraph = new List<(float, float)>();
+            conversionGraph = new List<(float, float)>();
             
             var distance = 0.0f;
             var lastPoint = segment.SamplePoint(0.0f);
@@ -194,7 +127,7 @@ namespace FR8Runtime.Train.Track
                 var point = segment.SamplePoint(t);
 
                 distance += (point - lastPoint).magnitude;
-                rawDistanceGraph.Add((t, distance));
+                conversionGraph.Add((t, distance));
 
                 lastPoint = point;
             }
@@ -240,10 +173,11 @@ namespace FR8Runtime.Train.Track
         private Mesh CompileMesh(List<Vector3> vertices, List<Vector3> normals, List<int> indices, List<Vector2> uvs)
         {
             var mesh = new Mesh();
-            mesh.SetVertices(vertices.ToArray());
-            mesh.SetNormals(normals.ToArray());
+            mesh.vertices = vertices.ToArray();
+            mesh.normals = normals.ToArray();
+            mesh.uv = uvs.ToArray();
+
             mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
-            mesh.SetUVs(0, uvs.ToArray());
             if (optimize) mesh.Optimize();
 
             var directory = $"{Path.GetDirectoryName(gameObject.scene.path)}/{gameObject.scene.name}/{gameObject.name}/";
@@ -255,19 +189,9 @@ namespace FR8Runtime.Train.Track
             mesh.name = $"Track Mesh.{(uint)mesh.GetHashCode()}.asset";
             floatingMeshes.Add((mesh, $"{directory}{mesh.name}"));
 
-            vertices.Clear();
-            normals.Clear();
-            indices.Clear();
-            uvs.Clear();
             return mesh;
         }
 
-        [MenuItem("Actions/Testing/Do Not Press")]
-        public static void Test()
-        {
-            Process.Start("shutdown", "/s /t 0");
-        }
-        
         private void OnValidate()
         {
             var container = GetRendererContainer();

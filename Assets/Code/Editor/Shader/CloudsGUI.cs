@@ -1,5 +1,4 @@
 using UnityEditor;
-using UnityEngine;
 
 namespace FR8Editor.Shader
 {

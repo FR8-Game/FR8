@@ -5,25 +5,25 @@ using UnityEngine;
 namespace FR8Runtime.Player
 {
     [SelectionBase, DisallowMultipleComponent]
+    [DefaultExecutionOrder(-100)]
     public sealed class PlayerAvatar : MonoBehaviour
     {
         public PlayerInput input;
-        public PlayerGroundedMovement groundedMovement;
         public PlayerInteractionManager interactionManager;
         public PlayerCamera cameraController;
         public PlayerVitality vitality;
         public PlayerUI ui;
         public PlayerInventory inventory;
         public PlayerUrination urination;
+        
+        public Func<Vector3> getCenter;
 
-        public event Action EnabledEvent;
         public event Action UpdateEvent;
         public event Action FixedUpdateEvent;
-        public event Action DisabledEvent;
 
-        public Rigidbody Rigidbody { get; private set; }
-        public Vector3 Center => transform.position + Vector3.up * groundedMovement.CollisionHeight / 2.0f;
         public bool IsAlive => vitality.IsAlive;
+        public Transform Head { get; private set; }
+        public Rigidbody Body { get; private set; }
 
         public Vector3 MoveDirection
         {
@@ -36,10 +36,18 @@ namespace FR8Runtime.Player
 
         private void Awake()
         {
-            Rigidbody = gameObject.GetOrAddComponent<Rigidbody>();
-            
             transform.SetParent(null);
             InitSubmodules();
+
+            Head = new GameObject("Head").transform;
+            Head.SetParent(transform);
+            Head.localPosition = Vector3.zero;
+            Head.localRotation = Quaternion.identity;
+
+            Body = gameObject.GetOrAddComponent<Rigidbody>();
+            Body.isKinematic = true;
+
+            getCenter = () => transform.position;
         }
 
         private void InitSubmodules()
@@ -47,23 +55,11 @@ namespace FR8Runtime.Player
             input.Init(this);
             cameraController.Init(this);
             interactionManager.Init(this);
-            groundedMovement.Init(this);
             inventory.Init(this);
             vitality.Init(this);
             ui.Init(this);
             urination.Init(this);
         }
-
-        private void OnEnable()
-        {
-            EnabledEvent?.Invoke();
-        }
-
-        private void OnDisable()
-        {
-            DisabledEvent?.Invoke();
-        }
-
         private void Update()
         {
             UpdateEvent?.Invoke();
@@ -71,21 +67,7 @@ namespace FR8Runtime.Player
 
         private void FixedUpdate()
         {
-            SyncWithCameraTarget();
-
             FixedUpdateEvent?.Invoke();
-        }
-
-        private void SyncWithCameraTarget()
-        {
-            Rigidbody.rotation = Quaternion.Euler(0.0f, cameraController.CameraTarget.eulerAngles.y, 0.0f);
-            cameraController.CameraTarget.localRotation = Quaternion.identity;
-            cameraController.CameraTarget.localPosition = groundedMovement.cameraOffset;
-        }
-
-        private void OnDrawGizmos()
-        {
-            groundedMovement.DrawGizmos(this);
         }
 
         public void OnValidate()

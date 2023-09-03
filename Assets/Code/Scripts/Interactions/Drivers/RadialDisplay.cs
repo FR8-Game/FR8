@@ -2,7 +2,6 @@
 using FR8Runtime.Interactions.Drivables;
 using FR8Runtime.Train.Electrics;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace FR8Runtime.Interactions.Drivers
 {
