@@ -16,8 +16,6 @@ namespace FR8Runtime.Player.Submodules
         private const float GimbalLockOffset = 1.0f;
         private const float YawRange = 180.0f - GimbalLockOffset;
 
-
-        [SerializeField] private float fieldOfView = 70.0f;
         [SerializeField] private float cameraDrift = 0.0f;
         [SerializeField] private float cameraDriftDeadzone = 0.0f;
         [SerializeField] private float zoomFieldOfView = 35.0f;
@@ -30,6 +28,8 @@ namespace FR8Runtime.Player.Submodules
         private bool zoomCamera;
         private bool cameraLocked;
         private bool wasCameraLocked;
+
+        private float fieldOfView = 70.0f;
         
         private Vector3 translationOffset;
 
@@ -54,6 +54,16 @@ namespace FR8Runtime.Player.Submodules
 
             cameraLocked = true;
             wasCameraLocked = !cameraLocked;
+
+            SaveManager.PersistantSave.DataChangedEvent += OnPersistantSaveDataChanged;
+            OnPersistantSaveDataChanged();
+        }
+
+        private void OnPersistantSaveDataChanged()
+        {
+            var data = SaveManager.PersistantSave.GetOrLoad();
+
+            fieldOfView = data.playerAvatarFov;
         }
 
         private void Update()
