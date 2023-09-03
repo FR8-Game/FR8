@@ -1,4 +1,5 @@
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace FR8Editor.Tools
@@ -18,13 +19,14 @@ namespace FR8Editor.Tools
         {
             UnityToolbarExtender.ToolbarExtender.LeftToolbarGUI.Add(OnToolbarGUI);
 
-            Undo.undoRedoPerformed += OnUndoRedoPerformed;
+            Undo.undoRedoPerformed += Reload;
+            EditorSceneManager.sceneOpened += (_, _) => Reload();
 
             if (!EditorPrefs.HasKey(ShownUIKey)) GetApproximateStateFromScene();
             ShowUI(EditorPrefs.GetBool(ShownUIKey));
         }
 
-        private static void OnUndoRedoPerformed()
+        private static void Reload()
         {
             GetApproximateStateFromScene();
         }
