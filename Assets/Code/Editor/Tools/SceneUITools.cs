@@ -55,6 +55,8 @@ namespace FR8Editor.Tools
 
             foreach (var e in canvasList)
             {
+                if (e.renderMode != RenderMode.ScreenSpaceOverlay) continue;
+                
                 if (show) SceneVisibilityManager.instance.Show(e.gameObject, true);
                 else SceneVisibilityManager.instance.Hide(e.gameObject, true);
             }
