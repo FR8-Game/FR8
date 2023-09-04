@@ -31,9 +31,17 @@ namespace FR8Runtime.Train.Track
 
         public static void ExecuteAndRefreshAssets(Action callback)
         {
-            callback();
-            EditorSceneManager.MarkAllScenesDirty();
-            AssetDatabase.Refresh();
+            try
+            {
+                AssetDatabase.StartAssetEditing();
+                callback();
+            }
+            finally
+            {
+                AssetDatabase.StopAssetEditing();
+                EditorSceneManager.MarkAllScenesDirty();
+                AssetDatabase.Refresh();
+            }
         }
 
         public partial void Clear()
@@ -48,7 +56,7 @@ namespace FR8Runtime.Train.Track
             }
 
             var dir = $"{Path.GetDirectoryName(gameObject.scene.path)}/{gameObject.scene.name}";
-            if (!Directory.EnumerateFileSystemEntries(dir).Any())
+            if (Directory.Exists(dir) && !Directory.EnumerateFileSystemEntries(dir).Any())
             {
                 Directory.Delete(dir);
             }
@@ -68,9 +76,9 @@ namespace FR8Runtime.Train.Track
             {
                 var path = AssetDatabase.GetAssetPath(mesh);
                 var dir = Path.GetDirectoryName(path);
-                
+
                 File.Delete(path);
-                
+
                 if (!Directory.EnumerateFileSystemEntries(dir).Any())
                 {
                     Directory.Delete(dir);
@@ -93,7 +101,7 @@ namespace FR8Runtime.Train.Track
                 var rendererContainer = GetRendererContainer();
                 var segment = GetComponent<TrackSegment>();
                 BakeConversionGraph(segment);
-                
+
                 bakeData = new TrackMeshBakeData(this, segment);
 
                 yield return new WaitUntil(() => bakeData.Done);
@@ -103,22 +111,23 @@ namespace FR8Runtime.Train.Track
                 {
                     SplitMesh(meshData.vertices, meshData.normals, meshData.indices, meshData.uvs, rendererContainer);
                 }
-                
+
                 foreach (var e in floatingMeshes)
                 {
                     AssetDatabase.CreateAsset(e.Item1, e.Item2);
                 }
+
                 floatingMeshes.Clear();
 
                 bakeData = null;
                 Debug.Log($"Finished Baking {name}");
             }
         }
-        
+
         private void BakeConversionGraph(TrackSegment segment)
         {
             conversionGraph = new List<(float, float)>();
-            
+
             var distance = 0.0f;
             var lastPoint = segment.SamplePoint(0.0f);
             for (var i = 0; i < DistanceSamples; i++)
@@ -180,7 +189,7 @@ namespace FR8Runtime.Train.Track
             mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
             if (optimize) mesh.Optimize();
 
-            var directory = $"{Path.GetDirectoryName(gameObject.scene.path)}/{gameObject.scene.name}/{gameObject.name}/";
+            var directory = $"{Path.GetDirectoryName(gameObject.scene.path)}/{gameObject.scene.name}/Track Bake/{gameObject.name}/";
             if (!Directory.Exists($"./{directory}"))
             {
                 Directory.CreateDirectory($"./{directory}");
