@@ -48,7 +48,7 @@ namespace FR8Runtime.Train.Track
             }
 
             var dir = $"{Path.GetDirectoryName(gameObject.scene.path)}/{gameObject.scene.name}";
-            if (!Directory.EnumerateFileSystemEntries(dir).Any())
+            if (Directory.Exists(dir) && !Directory.EnumerateFileSystemEntries(dir).Any())
             {
                 Directory.Delete(dir);
             }
@@ -180,7 +180,7 @@ namespace FR8Runtime.Train.Track
             mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
             if (optimize) mesh.Optimize();
 
-            var directory = $"{Path.GetDirectoryName(gameObject.scene.path)}/{gameObject.scene.name}/{gameObject.name}/";
+            var directory = $"{Path.GetDirectoryName(gameObject.scene.path)}/{gameObject.scene.name}/Track Bake/{gameObject.name}/";
             if (!Directory.Exists($"./{directory}"))
             {
                 Directory.CreateDirectory($"./{directory}");

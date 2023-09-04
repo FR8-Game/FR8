@@ -79,7 +79,6 @@ namespace FR8Runtime.Train.Track
             var t1 = 0.0f;
 
             var meshesPerFile = (ushort.MaxValue / baseMesh.vertices.Count) - 1;
-            Debug.Log(meshesPerFile);
 
             while (workingLength < totalLength)
             {
