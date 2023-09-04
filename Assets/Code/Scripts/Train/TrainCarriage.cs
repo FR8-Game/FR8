@@ -9,6 +9,9 @@ namespace FR8Runtime.Train
     public class TrainCarriage : MonoBehaviour
     {
         [Space]
+        public string saveTypeReference = "TrainCarriage";
+        
+        [Space]
         [SerializeField] protected float drag = 12.0f;
         [SerializeField] protected float referenceWeight;
         [SerializeField] protected float cornerLean = 0.6f;

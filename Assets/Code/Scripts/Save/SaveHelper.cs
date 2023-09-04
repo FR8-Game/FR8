@@ -22,11 +22,17 @@ namespace FR8Runtime.Save
             if (data == null) Load();
             return data;
         }
+
+        public bool HasSave()
+        {
+            var filename = this.filename();
+            return File.Exists(filename);
+        }
         
         public void Load()
         {
             var filename = this.filename();
-            if (!File.Exists(filename))
+            if (!HasSave())
             {
                 Debug.Log($"No Persistant Save Data was found at \"{filename}\", creating new one.");
                 data = new T();
