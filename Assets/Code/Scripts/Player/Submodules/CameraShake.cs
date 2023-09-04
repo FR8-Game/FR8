@@ -19,10 +19,13 @@ namespace FR8Runtime.Player.Submodules
             rotationalOffset = Quaternion.identity;
 
             var avatar = playerCamera.Avatar;
-            if (!avatar) return;
-            if (!avatar.groundedMovement.IsOnGround) return;
+            var movement = avatar.GetComponent<PlayerGroundedMovement>();
             
-            var moveSpeed = avatar.groundedMovement.MoveSpeed / avatar.groundedMovement.maxGroundedSpeed;
+            if (!avatar) return;
+            if (!movement) return;
+            if (!movement.IsOnGround) return;
+            
+            var moveSpeed = movement.MoveSpeed / movement.maxGroundedSpeed;
             var shakeAmount = -1.0f / (moveSpeed / slope + 1.0f) + 1.0f;
 
             d += moveSpeed * frequency * Time.deltaTime;
@@ -30,12 +33,12 @@ namespace FR8Runtime.Player.Submodules
             var c = Mathf.Abs(Mathf.Cos(d * Mathf.PI)) * shakeAmount;
             var s = Mathf.Sin(d * Mathf.PI) * shakeAmount;
 
-            translationalOffset += new Vector3()
+            rotationalOffset *= Quaternion.Euler(new Vector3()
             {
                 x = c * cosAmplitude.x + s * sinAmplitude.x,
                 y = c * cosAmplitude.y + s * sinAmplitude.y,
                 z = c * cosAmplitude.z + s * sinAmplitude.z,
-            };
+            });
         }
     }
 }

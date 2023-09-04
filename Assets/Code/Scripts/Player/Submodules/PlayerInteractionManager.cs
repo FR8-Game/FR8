@@ -6,7 +6,6 @@ using FR8Runtime.Rendering.Passes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Cursor = UnityEngine.Cursor;
 using Object = UnityEngine.Object;
 
 namespace FR8Runtime.Player.Submodules

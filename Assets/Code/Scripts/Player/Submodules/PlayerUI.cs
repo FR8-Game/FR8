@@ -15,7 +15,8 @@ namespace FR8Runtime.Player.Submodules
         [Space]
         [SerializeField] private float fadeTime = 0.4f;
 
-        [SerializeField] private AnimationCurve fadeCurve = AnimationCurve.Linear(0.0f, 1.0f, 1.0f, 0.0f);
+        [SerializeField] private AnimationCurve vignetteFadeCurve = AnimationCurve.Linear(0.0f, 1.0f, 1.0f, 0.0f);
+        [SerializeField] private AnimationCurve healthVignetting = AnimationCurve.Linear(0.0f, 1.0f, 1.0f, 0.0f);
 
         [Space]
         [Range(0.0f, 1.0f)] [SerializeField] private float vignetteMaxAlpha = 0.3f;
@@ -101,8 +102,11 @@ namespace FR8Runtime.Player.Submodules
         private void Update()
         {
             var t = Mathf.Clamp01((Time.time - avatar.vitality.LastDamageTime) / fadeTime);
-            var alpha = fadeCurve.Evaluate(t);
+            var alpha = vignetteFadeCurve.Evaluate(t);
 
+            var normalizedHealth = avatar.vitality.CurrentHealth / (float)avatar.vitality.maxHealth;
+            alpha = Mathf.Max(alpha, healthVignetting.Evaluate(normalizedHealth));
+            
             if (vignette)
             {
                 vignette.color = new Color(healthColor.r, healthColor.g, healthColor.b, alpha * vignetteMaxAlpha);

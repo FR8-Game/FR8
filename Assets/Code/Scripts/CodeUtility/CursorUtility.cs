@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Runtime.InteropServices;
-using UnityEngine;
 
 namespace FR8Runtime.CodeUtility
 {
@@ -17,5 +15,11 @@ namespace FR8Runtime.CodeUtility
 
         [DllImport("user32.dll")]
         private static extern bool SetCursorPos(int x, int y);
+
+        public static (int lastCursorX, int lastCursorY) GetPosition()
+        {
+            GetCursorPos(out var p);
+            return (p.X, p.Y);
+        }
     }
 }
