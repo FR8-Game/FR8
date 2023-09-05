@@ -3,11 +3,16 @@
     color: rgb(220, 220, 220);
 }
 
-.LoadingScreen {
+.unity-text-field {
+    -unity-font-definition: url('project://database/Assets/Content/Fonts/Assets/Montserrat/Montserrat%20Black%20UI.asset?fileID=11400000&guid=d8c5459ff9cce0046b5fed6b3d7c4a40&type=2#Montserrat Black UI');
+    -unity-font: url('project://database/Assets/Content/Fonts/Files/Montserrat/Montserrat-Black.ttf?fileID=12800000&guid=ef577ed07bb92144ba32fb334eee19f1&type=3#Montserrat-Black');
+}
+
+#loading-screen {
     --percent: 0;
     flex-shrink: 0;
     flex-grow: 1;
-    background-color: rgb(20, 20, 20);
+    background-color: rgb(10, 10, 10);
 }
 
 .LoadingTitle {
@@ -29,7 +34,155 @@
     opacity: 0.01;
 }
 
-.LoadingScreen ProgressBar {
+ProgressBar #loading-screen {
     width: 500px;
     height: auto;
+}
+
+.Background {
+    background-color: rgba(0, 0, 0, 0.75);
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    width: 100%;
+    height: 100%;
+}
+
+.Title {
+    font-size: 96px;
+    border-left-color: rgb(255, 255, 255);
+    border-right-color: rgb(255, 255, 255);
+    border-top-color: rgb(255, 255, 255);
+    border-bottom-color: rgb(255, 255, 255);
+    border-bottom-width: 2px;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.unity-button {
+    background-color: rgba(0, 0, 0, 0.2);
+    -unity-text-align: upper-left;
+    font-size: 32px;
+    padding-left: 80px;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-right: 80px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-left-color: rgb(255, 255, 255);
+    border-right-color: rgb(255, 255, 255);
+    border-top-color: rgb(255, 255, 255);
+    border-bottom-color: rgb(255, 255, 255);
+    transition-duration: 200ms;
+    transition-timing-function: ease-out-back;
+}
+
+.unity-button:hover {
+    border-left-width: 10px;
+    background-color: rgba(0, 0, 0, 0.39);
+}
+
+.h1 {
+    font-size: 24px;
+    border-left-color: rgb(255, 255, 255);
+    border-right-color: rgb(255, 255, 255);
+    border-top-color: rgb(255, 255, 255);
+    border-bottom-color: rgb(255, 255, 255);
+    border-bottom-width: 2px;
+}
+
+.back-button {
+    -unity-text-align: upper-right;
+}
+
+.back-button:hover {
+    border-left-width: 0;
+    border-right-width: 10px;
+    border-top-width: 0;
+    border-bottom-width: 0;
+}
+
+.indent {
+    margin-left: 40px;
+}
+
+#save-files .unity-button {
+    -unity-font-definition: url('project://database/Assets/Content/Fonts/Assets/Montserrat/Montserrat-Light%20SDF.asset?fileID=11400000&guid=275ea07cb640aad48907c0544b1002df&type=2#Montserrat-Light SDF');
+    background-color: rgba(0, 0, 0, 0);
+}
+
+Scroller .unity-repeat-button {
+    background-color: rgba(0, 0, 0, 0.39);
+    -unity-background-image-tint-color: rgba(255, 255, 255, 255);
+}
+
+Scroller #unity-tracker {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.unity-button:active {
+    background-color: rgba(0, 0, 0, 0.78);
+}
+
+Scroller #unity-dragger {
+    background-color: rgba(0, 0, 0, 0.59);
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    width: 22px;
+    left: 1px;
+    transition-duration: 200ms;
+    transition-timing-function: ease-out-cubic;
+    transition-property: background-color;
+}
+
+Scroller #unity-dragger:hover {
+    background-color: rgba(255, 255, 255, 0.24);
+}
+
+TextField {
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+#unity-text-input {
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 40px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-left-width: 5px;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    background-color: rgba(0, 0, 0, 0.59);
+    color: rgba(255, 255, 255, 255);
+    font-size: 24px;
+    border-left-color: rgba(255, 255, 255, 255);
+    border-right-color: rgba(255, 255, 255, 255);
+    border-top-color: rgba(255, 255, 255, 255);
+    border-bottom-color: rgba(255, 255, 255, 255);
 }

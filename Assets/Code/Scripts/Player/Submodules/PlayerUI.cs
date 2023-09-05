@@ -28,9 +28,6 @@ namespace FR8Runtime.Player.Submodules
         private Image healthBar;
         private Image shieldBar;
 
-        private TMP_Text longText;
-        private TMP_Text latText;
-        
         private const string VitalityRootPath = "UI/Vitality";
         private const string CoverPath = VitalityRootPath + "/Death";
         private const string VignettePath = VitalityRootPath + "/Vignette";
@@ -50,9 +47,6 @@ namespace FR8Runtime.Player.Submodules
             healthBar = FindUtility.Find<Image>(avatar.transform, $"{HealthBarPath}/Fill");
             shieldBar = FindUtility.Find<Image>(avatar.transform, $"{ShieldBarPath}/Fill");
             
-            longText = FindUtility.Find<TMP_Text>(avatar.transform, "UI/Space Info/Long");
-            latText = FindUtility.Find<TMP_Text>(avatar.transform, "UI/Space Info/Lat");
-
             SetupDeathUI();
 
             OnValidate(avatar);
@@ -111,9 +105,6 @@ namespace FR8Runtime.Player.Submodules
             {
                 vignette.color = new Color(healthColor.r, healthColor.g, healthColor.b, alpha * vignetteMaxAlpha);
             }
-
-            longText.text = $"<mspace=1e>LONG : {avatar.transform.position.x / 100.0f:N2}";
-            latText.text = $"<mspace=1e>LAT : {avatar.transform.position.z / 100.0f:N2}";
         }
     }
 }

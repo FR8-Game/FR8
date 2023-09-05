@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using FR8Runtime.Train.Splines;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace FR8Runtime.Train.Track
 {

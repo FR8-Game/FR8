@@ -83,8 +83,8 @@ namespace FR8Runtime.UI.Loading
         public void ShowUI(bool state)
         {
             document.enabled = state;
-            root = state ? document.rootVisualElement.Q("LoadingScreen") : null;
-            fill = state ? document.rootVisualElement.Q<ProgressBar>("ProgressBar") : null;
+            root = state ? document.rootVisualElement.Q("loading-screen") : null;
+            fill = state ? document.rootVisualElement.Q<ProgressBar>("progress-bar") : null;
         }
     }
 }

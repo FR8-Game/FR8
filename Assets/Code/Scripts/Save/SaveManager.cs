@@ -3,19 +3,22 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
 using FR8Runtime.CodeUtility;
+using UnityEditor;
 using UnityEngine;
 
 namespace FR8Runtime.Save
 {
     public static class SaveManager
     {
-        public static string currentSaveName = string.Empty;
+        public static string saveName = "New Save";
         public static string SaveLocation => $"{Application.dataPath}/.Saves";
         public const string SaveFileExtension = ".sav";
 
+        public static string SaveFilename => $"{SaveLocation}/{saveName}.sav";
+
         public static readonly SaveHelper<SaveData> SlotSave = new
         (
-            () => $"{SaveLocation}/{(!string.IsNullOrEmpty(currentSaveName) ? currentSaveName : "Unnamed Save")}.{DateTime.UtcNow:yyyy-mm-dd-hh-mm-ss}.{SaveFileExtension}",
+            () => SaveFilename,
             XMLSerialize<SaveData>(),
             XMLDeserialize<SaveData>()
         );
@@ -43,63 +46,63 @@ namespace FR8Runtime.Save
 
             foreach (var filename in Directory.EnumerateFiles(SaveLocation))
             {
+                if (!File.Exists(filename)) continue;
+                
                 var ext = Path.GetExtension(filename);
                 if (ext != SaveFileExtension) continue;
 
-                var name = Path.GetFileName(filename);
-                var saveName = name[..name.IndexOf('.')];
+                var name = Path.GetFileNameWithoutExtension(filename);
+                var separation = name.IndexOf('.');
+                var groupName = separation != -1 ? name[..separation] : "Uncategorized";
 
                 var newGroup = true;
                 foreach (var group in groups)
                 {
-                    if (group.saveName != saveName) continue;
+                    if (group.groupName != groupName) continue;
                     newGroup = false;
-                    group.filenames.Add(filename);
+                    group.saveNames.Add(name);
                 }
 
                 if (newGroup)
                 {
-                    groups.Add(new SaveGroup(saveName, filename));
+                    groups.Add(new SaveGroup(groupName, name));
                 }
             }
 
             foreach (var e in groups) e.Validate();
-            
-            groups.Sort((a, b) => string.Compare(b.Timestamp(), a.Timestamp()));
+
+            groups.Sort((a, b) => string.Compare(b.groupName, a.groupName));
 
             return groups;
         }
 
-        public static void LoadSave(string filename)
+        public static void LoadSave()
         {
-            currentSaveName = filename;
-
             SceneUtility.LoadScene(SceneUtility.Scene.Game);
-            Debug.Log($"Loading \"{filename}\"");
+            SlotSave.Load();
+
+            Debug.Log($"Loading \"{saveName}\"");
+        }
+
+        public static void SaveGame()
+        {
+            SlotSave.Save();
         }
 
         public class SaveGroup
         {
-            public string saveName;
-            public List<string> filenames;
+            public string groupName;
+            public List<string> saveNames;
 
-            public SaveGroup(string saveName, string filename)
+            public SaveGroup(string groupName, string filename)
             {
-                this.saveName = saveName;
-                filenames = new List<string> { filename };
+                this.groupName = groupName;
+                saveNames = new List<string> { filename };
             }
 
             public void Validate()
             {
-                filenames.Sort((a, b) => string.Compare(Timestamp(b), Timestamp(a)));
-            }
-
-            public string Timestamp() => Timestamp(filenames[0]);
-            
-            private string Timestamp(string filename)
-            {
-                var name = Path.GetFileNameWithoutExtension(filename);
-                return name[(name.IndexOf('.') + 1)..];
+                saveNames.Sort((a, b) => string.Compare(b, a));
             }
         }
     }

@@ -1,3 +1,4 @@
+using System;
 using FR8Runtime.Train.Track;
 using UnityEngine;
 
@@ -40,6 +41,29 @@ namespace FR8Runtime.Train
             Configure();
         }
 
+        public void FindClosestSegment()
+        {
+            var best = (TrackSegment)null;
+            var bestScore = float.MaxValue;
+            var point = transform.position;
+            
+            var segments = FindObjectsOfType<TrackSegment>();
+            foreach (var segment in segments)
+            {
+                var closestPoint = segment.SamplePoint(segment.GetClosestPoint(transform.position));
+                var score = (closestPoint - transform.position).sqrMagnitude;
+
+                if (score > bestScore) continue;
+
+                bestScore = score;
+                best = segment;
+                point = closestPoint;
+            }
+
+            segment = best;
+            transform.position = point;
+        }
+
         protected virtual void Configure()
         {
             Rigidbody = GetComponent<Rigidbody>();
@@ -51,8 +75,8 @@ namespace FR8Runtime.Train
 
         protected virtual void FixedUpdate()
         {
-            ApplyDrag();
-            ApplyCorrectiveForce();
+            //ApplyDrag();
+            //ApplyCorrectiveForce();
         }
 
         private void ApplyDrag()
@@ -61,6 +85,7 @@ namespace FR8Runtime.Train
             var drag = -fwdSpeed * Mathf.Abs(fwdSpeed) * this.drag;
 
             var force = drag * referenceWeight / Rigidbody.mass;
+            
             Rigidbody.AddForce(DriverDirection * force);
         }
 

@@ -34,6 +34,8 @@ namespace FR8Runtime.Save
 
             transform.position = new Vector3(px, py, pz);
             transform.rotation = Quaternion.Euler(rx, ry, rz);
+            
+            carriage.FindClosestSegment();
         }
     }
 }

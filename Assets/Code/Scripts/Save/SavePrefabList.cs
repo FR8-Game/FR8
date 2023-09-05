@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FR8Runtime.Train;
 using UnityEngine;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -32,7 +32,8 @@ namespace FR8Runtime.Save
                 var asset = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(guid));
                 var carriage = asset.GetComponent<TrainCarriage>();
                 if (!carriage) continue;
-
+                if (string.IsNullOrWhiteSpace(carriage.saveTypeReference)) continue;
+                
                 list.Add(carriage);
             }
 
@@ -45,6 +46,11 @@ namespace FR8Runtime.Save
         {
             var list = AssetDatabase.LoadAssetAtPath<SavePrefabList>("Assets/Config/Save/Save Prefab List.asset");
             list.GetPrefabsFromAssets();
+        }
+
+        private void Reset()
+        {
+            GetPrefabsFromAssets();
         }
 #endif
     }
