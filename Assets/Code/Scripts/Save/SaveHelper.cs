@@ -9,12 +9,18 @@ namespace FR8Runtime.Save
     {
         public T data;
         private Func<string> filename;
-
+        
+        public Action<Stream, T> serializeCallback;
+        public Func<Stream, T> deserializeCallback;
+        
         public event Action DataChangedEvent;
-
-        internal SaveHelper(Func<string> filename)
+        
+        internal SaveHelper(Func<string> filename, Action<Stream, T> serializeCallback, Func<Stream, T> deserializeCallback)
         {
             this.filename = filename;
+
+            this.serializeCallback = serializeCallback;
+            this.deserializeCallback = deserializeCallback;
         }
         
         public T GetOrLoad()
@@ -42,8 +48,7 @@ namespace FR8Runtime.Save
             
             using (var stream = new FileStream(filename, FileMode.Open))
             {
-                var formatter = new XmlSerializer(typeof(T));
-                data = (T)formatter.Deserialize(stream);
+                data = deserializeCallback(stream);
             }
             
             Debug.Log($"Finished Reading Persistant data from \"{filename}\"");
@@ -62,8 +67,7 @@ namespace FR8Runtime.Save
             
             using (var stream = new FileStream(filename, FileMode.OpenOrCreate))
             {
-                var formatter = new XmlSerializer(typeof(T));
-                formatter.Serialize(stream, data);
+                serializeCallback(stream, data);
             }
             
             DataChangedEvent?.Invoke();

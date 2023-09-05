@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FR8Runtime.Player;
 using FR8Runtime.Train;
 using UnityEngine;
@@ -13,6 +12,8 @@ namespace FR8Runtime.Save
     [SelectionBase, DisallowMultipleComponent]
     public class SceneSaveManager : MonoBehaviour
     {
+        [SerializeField] private SavePrefabList prefabList;
+        
         private void Awake()
         {
             if (!SaveManager.SlotSave.HasSave()) return;
@@ -21,19 +22,22 @@ namespace FR8Runtime.Save
 
             if (data.trains != null)
             {
-                var trainTable = new Dictionary<string, Queue<TrainCarriage>>();
                 var trains = FindObjectsOfType<TrainCarriage>();
 
                 foreach (var t in trains)
                 {
-                    var key = t.saveTypeReference;
-                    if (!trainTable.ContainsKey(key)) trainTable.Add(key, new Queue<TrainCarriage>());
-                    trainTable[key].Enqueue(t);
+                    Destroy(t.gameObject);
                 }
-
+                
+                var trainTable = new Dictionary<string, TrainCarriage>();
+                foreach (var prefab in prefabList.carriagePrefabs)
+                {
+                    trainTable.Add(prefab.saveTypeReference, prefab);
+                }
+                
                 foreach (var entry in data.trains)
                 {
-                    var train = trainTable[entry.saveTypeReference].Dequeue();
+                    var train = Instantiate(trainTable[entry.saveTypeReference]);
                     entry.Apply(train);
                 }
             }
@@ -52,6 +56,11 @@ namespace FR8Runtime.Save
             var manager = FindObjectOfType<SceneSaveManager>();
             if (!manager) return;
             manager.Save();
+        }
+
+        private void Reset()
+        {
+            prefabList = AssetDatabase.LoadAssetAtPath<SavePrefabList>("Assets/Config/Save/Save Prefab List.asset");
         }
 #endif
 
