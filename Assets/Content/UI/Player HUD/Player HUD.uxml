@@ -1,6 +1,24 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Content/UI/Style%20Sheets/Game%20UI%20Stylesheet.uss?fileID=7433441132597879392&amp;guid=acd50812ec1cbb044a0297b17ba892a4&amp;type=3#Game UI Stylesheet" />
-    <ui:VisualElement name="Vignette" class="Vignette" />
-    <ui:VisualElement name="Crosshair" class="Crosshair" />
-    <ui:VisualElement name="Vitality" />
+    <ui:VisualElement name="player-hud">
+        <ui:VisualElement name="vitality">
+            <ui:VisualElement name="shields" class="shields">
+                <ui:Label text="SHIELDS" display-tooltip-when-elided="true" name="shields-title" style="-unity-paragraph-spacing: -60px;" />
+                <ui:ProgressBar name="shields-bar" high-value="1" />
+                <ui:Label text="[ ACTIVE | 30 s ]" display-tooltip-when-elided="true" name="shields-text" style="-unity-paragraph-spacing: -60px;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="center-align" style="top: 0; right: 0; left: 0; bottom: 1px;">
+            <ui:VisualElement name="crosshair" />
+        </ui:VisualElement>
+        <ui:VisualElement name="vignette" />
+        <ui:VisualElement name="spatial-info">
+            <ui:VisualElement name="long-lat">
+                <ui:Label text="LONG: 20.2341" display-tooltip-when-elided="true" name="long" />
+                <ui:Label text="09.145 :LAT" display-tooltip-when-elided="true" name="lat" />
+            </ui:VisualElement>
+            <ui:VisualElement name="divider" />
+            <FR8Runtime.UI.CustomControls.Compass name="compass" FaceAngle="0" TickSpacing="2" />
+        </ui:VisualElement>
+    </ui:VisualElement>
 </ui:UXML>
