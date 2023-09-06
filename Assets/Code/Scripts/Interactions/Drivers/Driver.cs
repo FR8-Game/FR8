@@ -53,6 +53,7 @@ namespace FR8Runtime.Interactions.Drivers
         protected void Start()
         {
             SetValue(defaultValue);
+            OnValueChanged(defaultValue);
         }
         
         protected virtual void FixedUpdate()

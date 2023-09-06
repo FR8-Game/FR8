@@ -21,7 +21,6 @@ namespace FR8Runtime.UI.Loading
         private ProgressBar fill;
 
         private bool loadingNewLevel;
-        private static bool started;
 
         private void Awake()
         {
@@ -30,17 +29,10 @@ namespace FR8Runtime.UI.Loading
 
         private void Start()
         {
-            if (!started)
-            {
-                ShowUI(false);
-                started = true;
-                return;
-            }
-
             StartCoroutine(Fade(v => 1.0f - v, () => root.SetEnabled(false)));
         }
 
-        public void LoadScene(string sceneName)
+        public void LoadScene(int buildIndex)
         {
             StartCoroutine(routine());
 
@@ -55,7 +47,7 @@ namespace FR8Runtime.UI.Loading
                
                 yield return StartCoroutine(Fade(v => v, null));
 
-                var operation = SceneManager.LoadSceneAsync(sceneName);
+                var operation = SceneManager.LoadSceneAsync(buildIndex);
                 while (!operation.isDone)
                 {
                     SetFill(operation.progress);

@@ -1,7 +1,7 @@
 using FR8Runtime.Rendering.Volumetrics;
+using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-using Object = UnityEngine.Object;
 
 namespace FR8Runtime.Rendering.Passes
 {

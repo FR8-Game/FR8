@@ -13,6 +13,7 @@ namespace FR8Runtime.Player.Submodules
         [SerializeField] private float controllerSensitivity = 0.4f;
 
         private Camera mainCamera;
+        private PlayerAvatar avatar;
         
         private InputActionReference moveInput;
         private InputActionReference jumpInput;
@@ -25,8 +26,9 @@ namespace FR8Runtime.Player.Submodules
         private InputActionReference grabCamAction;
         private InputActionReference zoomCamAction;
         private InputActionReference peeAction;
-
-
+        private InputActionReference flyAction;
+        private InputActionReference[] hotbarActions;
+        
         public Vector3 Move
         {
             get
@@ -38,33 +40,49 @@ namespace FR8Runtime.Player.Submodules
         }
 
         public bool JumpTriggered => jumpInput.action?.WasPerformedThisFrame() ?? false;
-        public bool Jump => jumpInput.Switch();
-        public Vector2 LookFrameDelta => GetLookFrameDelta(false);
+        public bool Jump => jumpInput.State();
+        public Vector2 LookFrameDelta => GetLookFrameDelta();
 
         public int Nudge => Mathf.Clamp(Mathf.RoundToInt(nudgeAction.action?.ReadValue<float>() ?? 0.0f), -1, 1);
         public bool Press => pressAction.action?.WasPerformedThisFrame() ?? false;
-        public bool Drag => pressAction.Switch();
+        public bool Drag => pressAction.State();
         public bool FreeCam => freeCamAction.action?.WasPerformedThisFrame() ?? false;
-        public bool GrabCam => grabCamAction.Switch();
-        public bool ZoomCam => zoomCamAction.Switch();
-        public bool Sprint => sprintAction.Switch();
-        public bool Pee => peeAction.Switch();
+        public bool GrabCam => grabCamAction.State();
+        public bool ZoomCam => zoomCamAction.State();
+        public bool Sprint => sprintAction.State();
+        public bool Pee => peeAction.State();
+        public bool Fly => flyAction.action?.WasPerformedThisFrame() ?? false;
+        
+        public int SwitchHotbar
+        {
+            get
+            {
+                for (var i = 0; i < hotbarActions.Length; i++)
+                {
+                    var action = hotbarActions[i];
+                    if (action.action?.WasPerformedThisFrame() ?? false) return i;
+                }
+                return -1;
+            }
+        }
 
-        public Vector2 GetLookFrameDelta(bool forceMouseDelta)
+        public bool Crouch => crouchAction.State();
+
+        public Vector2 GetLookFrameDelta()
         {
             var fovSensitivity = GetFovSensitivity();
             var delta = Vector2.zero;
             
             delta += GetAdditiveLookInput();
-            delta += GetMouseLookInput(forceMouseDelta);
+            delta += GetMouseLookInput();
 
             return delta * fovSensitivity;
         }
 
-        private Vector2 GetMouseLookInput(bool forceMouseDelta)
+        private Vector2 GetMouseLookInput()
         {
             var mouse = Mouse.current;
-            if (mouse != null && (Cursor.lockState == CursorLockMode.Locked || forceMouseDelta))
+            if (mouse != null)
             {
                 return mouse.delta.ReadValue() * mouseSensitivity;
             }
@@ -78,8 +96,10 @@ namespace FR8Runtime.Player.Submodules
 
         private float GetFovSensitivity() => Mathf.Tan(mainCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
 
-        public void Init()
+        public void Init(PlayerAvatar avatar)
         {
+            this.avatar = avatar;
+            
             // Local Functions
             InputActionReference bind(string name) => InputActionReference.Create(inputMap.FindAction(name));
 
@@ -96,9 +116,24 @@ namespace FR8Runtime.Player.Submodules
             grabCamAction = bind("GrabCam");
             zoomCamAction = bind("ZoomCam");
             peeAction = bind("Pee");
+            flyAction = bind("Fly");
+
+            hotbarActions = new InputActionReference[PlayerInventory.HotbarSize];
+            for (var i = 0; i < hotbarActions.Length; i++)
+            {
+                hotbarActions[i] = bind($"Hotbar.{i + 1}");
+            }
             
             // Set Camera
             mainCamera = Camera.main;
+
+            avatar.vitality.IsAliveChangedEvent += IsAliveChanged;
+        }
+
+        private void IsAliveChanged()
+        {
+            if (avatar.vitality.IsAlive) inputMap.Enable();
+            else inputMap.Disable();
         }
     }
 }
