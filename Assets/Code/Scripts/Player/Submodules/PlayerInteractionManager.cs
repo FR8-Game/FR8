@@ -1,22 +1,18 @@
 using System;
-using FR8Runtime.CodeUtility;
 using FR8Runtime.Interactions.Drivers.Submodules;
 using FR8Runtime.Pickups;
 using FR8Runtime.Rendering.Passes;
-using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Object = UnityEngine.Object;
 
 namespace FR8Runtime.Player.Submodules
 {
-    [System.Serializable]
+    [Serializable]
     public class PlayerInteractionManager
     {
         [SerializeField] private float interactionDistance = 2.5f;
-        [SerializeField] private DampedSpring transition;
 
-        private TMP_Text readoutText;
         private int nudge;
         private bool dragging;
 
@@ -34,8 +30,6 @@ namespace FR8Runtime.Player.Submodules
 
             avatar.UpdateEvent += Update;
             avatar.FixedUpdateEvent += FixedUpdate;
-            
-            readoutText = FindUtility.Find<TMP_Text>(avatar.transform, "UI/Interaction/Text");
         }
 
         public void Update()
@@ -58,8 +52,6 @@ namespace FR8Runtime.Player.Submodules
             {
                 ResetInputFlags();
             }
-
-            AnimateUI();
         }
 
         private void UpdateInputFlags()
@@ -73,37 +65,10 @@ namespace FR8Runtime.Player.Submodules
             nudge = 0;
             dragging = false;
         }
-
-        private void AnimateUI()
-        {
-            var hasHighlightedObject = (bool)(Object)highlightedObject;
-
-            transition.Target(hasHighlightedObject ? 1.0f : 0.0f).Iterate(Time.deltaTime);
-            var animatePosition = Mathf.Max(0.0f, transition.currentPosition);
-
-            if (readoutText)
-            {
-                readoutText.transform.localScale = Vector3.one * animatePosition;
-                readoutText.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, (1.0f - animatePosition) * 20.0f);
-                
-                if (!hasHighlightedObject) return;
-
-                var alpha = $"<alpha={(highlightedObject.CanInteract ? "#FF" : "#80")}>";
-                readoutText.text = $"{alpha}{highlightedObject.DisplayName}\n<size=66%>{highlightedObject.DisplayValue}";
-            }
-        }
-
+        
         private void UpdateHighlightedObject()
         {
-            var newHighlightedObject = GetHighlightedObject();
-
-            if (newHighlightedObject != highlightedObject)
-            {
-                transition.currentPosition = 0.0f;
-                transition.velocity = 0.0f;
-            }
-
-            highlightedObject = newHighlightedObject;
+            highlightedObject = GetHighlightedObject();
         }
 
         private IInteractable GetHighlightedObject()

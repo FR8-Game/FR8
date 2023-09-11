@@ -33,16 +33,19 @@ namespace FR8Runtime.UI.Screen_Canvas
 
             var cam = Camera.main;
             if (cam) cam.cullingMask &= ~(0b1 << RenderLayer);
+            
+            var canvas = GetComponent<Canvas>();
+            resolution = Vector2Int.RoundToInt(((RectTransform)canvas.transform).rect.size);
 
             renderCamera = new GameObject($"{name}.RenderCamera").AddComponent<Camera>();
             renderCamera.cullingMask = 0b1 << RenderLayer;
 
-            renderCamera.transform.position = Vector3.up * 100.0f;
-            renderCamera.transform.rotation = Quaternion.identity;
+            renderCamera.transform.position = transform.position + transform.forward * -1.0f;
+            renderCamera.transform.rotation = transform.rotation;
             renderCamera.transform.localScale = Vector3.one;
 
             renderCamera.orthographic = true;
-            renderCamera.orthographicSize = 1.0f;
+            renderCamera.orthographicSize = resolution.y * canvas.transform.localScale.y * 0.5f;
             renderCamera.nearClipPlane = 0.0f;
             renderCamera.farClipPlane = 2.0f;
 
@@ -51,9 +54,6 @@ namespace FR8Runtime.UI.Screen_Canvas
 
             renderCamera.hideFlags = HideFlags.HideAndDontSave;
 
-            var canvas = GetComponent<Canvas>();
-            resolution = Vector2Int.RoundToInt(((RectTransform)canvas.transform).rect.size);
-            
             canvas.renderMode = RenderMode.ScreenSpaceCamera;
             canvas.planeDistance = 1.0f;
             canvas.worldCamera = renderCamera;
@@ -73,7 +73,7 @@ namespace FR8Runtime.UI.Screen_Canvas
                 renderTexture = null;
             }
 
-            propertyBlock.SetTexture(MainTexKey, null);
+            propertyBlock.SetTexture(MainTexKey, Texture2D.blackTexture);
         }
 
         private void Update()

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using FR8Runtime.UI;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -217,6 +218,18 @@ namespace FR8Runtime.Player.Submodules
             {
                 this.amount = amount;
             }
+        }
+
+        public void SetShields(float percent)
+        {
+            currentShields = percent * shieldDuration;
+            HealthChangeEvent?.Invoke();
+        }
+
+        public void SetHealth(int health)
+        {
+            currentHealth = health;
+            HealthChangeEvent?.Invoke();
         }
     }
 }
