@@ -39,11 +39,7 @@ namespace FR8Editor.Inspector
             {
                 var target = targets[0];
 
-                if (!target.Segment)
-                {
-                    EditorGUILayout.HelpBox("Train is Missing Spline", MessageType.Error);
-                }
-                else if (GUILayout.Button("Snap To Spline", GUILayout.Height(30)))
+                if (GUILayout.Button("Snap To Spline", GUILayout.Height(30)))
                 {
                     SnapToSpline(target);
                 }

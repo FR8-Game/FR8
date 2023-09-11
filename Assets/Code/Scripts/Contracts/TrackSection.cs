@@ -10,7 +10,7 @@ namespace FR8Runtime.Contracts
         [Range(0.0f, 1.0f)] [SerializeField] private float start = 0.0f;
         [Range(0.0f, 1.0f)] [SerializeField] private float end = 1.0f;
 
-        public bool Contain(Vector3 point)
+        public bool Contains(Vector3 point)
         {
             var t = track.GetClosestPoint(point);
             return t > start && t < end;
