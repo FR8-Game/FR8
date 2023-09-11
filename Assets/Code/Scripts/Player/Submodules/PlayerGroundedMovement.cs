@@ -48,8 +48,8 @@ namespace FR8Runtime.Player.Submodules
         public float ladderClimbSpeed = 5.0f;
 
         public float ladderRungDistance = 0.4f;
-        public float ladderClimbSpring = 300.0f;
-        public float ladderClimbDamper = 15.0f;
+        public float ladderClimbSpring = 12000.0f;
+        public float ladderClimbDamper = 3000.0f;
         public float ladderJumpForce = 5.0f;
 
         [Space]
