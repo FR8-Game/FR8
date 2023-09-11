@@ -523,6 +523,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d1b1c58fa6ab61439d1d93a376c3303, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  saveTypeReference: Locomotive
   drag: 12
   referenceWeight: 100000
   cornerLean: 0.6
@@ -655,11 +656,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   loopAudio:
     Guid:
-      Data1: -946610946
-      Data2: 1190281061
-      Data3: -830230912
-      Data4: -1287474464
-    Path: event:/Train/Train Engine Loop
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
 --- !u!1 &3830098878162190197
 GameObject:
   m_ObjectHideFlags: 0
@@ -2557,10 +2558,6 @@ PrefabInstance:
     - target: {fileID: 5259114831686077933, guid: 72cd28780c998b04eba2edf3cb000a91, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7051534229346262893, guid: 72cd28780c998b04eba2edf3cb000a91, type: 3}
-      propertyPath: defaultSpawn
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8656440802841748990, guid: 72cd28780c998b04eba2edf3cb000a91, type: 3}
       propertyPath: m_Enabled
