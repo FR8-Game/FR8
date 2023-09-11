@@ -45,7 +45,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1948529354362219670, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: key
-      value: Speedometer
+      value: Speed
       objectReference: {fileID: 0}
     - target: {fileID: 1948529354362219670, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: displayText.label
@@ -421,7 +421,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1948529354362219670, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: key
-      value: Power Draw
+      value: Load
+      objectReference: {fileID: 0}
+    - target: {fileID: 1948529354362219670, guid: ae851f06a593e204fb3418c760310250, type: 3}
+      propertyPath: displayMode
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1948529354362219670, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: displayText.label
@@ -441,7 +445,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6936461395209199177, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: m_text
-      value: '<mspace=0.7em>0</mspace>
+      value: '<mspace=0.7em>0%</mspace>
 
         <size=30%>MW</size>'
       objectReference: {fileID: 0}
@@ -451,7 +455,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6936461395732409891, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: m_Name
-      value: Power Draw
+      value: Load
       objectReference: {fileID: 0}
     - target: {fileID: 6936461395732409900, guid: ae851f06a593e204fb3418c760310250, type: 3}
       propertyPath: m_RootOrder

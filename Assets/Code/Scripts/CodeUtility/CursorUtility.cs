@@ -1,47 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Runtime.InteropServices;
-using UnityEngine;
 
 namespace FR8Runtime.CodeUtility
 {
     public static class CursorUtility
     {
-        private static readonly List<CursorLockMode> LockStack = new();
-
-        public static void Push(CursorLockMode element, ref int id)
-        {
-            LockStack.Add(element);
-            UpdateLockState();
-            id = LockStack.Count;
-        }
-
-        public static void Pop(ref int id)
-        {
-            if (id <= 0) return;
-
-            LockStack.RemoveAt(id - 1);
-            UpdateLockState();
-            id = 0;
-        }
-
-        public static void Change(int id, CursorLockMode mode)
-        {
-            LockStack[id - 1] = mode;
-            UpdateLockState();
-        }
-
-        public static void UpdateLockState()
-        {
-            UnityEngine.Cursor.lockState = LockStack.Count > 0 ? LockStack[^1] : CursorLockMode.None;
-        }
-
-        public static (int, int) GetPosition()
-        {
-            GetCursorPos(out var pos);
-            return (pos.X, pos.Y);
-        }
-
         public static void SetPosition(int x, int y)
         {
             SetCursorPos(x, y);
@@ -52,5 +15,11 @@ namespace FR8Runtime.CodeUtility
 
         [DllImport("user32.dll")]
         private static extern bool SetCursorPos(int x, int y);
+
+        public static (int lastCursorX, int lastCursorY) GetPosition()
+        {
+            GetCursorPos(out var p);
+            return (p.X, p.Y);
+        }
     }
 }

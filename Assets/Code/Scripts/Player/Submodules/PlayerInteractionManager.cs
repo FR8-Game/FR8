@@ -2,20 +2,16 @@ using System;
 using FR8Runtime.Interactions.Drivers.Submodules;
 using FR8Runtime.Pickups;
 using FR8Runtime.Rendering.Passes;
-using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Cursor = UnityEngine.Cursor;
 using Object = UnityEngine.Object;
 
 namespace FR8Runtime.Player.Submodules
 {
-    [System.Serializable]
+    [Serializable]
     public class PlayerInteractionManager
     {
         [SerializeField] private float interactionDistance = 2.5f;
-        [SerializeField] private TMP_Text readoutText;
-        [SerializeField] private CodeUtility.DampedSpring transition;
 
         private int nudge;
         private bool dragging;
@@ -25,6 +21,9 @@ namespace FR8Runtime.Player.Submodules
         public PickupObject HeldObject { get; private set; }
         public PlayerAvatar Avatar { get; private set; }
 
+        public event Action<PickupObject> PickupEvent;
+        public event Action<PickupObject> DropEvent;
+        
         public void Init(PlayerAvatar avatar)
         {
             Avatar = avatar;
@@ -53,8 +52,6 @@ namespace FR8Runtime.Player.Submodules
             {
                 ResetInputFlags();
             }
-
-            AnimateUI();
         }
 
         private void UpdateInputFlags()
@@ -68,37 +65,10 @@ namespace FR8Runtime.Player.Submodules
             nudge = 0;
             dragging = false;
         }
-
-        private void AnimateUI()
-        {
-            var hasHighlightedObject = (bool)(Object)highlightedObject;
-
-            transition.Target(hasHighlightedObject ? 1.0f : 0.0f).Iterate(Time.deltaTime);
-            var animatePosition = Mathf.Max(0.0f, transition.currentPosition);
-
-            if (readoutText)
-            {
-                readoutText.transform.localScale = Vector3.one * animatePosition;
-                readoutText.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, (1.0f - animatePosition) * 20.0f);
-                
-                if (!hasHighlightedObject) return;
-
-                var alpha = $"<alpha={(highlightedObject.CanInteract ? "#FF" : "#80")}>";
-                readoutText.text = $"{alpha}{highlightedObject.DisplayName}\n<size=66%>{highlightedObject.DisplayValue}";
-            }
-        }
-
+        
         private void UpdateHighlightedObject()
         {
-            var newHighlightedObject = GetHighlightedObject();
-
-            if (newHighlightedObject != highlightedObject)
-            {
-                transition.currentPosition = 0.0f;
-                transition.velocity = 0.0f;
-            }
-
-            highlightedObject = newHighlightedObject;
+            highlightedObject = GetHighlightedObject();
         }
 
         private IInteractable GetHighlightedObject()
@@ -135,11 +105,14 @@ namespace FR8Runtime.Player.Submodules
             if (HeldObject) return null;
 
             HeldObject = pickup.Pickup(Avatar);
+            
+            PickupEvent?.Invoke(HeldObject);
             return this;
         }
 
         public PlayerInteractionManager Drop()
         {
+            DropEvent?.Invoke(HeldObject);
             HeldObject = HeldObject.Drop(Avatar);
             return null;
         }

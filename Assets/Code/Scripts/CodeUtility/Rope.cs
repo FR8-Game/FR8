@@ -6,9 +6,9 @@ namespace FR8Runtime.CodeUtility
     [System.Serializable]
     public class Rope
     {
-        [SerializeField] private float drag;
-        [SerializeField] private bool useWind;
-        [SerializeField] private float windScale;
+        public float drag;
+        public bool useWind;
+        public float windScale;
         [SerializeField] private bool reset;
         
         private Vector3 velocity;

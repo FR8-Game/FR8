@@ -1,15 +1,24 @@
 using FR8Runtime.Interactions.Drivers;
+using FR8Runtime.Train.Electrics;
+using FR8Runtime.Train.Engine;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace FR8Runtime.Train
 {
+    [SelectionBase]
+    [DisallowMultipleComponent]
+    [RequireComponent(typeof(TrainEngine), typeof(TrainElectricsController), typeof(TrainGasTurbine))]
+    [RequireComponent(typeof(DriverNetwork), typeof(TrainMonitor), typeof(LocomotiveAudio))]
     public class Locomotive : TrainCarriage
     {
-        [SerializeField] private float brakeConstant = 4.0f;
+        [FormerlySerializedAs("brakeConstant")] 
+        [SerializeField] private float dynamicBrakeConstant = 0.5f;
+        [SerializeField] private float staticBrakeConstant = 25.0f;
 
         private const string BrakeKey = "Brake";
         private const string GearKey = "Gear";
-        private const string SpeedometerKey = "Speedometer";
+        private const string SpeedometerKey = "Speed";
 
         private DriverNetwork driverNetwork;
         
@@ -23,7 +32,7 @@ namespace FR8Runtime.Train
         {
             base.Configure();
             
-            brakeConstant = Mathf.Max(0.0f, brakeConstant);
+            dynamicBrakeConstant = Mathf.Max(0.0f, dynamicBrakeConstant);
             driverNetwork = GetComponentInParent<DriverNetwork>();
         }
 
@@ -38,7 +47,9 @@ namespace FR8Runtime.Train
         private void ApplyBrake()
         {
             var fwdSpeed = GetForwardSpeed();
-            var force = ToMps(brakeConstant) * Brake * -Mathf.Sign(fwdSpeed);
+            var constant = Mathf.Abs(fwdSpeed) > 1.0f ? dynamicBrakeConstant : staticBrakeConstant;
+            
+            var force = constant * Brake * -fwdSpeed;
 
             var velocityChange = force * referenceWeight / Rigidbody.mass * Time.deltaTime;
             if (Mathf.Abs(velocityChange) > Mathf.Abs(fwdSpeed)) velocityChange = -fwdSpeed;

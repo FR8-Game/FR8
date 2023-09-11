@@ -12,14 +12,14 @@ namespace FR8Runtime.Pickups
         public const int DefaultLayer = 0;
         public const int PickupLayer = 8;
 
-        [SerializeField] private string displayName;
-        [SerializeField] private PickupPose pickupPose;
-        [SerializeField] private Vector3 additionalTranslation;
-        [SerializeField] private Vector3 additionalRotation;
+        public string displayName;
+        public PickupPose pickupPose;
+        public Vector3 additionalTranslation;
+        public Vector3 additionalRotation;
 
-        [SerializeField] private float spring = 300.0f;
-        [SerializeField] private float damping = 18.0f;
-        [SerializeField] private float torqueScaling = 1.0f;
+        public float spring = 300.0f;
+        public float damping = 18.0f;
+        public float torqueScaling = 1.0f;
 
         private PlayerAvatar target;
 
@@ -110,7 +110,7 @@ namespace FR8Runtime.Pickups
             lastTargetRotation = targetRotation;
         }
 
-        private Vector3 GetTargetPosition() => target.cameraController.CameraTarget.TransformPoint(HoldTranslation);
-        private Quaternion GetTargetRotation() => target.cameraController.CameraTarget.rotation * HoldRotation;
+        private Vector3 GetTargetPosition() => target.Head.TransformPoint(HoldTranslation);
+        private Quaternion GetTargetRotation() => target.Head.rotation * HoldRotation;
     }
 }
