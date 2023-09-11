@@ -72,6 +72,8 @@ namespace FR8Runtime.UI.Loading
 
             root.style.opacity = fadeCurve.Evaluate(remap(1.0f));
             finishedCallback?.Invoke();
+
+            root.visible = root.style.opacity.value > 0.5f;
         }
 
         public void SetFill(float percent)

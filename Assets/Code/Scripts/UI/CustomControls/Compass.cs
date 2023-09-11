@@ -135,19 +135,20 @@ namespace FR8Runtime.UI.CustomControls
                 tick.style.top = Length.Percent(shrink ? 12.5f : 0.0f);
                 tick.style.bottom = Length.Percent(shrink ? 62.5f : 50.0f);
             }
+            
+            var facing = Mathf.RoundToInt(this.faceAngle / 90.0f) % 4;
 
             for (var i = 0; i < labels.Length; i++)
             {
                 var label = labels[i];
-                
+
                 var percent = i / (float)labels.Length;
                 var angle = percent * Mathf.PI * 2.0f;
                 setPositionOffAngle(label, angle - faceAngle, labelWidth, 2.0f, out var scale);
                 label.style.scale = new Scale(Vector3.one * scale);
-
-                var visible = Mathf.DeltaAngle(angle * Mathf.Rad2Deg, this.faceAngle) < this.cropAngle;
-                label.visible = visible;
                 
+                label.visible = i == facing;
+
                 label.style.unityTextAlign = TextAnchor.UpperCenter;
                 label.style.top = Length.Percent(50.0f);
                 label.style.bottom = 0.0f;
@@ -162,7 +163,7 @@ namespace FR8Runtime.UI.CustomControls
                 angle = (angle % 1.0f + 1.0f) % 1.0f;
                 angle = angle * 2.0f - 1.0f;
                 angle *= cropAngle;
-                
+
                 var p = Mathf.Sin(angle) * 0.5f + 0.5f;
 
                 target.style.position = Position.Absolute;

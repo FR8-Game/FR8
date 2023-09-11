@@ -46,13 +46,14 @@ ProgressBar #loading-screen {
 }
 
 .Background {
-    background-color: rgba(0, 0, 0, 0.75);
+    background-color: rgb(0, 0, 0);
     padding-left: 30px;
     padding-right: 30px;
     padding-top: 30px;
     padding-bottom: 30px;
     width: 100%;
     height: 100%;
+    opacity: 0.75;
 }
 
 .Title {
@@ -69,7 +70,7 @@ ProgressBar #loading-screen {
 }
 
 .unity-button {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(255, 255, 255, 0.02);
     -unity-text-align: upper-left;
     font-size: 32px;
     padding-left: 80px;
@@ -94,7 +95,7 @@ ProgressBar #loading-screen {
 
 .unity-button:hover {
     border-left-width: 10px;
-    background-color: rgba(0, 0, 0, 0.39);
+    background-color: rgba(255, 255, 255, 0.04);
 }
 
 .h1 {
@@ -222,7 +223,7 @@ TextField {
     right: 0;
     bottom: 0;
     background-image: url('project://database/Assets/Files/Textures/UI/Vignette.png?fileID=2800000&guid=797247f979072f4468e2fb4f207cd121&type=3#Vignette');
-    -unity-background-image-tint-color: rgba(128, 0, 0, 255);
+    -unity-background-image-tint-color: rgb(128, 0, 0);
     -unity-font-definition: url('project://database/Assets/Content/Fonts/Assets/Montserrat/Montserrat-Light%20SDF.asset?fileID=11400000&guid=275ea07cb640aad48907c0544b1002df&type=2#Montserrat-Light SDF');
 }
 
@@ -323,5 +324,9 @@ TextField {
 }
 
 .shields .unity-progress-bar__progress {
-    background-color: rgba(255, 255, 255, 255);
+    background-color: rgb(255, 255, 255);
+}
+
+.BigTitle {
+    font-size: 180px;
 }
