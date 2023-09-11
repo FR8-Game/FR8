@@ -1,5 +1,6 @@
 using FR8Runtime.Train;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace FR8Editor.Inspector
@@ -34,6 +35,8 @@ namespace FR8Editor.Inspector
 
             base.OnInspectorGUI();
 
+            if (PrefabStageUtility.GetCurrentPrefabStage()) return;
+            
             if (targets.Length == 0) return;
             if (targets.Length == 1)
             {
