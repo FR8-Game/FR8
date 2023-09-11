@@ -276,6 +276,37 @@ MonoBehaviour:
 
     Zoom
     Camera, Right Mouse'
+--- !u!1 &2067577546718259817
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4488509693492246082}
+  m_Layer: 0
+  m_Name: Cockpit
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4488509693492246082
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2067577546718259817}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.9999999, y: 1, z: 0.9999999}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7825685074210401694}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2674341771936020717
 GameObject:
   m_ObjectHideFlags: 0
@@ -438,7 +469,6 @@ MonoBehaviour:
   renderer: {fileID: 0}
   materialIndex: 1
   materialEmissionPropertyName: _EmissionColor
-  key: Headlights
   fuseGroup: Headlights
   powerDrawWatts: 40
   threshold: 0.5
@@ -456,6 +486,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   density: 1
   resolution: 500
+--- !u!1 &5539883185747218588
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7825685074210401694}
+  m_Layer: 0
+  m_Name: Shapes
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7825685074210401694
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5539883185747218588}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.0000001, y: 1, z: 1.0000001}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4488509693492246082}
+  m_Father: {fileID: 8669327851989132187}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8238142573764840505
 GameObject:
   m_ObjectHideFlags: 0
@@ -618,7 +680,6 @@ MonoBehaviour:
   renderer: {fileID: 0}
   materialIndex: 1
   materialEmissionPropertyName: _EmissionColor
-  key: Headlights
   fuseGroup: Headlights
   powerDrawWatts: 40
   threshold: 0.5
@@ -1033,6 +1094,7 @@ GameObject:
   - component: {fileID: 2338552693555117045}
   - component: {fileID: 6644183762511143645}
   - component: {fileID: 2741304311204880686}
+  - component: {fileID: 2130464060440000462}
   m_Layer: 0
   m_Name: Old Locomotive
   m_TagString: Untagged
@@ -1053,6 +1115,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 9206794437295940030}
+  - {fileID: 7825685074210401694}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1084,6 +1147,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d1b1c58fa6ab61439d1d93a376c3303, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  saveTypeReference: 
   drag: 12
   referenceWeight: 100000
   cornerLean: 0.6
@@ -1091,7 +1155,8 @@ MonoBehaviour:
   retentionDamping: 25
   retentionTorqueConstant: 0.05
   segment: {fileID: 0}
-  brakeConstant: 30
+  dynamicBrakeConstant: 30
+  staticBrakeConstant: 25
 --- !u!114 &6888675464939285067
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1107,8 +1172,36 @@ MonoBehaviour:
   maxSpeedKmpH: 120
   acceleration: 0.1
   maxPowerConsumption: 75
-  tangentialForceCost: 0
+  throttleLoadPowerSplit: 0
   throttleSmoothing: 0.8
+  loadScaling: 0.02
+  load: 0
+  loadCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  throttleAcceleration: 0
+  actualAcceleration: 0
 --- !u!114 &1884765813156554468
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1122,7 +1215,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baselineGeneration: 1
-  connected: 0
 --- !u!114 &2338552693555117045
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1174,9 +1266,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   source: {fileID: 11400000, guid: 96c9b8288e4d7e64a9e8a2c62f759eca, type: 2}
-  cockpitBounds:
-    m_Center: {x: 0, y: 3.3, z: 3.03}
-    m_Extent: {x: 2.33, y: 2.14, z: 3.81}
+--- !u!114 &2130464060440000462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8669327851989132185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf67fa160d3dbbf4883af0c9b76b45f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  loopAudio:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
 --- !u!1 &8669327852029670927
 GameObject:
   m_ObjectHideFlags: 0

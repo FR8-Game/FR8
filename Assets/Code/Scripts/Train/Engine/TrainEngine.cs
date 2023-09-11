@@ -12,10 +12,19 @@ namespace FR8Runtime.Train.Engine
         [SerializeField] private float maxSpeedKmpH = 120.0f;
         [SerializeField] private float acceleration = 8.0f;
         [SerializeField] private float maxPowerConsumption = 75.0f;
-        [SerializeField] private float tangentialForceCost = 10.0f;
+        [SerializeField] [Range(0.0f, 1.0f)] private float throttleLoadPowerSplit;
         [SerializeField] [Range(0.0f, 1.0f)] private float throttleSmoothing;
+        [SerializeField] private float loadScaling = 0.02f;
+        [SerializeField] [Range(0.0f, 1.0f)] private float load;
+        [SerializeField] private AnimationCurve loadCurve = AnimationCurve.Linear(0.0f, 1.0f, 1.0f, 0.0f);
+
+        [Space]
+        [SerializeField] private float throttleAcceleration;
+
+        [SerializeField] private float actualAcceleration;
 
         private const string ThrottleKey = "Throttle";
+        private const string LoadKey = "Load";
         private const string PowerDrawKey = "PowerDraw";
         private const string CurrentKey = "Current";
 
@@ -24,6 +33,7 @@ namespace FR8Runtime.Train.Engine
 
         private float powerDraw;
         private float throttleActual;
+        private float lastForwardSpeed;
 
         public float ThrottleInput => driverNetwork.GetValue(ThrottleKey);
 
@@ -43,37 +53,54 @@ namespace FR8Runtime.Train.Engine
         {
             throttleActual += (ThrottleInput - throttleActual) * (1.0f - throttleSmoothing);
 
-            if (locomotive.Gear == 0) return;
-
             var fwdSpeed = locomotive.GetForwardSpeed();
-            var oldPowerDraw = powerDraw;
             var connected = driverNetwork.GetValue(TrainElectricsController.MainFuse) > 0.5f;
-            
+
+            CalculateLoad(fwdSpeed);
+
             if (connected)
             {
-                ApplyDriveForce(fwdSpeed);
+                ApplyDriveForce();
             }
-            else
-            {
-                powerDraw = 0.0f;
-            }
-            
-            UpdatePowerDraw(oldPowerDraw);
+
+            UpdatePowerDraw(connected);
+            lastForwardSpeed = fwdSpeed;
         }
 
-        private void UpdatePowerDraw(float oldPowerDraw)
+        private void UpdatePowerDraw(bool connected)
         {
-            powerDraw = (powerDraw + oldPowerDraw) / 2.0f;
+            var newPowerDraw = 0.0f;
+            newPowerDraw += throttleActual * maxPowerConsumption * (1.0f - throttleLoadPowerSplit);
+            newPowerDraw += load * maxPowerConsumption * throttleLoadPowerSplit;
+
+            if (locomotive.Gear == 0) newPowerDraw = 0.0f; 
+            if (!connected) newPowerDraw = 0.0f; 
+
+            powerDraw = (newPowerDraw + powerDraw) / 2.0f;
             driverNetwork.SetValue(PowerDrawKey, powerDraw);
         }
 
-        private void ApplyDriveForce(float fwdSpeed)
+        private void CalculateLoad(float fwdSpeed)
         {
-            var maxSpeed = maxSpeedKmpH / 3.6f;
-            var acceleration = (maxSpeed - Mathf.Abs(fwdSpeed)) * this.acceleration * throttleActual * locomotive.Gear;
+            actualAcceleration = (fwdSpeed - lastForwardSpeed) / Time.deltaTime;
+            load = locomotive.Gear != 0 ? Mathf.Abs(throttleAcceleration - actualAcceleration) * loadScaling : 0.0f;
+            load = Mathf.Clamp01(load);
+            driverNetwork.SetValue(LoadKey, Mathf.Clamp01(load));
+        }
 
-            locomotive.Rigidbody.AddForce(locomotive.DriverDirection * acceleration * locomotive.ReferenceWeight);
-            powerDraw = throttleActual * maxPowerConsumption + Mathf.Abs(Vector3.Dot(locomotive.TangentialForce, transform.right)) * tangentialForceCost;
+        private void ApplyDriveForce()
+        {
+            var efficiency = loadCurve.Evaluate(load);
+
+            throttleAcceleration = GetThrottleForce(throttleActual);
+            locomotive.Rigidbody.AddForce(locomotive.DriverDirection * throttleAcceleration * efficiency * locomotive.ReferenceWeight);
+        }
+
+        private float GetThrottleForce(float throttle)
+        {
+            var fwdSpeed = locomotive.GetForwardSpeed();
+            var maxSpeed = maxSpeedKmpH / 3.6f;
+            return (maxSpeed - Mathf.Abs(fwdSpeed)) * acceleration * throttle * locomotive.Gear;
         }
 
         public float CalculatePowerDraw() => powerDraw;

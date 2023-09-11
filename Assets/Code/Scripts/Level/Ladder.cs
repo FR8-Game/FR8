@@ -1,4 +1,4 @@
-using FR8Runtime.Player;
+using FR8Runtime.Player.Submodules;
 using UnityEngine;
 
 namespace FR8Runtime.Level
@@ -17,6 +17,15 @@ namespace FR8Runtime.Level
         private void Awake()
         {
             ParentRigidbody = GetComponent<Rigidbody>();
+
+            if (!GetComponent<Collider>())
+            {
+                var collider = gameObject.AddComponent<BoxCollider>();
+                collider.isTrigger = true;
+
+                collider.center = Vector3.up * (height / 2.0f - heightOffset) + Vector3.forward * normalOffset;
+                collider.size = new Vector3(0.5f, height, 0.5f);
+            }
         }
 
         public float FromWorldPos(Vector3 position)
@@ -50,11 +59,11 @@ namespace FR8Runtime.Level
 
         private void OnTriggerEnter(Collider other)
         {
-            var player = other.transform.GetComponentInParent<PlayerAvatar>();
-            if (!player) return;
-            if (player.groundedMovement.Ladder) return;
+            var movement = other.transform.GetComponentInParent<PlayerGroundedMovement>();
+            if (!movement) return;
+            if (movement.Ladder) return;
 
-            player.groundedMovement.SetLadder(this);
+            movement.SetLadder(this);
         }
     }
 }

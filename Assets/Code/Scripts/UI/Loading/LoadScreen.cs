@@ -21,7 +21,6 @@ namespace FR8Runtime.UI.Loading
         private ProgressBar fill;
 
         private bool loadingNewLevel;
-        private static bool started;
 
         private void Awake()
         {
@@ -30,17 +29,10 @@ namespace FR8Runtime.UI.Loading
 
         private void Start()
         {
-            if (!started)
-            {
-                ShowUI(false);
-                started = true;
-                return;
-            }
-
             StartCoroutine(Fade(v => 1.0f - v, () => root.SetEnabled(false)));
         }
 
-        public void LoadScene(string sceneName)
+        public void LoadScene(int buildIndex)
         {
             StartCoroutine(routine());
 
@@ -55,7 +47,7 @@ namespace FR8Runtime.UI.Loading
                
                 yield return StartCoroutine(Fade(v => v, null));
 
-                var operation = SceneManager.LoadSceneAsync(sceneName);
+                var operation = SceneManager.LoadSceneAsync(buildIndex);
                 while (!operation.isDone)
                 {
                     SetFill(operation.progress);
@@ -80,6 +72,8 @@ namespace FR8Runtime.UI.Loading
 
             root.style.opacity = fadeCurve.Evaluate(remap(1.0f));
             finishedCallback?.Invoke();
+
+            root.visible = root.style.opacity.value > 0.5f;
         }
 
         public void SetFill(float percent)
@@ -91,8 +85,8 @@ namespace FR8Runtime.UI.Loading
         public void ShowUI(bool state)
         {
             document.enabled = state;
-            root = state ? document.rootVisualElement.Q("LoadingScreen") : null;
-            fill = state ? document.rootVisualElement.Q<ProgressBar>("ProgressBar") : null;
+            root = state ? document.rootVisualElement.Q("loading-screen") : null;
+            fill = state ? document.rootVisualElement.Q<ProgressBar>("progress-bar") : null;
         }
     }
 }

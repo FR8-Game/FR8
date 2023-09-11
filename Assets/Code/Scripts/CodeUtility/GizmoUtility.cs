@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -7,7 +8,7 @@ namespace FR8Runtime.CodeUtility
 {
     public static class GizmoUtility
     {
-        public static int resolution = 32;
+        public static int resolution = 12;
         
 #if UNITY_EDITOR
         public static Action<Vector3, Vector3, Color, Matrix4x4> drawLineAction = (a, b, color, matrix) =>
@@ -29,8 +30,6 @@ namespace FR8Runtime.CodeUtility
 #else
         public static Action<Vector3, Vector3> drawLineAction = null;
 #endif
-
-        public static void DrawLine(Vector3 a, Vector3 b) => drawLineAction?.Invoke(a, b, Gizmos.color, Gizmos.matrix);
 
         public static void DrawCapsule(Vector3 center, UnityEngine.Quaternion orientation, float height, float radius)
         {
@@ -57,8 +56,8 @@ namespace FR8Runtime.CodeUtility
             var c0 = position + Vector3.up * (halfHeight - radius);
             var c1 = position - Vector3.up * (halfHeight - radius);
             
-            DrawLine(point(-radius, radius - halfHeight), point(-radius, halfHeight - radius));
-            DrawLine(point(radius, radius - halfHeight), point(radius, halfHeight - radius));
+            Handles.DrawPolyLine(point(-radius, radius - halfHeight), point(-radius, halfHeight - radius));
+            Handles.DrawPolyLine(point(radius, radius - halfHeight), point(radius, halfHeight - radius));
             
             DrawArc(c0, right, up, 0.0f, 180.0f, radius);
             DrawArc(c1, right, up, 180.0f, 180.0f, radius);
@@ -68,14 +67,11 @@ namespace FR8Runtime.CodeUtility
 
         public static void LineLoop(params Vector3[] points)
         {
-            for (var i = 0; i < points.Length - 1; i++)
-            {
-                var a = points[i];
-                var b = points[i + 1];
-                DrawLine(a, b);
-            }
-
-            DrawLine(points[^1], points[0]);
+            var newPoints = new Vector3[points.Length + 1];
+            for (var i = 0; i < points.Length; i++) newPoints[i] = points[i];
+            
+            newPoints[^1] = newPoints[0];
+            Handles.DrawLines(newPoints);
         }
 
         public static void DrawCircle(Vector3 center, Vector3 right, Vector3 up, float radius)
@@ -88,16 +84,15 @@ namespace FR8Runtime.CodeUtility
             var arcOffset = arcOffsetDeg * Mathf.Deg2Rad;
             var arcAngle = arcAngleDeg * Mathf.Deg2Rad;
 
+            var points = new List<Vector3>();
             for (var i = 0; i < resolution; i++)
             {
                 var a0 = i / (float)resolution * arcAngle + arcOffset;
-                var a1 = (i + 1.0f) / resolution * arcAngle + arcOffset;
-
                 var p0 = center + (right * Mathf.Cos(a0) + up * Mathf.Sin(a0)) * radius;
-                var p1 = center + (right * Mathf.Cos(a1) + up * Mathf.Sin(a1)) * radius;
-
-                DrawLine(p0, p1);
+                
+                points.Add(p0);
             }
+            Handles.DrawPolyLine(points.ToArray());
         }
     }
 }
