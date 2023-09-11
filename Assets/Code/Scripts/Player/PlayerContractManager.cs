@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using FR8Runtime.Contracts;
 using UnityEngine;
 
@@ -10,7 +11,7 @@ namespace FR8Runtime.Player
     {
         [SerializeField] private TextAsset initialContract;
 
-        private Contract contract;
+        public Contract ActiveContract { get; private set; }
 
         private void OnEnable()
         {
@@ -24,13 +25,13 @@ namespace FR8Runtime.Player
 
         private void ReadContract()
         {
-            if (contract) DestroyImmediate(contract);
+            if (ActiveContract) DestroyImmediate(ActiveContract);
+            if (!initialContract) return;
 
-            using (var stream = new MemoryStream())
-            using (var writer = new StreamWriter(stream))
+            using (var stream = new MemoryStream(Encoding.ASCII.GetBytes(initialContract.text)))
             {
-                writer.Write(initialContract.text);
-                contract = Contract.Deserialize(stream);
+                stream.Position = 0;
+                ActiveContract = Contract.Deserialize(stream);
             }
         }
     }

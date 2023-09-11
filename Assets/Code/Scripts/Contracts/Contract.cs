@@ -58,7 +58,7 @@ namespace FR8Runtime.Contracts
 
         public void Serialize(Stream stream)
         {
-            var serializer = new XmlSerializer(GetType());
+            var serializer = new XmlSerializer(typeof(Contract));
             serializer.Serialize(stream, this);
         }
 

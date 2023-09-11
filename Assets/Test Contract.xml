@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<Contract xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <name>Test Contract</name>
+  <hideFlags>None</hideFlags>
+  <predicates>
+    <ContractPredicate xsi:type="DeliveryPredicate">
+      <carriageNames>
+        <string>Container</string>
+      </carriageNames>
+      <deliveryLocationName>Section</deliveryLocationName>
+    </ContractPredicate>
+  </predicates>
+</Contract>

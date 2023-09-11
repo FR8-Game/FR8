@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using FR8Runtime.Train;
 using UnityEngine;
 
@@ -10,6 +11,22 @@ namespace FR8Runtime.Contracts.Predicates
     {
         public string[] carriageNames;
         public string deliveryLocationName;
+
+        public override string BuildText()
+        {
+            var sb = new StringBuilder();
+
+            sb.Append("Deliver ");
+            for (var i = 0; i < carriageNames.Length; i++)
+            {
+                if (i == 0) sb.Append($"{carriageNames[i]}");
+                else if (i == sb.Length - 1) sb.Append($", {carriageNames[i]}");
+                else sb.Append($", and {carriageNames[i]}");
+            }
+            sb.Append($" to {deliveryLocationName}");
+            
+            return sb.ToString();
+        }
 
         protected override int TasksDone()
         {

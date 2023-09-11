@@ -12,6 +12,8 @@ namespace FR8Runtime.Contracts.Predicates
         [XmlIgnore]
         public bool Done { get; private set; }
 
+        public abstract string BuildText();
+
         public void Update()
         {
             var tasksDone = TasksDone();
