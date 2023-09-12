@@ -66,7 +66,7 @@ namespace FR8Runtime.Player.Submodules
             compass.FaceAngle = avatar.transform.eulerAngles.y;
 
             var lookingAt = avatar.interactionManager.HighlightedObject;
-            this.lookingAt.text = (Object)lookingAt ? $"{lookingAt.DisplayName}\n{lookingAt.DisplayValue}" : string.Empty;
+            this.lookingAt.text = (Object)lookingAt ? $"{lookingAt.DisplayName}\n{lookingAt.DisplayValue}".ToUpper() : string.Empty;
 
             vignette.style.opacity = Mathf.Max
             (
