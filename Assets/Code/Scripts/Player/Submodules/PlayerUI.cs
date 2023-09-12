@@ -1,8 +1,10 @@
 ﻿using System;
 using FR8Runtime.CodeUtility;
+using FR8Runtime.Contracts;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Compass = FR8Runtime.UI.CustomControls.Compass;
+using Object = UnityEngine.Object;
 
 namespace FR8Runtime.Player.Submodules
 {
@@ -19,8 +21,9 @@ namespace FR8Runtime.Player.Submodules
         );
 
         [SerializeField] private float damageFlashTime;
-        
+
         private PlayerAvatar avatar;
+        private PlayerContractManager contractManager;
         private UIDocument hud;
 
         private ProgressBar shieldsFill;
@@ -28,6 +31,8 @@ namespace FR8Runtime.Player.Submodules
         private Compass compass;
         private VisualElement vignette;
         private VisualElement deathScreen;
+        private Label lookingAt;
+        private VisualElement contractContainer;
 
         private const string VitalityRootPath = "UI/Vitality";
         private const string CoverPath = VitalityRootPath + "/Death";
@@ -35,6 +40,7 @@ namespace FR8Runtime.Player.Submodules
         public void Init(PlayerAvatar avatar)
         {
             this.avatar = avatar;
+            contractManager = avatar.GetComponent<PlayerContractManager>();
 
             avatar.vitality.IsAliveChangedEvent += UpdateDeathUI;
             avatar.vitality.HealthChangeEvent += UpdateBars;
@@ -47,13 +53,20 @@ namespace FR8Runtime.Player.Submodules
             shieldsText = root.Q<Label>("shields-text");
             compass = root.Q<Compass>("compass");
             vignette = root.Q("vignette");
-            
+            lookingAt = root.Q<Label>("looking-at");
+            contractContainer = root.Q("contracts").Q("content");
+
             SetupDeathUI();
         }
 
         private void Update()
         {
+            RebuildContracts();
+
             compass.FaceAngle = avatar.transform.eulerAngles.y;
+
+            var lookingAt = avatar.interactionManager.HighlightedObject;
+            this.lookingAt.text = (Object)lookingAt ? $"{lookingAt.DisplayName}\n{lookingAt.DisplayValue}" : string.Empty;
 
             vignette.style.opacity = Mathf.Max
             (
@@ -92,13 +105,26 @@ namespace FR8Runtime.Player.Submodules
                 avatar.vitality.Revive();
                 SceneUtility.LoadScene(SceneUtility.Scene.Menu);
             };
-                
+
             UpdateDeathUI();
         }
 
         private void UpdateDeathUI()
         {
             deathScreen.visible = !avatar.IsAlive;
+        }
+
+        private void RebuildContracts()
+        {
+            contractContainer.Clear();
+
+            if (!contractManager) return;
+
+            foreach (var contract in contractManager.ActiveContracts)
+            {
+                if (!contract) return;
+                contractContainer.Add(contract.BuildUI());
+            }
         }
     }
 }

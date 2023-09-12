@@ -16,7 +16,7 @@ namespace FR8Runtime.Player.Submodules
         private int nudge;
         private bool dragging;
 
-        private IInteractable highlightedObject;
+        public IInteractable HighlightedObject { get; private set; }
 
         public PickupObject HeldObject { get; private set; }
         public PlayerAvatar Avatar { get; private set; }
@@ -34,7 +34,7 @@ namespace FR8Runtime.Player.Submodules
 
         public void Update()
         {
-            if ((Object)highlightedObject) SelectionOutlinePass.Add(highlightedObject.gameObject);
+            if ((Object)HighlightedObject) SelectionOutlinePass.Add(HighlightedObject.gameObject);
 
             if (Avatar.input.Nudge != 0) nudge = Avatar.input.Nudge;
         }
@@ -43,7 +43,7 @@ namespace FR8Runtime.Player.Submodules
         {
             UpdateHighlightedObject();
 
-            if ((Object)highlightedObject)
+            if ((Object)HighlightedObject)
             {
                 ProcessInteractable();
                 UpdateInputFlags();
@@ -68,12 +68,12 @@ namespace FR8Runtime.Player.Submodules
         
         private void UpdateHighlightedObject()
         {
-            highlightedObject = GetHighlightedObject();
+            HighlightedObject = GetHighlightedObject();
         }
 
         private IInteractable GetHighlightedObject()
         {
-            if (dragging) return highlightedObject;
+            if (dragging) return HighlightedObject;
 
             var lookingAt = GetLookingAt();
             if ((Object)lookingAt) return lookingAt;
@@ -85,17 +85,17 @@ namespace FR8Runtime.Player.Submodules
 
         private void ProcessInteractable()
         {
-            if (!highlightedObject.CanInteract) return;
+            if (!HighlightedObject.CanInteract) return;
 
             if (Avatar.input.Drag)
             {
-                if (dragging) highlightedObject.ContinueInteract(Avatar.gameObject);
-                else highlightedObject.BeginInteract(Avatar.gameObject);
+                if (dragging) HighlightedObject.ContinueInteract(Avatar.gameObject);
+                else HighlightedObject.BeginInteract(Avatar.gameObject);
             }
 
             if (nudge != 0)
             {
-                highlightedObject.Nudge(nudge);
+                HighlightedObject.Nudge(nudge);
                 nudge = 0;
             }
         }
