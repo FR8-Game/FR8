@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using FR8Runtime.Contracts.Predicates;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace FR8Runtime.Contracts
 {
@@ -24,7 +25,7 @@ namespace FR8Runtime.Contracts
             }
         }
 
-        public string BuildTitle() => $"{name} [{PredicatesCompleted}/{predicates.Count}]";
+        public string BuildTitle() => $"{name} [{PredicatesCompleted}/{predicates.Count}]".ToUpper();
         
         public override string ToString()
         {
@@ -35,6 +36,32 @@ namespace FR8Runtime.Contracts
             }
             
             return str;
+        }
+
+        public VisualElement BuildUI()
+        {
+            var root = new VisualElement();
+            root.AddToClassList("contract");
+
+            root.style.marginLeft = 10;
+            root.style.marginBottom = 6;
+
+            var header = new Label(BuildTitle());
+            root.name = "#header";
+            root.Add(header);
+
+            var content = new VisualElement();
+            content.name = "#predicates";
+            content.style.marginLeft = 10;
+            content.style.maxWidth = 350;
+            root.Add(content);
+
+            foreach (var e in predicates)
+            {
+                content.Add(e.BuildUI());
+            }
+
+            return root;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FR8Runtime.CodeUtility;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace FR8Runtime.Contracts.Predicates
 {
@@ -23,10 +24,13 @@ namespace FR8Runtime.Contracts.Predicates
         protected abstract int TaskCount();
 
         protected abstract string BuildString();
+        protected virtual string ProgressString() => StringUtility.Percent(Progress);
 
         public sealed override string ToString()
         {
-            return $"{BuildString()} [{(Done ? "Done" : StringUtility.Percent(Progress).PadLeft(4))}%]";
+            return $"{BuildString()} [{(Done ? "Done" : ProgressString().PadLeft(4))}]".ToUpper();
         }
+
+        public abstract VisualElement BuildUI();
     }
 }

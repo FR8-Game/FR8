@@ -7,7 +7,7 @@ namespace FR8Runtime.Train
     [SelectionBase]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Rigidbody))]
-    public class TrainCarriage : MonoBehaviour
+    public class TrainCarriage : MonoBehaviour, INameplateProvider
     {
         [Space]
         public string saveTypeReference = "TrainCarriage";
@@ -31,6 +31,7 @@ namespace FR8Runtime.Train
             set => segment = value;
         }
 
+        public string Name => name;
         public Rigidbody Rigidbody { get; private set; }
         public Vector3 DriverDirection { get; private set; }
         public float ReferenceWeight => referenceWeight;

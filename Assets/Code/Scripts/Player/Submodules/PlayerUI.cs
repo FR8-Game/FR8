@@ -22,8 +22,6 @@ namespace FR8Runtime.Player.Submodules
 
         [SerializeField] private float damageFlashTime;
 
-        [SerializeField] private VisualTreeAsset contractAsset;
-
         private PlayerAvatar avatar;
         private PlayerContractManager contractManager;
         private UIDocument hud;
@@ -125,26 +123,7 @@ namespace FR8Runtime.Player.Submodules
             foreach (var contract in contractManager.ActiveContracts)
             {
                 if (!contract) return;
-                BuildContract(contract);
-            }
-        }
-
-        private void BuildContract(Contract contract)
-        {
-            var root = contractAsset.Instantiate();
-            contractContainer.Add(root);
-
-            var header = root.Q<Label>("header");
-            header.text = contract.name.ToUpper();
-
-            var predicateContainer = root.Q("predicates");
-            predicateContainer.Clear();
-            foreach (var e in contract.predicates)
-            {
-                var progressBar = new ProgressBar();
-                predicateContainer.Add(progressBar);
-                progressBar.title = e.ToString().ToUpper();
-                progressBar.value = e.Progress * 100.0f;
+                contractContainer.Add(contract.BuildUI());
             }
         }
     }

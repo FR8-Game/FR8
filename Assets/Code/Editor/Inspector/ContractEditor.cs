@@ -83,6 +83,9 @@ namespace FR8Editor.Inspector
             AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(predicate));
             DestroyImmediate(predicate);
 
+            EditorUtility.SetDirty(Target);
+            AssetDatabase.SaveAssets();
+
             BuildInspector();
         };
 
@@ -98,6 +101,9 @@ namespace FR8Editor.Inspector
             var filename = Path.Combine(dir, $"{predicate.name}.asset");
             AssetDatabase.CreateAsset(predicate, filename);
 
+            EditorUtility.SetDirty(Target);
+            AssetDatabase.SaveAssets();
+            
             BuildInspector();
             Repaint();
         };
