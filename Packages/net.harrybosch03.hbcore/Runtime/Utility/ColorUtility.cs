@@ -14,5 +14,6 @@ namespace HBCore.Utility
 
         public static Color Gray(float gray, float alpha = 1.0f) => new(gray, gray, gray, alpha);
         public static Color ScaleAlpha(Color color, float alphaScale) => new(color.r, color.g, color.b, color.a * alphaScale);
+        public static Color Gray255(int gray, float alpha = 1.0f) => new(gray / 255.0f, gray / 255.0f, gray / 255.0f, alpha);
     }
 }

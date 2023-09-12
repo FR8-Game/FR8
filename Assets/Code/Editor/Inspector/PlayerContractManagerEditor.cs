@@ -20,9 +20,12 @@ namespace FR8Editor.Inspector
             var player = target as PlayerContractManager;
             if (!player) return root;
 
-            foreach (var contract in player.ActiveContracts)
+            if (player.ActiveContracts != null)
             {
-                AddContract(contract, root);
+                foreach (var contract in player.ActiveContracts)
+                {
+                    AddContract(contract, root);
+                }
             }
 
             return root;
@@ -31,7 +34,7 @@ namespace FR8Editor.Inspector
         private void AddContract(Contract contract, VisualElement root)
         {
             if (!contract) return;
-            
+
             var container = new VisualElement();
             root.Add(container);
 
@@ -40,10 +43,10 @@ namespace FR8Editor.Inspector
             header.lowValue = 0.0f;
             header.highValue = 1.0f;
             header.value = contract.Progress;
-            
+
             header.style.fontSize = 24;
             root.Add(header);
-            
+
             foreach (var e in contract.predicates)
             {
                 var bar = new ProgressBar();
@@ -52,7 +55,7 @@ namespace FR8Editor.Inspector
                 bar.value = e.Progress;
                 bar.lowValue = 0.0f;
                 bar.highValue = 1.0f;
-                
+
                 container.Add(bar);
             }
         }
