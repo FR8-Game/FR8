@@ -1,17 +1,21 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using FR8Runtime.Interactions.Drivers;
+using FR8Runtime.Interactions.Drivers.Submodules;
 using UnityEngine;
 
 namespace FR8Runtime.Train
 {
-    public class CarriageConnector : Driver
+    public class CarriageConnector : MonoBehaviour, IInteractable
     {
         [SerializeField] private CarriageConnectorSettings settings;
+        [SerializeField] private bool engaged = true;
         [SerializeField] private Transform anchor;
         [SerializeField] private Transform magnetFX;
         [SerializeField] private float fxTransitionSpeed;
+        [SerializeField] private Vector3 offset;
 
+        private Vector3 anchorOrigin;
+        private float anchorConnectionDistance;
         private new Rigidbody rigidbody;
         private CarriageConnector connection;
 
@@ -20,17 +24,36 @@ namespace FR8Runtime.Train
 
         private static HashSet<CarriageConnector> all = new();
 
-        public override string DisplayValue => Value > 0.5f ? "Engaged" : "Disengaged";
-
-        protected override void Awake()
+        public bool CanInteract => true;
+        public string DisplayName => "Carriage Connector";
+        public string DisplayValue => engaged ? "Engaged" : "Disengaged";
+        public bool OverrideInteractDistance { get; }
+        public float InteractDistance { get; }
+        public Vector3 AnchorPosition => transform.TransformPoint(anchorOrigin);
+        
+        public void Nudge(int direction)
         {
-            base.Awake();
+            engaged = direction > 0;
+        }
+
+        public void BeginInteract(GameObject interactingObject)
+        {
+            engaged = !engaged;
+        }
+
+        public void ContinueInteract(GameObject interactingObject) { }
+
+        protected void Awake()
+        {
             rigidbody = GetComponentInParent<Rigidbody>();
 
             if (magnetFX)
             {
                 magnetFXScale = magnetFX.transform.localScale;
             }
+
+            anchorOrigin = transform.InverseTransformPoint(anchor.position);
+            anchorConnectionDistance = anchorOrigin.magnitude;
         }
 
         private void OnEnable()
@@ -43,42 +66,54 @@ namespace FR8Runtime.Train
             all.Remove(this);
         }
 
-        protected override void FixedUpdate()
+        protected void FixedUpdate()
         {
-            base.FixedUpdate();
-            var engaged = Value > 0.5f;
-
             UpdateFX(engaged);
 
-            if (!engaged) return;
+            if (!engaged)
+            {
+                connection = null;
+                return;
+            }
 
             if (connection)
             {
-                if (connection.Value < 0.5f)
+                if (!connection.engaged)
                 {
-                    SetValue(0.0f);
                     connection = null;
                     return;
                 }
                 
                 ApplyForce();
-                UpdateOrientation();
-                
+                PositionAnchor(connection.transform, 1.0f);
+
                 return;
             }
 
             var connectorsInRange = GetAllConnectorsInRange();
             foreach (var other in connectorsInRange)
             {
-                var vector = other.anchor.position - anchor.position;
-                var dist = vector.magnitude;
+                var vector = other.transform.position - transform.position;
+                var dist = vector.magnitude - (anchorConnectionDistance + other.anchorConnectionDistance);
                 var direction = vector / dist;
 
-                if (other.Value < 0.5f) continue;
+                if (!other.engaged) continue;
                 if (TryConnect(dist, other)) break;
 
                 ApplyMagneticForce(direction, dist);
+                PositionAnchor(other.transform, 1.0f - (dist / settings.forceRange));
+                
+                break;
             }
+        }
+
+        private void PositionAnchor(Transform target, float t)
+        {
+            var vector = target.transform.position - transform.position;
+            vector = vector.normalized * Mathf.Min(vector.magnitude, anchorConnectionDistance);
+            
+            anchor.position = Vector3.Lerp(transform.TransformPoint(anchorOrigin), transform.position + vector, t);
+            anchor.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(vector, rigidbody.transform.up), t)* Quaternion.Euler(offset);
         }
 
         private bool TryConnect(float dist, CarriageConnector other)
@@ -98,29 +133,23 @@ namespace FR8Runtime.Train
             rigidbody.AddForce(force);
         }
 
-        private void UpdateOrientation()
-        {
-            var direction = connection.transform.position - transform.position;
-            var orientation = Quaternion.LookRotation(direction, rigidbody.transform.up);
-            //transform.rotation = orientation;
-        }
-
         private void ApplyForce()
         {
-            var displacement = connection.anchor.position - anchor.position;
+            var displacement = connection.transform.position - transform.position;
+            displacement = displacement.normalized * (displacement.magnitude - anchorConnectionDistance - connection.anchorConnectionDistance);
 
             var mass = rigidbody.mass;
             var otherMass = connection.rigidbody.mass;
             var totalMass = mass + otherMass;
 
-            var force = displacement * settings.connectionForce;
-            force -= rigidbody.velocity * settings.connectionDamping;
+            var force = displacement / (Time.deltaTime * Time.deltaTime);
+            force -= rigidbody.velocity / Time.deltaTime;
             force *= mass * (mass / totalMass);
 
             force = transform.forward * Vector3.Dot(transform.forward, force);
 
-            rigidbody.AddForce(force);
-            connection.rigidbody.AddForce(-force);
+            rigidbody.AddForce(force / 2.0f);
+            connection.rigidbody.AddForce(-force / 2.0f);
         }
 
         private void UpdateFX(bool engaged)
@@ -139,7 +168,7 @@ namespace FR8Runtime.Train
             {
                 if (e == this) continue;
 
-                if ((e.anchor.position - anchor.position).sqrMagnitude < settings.forceRange * settings.forceRange)
+                if ((e.AnchorPosition - AnchorPosition).sqrMagnitude < settings.forceRange * settings.forceRange)
                 {
                     list.Add(e);
                 }
@@ -171,23 +200,9 @@ namespace FR8Runtime.Train
         {
             if (!anchor || !settings) return;
             Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(anchor.position, settings.forceRange);
+            Gizmos.DrawWireSphere(AnchorPosition, settings.forceRange);
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(anchor.position, settings.connectionDistance);
+            Gizmos.DrawWireSphere(AnchorPosition, settings.connectionDistance);
         }
-
-        protected override void SetValue(float newValue) => base.SetValue(newValue > 0.5f ? 1.0f : 0.0f);
-
-        public override void Nudge(int direction)
-        {
-            SetValue(direction == 1 ? 1.0f : 0.0f);
-        }
-
-        public override void BeginInteract(GameObject interactingObject)
-        {
-            SetValue(1.0f - Value);
-        }
-
-        public override void ContinueInteract(GameObject interactingObject) { }
     }
 }

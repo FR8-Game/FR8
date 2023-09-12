@@ -14,6 +14,8 @@ namespace FR8Runtime.Save
     [CreateAssetMenu(menuName = "Scriptable Objects/Save System/Save Prefab List")]
     public class SavePrefabList : ScriptableObject
     {
+        private const bool Log = false;
+        
         public TrainCarriage[] carriagePrefabs;
 
 #if UNITY_EDITOR
@@ -38,7 +40,7 @@ namespace FR8Runtime.Save
             }
 
             carriagePrefabs = list.ToArray();
-            Debug.Log($"Rebuild Prefab Save List at \"{AssetDatabase.GetAssetPath(this)}\"");
+            if (Log) Debug.Log($"Rebuild Prefab Save List at \"{AssetDatabase.GetAssetPath(this)}\"");
         }
 
         [MenuItem("Actions/Save/Rebuild Save Prefab List")]
