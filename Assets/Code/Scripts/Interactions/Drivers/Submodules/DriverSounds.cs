@@ -1,4 +1,5 @@
 using FMODUnity;
+using FR8Runtime.CodeUtility;
 using UnityEngine;
 
 namespace FR8Runtime.Interactions.Drivers.Submodules
@@ -6,11 +7,9 @@ namespace FR8Runtime.Interactions.Drivers.Submodules
     [System.Serializable]
     public sealed class DriverSounds
     {
-        public EventReference clickEvent;
-        
         private GameObject gameObject;
         private float lastValue;
-        
+
         public void Awake(GameObject gameObject)
         {
             this.gameObject = gameObject;
@@ -23,12 +22,9 @@ namespace FR8Runtime.Interactions.Drivers.Submodules
 
             if (index != lastIndex)
             {
-                var sound = RuntimeManager.CreateInstance(clickEvent);
-                sound.set3DAttributes(gameObject.To3DAttributes());
-                sound.start();
-                sound.release();
+                SoundUtility.PlayOneShot("event:/Interactions/Control Stick Click");
             }
-            
+
             lastValue = newValue;
         }
     }
