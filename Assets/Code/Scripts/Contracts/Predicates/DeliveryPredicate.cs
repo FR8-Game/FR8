@@ -5,14 +5,13 @@ using UnityEngine;
 
 namespace FR8Runtime.Contracts.Predicates
 {
-    [Serializable]
-    [ContractElement]
+    [CreateAssetMenu(menuName = ScriptableObjectLocation + "Delivery Predicate")]
     public class DeliveryPredicate : ContractPredicate
     {
         public string[] carriageNames;
         public string deliveryLocationName;
 
-        public override string BuildText()
+        protected override string BuildString()
         {
             var sb = new StringBuilder();
 

@@ -1,18 +1,14 @@
-﻿using System;
-using System.Xml.Serialization;
+﻿using FR8Runtime.CodeUtility;
+using UnityEngine;
 
 namespace FR8Runtime.Contracts.Predicates
 {
-    [Serializable]
-    public abstract class ContractPredicate
+    public abstract class ContractPredicate : ScriptableObject
     {
-        [XmlIgnore]
-        public float Progress { get; private set; }
+        public const string ScriptableObjectLocation = "Scriptable Objects/Contracts/";
         
-        [XmlIgnore]
+        public float Progress { get; private set; }
         public bool Done { get; private set; }
-
-        public abstract string BuildText();
 
         public void Update()
         {
@@ -25,5 +21,12 @@ namespace FR8Runtime.Contracts.Predicates
         
         protected abstract int TasksDone();
         protected abstract int TaskCount();
+
+        protected abstract string BuildString();
+
+        public sealed override string ToString()
+        {
+            return $"{BuildString()} [{(Done ? "Done" : StringUtility.Percent(Progress).PadLeft(4))}%]";
+        }
     }
 }

@@ -23,7 +23,7 @@ namespace FR8Runtime.Player.Submodules
         [SerializeField] private float damageFlashTime;
 
         [SerializeField] private VisualTreeAsset contractAsset;
-        
+
         private PlayerAvatar avatar;
         private PlayerContractManager contractManager;
         private UIDocument hud;
@@ -57,19 +57,19 @@ namespace FR8Runtime.Player.Submodules
             vignette = root.Q("vignette");
             lookingAt = root.Q<Label>("looking-at");
             contractContainer = root.Q("contracts").Q("content");
-            
+
             SetupDeathUI();
         }
 
         private void Update()
         {
             RebuildContracts();
-            
+
             compass.FaceAngle = avatar.transform.eulerAngles.y;
 
             var lookingAt = avatar.interactionManager.HighlightedObject;
             this.lookingAt.text = (Object)lookingAt ? $"{lookingAt.DisplayName}\n{lookingAt.DisplayValue}" : string.Empty;
-            
+
             vignette.style.opacity = Mathf.Max
             (
                 GetVignetteOpacity(),
@@ -107,7 +107,7 @@ namespace FR8Runtime.Player.Submodules
                 avatar.vitality.Revive();
                 SceneUtility.LoadScene(SceneUtility.Scene.Menu);
             };
-                
+
             UpdateDeathUI();
         }
 
@@ -122,10 +122,11 @@ namespace FR8Runtime.Player.Submodules
 
             if (!contractManager) return;
 
-            var contract = contractManager.ActiveContract;
-            if (!contract) return;
-
-            BuildContract(contract);
+            foreach (var contract in contractManager.ActiveContracts)
+            {
+                if (!contract) return;
+                BuildContract(contract);
+            }
         }
 
         private void BuildContract(Contract contract)
@@ -135,14 +136,14 @@ namespace FR8Runtime.Player.Submodules
 
             var header = root.Q<Label>("header");
             header.text = contract.name.ToUpper();
-            
+
             var predicateContainer = root.Q("predicates");
             predicateContainer.Clear();
             foreach (var e in contract.predicates)
             {
                 var progressBar = new ProgressBar();
                 predicateContainer.Add(progressBar);
-                progressBar.title = $"{e.BuildText()} [{(e.Done ? "DONE" : (e.Progress * 100.0f).ToString("N0").PadLeft(4))}]".ToUpper();
+                progressBar.title = e.ToString().ToUpper();
                 progressBar.value = e.Progress * 100.0f;
             }
         }

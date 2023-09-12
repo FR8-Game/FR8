@@ -1,116 +1,39 @@
-using System.IO;
-using System.Xml.Serialization;
 using FR8Runtime.Contracts.Predicates;
-using UnityEditor;
 using UnityEngine;
-
-#if UNITY_EDITOR
-
-#endif
 
 namespace FR8Runtime.Contracts
 {
     [CreateAssetMenu(menuName = "Scriptable Objects/Contract")]
-    [XmlInclude(typeof(DeliveryPredicate))]
-    public class Contract : ScriptableObject
+    public abstract class Contract : ScriptableObject
     {
         public ContractPredicate[] predicates;
-
-        [ContextMenu("Debug Serialize")]
-        public void DebugSerialize()
+        
+        public float Progress { get; private set; }
+        public int PredicatesCompleted { get; private set; }
+        public bool Done => PredicatesCompleted == predicates.Length;
+        
+        public void Update()
         {
-            var temp = CreateInstance<Contract>();
-
-            temp.name = "Testing Contract";
-            temp.predicates = new ContractPredicate[]
+            PredicatesCompleted = 0;
+            foreach (var e in predicates)
             {
-                new DeliveryPredicate()
-                {
-                    carriageNames = new[]
-                    {
-                        "Carriage.1",
-                        "Carriage.2",
-                        "Carriage.3"
-                    },
-                    deliveryLocationName = "The Delivery Location"
-                },
-            };
-
-            Debug.Log(temp.Serialize());
-            DestroyImmediate(temp);
-        }
-
-        public string Serialize()
-        {
-            string text;
-            using (var stream = new MemoryStream())
-            {
-                Serialize(stream);
-                stream.Position = 0;
-                using (var reader = new StreamReader(stream))
-                {
-                    text = reader.ReadToEnd();
-                }
+                e.Update();
+                Progress += e.Progress / predicates.Length;
+                PredicatesCompleted++;
             }
-
-            return text;
         }
 
-        public void Serialize(Stream stream)
+        public string BuildTitle() => $"{name} [{PredicatesCompleted}/{predicates.Length}]";
+        
+        public override string ToString()
         {
-            var serializer = new XmlSerializer(typeof(Contract));
-            serializer.Serialize(stream, this);
-        }
-
-        public static Contract Deserialize(Stream stream)
-        {
-            var serializer = new XmlSerializer(typeof(Contract));
-            return (Contract)serializer.Deserialize(stream);
-        }
-
-#if UNITY_EDITOR
-        [MenuItem("Tools/Contracts/Create Contract Template")]
-        public static void CreateContractTemplate()
-        {
-            var contract = CreateInstance<Contract>();
-            contract.name = "Contract Template";
-
-            contract.predicates = new ContractPredicate[]
+            var str = $"{BuildTitle()}\n";
+            foreach (var e in predicates)
             {
-                new DeliveryPredicate
-                {
-                    carriageNames = new[]
-                    {
-                        "Train Carriage Scene Name 0",
-                        "Train Carriage Scene Name 1",
-                        "Train Carriage Scene Name 2"
-                    },
-                    deliveryLocationName = "Track Section Scene Name 1"
-                },
-                new DeliveryPredicate
-                {
-                    carriageNames = new[]
-                    {
-                        "Train Carriage Scene Name 3",
-                        "Train Carriage Scene Name 4"
-                    },
-                    deliveryLocationName = "Track Section Scene Name 2"
-                },
-            };
-
-            var path = Application.dataPath;
-            var filename = Path.Combine(path, $"{contract.name}.xml");
-
-            Directory.CreateDirectory(path);
-            using (var fs = new FileStream(filename, FileMode.OpenOrCreate))
-            {
-                contract.Serialize(fs);
+                str += e.ToString();
             }
-            AssetDatabase.Refresh();
-
-            DestroyImmediate(contract);
+            
+            return str;
         }
-
-#endif
     }
 }

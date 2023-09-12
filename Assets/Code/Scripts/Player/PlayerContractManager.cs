@@ -1,6 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.Text;
+using System.Collections.Generic;
 using FR8Runtime.Contracts;
 using UnityEngine;
 
@@ -9,29 +8,20 @@ namespace FR8Runtime.Player
     [SelectionBase, DisallowMultipleComponent]
     public class PlayerContractManager : MonoBehaviour
     {
-        [SerializeField] private TextAsset initialContract;
+        [SerializeField] private List<Contract> initialContracts;
 
-        public Contract ActiveContract { get; private set; }
+        public List<Contract> ActiveContracts { get; private set; }
 
         private void OnEnable()
         {
-            ReadContract();
+            ActiveContracts = new List<Contract>(initialContracts);
         }
 
-        private void OnValidate()
+        private void Update()
         {
-            ReadContract();
-        }
-
-        private void ReadContract()
-        {
-            if (ActiveContract) DestroyImmediate(ActiveContract);
-            if (!initialContract) return;
-
-            using (var stream = new MemoryStream(Encoding.ASCII.GetBytes(initialContract.text)))
+            foreach (var e in ActiveContracts)
             {
-                stream.Position = 0;
-                ActiveContract = Contract.Deserialize(stream);
+                e.Update();
             }
         }
     }
