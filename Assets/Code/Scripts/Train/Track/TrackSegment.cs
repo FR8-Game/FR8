@@ -361,7 +361,6 @@ namespace FR8Runtime.Train.Track
                 {
                     if (!Valid(s)) continue;
                     if (s == this) continue;
-                    if (s.ConnectedTo(this)) continue;
 
                     var t = s.GetClosestPoint(knot.position);
                     var closestPoint = s.SamplePoint(t);
@@ -371,7 +370,7 @@ namespace FR8Runtime.Train.Track
                     connection.t = t;
 
                     var d1 = s.SampleVelocity(t);
-                    connection.direction = (int)Mathf.Sign(Vector3.Dot(d0, d1));
+                    connection.direction = -(int)Mathf.Sign(Vector3.Dot(d0, d1));
 
                     knot.position = closestPoint;
 

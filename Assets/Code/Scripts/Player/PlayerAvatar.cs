@@ -20,6 +20,7 @@ namespace FR8Runtime.Player
 
         public event Action UpdateEvent;
         public event Action FixedUpdateEvent;
+        public event Action DisableEvent;
 
         public bool IsAlive => vitality.IsAlive;
         public Transform Head { get; private set; }
@@ -48,6 +49,11 @@ namespace FR8Runtime.Player
             Body.isKinematic = true;
 
             getCenter = () => transform.position;
+        }
+
+        private void OnDisable()
+        {
+            DisableEvent?.Invoke();
         }
 
         private void InitSubmodules()
