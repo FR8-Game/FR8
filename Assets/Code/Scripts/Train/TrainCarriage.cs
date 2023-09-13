@@ -7,7 +7,7 @@ namespace FR8Runtime.Train
     [SelectionBase]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Rigidbody))]
-    public class TrainCarriage : MonoBehaviour
+    public class TrainCarriage : MonoBehaviour, INameplateProvider
     {
         [Space]
         public string saveTypeReference = "TrainCarriage";
@@ -31,6 +31,7 @@ namespace FR8Runtime.Train
             set => segment = value;
         }
 
+        public string Name => name;
         public Rigidbody Rigidbody { get; private set; }
         public Vector3 DriverDirection { get; private set; }
         public float ReferenceWeight => referenceWeight;
@@ -41,16 +42,23 @@ namespace FR8Runtime.Train
             Configure();
         }
 
+        private void OnEnable()
+        {
+            FindClosestSegment();
+        }
+
         public void FindClosestSegment()
         {
             var best = (TrackSegment)null;
             var bestScore = float.MaxValue;
             var point = transform.position;
+            var tangent = transform.forward;
             
             var segments = FindObjectsOfType<TrackSegment>();
             foreach (var segment in segments)
             {
-                var closestPoint = segment.SamplePoint(segment.GetClosestPoint(transform.position));
+                var t = segment.GetClosestPoint(transform.position);
+                var closestPoint = segment.SamplePoint(t);
                 var score = (closestPoint - transform.position).sqrMagnitude;
 
                 if (score > bestScore) continue;
@@ -58,10 +66,12 @@ namespace FR8Runtime.Train
                 bestScore = score;
                 best = segment;
                 point = closestPoint;
+                tangent = segment.SampleTangent(t);
             }
 
             segment = best;
             transform.position = point;
+            transform.rotation = Quaternion.LookRotation(tangent, Vector3.up);
         }
 
         protected virtual void Configure()
@@ -75,8 +85,8 @@ namespace FR8Runtime.Train
 
         protected virtual void FixedUpdate()
         {
-            //ApplyDrag();
-            //ApplyCorrectiveForce();
+            ApplyDrag();
+            ApplyCorrectiveForce();
         }
 
         private void ApplyDrag()

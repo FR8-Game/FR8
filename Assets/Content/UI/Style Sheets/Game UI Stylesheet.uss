@@ -1,12 +1,10 @@
 * {
-    -unity-font-definition: url('project://database/Assets/Content/Fonts/Assets/Montserrat/Montserrat%20Black%20UI.asset?fileID=11400000&guid=d8c5459ff9cce0046b5fed6b3d7c4a40&type=2#Montserrat Black UI');
+    -unity-font-definition: url('project://database/Assets/Content/Fonts/Assets/IBMPlexMono/IBMPlexMono-Bold%20SDF%202.asset?fileID=11400000&guid=3dd4b8f06568f1c4f83f1ec62e559cb5&type=2#IBMPlexMono-Bold SDF 2');
     color: rgb(220, 220, 220);
-    -unity-font: url('project://database/Assets/Content/Fonts/Files/Montserrat/Montserrat-Black.ttf?fileID=12800000&guid=ef577ed07bb92144ba32fb334eee19f1&type=3#Montserrat-Black');
+    -unity-font: url('project://database/Assets/Content/Fonts/Files/IBM%20Plex%20Mono/IBMPlexMono-Bold.ttf?fileID=12800000&guid=58b8ca5e263606247a20d7192c183704&type=3#IBMPlexMono-Bold');
 }
 
 .text-light * {
-    -unity-font: url('project://database/Assets/Content/Fonts/Files/Montserrat/Montserrat-Light.ttf?fileID=12800000&guid=fa4c27407242ce143bed7792e0ba7e9b&type=3#Montserrat-Light');
-    -unity-font-definition: url('project://database/Assets/Content/Fonts/Assets/Montserrat/Montserrat-Light%20SDF.asset?fileID=11400000&guid=275ea07cb640aad48907c0544b1002df&type=2#Montserrat-Light SDF');
 }
 
 #divider {
@@ -329,4 +327,46 @@ TextField {
 
 .BigTitle {
     font-size: 180px;
+}
+
+.contract ProgressBar Label {
+    -unity-text-align: middle-left;
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-wrap: nowrap;
+    white-space: normal;
+    color: rgb(255, 255, 255);
+}
+
+.contract ProgressBar #unity-progress-bar {
+    max-height: none;
+}
+
+.contract .unity-progress-bar__background {
+    background-color: rgba(255, 255, 255, 0);
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+    opacity: 1;
+}
+
+.contract .unity-progress-bar__progress {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.39);
+    margin-left: 4px;
+    margin-right: 4px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.contract * {
+    border-left-color: rgb(255, 255, 255);
+    border-right-color: rgb(255, 255, 255);
+    border-top-color: rgb(255, 255, 255);
+    border-bottom-color: rgb(255, 255, 255);
 }
