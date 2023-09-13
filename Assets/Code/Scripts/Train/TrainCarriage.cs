@@ -1,3 +1,4 @@
+using System;
 using FR8Runtime.Train.Track;
 using UnityEngine;
 
@@ -6,8 +7,11 @@ namespace FR8Runtime.Train
     [SelectionBase]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Rigidbody))]
-    public class TrainCarriage : MonoBehaviour
+    public class TrainCarriage : MonoBehaviour, INameplateProvider
     {
+        [Space]
+        public string saveTypeReference = "TrainCarriage";
+        
         [Space]
         [SerializeField] protected float drag = 12.0f;
         [SerializeField] protected float referenceWeight;
@@ -27,6 +31,7 @@ namespace FR8Runtime.Train
             set => segment = value;
         }
 
+        public string Name => name;
         public Rigidbody Rigidbody { get; private set; }
         public Vector3 DriverDirection { get; private set; }
         public float ReferenceWeight => referenceWeight;
@@ -35,6 +40,38 @@ namespace FR8Runtime.Train
         private void Awake()
         {
             Configure();
+        }
+
+        private void OnEnable()
+        {
+            FindClosestSegment();
+        }
+
+        public void FindClosestSegment()
+        {
+            var best = (TrackSegment)null;
+            var bestScore = float.MaxValue;
+            var point = transform.position;
+            var tangent = transform.forward;
+            
+            var segments = FindObjectsOfType<TrackSegment>();
+            foreach (var segment in segments)
+            {
+                var t = segment.GetClosestPoint(transform.position);
+                var closestPoint = segment.SamplePoint(t);
+                var score = (closestPoint - transform.position).sqrMagnitude;
+
+                if (score > bestScore) continue;
+
+                bestScore = score;
+                best = segment;
+                point = closestPoint;
+                tangent = segment.SampleTangent(t);
+            }
+
+            segment = best;
+            transform.position = point;
+            transform.rotation = Quaternion.LookRotation(tangent, Vector3.up);
         }
 
         protected virtual void Configure()
@@ -58,6 +95,7 @@ namespace FR8Runtime.Train
             var drag = -fwdSpeed * Mathf.Abs(fwdSpeed) * this.drag;
 
             var force = drag * referenceWeight / Rigidbody.mass;
+            
             Rigidbody.AddForce(DriverDirection * force);
         }
 

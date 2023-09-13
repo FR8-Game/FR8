@@ -28,7 +28,7 @@ namespace FR8Runtime.Train
 
         private void OnEnable()
         {
-            loopEvent = RuntimeManager.CreateInstance(loopAudio);
+            if (!loopAudio.IsNull) loopEvent = RuntimeManager.CreateInstance(loopAudio);
         }
 
         private void OnDisable()

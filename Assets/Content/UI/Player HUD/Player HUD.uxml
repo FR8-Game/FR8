@@ -1,0 +1,32 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Contract" src="project://database/Assets/Content/UI/Player%20HUD/Contract.uxml?fileID=9197481963319205126&amp;guid=d3169c27548604a4caeaaa1087505fdf&amp;type=3#Contract" />
+    <Style src="project://database/Assets/Content/UI/Style%20Sheets/Game%20UI%20Stylesheet.uss?fileID=7433441132597879392&amp;guid=acd50812ec1cbb044a0297b17ba892a4&amp;type=3#Game UI Stylesheet" />
+    <ui:VisualElement name="player-hud">
+        <ui:VisualElement name="vitality">
+            <ui:VisualElement name="shields" class="shields">
+                <ui:Label text="SHIELDS" display-tooltip-when-elided="true" name="shields-title" style="-unity-paragraph-spacing: -60px;" />
+                <ui:ProgressBar name="shields-bar" high-value="1" />
+                <ui:Label text="[ ACTIVE | 30 s ]" display-tooltip-when-elided="true" name="shields-text" style="-unity-paragraph-spacing: -60px;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="center-align" style="top: 0; right: 0; left: 0; bottom: 1px;">
+            <ui:VisualElement name="crosshair" />
+        </ui:VisualElement>
+        <ui:VisualElement name="vignette" />
+        <ui:VisualElement name="spatial-info">
+            <ui:VisualElement name="long-lat">
+                <ui:Label text="LONG: 20.2341" display-tooltip-when-elided="true" name="long" />
+                <ui:Label text="09.145 :LAT" display-tooltip-when-elided="true" name="lat" />
+            </ui:VisualElement>
+            <ui:VisualElement name="divider" />
+            <FR8Runtime.UI.CustomControls.Compass name="compass" FaceAngle="0" TickSpacing="2" />
+        </ui:VisualElement>
+        <ui:Label text="Thing you are looking at&#10;Seccond Line" display-tooltip-when-elided="true" name="looking-at" style="margin-left: auto; margin-right: auto; margin-top: auto; margin-bottom: auto; width: auto; height: auto; translate: 0 150px; font-size: 24px; opacity: 0.75; -unity-text-align: upper-left;" />
+        <ui:VisualElement name="contracts" style="position: absolute; left: 0; bottom: 20%; margin-left: 30px; margin-right: 30px; margin-top: 30px; margin-bottom: 30px;">
+            <ui:Label text="ACTIVE CONTRACTS" display-tooltip-when-elided="true" name="header" style="font-size: 24px;" />
+            <ui:VisualElement name="content" style="border-left-color: rgba(255, 255, 255, 0.39); border-right-color: rgba(255, 255, 255, 0.39); border-top-color: rgba(255, 255, 255, 0.39); border-bottom-color: rgba(255, 255, 255, 0.39); border-top-width: 2px; border-bottom-width: 2px;">
+                <ui:Instance template="Contract" name="Contract" style="margin-left: 15px;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

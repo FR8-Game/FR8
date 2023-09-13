@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Runtime.CompilerServices;
+using UnityEditor.Build;
+using UnityEngine;
 
 namespace FR8Runtime.Player
 {
@@ -12,21 +15,36 @@ namespace FR8Runtime.Player
         private Animator animator;
         private static readonly int Occupied = Animator.StringToHash("occupied");
 
+        // ReSharper disable once InconsistentNaming
+        private static PlayerSpawnPoint _default;
+        
         public Vector3 Position => (point ? point : transform).position;
         public Quaternion Orientation => (point ? point : transform).rotation;
-        public static PlayerSpawnPoint Default { get; private set; }
+
+        public static PlayerSpawnPoint Default
+        {
+            get
+            {
+                if (_default) return _default;
+                
+                var all = FindObjectsOfType<PlayerSpawnPoint>();
+                foreach (var e in all)
+                {
+                    if (!e.defaultSpawn) continue;
+                    
+                    _default = e;
+                    return e;
+                }
+
+                _default = all[0];
+                _default.defaultSpawn = true;
+                return _default;
+            }
+        }
 
         private void Awake()
         {
-            FindDefaultSpawnPoint();
-
             animator = GetComponentInChildren<Animator>();
-        }
-
-        private void OnValidate()
-        {
-            if (defaultSpawn) Default = this;
-            FindDefaultSpawnPoint();
         }
 
         private void FixedUpdate()
@@ -51,27 +69,6 @@ namespace FR8Runtime.Player
             Gizmos.matrix = transform.localToWorldMatrix;
             
             Gizmos.DrawWireCube(bounds.center, bounds.size);
-        }
-
-        private static void FindDefaultSpawnPoint()
-        {
-            var spawnPoints = FindObjectsOfType<PlayerSpawnPoint>();
-            if (spawnPoints.Length == 0)
-            {
-                Default = null;
-                return;
-            }
-            
-            foreach (var e in spawnPoints)
-            {
-                if (Default != e) e.defaultSpawn = false;
-                if (e.defaultSpawn && !Default) Default = e;
-            }
-
-            if (!Default)
-            {
-                Default = spawnPoints[0];
-            }
         }
     }
 }

@@ -277,7 +277,8 @@ namespace FR8Runtime.Train.Track
 
         public float GetClosestPoint(Vector3 point)
         {
-            if (points == null) BakePoints();
+            if (points == null || points.Count == 0) BakePoints();
+            if (points.Count == 0) return default;
 
             FindClosestPair(point, out var best, out var other);
             return InterpolatePoints(point, best, other);
@@ -311,7 +312,7 @@ namespace FR8Runtime.Train.Track
             }
 
             other = best + 1;
-            if (other == points.Count)
+            if (other >= points.Count)
             {
                 other--;
                 best--;

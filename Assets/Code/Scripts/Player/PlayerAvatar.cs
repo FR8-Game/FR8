@@ -69,10 +69,5 @@ namespace FR8Runtime.Player
         {
             FixedUpdateEvent?.Invoke();
         }
-
-        public void OnValidate()
-        {
-            ui.OnValidate(this);
-        }
     }
 }
