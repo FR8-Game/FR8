@@ -16,14 +16,10 @@ namespace FR8Runtime.Rendering.Passes
 
         public override bool Enabled => Settings.active;
 
-        public FogPass()
-        {
-            var renderOverSkybox = Settings && Settings.renderOverSkybox.value;
-            renderPassEvent = renderOverSkybox ? RenderPassEvent.AfterRenderingSkybox : RenderPassEvent.BeforeRenderingSkybox;
-        }
-        
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
+            renderPassEvent = Settings.renderOverSkybox.value ? RenderPassEvent.AfterRenderingSkybox : RenderPassEvent.BeforeRenderingSkybox;
+
             fogShader = Shader.Find("Hidden/Fog");
             if (fogShader) fogMaterial = CoreUtils.CreateEngineMaterial(fogShader);
             
