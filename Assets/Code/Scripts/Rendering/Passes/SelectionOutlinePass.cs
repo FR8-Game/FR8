@@ -41,7 +41,7 @@ namespace FR8Runtime.Rendering.Passes
             if (!blackMaterial) blackMaterial = new Material(Shader.Find("Unlit/OutlineObject"));
             if (!blitMaterial) blitMaterial = new Material(Shader.Find("Hidden/OutlineBlit"));
 
-            RenderList.RemoveAll(e => e.CompareTag("Do Not Outline"));
+            RenderList.RemoveAll(e => !e || e.CompareTag("Do Not Outline"));
         }
 
         public override void OnExecute(ScriptableRenderContext context, ref RenderingData renderingData)
@@ -81,11 +81,5 @@ namespace FR8Runtime.Rendering.Passes
         {
             base.FrameCleanup(cmd);
         }
-    }
-
-    [VolumeComponentMenu("Custom/Selection Outline")]
-    public class SelectionOutlineSettings : VolumeComponent
-    {
-        public ColorParameter outlineColor = new(Color.white);
     }
 }

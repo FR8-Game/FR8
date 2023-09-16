@@ -18,11 +18,4 @@ namespace FR8Runtime.Rendering.Passes
             ExecuteWithCommandBuffer(context, cmd => cmd.DrawMesh(Settings.domeMesh.value, Matrix4x4.identity, Settings.material.value, 0, 0));
         }
     }
-
-    [VolumeComponentMenu("Custom/Clouds")]
-    public class CloudSettings : VolumeComponent
-    {
-        public VolumeParameter<Mesh> domeMesh = new();
-        public VolumeParameter<Material> material = new();
-    }
 }

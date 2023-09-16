@@ -12,13 +12,13 @@ namespace FR8Runtime.Interactions.Drivers
         [SerializeField] private string displayName;
         [SerializeField] private float defaultValue;
         
-        private const float shakeAmplitude = 0.006f;
+        private const float shakeAmplitude = 0.003f;
         private const float shakeFrequency = 100.0f;
         private const float shakeDecay = 12.0f;
 
         private Vector3 origin;
         private DriverNetwork driverNetwork;
-        private float lastInteractTime = float.MinValue;
+        private float shakeTime = float.MinValue;
         
         public virtual bool CanInteract => true;
         public virtual string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
@@ -33,7 +33,12 @@ namespace FR8Runtime.Interactions.Drivers
         public virtual void OnValueChanged(float newValue)
         {
             Value = newValue;
-            lastInteractTime = Time.time;
+            Shake();
+        }
+
+        public void Shake()
+        {
+            shakeTime = Time.time;
         }
 
         protected virtual void SetValue(float newValue)
@@ -84,7 +89,7 @@ namespace FR8Runtime.Interactions.Drivers
                 z = Mathf.PerlinNoise(t, 30.5f) * 2.0f - 1.0f,
             } * shakeAmplitude;
 
-            noise *= Mathf.Exp((Time.time - lastInteractTime) * -shakeDecay);
+            noise *= Mathf.Exp((Time.time - shakeTime) * -shakeDecay);
             transform.localPosition = origin + noise;
         }
     }

@@ -13,7 +13,7 @@ namespace FR8Runtime.Player
         public PlayerCamera cameraController;
         public PlayerVitality vitality;
         public PlayerUI ui;
-        public PlayerInventory inventory;
+        //public PlayerInventory inventory;
         public PlayerUrination urination;
         
         public Func<Vector3> getCenter;
@@ -38,9 +38,8 @@ namespace FR8Runtime.Player
         private void Awake()
         {
             transform.SetParent(null);
-            InitSubmodules();
 
-            Head = new GameObject("Head").transform;
+            Head = transform.Find("Head");
             Head.SetParent(transform);
             Head.localPosition = Vector3.zero;
             Head.localRotation = Quaternion.identity;
@@ -49,6 +48,11 @@ namespace FR8Runtime.Player
             Body.isKinematic = true;
 
             getCenter = () => transform.position;
+        }
+
+        private void Start()
+        {
+            InitSubmodules();
         }
 
         private void OnDisable()
@@ -61,7 +65,7 @@ namespace FR8Runtime.Player
             input.Init(this);
             cameraController.Init(this);
             interactionManager.Init(this);
-            inventory.Init(this);
+            //inventory.Init(this);
             vitality.Init(this);
             ui.Init(this);
             urination.Init(this);
