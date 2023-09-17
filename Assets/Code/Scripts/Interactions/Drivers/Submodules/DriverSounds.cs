@@ -7,6 +7,8 @@ namespace FR8Runtime.Interactions.Drivers.Submodules
     [System.Serializable]
     public sealed class DriverSounds
     {
+        [SerializeField] private EventReference clickReference;
+        
         private GameObject gameObject;
         private float lastValue;
 
@@ -22,7 +24,7 @@ namespace FR8Runtime.Interactions.Drivers.Submodules
 
             if (index != lastIndex)
             {
-                SoundUtility.PlayOneShot("event:/Interactions/Control Stick Click");
+                SoundUtility.PlayOneShot(clickReference);
             }
 
             lastValue = newValue;

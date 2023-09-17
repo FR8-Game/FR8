@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using FR8Runtime.Interactions.Drivers.Submodules;
 using FR8Runtime.Pickups;
 using FR8Runtime.Rendering.Passes;
@@ -15,8 +16,9 @@ namespace FR8Runtime.Player.Submodules
 
         private int nudge;
         private bool dragging;
-
-        private IInteractable highlightedObject;
+        private IInteractable lastHighlightedObject;
+        
+        public IInteractable HighlightedObject { get; private set; }
 
         public PickupObject HeldObject { get; private set; }
         public PlayerAvatar Avatar { get; private set; }
@@ -30,12 +32,16 @@ namespace FR8Runtime.Player.Submodules
 
             avatar.UpdateEvent += Update;
             avatar.FixedUpdateEvent += FixedUpdate;
+            avatar.DisableEvent += OnDisable;
         }
 
+        public void OnDisable()
+        {
+            if ((Object)lastHighlightedObject) SelectionOutlinePass.Remove(lastHighlightedObject.gameObject);
+        }
+        
         public void Update()
         {
-            if ((Object)highlightedObject) SelectionOutlinePass.Add(highlightedObject.gameObject);
-
             if (Avatar.input.Nudge != 0) nudge = Avatar.input.Nudge;
         }
 
@@ -43,7 +49,7 @@ namespace FR8Runtime.Player.Submodules
         {
             UpdateHighlightedObject();
 
-            if ((Object)highlightedObject)
+            if ((Object)HighlightedObject)
             {
                 ProcessInteractable();
                 UpdateInputFlags();
@@ -68,12 +74,19 @@ namespace FR8Runtime.Player.Submodules
         
         private void UpdateHighlightedObject()
         {
-            highlightedObject = GetHighlightedObject();
+            HighlightedObject = GetHighlightedObject();
+
+            if (lastHighlightedObject == HighlightedObject) return;
+            
+            if ((Object)lastHighlightedObject) SelectionOutlinePass.Remove(lastHighlightedObject.gameObject);
+            if ((Object)HighlightedObject) SelectionOutlinePass.Add(HighlightedObject.gameObject);
+            
+            lastHighlightedObject = HighlightedObject;
         }
 
         private IInteractable GetHighlightedObject()
         {
-            if (dragging) return highlightedObject;
+            if (dragging) return HighlightedObject;
 
             var lookingAt = GetLookingAt();
             if ((Object)lookingAt) return lookingAt;
@@ -85,17 +98,17 @@ namespace FR8Runtime.Player.Submodules
 
         private void ProcessInteractable()
         {
-            if (!highlightedObject.CanInteract) return;
+            if (!HighlightedObject.CanInteract) return;
 
             if (Avatar.input.Drag)
             {
-                if (dragging) highlightedObject.ContinueInteract(Avatar.gameObject);
-                else highlightedObject.BeginInteract(Avatar.gameObject);
+                if (dragging) HighlightedObject.ContinueInteract(Avatar.gameObject);
+                else HighlightedObject.BeginInteract(Avatar.gameObject);
             }
 
             if (nudge != 0)
             {
-                highlightedObject.Nudge(nudge);
+                HighlightedObject.Nudge(nudge);
                 nudge = 0;
             }
         }
