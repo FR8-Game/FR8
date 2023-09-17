@@ -30,7 +30,7 @@ namespace FR8Runtime.Train
 
         private void FixedUpdate()
         {
-            CheckForDriver();
+            //CheckForDriver();
         }
 
         private void CheckForDriver()
