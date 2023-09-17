@@ -1,10 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/Content/UI/Game%20UI%20Stylesheet.uss?fileID=7433441132597879392&amp;guid=acd50812ec1cbb044a0297b17ba892a4&amp;type=3#Game UI Stylesheet" />
-    <ui:VisualElement name="loading-screen" style="justify-content: center; align-items: center;">
-        <ui:VisualElement name="content">
-            <ui:Label text="LOADING" display-tooltip-when-elided="true" name="title" class="LoadingTitle" />
-            <ui:ProgressBar high-value="1" name="progress-bar" />
-        </ui:VisualElement>
-        <ui:Label text="FR8" display-tooltip-when-elided="true" name="background-flavour-text" class="BackgroundFlavorText" />
+    <Style src="project://database/Assets/Content/UI/Style%20Sheets/Game%20UI%20Stylesheet.uss?fileID=7433441132597879392&amp;guid=acd50812ec1cbb044a0297b17ba892a4&amp;type=3#Game UI Stylesheet" />
+    <ui:VisualElement name="loading-screen" class="background-opaque" style="top: 0; right: 0; left: 0; bottom: 0;" />
+    <ui:VisualElement name="content" style="margin-left: auto; margin-right: auto; margin-top: auto; margin-bottom: auto;">
+        <ui:Label text="LOADING" display-tooltip-when-elided="true" name="title" class="LoadingTitle" />
+        <FR8Runtime.UI.CustomControls.LoadBar CharacterCount="50" name="load-bar" />
     </ui:VisualElement>
 </ui:UXML>

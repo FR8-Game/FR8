@@ -64,7 +64,7 @@ namespace FR8Runtime.Save
                 Directory.CreateDirectory(dir);
             }
             
-            using (var stream = new FileStream(filename, FileMode.OpenOrCreate))
+            using (var stream = new FileStream(filename, FileMode.Create))
             {
                 serializeCallback(stream, data);
             }

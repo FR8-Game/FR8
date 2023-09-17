@@ -10,7 +10,6 @@ namespace FR8Runtime.Train.Electrics
         [SerializeField] private float powerDrawWatts = 40.0f;
         [SerializeField] private float threshold = 0.5f;
         
-        private bool driverState;
         private DriverNetwork driverNetwork;
         
         public string FuseGroup => fuseGroup;
@@ -27,7 +26,7 @@ namespace FR8Runtime.Train.Electrics
             var switchState = driverNetwork.GetValue(fuseGroup) > threshold;
             var fuseState = driverNetwork.GetValue(TrainElectricsController.MainFuse) > 0.5f;
             
-            state = fuseState && driverState;
+            state = fuseState && switchState;
             base.FixedUpdate();
         }
 

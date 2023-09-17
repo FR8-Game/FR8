@@ -2,6 +2,7 @@
 using FR8Runtime.Interactions.Drivers.DragBehaviours;
 using FR8Runtime.Interactions.Drivers.Submodules;
 using FR8Runtime.Player;
+using FR8Runtime.Train.Electrics;
 using UnityEngine;
 
 namespace FR8Runtime.Interactions.Drivers
@@ -15,15 +16,24 @@ namespace FR8Runtime.Interactions.Drivers
         [SerializeField] private TwoPoseDrivableAnimator animator;
         [SerializeField] private DriverSounds sounds;
         [SerializeField] private DriverSliderDragBehaviour dragBehaviour;
+
+        private TrainGasTurbine engine;
         
-        public override string DisplayValue =>
-            Value switch
+        public override string DisplayValue
+        {
+            get
             {
-                > 0.5f => "Drive",
-                < -0.5f => "Reverse",
-                _ => "Neutral"
-            };
-        
+                if (!engine.running) return "Neutral [Locked: Engine is not Running]";
+                
+                return Value switch
+                {
+                    > 0.5f => "Drive",
+                    < -0.5f => "Reverse",
+                    _ => "Neutral"
+                };
+            }
+        }
+
         public override void OnValueChanged(float newValue)
         {
             animator.SetValue(newValue);
@@ -34,6 +44,13 @@ namespace FR8Runtime.Interactions.Drivers
         
         protected override void SetValue(float newValue)
         {
+            if (!engine.running)
+            {
+                base.SetValue(0.0f);
+                Shake();
+                return;
+            }
+            
             switch (newValue)
             {
                 case > 0.5f:
@@ -74,6 +91,7 @@ namespace FR8Runtime.Interactions.Drivers
         protected override void Awake()
         {
             base.Awake();
+            engine = GetComponentInParent<TrainGasTurbine>();
             
             sounds.Awake(gameObject);
         }

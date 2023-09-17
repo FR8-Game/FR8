@@ -21,9 +21,10 @@ namespace FR8Runtime.Train
         [SerializeField] protected float retentionSpring = 2500.0f;
         [SerializeField] protected float retentionDamping = 50.0f;
         [SerializeField] protected float retentionTorqueConstant = 0.2f;
+        
+        [SerializeField] protected float trainLength = 20.0f;
 
-        [Space]
-        [SerializeField] protected TrackSegment segment;
+        protected TrackSegment segment;
 
         public TrackSegment Segment
         {
@@ -36,6 +37,9 @@ namespace FR8Runtime.Train
         public Vector3 DriverDirection { get; private set; }
         public float ReferenceWeight => referenceWeight;
         public Vector3 TangentialForce { get; private set; }
+
+        public Vector3 HardAnchorPosition => (Rigidbody ? Rigidbody.position : transform.position) + transform.forward * trainLength * 0.5f;
+        public Vector3 SoftAnchorPosition => (Rigidbody ? Rigidbody.position : transform.position) - transform.forward * trainLength * 0.5f;
 
         private void Awake()
         {
@@ -102,19 +106,23 @@ namespace FR8Runtime.Train
         private void ApplyCorrectiveForce()
         {
             // Calculate pose of front wheel assembly
-            var t = segment.GetClosestPoint(Rigidbody.position);
-            var trackPosition = segment.SamplePoint(t);
-            var trackNormal = segment.SampleTangent(t);
-            trackNormal.Normalize();
+            var th = segment.GetClosestPoint(HardAnchorPosition);
+            var hardTrackPosition = segment.SamplePoint(th);
 
-            var alignmentDot = Vector3.Dot(trackNormal, transform.forward);
-            if (alignmentDot < 0.0f) trackNormal = -trackNormal;
+            var ts = segment.GetClosestPoint(SoftAnchorPosition);
+            var softTrackPosition = segment.SamplePoint(ts);
 
-            DriverDirection = trackNormal;
+            var center = (hardTrackPosition + softTrackPosition) / 2.0f;
+            var normal = (hardTrackPosition - softTrackPosition).normalized;
+
+            var alignmentDot = Vector3.Dot(normal, transform.forward);
+            if (alignmentDot < 0.0f) normal = -normal;
+
+            DriverDirection = normal;
             
-            ApplyCorrectiveForce(trackPosition, trackNormal);
+            ApplyCorrectiveForce(center, normal);
             
-            var orientation = CalculateOrientation(trackNormal);
+            var orientation = CalculateOrientation(normal);
             ApplyCorrectiveTorque(orientation);
         }
 
@@ -165,10 +173,17 @@ namespace FR8Runtime.Train
         
         private void OnValidate()
         {
+            trainLength = Mathf.Max(0.0f, trainLength);
             Configure();
         }
 
         protected static float ToMps(float kmph) => kmph / 3.6f;
         protected static float ToKmpH(float mps) => mps * 3.6f;
+
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawLine(HardAnchorPosition, SoftAnchorPosition);
+        }
     }
 }

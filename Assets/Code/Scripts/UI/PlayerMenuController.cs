@@ -33,14 +33,21 @@ namespace FR8Runtime.UI
             menus = GetComponentsInChildren<UIDocument>();
 
             var pauseMenu = menus[PauseMenu];
-            pauseMenu.rootVisualElement.Q<Button>("resume").clickable.clicked += HideMenu;
-            pauseMenu.rootVisualElement.Q<Button>("load-save").clickable.clicked += () => SetMenu(LoadMenu);
-            pauseMenu.rootVisualElement.Q<Button>("return").clickable.clicked += LoadScene(SceneUtility.Scene.Menu);
-            pauseMenu.rootVisualElement.Q<Button>("quit").clickable.clicked += Quit;
+            UIActions.BindButton(pauseMenu, "resume", HideMenu);
+            UIActions.BindButton(pauseMenu, "reload-scene", HideAnd(UIActions.Load(SceneUtility.Scene.Game)));
+            UIActions.BindButton(pauseMenu, "load-save", () => SetMenu(LoadMenu));
+            UIActions.BindButton(pauseMenu, "return", HideAnd(UIActions.Load(SceneUtility.Scene.Menu)));
+            UIActions.BindButton(pauseMenu, "quit", HideAnd(UIActions.QuitToDesktop));
 
             BindBackButtons();
             HideMenu();
         }
+
+        private Action HideAnd(Action callback) => () =>
+        {
+            HideMenu();
+            callback?.Invoke();
+        };
 
         private void OnEnable()
         {
