@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Content/UI/Style%20Sheets/Game%20UI%20Stylesheet.uss?fileID=7433441132597879392&amp;guid=acd50812ec1cbb044a0297b17ba892a4&amp;type=3#Game UI Stylesheet" />
+    <ui:VisualElement name="container" class="contract" style="border-left-width: 2px; margin-bottom: 10px;">
+        <ui:Label text="DELIVERY REQUEST" display-tooltip-when-elided="true" name="header" style="font-size: 18px; margin-left: 5px; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;" />
+        <ui:VisualElement name="predicates" style="margin-left: 5px;">
+            <ui:ProgressBar title="This text is intentionally really long to see what happens to the text wrapping when there is a really long contract name oh no" name="ProgressBar" high-value="100" low-value="115" class="labeled-bar" style="white-space: normal; color: rgb(0, 0, 0); max-width: 300px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

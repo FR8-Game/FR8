@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using FR8Runtime.UI;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -64,6 +65,8 @@ namespace FR8Runtime.Player.Submodules
                 }
                 else
                 {
+                    currentShields = -1.0f;
+                    
                     exposureTimer += Time.deltaTime;
                     var exposureTime = 1.0f / exposureDamageFrequency;
                     while (exposureTimer > exposureTime)
@@ -122,7 +125,7 @@ namespace FR8Runtime.Player.Submodules
 
             currentHealth -= damage;
 
-            if (currentShields < 0) currentShields = 0;
+            if (currentShields <= 0) currentShields = -1.0f;
             if (currentHealth < 0) currentHealth = 0;
 
             DamageEvent?.Invoke(damageInstance);
@@ -177,6 +180,7 @@ namespace FR8Runtime.Player.Submodules
             currentHealth = maxHealth;
             currentShields = shieldDuration;
             IsAlive = true;
+            LastDamageTime = float.MinValue;
 
             var (spawnPosition, spawnOrientation) = GetSpawnPoint();
 
@@ -217,6 +221,18 @@ namespace FR8Runtime.Player.Submodules
             {
                 this.amount = amount;
             }
+        }
+
+        public void SetShields(float percent)
+        {
+            currentShields = percent * shieldDuration;
+            HealthChangeEvent?.Invoke();
+        }
+
+        public void SetHealth(int health)
+        {
+            currentHealth = health;
+            HealthChangeEvent?.Invoke();
         }
     }
 }

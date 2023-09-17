@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if UNITY_EDITOR
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using UnityEditor;
@@ -57,7 +58,7 @@ namespace FR8Runtime.Train.Track
 
             matrix = trackMesh.transform.worldToLocalMatrix;
             Split();
-            
+
             taskID = Progress.Start($"Baking {trackName} Track Mesh");
 
             threadTimer = new Stopwatch();
@@ -100,7 +101,7 @@ namespace FR8Runtime.Train.Track
                     var splinePoint = TrackSegment.Sample(p2, (spline, t) => spline.EvaluatePoint(t), i => spline[i], spline.Count);
                     var splineTangent = TrackSegment.Sample(p2, (spline, t) => spline.EvaluateVelocity(t).normalized, i => spline[i], spline.Count);
                     var r = Quaternion.LookRotation(splineTangent);
-                    
+
                     vertex = r * new Vector3(vertex.x, vertex.y, 0.0f) + splinePoint;
                     normal = r * normal;
 
@@ -124,7 +125,7 @@ namespace FR8Runtime.Train.Track
                     Report(workingLength / totalLength);
                 }
             }
-            
+
             float samplePercentFromDistance(float distance)
             {
                 var i = 0;
@@ -164,3 +165,4 @@ namespace FR8Runtime.Train.Track
         }
     }
 }
+#endif

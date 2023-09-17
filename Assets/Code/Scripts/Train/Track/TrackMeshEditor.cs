@@ -3,7 +3,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using FR8Runtime.Rendering;
@@ -11,7 +10,6 @@ using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace FR8Runtime.Train.Track
 {
@@ -205,6 +203,9 @@ namespace FR8Runtime.Train.Track
         {
             var container = GetRendererContainer();
 
+            var rng = new System.Random(gameObject.GetInstanceID());
+            var verticalOffset = this.verticalOffset + (float)rng.NextDouble() * 0.01f;
+            
             foreach (Transform child in container)
             {
                 child.localPosition = Vector3.up * verticalOffset;

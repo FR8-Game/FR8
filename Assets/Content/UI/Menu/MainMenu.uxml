@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Content/UI/Style%20Sheets/Game%20UI%20Stylesheet.uss?fileID=7433441132597879392&amp;guid=acd50812ec1cbb044a0297b17ba892a4&amp;type=3#Game UI Stylesheet" />
+    <ui:VisualElement name="background" class="background-transparent" />
+    <ui:VisualElement name="landing" style="padding-left: 25px; margin-left: 100px; margin-right: 100px; margin-top: auto; margin-bottom: auto; position: absolute; left: 0; top: 0; right: 0; bottom: 0; justify-content: center;">
+        <ui:VisualElement name="title" class="title">
+            <ui:VisualElement style="width: 80px; background-image: url(&apos;project://database/Assets/Files/Textures/UI/Stripes.png?fileID=21300000&amp;guid=232748a78fe90674886cf65891cc8396&amp;type=3#Stripes&apos;); -unity-background-scale-mode: scale-and-crop; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0; border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0;" />
+            <ui:Label text="FR8" display-tooltip-when-elided="true" />
+        </ui:VisualElement>
+        <ui:Button text="START GAME" display-tooltip-when-elided="true" name="start" />
+        <ui:Button text="EXIT" display-tooltip-when-elided="true" name="exit" />
+    </ui:VisualElement>
+</ui:UXML>

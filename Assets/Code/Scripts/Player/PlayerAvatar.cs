@@ -13,13 +13,14 @@ namespace FR8Runtime.Player
         public PlayerCamera cameraController;
         public PlayerVitality vitality;
         public PlayerUI ui;
-        public PlayerInventory inventory;
+        //public PlayerInventory inventory;
         public PlayerUrination urination;
         
         public Func<Vector3> getCenter;
 
         public event Action UpdateEvent;
         public event Action FixedUpdateEvent;
+        public event Action DisableEvent;
 
         public bool IsAlive => vitality.IsAlive;
         public Transform Head { get; private set; }
@@ -37,9 +38,8 @@ namespace FR8Runtime.Player
         private void Awake()
         {
             transform.SetParent(null);
-            InitSubmodules();
 
-            Head = new GameObject("Head").transform;
+            Head = transform.Find("Head");
             Head.SetParent(transform);
             Head.localPosition = Vector3.zero;
             Head.localRotation = Quaternion.identity;
@@ -50,12 +50,22 @@ namespace FR8Runtime.Player
             getCenter = () => transform.position;
         }
 
+        private void Start()
+        {
+            InitSubmodules();
+        }
+
+        private void OnDisable()
+        {
+            DisableEvent?.Invoke();
+        }
+
         private void InitSubmodules()
         {
             input.Init(this);
             cameraController.Init(this);
             interactionManager.Init(this);
-            inventory.Init(this);
+            //inventory.Init(this);
             vitality.Init(this);
             ui.Init(this);
             urination.Init(this);
@@ -68,11 +78,6 @@ namespace FR8Runtime.Player
         private void FixedUpdate()
         {
             FixedUpdateEvent?.Invoke();
-        }
-
-        public void OnValidate()
-        {
-            ui.OnValidate(this);
         }
     }
 }

@@ -1,0 +1,59 @@
+﻿using System;
+using System.Collections.Generic;
+using FR8Runtime.Train;
+using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+namespace FR8Runtime.Save
+{
+#if UNITY_EDITOR
+    [InitializeOnLoad]
+#endif
+    [CreateAssetMenu(menuName = "Scriptable Objects/Save System/Save Prefab List")]
+    public class SavePrefabList : ScriptableObject
+    {
+        private const bool Log = false;
+        
+        public TrainCarriage[] carriagePrefabs;
+
+#if UNITY_EDITOR
+        static SavePrefabList()
+        {
+            EditorApplication.projectChanged += RebuildPrefabList;
+        }
+
+        [ContextMenu("Get Prefabs From Assets")]
+        public void GetPrefabsFromAssets()
+        {
+            var list = new List<TrainCarriage>();
+            var guids = AssetDatabase.FindAssets("t:prefab");
+            foreach (var guid in guids)
+            {
+                var asset = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(guid));
+                var carriage = asset.GetComponent<TrainCarriage>();
+                if (!carriage) continue;
+                if (string.IsNullOrWhiteSpace(carriage.saveTypeReference)) continue;
+                
+                list.Add(carriage);
+            }
+
+            carriagePrefabs = list.ToArray();
+            if (Log) Debug.Log($"Rebuild Prefab Save List at \"{AssetDatabase.GetAssetPath(this)}\"");
+        }
+
+        [MenuItem("Actions/Save/Rebuild Save Prefab List")]
+        public static void RebuildPrefabList()
+        {
+            var list = AssetDatabase.LoadAssetAtPath<SavePrefabList>("Assets/Config/Save/Save Prefab List.asset");
+            list.GetPrefabsFromAssets();
+        }
+
+        private void Reset()
+        {
+            GetPrefabsFromAssets();
+        }
+#endif
+    }
+}

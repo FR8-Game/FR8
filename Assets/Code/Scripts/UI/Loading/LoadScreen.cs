@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
+using FR8Runtime.UI.CustomControls;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
+using Cursor = UnityEngine.Cursor;
 
 namespace FR8Runtime.UI.Loading
 {
@@ -13,23 +15,32 @@ namespace FR8Runtime.UI.Loading
         [SerializeField] private float fadeTime = 0.5f;
         [SerializeField] private AnimationCurve fadeCurve = AnimationCurve.EaseInOut(0.0f, 0.0f, 1.0f, 1.0f);
 
-        [SerializeField] private float contentBobFrequency;
-        [SerializeField] private float contentBobAmplitude;
-
         private UIDocument document;
         private VisualElement root;
-        private ProgressBar fill;
+        private LoadBar loadBar;
 
         private bool loadingNewLevel;
 
+        private const string LoadSpinnyThing = "|/-\\";
+        
         private void Awake()
         {
             document = GetComponent<UIDocument>();
+            root = document.rootVisualElement;
+            loadBar = root.Q<LoadBar>("load-bar");
         }
 
         private void Start()
         {
-            StartCoroutine(Fade(v => 1.0f - v, () => root.SetEnabled(false)));
+            StartCoroutine(Fade(v => 1.0f - v));
+        }
+
+        private void Update()
+        {
+            if (root.visible)
+            {
+                loadBar.Prepend = $"[{LoadSpinnyThing[Mathf.FloorToInt(Time.time * 3.0f) % LoadSpinnyThing.Length]}] ";
+            }
         }
 
         public void LoadScene(int buildIndex)
@@ -38,15 +49,13 @@ namespace FR8Runtime.UI.Loading
 
             IEnumerator routine()
             {
-                ShowUI(true);
-                
                 if (loadingNewLevel) yield break;
                 loadingNewLevel = true;
 
                 SetFill(0.0f);
-               
-                yield return StartCoroutine(Fade(v => v, null));
-
+                
+                yield return StartCoroutine(Fade(v => v));
+                
                 var operation = SceneManager.LoadSceneAsync(buildIndex);
                 while (!operation.isDone)
                 {
@@ -58,9 +67,9 @@ namespace FR8Runtime.UI.Loading
             }
         }
 
-        private IEnumerator Fade(Func<float, float> remap, Action finishedCallback)
+        private IEnumerator Fade(Func<float, float> remap)
         {
-            ShowUI(true);
+            root.visible = true;
 
             var p = 0.0f;
             while (p < 1.0f)
@@ -71,20 +80,14 @@ namespace FR8Runtime.UI.Loading
             }
 
             root.style.opacity = fadeCurve.Evaluate(remap(1.0f));
-            finishedCallback?.Invoke();
+            root.visible = root.style.opacity.value > 0.5f;
         }
 
         public void SetFill(float percent)
         {
-            if (fill == null) return;
-            fill.value = percent;
-        }
-        
-        public void ShowUI(bool state)
-        {
-            document.enabled = state;
-            root = state ? document.rootVisualElement.Q("LoadingScreen") : null;
-            fill = state ? document.rootVisualElement.Q<ProgressBar>("ProgressBar") : null;
+            Debug.Log(percent);
+            if (loadBar == null) return;
+            loadBar.Percent = percent;
         }
     }
 }
