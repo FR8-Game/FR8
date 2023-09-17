@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using FR8Runtime.Interactions.Drivers.Submodules;
 using FR8Runtime.Pickups;
 using FR8Runtime.Rendering.Passes;
@@ -15,7 +16,8 @@ namespace FR8Runtime.Player.Submodules
 
         private int nudge;
         private bool dragging;
-
+        private IInteractable lastHighlightedObject;
+        
         public IInteractable HighlightedObject { get; private set; }
 
         public PickupObject HeldObject { get; private set; }
@@ -30,12 +32,16 @@ namespace FR8Runtime.Player.Submodules
 
             avatar.UpdateEvent += Update;
             avatar.FixedUpdateEvent += FixedUpdate;
+            avatar.DisableEvent += OnDisable;
         }
 
+        public void OnDisable()
+        {
+            if ((Object)lastHighlightedObject) SelectionOutlinePass.Remove(lastHighlightedObject.gameObject);
+        }
+        
         public void Update()
         {
-            if ((Object)HighlightedObject) SelectionOutlinePass.Add(HighlightedObject.gameObject);
-
             if (Avatar.input.Nudge != 0) nudge = Avatar.input.Nudge;
         }
 
@@ -69,6 +75,13 @@ namespace FR8Runtime.Player.Submodules
         private void UpdateHighlightedObject()
         {
             HighlightedObject = GetHighlightedObject();
+
+            if (lastHighlightedObject == HighlightedObject) return;
+            
+            if ((Object)lastHighlightedObject) SelectionOutlinePass.Remove(lastHighlightedObject.gameObject);
+            if ((Object)HighlightedObject) SelectionOutlinePass.Add(HighlightedObject.gameObject);
+            
+            lastHighlightedObject = HighlightedObject;
         }
 
         private IInteractable GetHighlightedObject()

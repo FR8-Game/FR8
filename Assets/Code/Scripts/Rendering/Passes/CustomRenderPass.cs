@@ -4,7 +4,6 @@ using UnityEngine.Rendering.Universal;
 
 namespace FR8Runtime.Rendering.Passes
 {
-    [Serializable]
     public abstract class CustomRenderPass<T> : ScriptableRenderPass where T : VolumeComponent
     {
         public abstract bool Enabled { get; }

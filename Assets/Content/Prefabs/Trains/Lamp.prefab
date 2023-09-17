@@ -47,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 1
   color: {r: 0.9137255, g: 0.50980395, b: 0.21960784, a: 1}
-  lightIntensity: 1.5
+  lightIntensity: 0.2
   materialIntensity: 2
   warmUpTime: 0.5
   cooldownTime: 5
@@ -78,7 +78,6 @@ MonoBehaviour:
   renderer: {fileID: 6994452479898807530}
   materialIndex: 0
   materialEmissionPropertyName: _EmissionColor
-  key: lights
   fuseGroup: Lights
   powerDrawWatts: 40
   threshold: 0.5
@@ -93,6 +92,7 @@ GameObject:
   - component: {fileID: 8277196481860062068}
   - component: {fileID: 6908402539985806903}
   - component: {fileID: 542727759390669291}
+  - component: {fileID: 2690741046892508555}
   m_Layer: 0
   m_Name: Point Light
   m_TagString: Untagged
@@ -108,7 +108,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7388045745115260339}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.427, z: 0}
+  m_LocalPosition: {x: 0, y: -0.472, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -127,13 +127,13 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 0.9150943, g: 0.51093763, b: 0.22014059, a: 1}
-  m_Intensity: 1.5
+  m_Intensity: 1
   m_Range: 3
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -161,7 +161,7 @@ Light:
   m_Cookie: {fileID: 0}
   m_DrawHalo: 0
   m_Flare: {fileID: 0}
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -197,6 +197,20 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
+--- !u!114 &2690741046892508555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7388045745115260339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75263907c2d155d48b460ee1fe3d6377, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shadowCullDistance: 15
+  mode: 2
 --- !u!1001 &1594957470880837407
 PrefabInstance:
   m_ObjectHideFlags: 0

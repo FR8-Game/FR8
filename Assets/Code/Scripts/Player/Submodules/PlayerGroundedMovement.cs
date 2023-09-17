@@ -22,7 +22,6 @@ namespace FR8Runtime.Player.Submodules
 
         [Header("Movement")]
         public float maxGroundedSpeed = 4.0f;
-
         public float accelerationTime = 0.12f;
         public float sprintSpeedScalar = 2.0f;
 
@@ -36,12 +35,10 @@ namespace FR8Runtime.Player.Submodules
 
         [Space]
         public float groundSpring = 500.0f;
-
         public float groundDamping = 25.0f;
 
         [Space]
         public float downGravityScale = 3.0f;
-
         public float upGravityScale = 2.0f;
 
         [Space]
@@ -54,7 +51,6 @@ namespace FR8Runtime.Player.Submodules
 
         [Space]
         public bool canFlyInBuild = false;
-
         public bool canFlyInEditor = true;
         public MovementType movementType = MovementType.Normal;
 
@@ -193,7 +189,7 @@ namespace FR8Runtime.Player.Submodules
             ConstrainTransform();
             SetJumpTrigger();
 
-            if (avatar.input.Fly)
+            if (avatar.input.Fly && CanFly)
             {
                 movementType = movementType switch
                 {

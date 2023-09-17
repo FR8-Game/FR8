@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -77,11 +76,13 @@ namespace FR8Runtime.UI.CustomControls
             for (var i = 0; i < labels.Length; i++)
             {
                 labels[i] = new Label();
+                labels[i].style.position = Position.Absolute;
                 labels[i].text = LabelTexts[i];
                 Add(labels[i]);
             }
 
             style.flexDirection = FlexDirection.Row;
+            style.alignContent = Align.Center;
 
             RegenTicks();
             Update();
@@ -124,16 +125,15 @@ namespace FR8Runtime.UI.CustomControls
 
                 var p = i / (ticks.Length - 1.0f);
                 setPositionOffAngle(tick, (2.0f * p - 1.0f) * cropAngle - faceAngle, tickWidth, 2.0f, out var scale);
-                tick.style.scale = new Scale(new Vector3(1.0f, scale, 1.0f));
 
                 tick.style.backgroundImage = Texture2D.whiteTexture;
                 tick.style.unityBackgroundImageTintColor = Color.white;
-                tick.style.scale = new Scale(new Vector3(1.0f, tick.style.scale.value.value.y, 0.0f));
 
                 var shrink = i % 2 == 0;
 
-                tick.style.top = Length.Percent(shrink ? 12.5f : 0.0f);
-                tick.style.bottom = Length.Percent(shrink ? 62.5f : 50.0f);
+                tick.style.top = 0.0f;
+                tick.style.bottom = 0.0f;
+                tick.style.scale = new Scale(new Vector3(1.0f, scale * (shrink ? 0.5f : 1.0f), 1.0f));
             }
             
             var facing = Mathf.RoundToInt(this.faceAngle / 90.0f) % 4;
@@ -150,8 +150,16 @@ namespace FR8Runtime.UI.CustomControls
                 label.visible = i == facing;
 
                 label.style.unityTextAlign = TextAnchor.UpperCenter;
-                label.style.top = Length.Percent(50.0f);
-                label.style.bottom = 0.0f;
+                label.style.top = Length.Percent(100.0f);
+                label.style.paddingLeft = 0.0f;
+                label.style.paddingRight = 0.0f;
+                label.style.paddingTop = 0.0f;
+                label.style.paddingBottom = 0.0f;
+                label.style.marginLeft = 0.0f;
+                label.style.marginRight = 0.0f;
+                label.style.marginTop = 0.0f;
+                label.style.marginBottom = 0.0f;
+                label.style.unityTextAlign = TextAnchor.MiddleCenter;
             }
 
             float sqr(float x) => x * x;
