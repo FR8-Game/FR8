@@ -10,7 +10,7 @@ namespace FR8Runtime.Train.Track
         public partial void BakeMesh();
         
         #if !UNITY_EDITOR
-        public partial void Clear(){}
+        public partial void Clear();
         public partial void BakeMesh(){}
         #endif
     }
