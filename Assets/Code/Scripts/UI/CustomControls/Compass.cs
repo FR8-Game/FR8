@@ -90,6 +90,11 @@ namespace FR8Runtime.UI.CustomControls
 
         private void RegenTicks()
         {
+            if (tickSpacing < 1.0f) tickSpacing = 1.0f;
+            var tickCount = Mathf.FloorToInt((360.0f / tickSpacing) * (cropAngle / 360.0f));
+
+            if (ticks != null && ticks.Length == tickCount) return;
+            
             if (ticks != null)
             {
                 foreach (var t in ticks)
@@ -97,10 +102,9 @@ namespace FR8Runtime.UI.CustomControls
                     Remove(t);
                 }
             }
-
-            if (tickSpacing < 1.0f) tickSpacing = 1.0f;
-            ticks = new VisualElement[Mathf.FloorToInt((360.0f / tickSpacing) * (cropAngle / 360.0f))];
-
+            
+            ticks = new VisualElement[tickCount];
+            
             for (var i = 0; i < ticks.Length; i++)
             {
                 ticks[i] = new VisualElement();

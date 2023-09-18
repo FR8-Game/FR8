@@ -11,9 +11,12 @@ namespace FR8Runtime.Rendering
         [SerializeField] private bool drawGizmos;
         
         private MeshFilter filter;
+        private MeshRenderer renderer;
         
         public static List<MapMarker> All { get; } = new();
         public Mesh Mesh => filter.sharedMesh;
+        public MeshFilter Filter => filter;
+        public MeshRenderer Renderer => renderer;
         public Color MarkerColor
         {
             get => markerColor;
@@ -23,6 +26,7 @@ namespace FR8Runtime.Rendering
         private void OnEnable()
         {
             filter = GetComponent<MeshFilter>();
+            renderer = GetComponent<MeshRenderer>();
             All.Add(this);
         }
 

@@ -9,24 +9,38 @@ namespace FR8Editor.Inspector
     [CustomEditor(typeof(TrackMesh))]
     public class TrackMeshEditor : Editor
     {
-        [MenuItem("Actions/Track Model/Bake All Meshes")]
-        public static void BakeAllTracks()
+        [MenuItem("Actions/Track Mesh/Refresh Track Meshes")]
+        public static void FindAlLTrackMeshes()
         {
-            var list = FindObjectsOfType<TrackMesh>();
-            foreach (var e in list)
-            {
-                e.BakeMesh();
-            }
+            AllAction(e => e.FindTrackMeshes());
         }
 
-        [MenuItem("Actions/Track Model/Clear All Meshes")]
+        [MenuItem("Actions/Track Mesh/Bake All Meshes")]
+        public static void BakeAllTracks()
+        {
+            if (!EditorUtility.DisplayDialog("Bake All Meshes", "Are you sure you want to bake all Track Meshes in this Scene\nThis will take a long time", "Bake All", "Cancel")) return;
+
+            AllAction(e => e.BakeMesh());
+        }
+
+        [MenuItem("Actions/Track Mesh/Clear All Meshes")]
         public static void ClearAllTracks()
         {
-            var list = FindObjectsOfType<TrackMesh>();
-            foreach (var e in list)
+            if (!EditorUtility.DisplayDialog("Clear All Meshes", "Are you sure you want to delete all Track Bake Assets\nTHIS CANNOT BE UNDONE", "Delete All", "Cancel")) return;
+
+            AllAction(e => e.Clear());
+        }
+
+        public static void AllAction(Action<TrackMesh> callback)
+        {
+            TrackMesh.ExecuteAndRefreshAssets(() =>
             {
-                e.Clear();
-            }
+                var list = FindObjectsOfType<TrackMesh>();
+                foreach (var e in list)
+                {
+                    callback(e);
+                }
+            });
         }
 
         public override void OnInspectorGUI()
