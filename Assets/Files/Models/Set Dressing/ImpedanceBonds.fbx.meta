@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 14cbf64f4742e284ab18d2d877a62b32
+guid: 115f122ec46f82040819f9eabcd74d53
 ModelImporter:
   serializedVersion: 21300
   internalIDToNameTable: []
@@ -7,7 +7,27 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Cable
+    second: {fileID: 2100000, guid: 8d57235ff3b36534ab6c2a8df3a5c823, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Concrete
+    second: {fileID: 2100000, guid: bde961efcc2b890478c1f8feff14cceb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Material
+    second: {fileID: 2100000, guid: f802a82ef760cae47881981e2307afa5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Metal
+    second: {fileID: 2100000, guid: 757a517787f6c4449a3b2e2c6508c00d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Plastic
     second: {fileID: 2100000, guid: f802a82ef760cae47881981e2307afa5, type: 2}
   materials:
     materialImportMode: 2
@@ -37,7 +57,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages: []
     globalScale: 1
@@ -57,7 +77,7 @@ ModelImporter:
     keepQuads: 0
     weldVertices: 1
     bakeAxisConversion: 1
-    preserveHierarchy: 1
+    preserveHierarchy: 0
     skinWeightsMode: 0
     maxBonesPerVertex: 4
     minBoneWeight: 0.001
