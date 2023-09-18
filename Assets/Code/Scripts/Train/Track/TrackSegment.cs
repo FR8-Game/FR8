@@ -88,6 +88,7 @@ namespace FR8Runtime.Train.Track
 
         private void DrawDistanceFromGround(Vector3 p0)
         {
+#if UNITY_EDITOR
             if (Physics.Raycast(p0, Vector3.down, out var hit))
             {
                 var radius = Mathf.Min(2.0f, hit.distance * 2.0f);
@@ -101,6 +102,7 @@ namespace FR8Runtime.Train.Track
                 GizmosDrawLine(new Color(0.4f, 1.0f, 0.2f, 1.0f), 1.0f, p0, hit.point);
                 Handles.DrawWireArc(hit.point, Vector3.up, Vector3.right, 360.0f, radius);
             }
+#endif
         }
 
         private void GizmosDrawLine(Color color, float width = 1.0f, params Vector3[] points)
@@ -361,7 +363,6 @@ namespace FR8Runtime.Train.Track
                 {
                     if (!Valid(s)) continue;
                     if (s == this) continue;
-                    if (s.ConnectedTo(this)) continue;
 
                     var t = s.GetClosestPoint(knot.position);
                     var closestPoint = s.SamplePoint(t);
@@ -371,7 +372,7 @@ namespace FR8Runtime.Train.Track
                     connection.t = t;
 
                     var d1 = s.SampleVelocity(t);
-                    connection.direction = (int)Mathf.Sign(Vector3.Dot(d0, d1));
+                    connection.direction = -(int)Mathf.Sign(Vector3.Dot(d0, d1));
 
                     knot.position = closestPoint;
 

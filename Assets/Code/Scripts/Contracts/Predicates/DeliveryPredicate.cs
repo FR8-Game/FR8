@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using FR8Runtime.Train;
 using UnityEngine;
@@ -10,7 +11,7 @@ namespace FR8Runtime.Contracts.Predicates
     public class DeliveryPredicate : ContractPredicate
     {
         private int carriagesDelivered;
-        
+
         public string[] carriageNames;
         public string deliveryLocationName;
 
@@ -25,6 +26,7 @@ namespace FR8Runtime.Contracts.Predicates
                 else if (i == sb.Length - 1) sb.Append($", {carriageNames[i]}");
                 else sb.Append($", and {carriageNames[i]}");
             }
+
             sb.Append($" to {deliveryLocationName}");
 
             return sb.ToString();
@@ -40,20 +42,21 @@ namespace FR8Runtime.Contracts.Predicates
             root.lowValue = 0.0f;
             root.highValue = carriageNames.Length;
             root.value = carriagesDelivered;
-            
+
             return root;
         }
 
         protected override int TasksDone()
         {
-            var carriages = new TrainCarriage[carriageNames.Length];
+            var carriages = new List<TrainCarriage>();
             var deliveryLocation = GameObject.Find(deliveryLocationName).GetComponent<TrackSection>();
 
-            for (var i = 0; i < carriages.Length; i++)
+            foreach (var name in carriageNames)
             {
-                carriages[i] = GameObject.Find(carriageNames[i]).GetComponent<TrainCarriage>();
+                var find = GameObject.Find(name);
+                if (find) carriages.Add(find.GetComponent<TrainCarriage>());
             }
-            
+
             carriagesDelivered = 0;
             foreach (var e in carriages)
             {

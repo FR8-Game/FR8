@@ -203,6 +203,9 @@ namespace FR8Runtime.Train.Track
         {
             var container = GetRendererContainer();
 
+            var rng = new System.Random(gameObject.GetInstanceID());
+            var verticalOffset = this.verticalOffset + (float)rng.NextDouble() * 0.01f;
+            
             foreach (Transform child in container)
             {
                 child.localPosition = Vector3.up * verticalOffset;

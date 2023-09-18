@@ -11,25 +11,24 @@ namespace FR8Runtime.CodeUtility
     {
         public static bool logErrors = false;
 
-        private static string path;
+        private static EventReference reference;
         private static GameObject emitter;
 
-        public static void PlayOneShot(string path)
+        public static void PlayOneShot(EventReference reference)
         {
-            PlayOneShot(path, _ => { });
+            PlayOneShot(reference, _ => { });
         }
 
-        public static void PlayOneShot(string path, GameObject emitter)
+        public static void PlayOneShot(EventReference reference, GameObject emitter)
         {
             SoundUtility.emitter = emitter;
-            PlayOneShot(path, sound => sound.set3DAttributes(emitter.To3DAttributes()));
+            PlayOneShot(reference, sound => sound.set3DAttributes(emitter.To3DAttributes()));
         }
         
-        private static void PlayOneShot(string path, Action<EventInstance> callback)
+        private static void PlayOneShot(EventReference reference, Action<EventInstance> callback)
         {
-            SoundUtility.path = path;
+            SoundUtility.reference = reference;
             
-            var reference = EventReference.Find(path);
             if (reference.IsNull || reference.Guid == new GUID())
             {
                 LogGeneric("could not be found!");
@@ -52,7 +51,7 @@ namespace FR8Runtime.CodeUtility
         {
             if (!logErrors) return;
 
-            var ex = new Exception($"Sound \"{path}\" {reason}!");
+            var ex = new Exception($"Sound \"{reference.Guid}\" {reason}!");
             Debug.LogWarning(ex, emitter);
         }
     }

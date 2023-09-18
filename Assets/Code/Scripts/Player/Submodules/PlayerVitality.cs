@@ -65,6 +65,8 @@ namespace FR8Runtime.Player.Submodules
                 }
                 else
                 {
+                    currentShields = -1.0f;
+                    
                     exposureTimer += Time.deltaTime;
                     var exposureTime = 1.0f / exposureDamageFrequency;
                     while (exposureTimer > exposureTime)
@@ -123,7 +125,7 @@ namespace FR8Runtime.Player.Submodules
 
             currentHealth -= damage;
 
-            if (currentShields < 0) currentShields = 0;
+            if (currentShields <= 0) currentShields = -1.0f;
             if (currentHealth < 0) currentHealth = 0;
 
             DamageEvent?.Invoke(damageInstance);
@@ -178,6 +180,7 @@ namespace FR8Runtime.Player.Submodules
             currentHealth = maxHealth;
             currentShields = shieldDuration;
             IsAlive = true;
+            LastDamageTime = float.MinValue;
 
             var (spawnPosition, spawnOrientation) = GetSpawnPoint();
 
