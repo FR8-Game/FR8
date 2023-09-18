@@ -40,7 +40,7 @@ namespace FR8Runtime.Level
 
         protected virtual void FixedUpdate()
         {
-            percent = Mathf.Clamp01(percent + (state ? warmUpTime : -cooldownTime) * Time.deltaTime);
+            percent = Mathf.Clamp01(percent + Time.deltaTime / (state ? warmUpTime : -cooldownTime));
             var smoothedPercent = smoothingCurve.Evaluate(percent);
 
             if (material)
