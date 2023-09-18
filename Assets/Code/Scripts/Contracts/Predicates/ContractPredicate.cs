@@ -7,7 +7,10 @@ namespace FR8Runtime.Contracts.Predicates
     public abstract class ContractPredicate : ScriptableObject
     {
         public const string ScriptableObjectLocation = "Scriptable Objects/Contracts/";
-        
+
+        private int tasksDone;
+        private int taskCount;
+
         public float Progress { get; private set; }
         public bool Done { get; private set; }
 
@@ -15,11 +18,19 @@ namespace FR8Runtime.Contracts.Predicates
         {
             var tasksDone = TasksDone();
             var taskCount = TaskCount();
-            
-             Progress = (float)tasksDone / taskCount;
+
+            Progress = (float)tasksDone / taskCount;
             Done = tasksDone == taskCount;
+
+            if (tasksDone == this.tasksDone && taskCount == this.taskCount) return;
+            
+            UpdateUI();
+            this.tasksDone = tasksDone;
+            this.taskCount = taskCount;
         }
-        
+
+        public abstract void UpdateUI();
+
         protected abstract int TasksDone();
         protected abstract int TaskCount();
 

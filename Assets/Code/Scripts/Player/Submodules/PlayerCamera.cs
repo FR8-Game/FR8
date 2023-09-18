@@ -115,7 +115,6 @@ namespace FR8Runtime.Player.Submodules
             }
 
             zoomCamera = Avatar.input.ZoomCam;
-
             Camera.transform.rotation = Avatar.Head.transform.rotation;
 
             // Update additional camera variables.

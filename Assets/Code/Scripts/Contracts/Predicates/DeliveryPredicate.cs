@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using FR8Runtime.Train;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -14,6 +15,11 @@ namespace FR8Runtime.Contracts.Predicates
 
         public string[] carriageNames;
         public string deliveryLocationName;
+
+        private bool initialized;
+        private List<TrainCarriage> carriages;
+        private TrackSection deliveryLocation;
+        private ProgressBar uiProgressBar;
 
         protected override string BuildString()
         {
@@ -36,27 +42,22 @@ namespace FR8Runtime.Contracts.Predicates
 
         public override VisualElement BuildUI()
         {
-            var root = new ProgressBar();
+            uiProgressBar = new ProgressBar();
+            uiProgressBar.title = ToString();
+            return uiProgressBar;
+        }
 
-            root.title = ToString();
-            root.lowValue = 0.0f;
-            root.highValue = carriageNames.Length;
-            root.value = carriagesDelivered;
-
-            return root;
+        public override void UpdateUI()
+        {
+            uiProgressBar.lowValue = 0.0f;
+            uiProgressBar.highValue = carriageNames.Length;
+            uiProgressBar.value = carriagesDelivered;
         }
 
         protected override int TasksDone()
         {
-            var carriages = new List<TrainCarriage>();
-            var deliveryLocation = GameObject.Find(deliveryLocationName).GetComponent<TrackSection>();
-
-            foreach (var name in carriageNames)
-            {
-                var find = GameObject.Find(name);
-                if (find) carriages.Add(find.GetComponent<TrainCarriage>());
-            }
-
+            if (!initialized) Initialize();
+            
             carriagesDelivered = 0;
             foreach (var e in carriages)
             {
@@ -64,6 +65,18 @@ namespace FR8Runtime.Contracts.Predicates
             }
 
             return carriagesDelivered;
+        }
+
+        private void Initialize()
+        {
+            carriages = new List<TrainCarriage>();
+            deliveryLocation = GameObject.Find(deliveryLocationName).GetComponent<TrackSection>();
+
+            foreach (var name in carriageNames)
+            {
+                var find = GameObject.Find(name);
+                if (find) carriages.Add(find.GetComponent<TrainCarriage>());
+            }
         }
 
         protected override int TaskCount() => carriageNames.Length;
