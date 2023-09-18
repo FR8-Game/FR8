@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using FR8Runtime.Player.Submodules;
 using UnityEngine;
 
@@ -35,6 +36,8 @@ namespace FR8Runtime.Player
             }
         }
 
+        public static readonly List<PlayerAvatar> All = new();
+
         private void Awake()
         {
             transform.SetParent(null);
@@ -55,8 +58,14 @@ namespace FR8Runtime.Player
             InitSubmodules();
         }
 
+        private void OnEnable()
+        {
+            All.Add(this);
+        }
+
         private void OnDisable()
         {
+            All.Remove(this);
             DisableEvent?.Invoke();
         }
 

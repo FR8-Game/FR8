@@ -9,7 +9,7 @@ namespace FR8Runtime.Contracts
     public class Contract : ScriptableObject
     {
         public List<ContractPredicate> predicates;
-        
+
         public float Progress { get; private set; }
         public int PredicatesCompleted { get; private set; }
         public bool Done => PredicatesCompleted == predicates.Count;
@@ -59,6 +59,7 @@ namespace FR8Runtime.Contracts
             foreach (var e in predicates)
             {
                 content.Add(e.BuildUI());
+                e.UpdateUI();
             }
 
             return root;

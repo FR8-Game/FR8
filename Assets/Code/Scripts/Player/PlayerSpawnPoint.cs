@@ -49,7 +49,7 @@ namespace FR8Runtime.Player
         private void FixedUpdate()
         {
             var occupied = false;
-            var players = FindObjectsOfType<PlayerAvatar>();
+            var players = PlayerAvatar.All;
             foreach (var p in players)
             {
                 if (bounds.Contains(transform.InverseTransformPoint(p.transform.position)))
