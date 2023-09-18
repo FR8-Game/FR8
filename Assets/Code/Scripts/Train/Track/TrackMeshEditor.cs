@@ -37,7 +37,6 @@ namespace FR8Runtime.Train.Track
                 AssetDatabase.StopAssetEditing();
                 EditorSceneManager.MarkAllScenesDirty();
                 AssetDatabase.Refresh();
-                AssetDatabase.SaveAssets();
             }
         }
 
@@ -48,9 +47,6 @@ namespace FR8Runtime.Train.Track
             BakeConversionGraph(segment);
 
             bakeData = new TrackMeshBakeData(this, segment);
-
-            while (!bakeData.Done) { }
-
             bakeData.Cleanup();
 
             for (var i = 0; i < bakeData.meshes.Count; i++)

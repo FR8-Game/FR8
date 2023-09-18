@@ -20,13 +20,11 @@ namespace FR8Runtime.Train.Track
         private Matrix4x4 matrix;
         private List<(Vector3, Vector3)> spline;
 
-        private Thread thread;
         private int taskID;
         private string trackName;
-        private Stopwatch threadTimer;
 
         public MeshSegment Segment => meshes[^1];
-        public bool Done => !thread.IsAlive;
+        public bool Done => true;
 
         public TrackMeshBakeData(TrackMesh trackMesh, TrackSegment segment)
         {
@@ -51,9 +49,10 @@ namespace FR8Runtime.Train.Track
             baseMeshZMax = trackMesh.baseMesh.bounds.max.z;
 
             spline = new List<(Vector3, Vector3)>();
-            foreach (Transform knot in segment)
+            for (var i = 0; i < spline.Count; i++)
             {
-                spline.Add((knot.position, knot.forward));
+                var knot = spline[i];
+                spline.Add((knot.Item1, knot.Item2));
             }
 
             matrix = trackMesh.transform.worldToLocalMatrix;
@@ -61,11 +60,7 @@ namespace FR8Runtime.Train.Track
 
             taskID = Progress.Start($"Baking {trackName} Track Mesh");
 
-            threadTimer = new Stopwatch();
-            threadTimer.Start();
-
-            thread = new Thread(ThreadAction);
-            thread.Start();
+            ThreadAction();
         }
 
         private void Split() => meshes.Add(new MeshSegment());
@@ -147,8 +142,6 @@ namespace FR8Runtime.Train.Track
         public void Cleanup()
         {
             Progress.Finish(taskID);
-            threadTimer.Stop();
-            Debug.Log($"Finished Baking {trackName} in {threadTimer.ElapsedMilliseconds}");
         }
 
         private void Report(float progress)

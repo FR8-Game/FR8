@@ -8,7 +8,7 @@ using UnityEngine;
 namespace FR8Runtime.Train.Track
 {
     [SelectionBase, DisallowMultipleComponent]
-    public class TrackSegment : MonoBehaviour, IEnumerable<Transform>
+    public class TrackSegment : MonoBehaviour
     {
         public const float ConnectionDistance = 3.0f;
         public static readonly Spline.SplineProfile SplineProfile = Spline.Cubic;
@@ -32,7 +32,7 @@ namespace FR8Runtime.Train.Track
         public Connection StartConnection => startConnection;
         public Connection EndConnection => endConnection;
         public int Resolution => resolution;
-        public int Count => KnotContainer().childCount;
+        public int Count => KnotContainer().childCount + (closedLoop ? 1 : 0);
 
         private void Awake()
         {
@@ -78,8 +78,9 @@ namespace FR8Runtime.Train.Track
         private void DrawLineBetweenKnots()
         {
             var points = new List<Vector3>();
-            foreach (Transform t in this)
+            for (var i = 0; i < Count; i++)
             {
+                var t = this[i];
                 points.Add(t.position);
             }
 
@@ -451,10 +452,7 @@ namespace FR8Runtime.Train.Track
             UpdateKnotNames();
         }
 
-        public Transform this[int index] => KnotContainer().GetChild(index);
-
-        public IEnumerator GetEnumerator() => KnotContainer().GetEnumerator();
-        IEnumerator<Transform> IEnumerable<Transform>.GetEnumerator() => (IEnumerator<Transform>)KnotContainer().GetEnumerator();
+        public Transform this[int index] => KnotContainer().GetChild(index % KnotContainer().childCount);
 
         public static bool Valid(TrackSegment segment)
         {
