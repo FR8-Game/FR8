@@ -16,7 +16,7 @@ namespace FR8Editor.Tools
             testChainCache = AssetDatabase.LoadAssetAtPath<DialogueChain>(filename);
         }
         
-        [MenuItem("Actions/Testing/Dialogue Test")]
+        //[MenuItem("Actions/Testing/Dialogue Test")]
         public static void TestDialogue()
         {
             UpdateTestingChainCache();

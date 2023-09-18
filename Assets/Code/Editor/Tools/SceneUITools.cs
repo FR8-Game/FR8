@@ -7,12 +7,6 @@ namespace FR8Editor.Tools
     [InitializeOnLoad]
     public static class SceneUITools
     {
-        [MenuItem("Actions/Hide UI/Show")]
-        public static void ShowUI() => ShowUI(true);
-        
-        [MenuItem("Actions/Hide UI/Hide")]
-        public static void HideUI() => ShowUI(false);
-
         private static string ShownUIKey => $"{nameof(SceneUITools)}.ShowUI";
         
         static SceneUITools()
