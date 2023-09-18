@@ -83,14 +83,222 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -1672234348593858002, guid: df80b2491c2fef141b734ad7bd9c5677, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9238795
+      objectReference: {fileID: 0}
+    - target: {fileID: -1672234348593858002, guid: df80b2491c2fef141b734ad7bd9c5677, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.38268346
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: df80b2491c2fef141b734ad7bd9c5677, type: 3}
       propertyPath: m_Name
       value: GenericLever
       objectReference: {fileID: 0}
+    - target: {fileID: 3066928120213606484, guid: df80b2491c2fef141b734ad7bd9c5677, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9238795
+      objectReference: {fileID: 0}
+    - target: {fileID: 3066928120213606484, guid: df80b2491c2fef141b734ad7bd9c5677, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.38268346
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: df80b2491c2fef141b734ad7bd9c5677, type: 3}
+--- !u!1 &603398859860804204 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5984724572080410483, guid: df80b2491c2fef141b734ad7bd9c5677, type: 3}
+  m_PrefabInstance: {fileID: 6580242131473304863}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &8166898509378039958
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 603398859860804204}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -5246729107692818707, guid: df80b2491c2fef141b734ad7bd9c5677, type: 3}
+--- !u!1 &3693740407319040692 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7499472006531030955, guid: df80b2491c2fef141b734ad7bd9c5677, type: 3}
+  m_PrefabInstance: {fileID: 6580242131473304863}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &8080722974864100484
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3693740407319040692}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -7601530903879507250, guid: df80b2491c2fef141b734ad7bd9c5677, type: 3}
+--- !u!4 &3718478929613141809 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -1672234348593858002, guid: df80b2491c2fef141b734ad7bd9c5677, type: 3}
+  m_PrefabInstance: {fileID: 6580242131473304863}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &4295312298539810116 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6975429988419006555, guid: df80b2491c2fef141b734ad7bd9c5677, type: 3}
+  m_PrefabInstance: {fileID: 6580242131473304863}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2228480024415316219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4295312298539810116}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d443e25e44d34a92a98ecae067bdce50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: Throttle
+  displayName: Throttle
+  defaultValue: 0
+  steps: 10
+  forceStep: 0
+  testValue: 0
+  range: {x: 0, y: 1}
+  animator:
+    handle: {fileID: 3718478929613141809}
+    valueRange: {x: 0, y: 1}
+    animationSpring:
+      springConstant: 350
+      dampingConstant: 25
+      clamped: 1
+      range: {x: 0, y: 1}
+      bounce: 0.4
+      currentPosition: 0
+      targetPosition: 0
+      velocity: 0
+    animatePosition: 0
+    slidePoseAPosition: {x: 0, y: 0, z: 0}
+    slidePoseBPosition: {x: 0, y: 0, z: 0}
+    animateRotation: 1
+    slidePoseARotation: {x: -45, y: 0, z: 0}
+    slidePoseBRotation: {x: 45, y: 0, z: 0}
+  sounds:
+    clickReference:
+      Guid:
+        Data1: 779939904
+        Data2: 1153591353
+        Data3: 1315055039
+        Data4: 1935609873
+      Path: event:/Interactions/Control Stick Click
+  dragBehaviour:
+    sensitivity: 1
+    dragVector: {x: 0, y: 0, z: 1}
+--- !u!1 &6314162448865050298 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -8290601271125036123, guid: df80b2491c2fef141b734ad7bd9c5677, type: 3}
+  m_PrefabInstance: {fileID: 6580242131473304863}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &3990511280516420120
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6314162448865050298}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -6925303787040754757, guid: df80b2491c2fef141b734ad7bd9c5677, type: 3}
 --- !u!4 &6690957234743798516 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: df80b2491c2fef141b734ad7bd9c5677, type: 3}
   m_PrefabInstance: {fileID: 6580242131473304863}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &8016527350618117797 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -5471351845239825478, guid: df80b2491c2fef141b734ad7bd9c5677, type: 3}
+  m_PrefabInstance: {fileID: 6580242131473304863}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &8490535055911268829
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8016527350618117797}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 3956391553483788271, guid: df80b2491c2fef141b734ad7bd9c5677, type: 3}
+--- !u!4 &8205098627152715083 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3066928120213606484, guid: df80b2491c2fef141b734ad7bd9c5677, type: 3}
+  m_PrefabInstance: {fileID: 6580242131473304863}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &9141285677365857230 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2706075956782859985, guid: df80b2491c2fef141b734ad7bd9c5677, type: 3}
+  m_PrefabInstance: {fileID: 6580242131473304863}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &739193058776285238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9141285677365857230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d443e25e44d34a92a98ecae067bdce50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: Brake
+  displayName: Brake
+  defaultValue: 0
+  steps: 10
+  forceStep: 0
+  testValue: 0
+  range: {x: 0, y: 1}
+  animator:
+    handle: {fileID: 8205098627152715083}
+    valueRange: {x: 0, y: 1}
+    animationSpring:
+      springConstant: 350
+      dampingConstant: 25
+      clamped: 1
+      range: {x: 0, y: 1}
+      bounce: 0.4
+      currentPosition: 0
+      targetPosition: 0
+      velocity: 0
+    animatePosition: 0
+    slidePoseAPosition: {x: 0, y: 0, z: 0}
+    slidePoseBPosition: {x: 0, y: 0, z: 0}
+    animateRotation: 1
+    slidePoseARotation: {x: -45, y: 0, z: 0}
+    slidePoseBRotation: {x: 45, y: 0, z: 0}
+  sounds:
+    clickReference:
+      Guid:
+        Data1: 779939904
+        Data2: 1153591353
+        Data3: 1315055039
+        Data4: 1935609873
+      Path: event:/Interactions/Control Stick Click
+  dragBehaviour:
+    sensitivity: 1
+    dragVector: {x: 0, y: 0, z: 1}
