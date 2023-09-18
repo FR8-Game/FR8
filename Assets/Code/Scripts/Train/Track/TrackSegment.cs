@@ -54,7 +54,7 @@ namespace FR8Runtime.Train.Track
 
         private void FixedUpdate()
         {
-            var trains = FindObjectsOfType<TrainCarriage>();
+            var trains = TrainCarriage.All;
 
             UpdateConnection(trains, ConnectionType.Start);
             UpdateConnection(trains, ConnectionType.End);
@@ -125,7 +125,7 @@ namespace FR8Runtime.Train.Track
             }
         }
 
-        private void UpdateTrainMetadata(TrainCarriage[] trains)
+        private void UpdateTrainMetadata(List<TrainCarriage> trains)
         {
             foreach (var train in trains)
             {
@@ -134,7 +134,7 @@ namespace FR8Runtime.Train.Track
             }
         }
 
-        private void UpdateConnection(TrainCarriage[] trains, ConnectionType type)
+        private void UpdateConnection(List<TrainCarriage> trains, ConnectionType type)
         {
             var connection = type switch
             {
