@@ -25,6 +25,7 @@ namespace FR8Runtime.Player.Submodules
 
         [Space]
         [SerializeField] private Color baseColor = Color.white;
+        [SerializeField] private Color shieldColor = Color.cyan;
         [SerializeField] private Color flashColor = Color.red;
         [SerializeField] private float flashTiming = 1.0f;
         [SerializeField] [Range(0.0f, 1.0f)] private float flashSplit = 0.5f;
@@ -76,12 +77,11 @@ namespace FR8Runtime.Player.Submodules
             vignette = avatar.transform.Find("Vignette").GetComponent<UIDocument>().rootVisualElement.Q("vignette");
 
             SetupDeathUI();
+            BuildContractUI();
         }
 
         private void Update()
         {
-            RebuildContracts();
-
             compass.FaceAngle = avatar.transform.eulerAngles.y;
 
             var lookingAt = avatar.interactionManager.HighlightedObject;
@@ -95,9 +95,13 @@ namespace FR8Runtime.Player.Submodules
             );
 
             var hudColor = baseColor;
+            if (avatar.vitality.Exposed)
+            {
+                hudColor = shieldColor;
+            }
             if (avatar.vitality.CurrentShields <= 5.0f)
             {
-                hudColor = Time.time / GetFlashTiming() % 1.0f > flashSplit ? baseColor : flashColor;
+                hudColor = Time.time / GetFlashTiming() % 1.0f > flashSplit ? hudColor : flashColor;
             }
             hudRendererProperties.SetColor("_Color", hudColor);
             hudRenderer.SetPropertyBlock(hudRendererProperties);
@@ -186,7 +190,7 @@ namespace FR8Runtime.Player.Submodules
             }
         }
 
-        private void RebuildContracts()
+        private void BuildContractUI()
         {
             contractContainer.Clear();
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using FR8Runtime.Train.Track;
 using UnityEngine;
 
@@ -40,7 +41,9 @@ namespace FR8Runtime.Train
 
         public Vector3 HardAnchorPosition => (Rigidbody ? Rigidbody.position : transform.position) + transform.forward * trainLength * 0.5f;
         public Vector3 SoftAnchorPosition => (Rigidbody ? Rigidbody.position : transform.position) - transform.forward * trainLength * 0.5f;
-
+        
+        public static readonly List<TrainCarriage> All = new();
+        
         private void Awake()
         {
             Configure();
@@ -48,7 +51,13 @@ namespace FR8Runtime.Train
 
         private void OnEnable()
         {
+            All.Add(this);
             FindClosestSegment();
+        }
+
+        private void OnDisable()
+        {
+            All.Remove(this);
         }
 
         public void FindClosestSegment()

@@ -5,6 +5,12 @@ namespace FR8Runtime.Rendering
 {
     public sealed class CustomRenderFeatures : ScriptableRendererFeature
     {
+        public bool renderFog = true;
+        public bool renderOutline = true;
+        public bool renderVolumetrics;
+        public bool renderMapMarker = true;
+        public bool renderClouds;
+
         private FogPass fogPass;
         private SelectionOutlinePass outlinePass;
         private LightVolumetricPass volumetricPass;
@@ -13,20 +19,20 @@ namespace FR8Runtime.Rendering
 
         public override void Create()
         {
-            fogPass = new FogPass();
-            outlinePass = new SelectionOutlinePass();
-            volumetricPass = new LightVolumetricPass();
-            mapMarkersPass = new MapMarkerPass();
-            cloudPass = new CloudPass();
+            if (renderFog) fogPass = new FogPass();
+            if (renderOutline) outlinePass = new SelectionOutlinePass();
+            if (renderVolumetrics) volumetricPass = new LightVolumetricPass();
+            if (renderMapMarker) mapMarkersPass = new MapMarkerPass();
+            if (renderClouds) cloudPass = new CloudPass();
         }
 
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
-            fogPass.Enqueue(renderer);
-            outlinePass.Enqueue(renderer);
-            volumetricPass.Enqueue(renderer);
-            mapMarkersPass.Enqueue(renderer);
-            cloudPass.Enqueue(renderer);
+            if (renderFog) fogPass.Enqueue(renderer);
+            if (renderOutline) outlinePass.Enqueue(renderer);
+            if (renderVolumetrics) volumetricPass.Enqueue(renderer);
+            if (renderMapMarker) mapMarkersPass.Enqueue(renderer);
+            if (renderClouds) cloudPass.Enqueue(renderer);
         }
     }
 }
