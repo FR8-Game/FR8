@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2398640511836451229}
+  - component: {fileID: 308098229587804129}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -32,6 +33,48 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &308098229587804129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3570056455631591039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0723fe3c44e341f8ac64f5cd038f5ac8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: Ignition
+  displayName: Ignition
+  defaultValue: 0
+  animator:
+    handle: {fileID: 7329044123161991173}
+    valueRange: {x: 0, y: 1}
+    animationSpring:
+      springConstant: 350
+      dampingConstant: 25
+      clamped: 1
+      range: {x: 0, y: 1}
+      bounce: 0.4
+      currentPosition: 0
+      targetPosition: 0
+      velocity: 0
+    animatePosition: 1
+    slidePoseAPosition: {x: 0, y: 0.015, z: 0}
+    slidePoseBPosition: {x: 0, y: 0, z: 0}
+    animateRotation: 0
+    slidePoseARotation: {x: 0, y: 0, z: 0}
+    slidePoseBRotation: {x: 0, y: 0, z: 0}
+  testValue: 0
+  sounds:
+    clickReference:
+      Guid:
+        Data1: 779939904
+        Data2: 1153591353
+        Data3: 1315055039
+        Data4: 1935609873
+      Path: event:/Interactions/Control Stick Click
 --- !u!1001 &3579330941955229517
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -83,14 +126,61 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -3163312221011681464, guid: 92327f2e0b507544fb6612e4c0beace4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.015
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 92327f2e0b507544fb6612e4c0beace4, type: 3}
       propertyPath: m_Name
       value: Button
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 92327f2e0b507544fb6612e4c0beace4, type: 3}
+--- !u!1 &567963618346886571 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3912952296436605670, guid: 92327f2e0b507544fb6612e4c0beace4, type: 3}
+  m_PrefabInstance: {fileID: 3579330941955229517}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &952098243729562928
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 567963618346886571}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -5447036705194824928, guid: 92327f2e0b507544fb6612e4c0beace4, type: 3}
 --- !u!4 &3902069986037014694 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 92327f2e0b507544fb6612e4c0beace4, type: 3}
   m_PrefabInstance: {fileID: 3579330941955229517}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &7329044123161991173 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -3163312221011681464, guid: 92327f2e0b507544fb6612e4c0beace4, type: 3}
+  m_PrefabInstance: {fileID: 3579330941955229517}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8895203404369162717 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5394831699547436688, guid: 92327f2e0b507544fb6612e4c0beace4, type: 3}
+  m_PrefabInstance: {fileID: 3579330941955229517}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &9120871828239619435
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8895203404369162717}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -492873391128262092, guid: 92327f2e0b507544fb6612e4c0beace4, type: 3}
