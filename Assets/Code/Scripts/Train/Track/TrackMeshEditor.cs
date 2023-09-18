@@ -1,12 +1,10 @@
 ﻿#if UNITY_EDITOR
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FR8Runtime.Rendering;
-using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -32,51 +30,37 @@ namespace FR8Runtime.Train.Track
             try
             {
                 AssetDatabase.StartAssetEditing();
-                trackMeshesBaking++;
                 callback();
             }
             finally
             {
-                trackMeshesBaking--;
-                if (trackMeshesBaking <= 0)
-                {
-                    AssetDatabase.StopAssetEditing();
-                    EditorSceneManager.MarkAllScenesDirty();
-                    AssetDatabase.Refresh();
-                    AssetDatabase.SaveAssets();
-                }
+                AssetDatabase.StopAssetEditing();
+                EditorSceneManager.MarkAllScenesDirty();
+                AssetDatabase.Refresh();
+                AssetDatabase.SaveAssets();
             }
         }
 
         public partial void BakeMesh()
         {
-            EditorCoroutineUtility.StartCoroutine(routine(), gameObject);
+            var rendererContainer = GetRendererContainer(true);
+            var segment = GetComponent<TrackSegment>();
+            BakeConversionGraph(segment);
 
-            IEnumerator routine()
+            bakeData = new TrackMeshBakeData(this, segment);
+
+            while (!bakeData.Done) { }
+
+            bakeData.Cleanup();
+
+            for (var i = 0; i < bakeData.meshes.Count; i++)
             {
-                yield return null;
-
-                var rendererContainer = GetRendererContainer(true);
-                var segment = GetComponent<TrackSegment>();
-                BakeConversionGraph(segment);
-
-                bakeData = new TrackMeshBakeData(this, segment);
-
-                yield return new WaitUntil(() => bakeData.Done);
-                bakeData.Cleanup();
-
-                ExecuteAndRefreshAssets(() =>
-                {
-                    for (var i = 0; i < bakeData.meshes.Count; i++)
-                    {
-                        var meshData = bakeData.meshes[i];
-                        SplitMesh(i, meshData.vertices, meshData.normals, meshData.indices, meshData.uvs, rendererContainer);
-                    }
-
-                    bakeData = null;
-                    Debug.Log($"Finished Baking {name}");
-                });
+                var meshData = bakeData.meshes[i];
+                SplitMesh(i, meshData.vertices, meshData.normals, meshData.indices, meshData.uvs, rendererContainer);
             }
+
+            bakeData = null;
+            Debug.Log($"Finished Baking {name}");
         }
 
         private void BakeConversionGraph(TrackSegment segment)
@@ -217,12 +201,7 @@ namespace FR8Runtime.Train.Track
 
             var rng = new System.Random(gameObject.GetInstanceID());
             var verticalOffset = this.verticalOffset + (float)rng.NextDouble() * 0.01f;
-
-            foreach (Transform child in container)
-            {
-                child.localPosition = Vector3.up * verticalOffset;
-                child.localRotation = Quaternion.identity;
-            }
+            container.localPosition = Vector3.up * verticalOffset;
         }
 
         public void FindTrackMeshes()

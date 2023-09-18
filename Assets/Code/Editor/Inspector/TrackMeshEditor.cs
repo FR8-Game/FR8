@@ -19,7 +19,7 @@ namespace FR8Editor.Inspector
         public static void BakeAllTracks()
         {
             if (!EditorUtility.DisplayDialog("Bake All Meshes", "Are you sure you want to bake all Track Meshes in this Scene\nThis will take a long time", "Bake All", "Cancel")) return;
-            
+
             AllAction(e => e.BakeMesh());
         }
 
@@ -27,17 +27,20 @@ namespace FR8Editor.Inspector
         public static void ClearAllTracks()
         {
             if (!EditorUtility.DisplayDialog("Clear All Meshes", "Are you sure you want to delete all Track Bake Assets\nTHIS CANNOT BE UNDONE", "Delete All", "Cancel")) return;
-            
+
             AllAction(e => e.Clear());
         }
 
         public static void AllAction(Action<TrackMesh> callback)
         {
-            var list = FindObjectsOfType<TrackMesh>();
-            foreach (var e in list)
+            TrackMesh.ExecuteAndRefreshAssets(() =>
             {
-                callback(e);
-            }
+                var list = FindObjectsOfType<TrackMesh>();
+                foreach (var e in list)
+                {
+                    callback(e);
+                }
+            });
         }
 
         public override void OnInspectorGUI()
