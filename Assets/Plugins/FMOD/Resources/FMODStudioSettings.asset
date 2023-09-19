@@ -277,8 +277,8 @@ MonoBehaviour:
   switchSettingsMigration: 1
   HasSourceProject: 1
   HasPlatforms: 1
-  sourceProjectPath: 
-  sourceBankPath: 
+  sourceProjectPath: FMOD/FR8.fspro
+  sourceBankPath: FMOD/Build
   sourceBankPathUnformatted: 
   BankRefreshCooldown: 5
   ShowBankRefreshWindow: 1
@@ -299,8 +299,12 @@ MonoBehaviour:
   VirtualChannelSettings: []
   RealChannelSettings: []
   Plugins: []
-  MasterBanks: []
-  Banks: []
+  MasterBanks:
+  - Master
+  Banks:
+  - Interactions
+  - Player
+  - Train
   BanksToLoad: []
   LiveUpdatePort: 9264
   EnableMemoryTracking: 0
@@ -316,9 +320,9 @@ MonoBehaviour:
   HideSetupWizard: 0
   LastEventReferenceScanVersion: 131605
   Platforms:
-  - {fileID: 8401155131375972610}
-  - {fileID: 1166789501131274943}
   - {fileID: -2687540330671565835}
+  - {fileID: 1166789501131274943}
+  - {fileID: 8401155131375972610}
   MigratedPlatforms: 080000000200000001000000
 --- !u!114 &1166789501131274943
 MonoBehaviour:
