@@ -15,8 +15,8 @@ namespace FR8Editor.Inspector
             if (!train.Segment) return;
 
             var a = train.transform.position;
+            var p = Application.isPlaying ? train.PositionOnSpline : train.Segment.GetClosestPoint(a);
 
-            var p = train.Segment.GetClosestPoint(a);
             var b = train.Segment.SamplePoint(p);
             var t = train.Segment.SampleTangent(p);
 
@@ -36,7 +36,7 @@ namespace FR8Editor.Inspector
             base.OnInspectorGUI();
 
             if (PrefabStageUtility.GetCurrentPrefabStage()) return;
-            
+
             if (targets.Length == 0) return;
             if (targets.Length == 1)
             {
@@ -60,7 +60,7 @@ namespace FR8Editor.Inspector
         {
             Undo.RecordObject(target, "Snapped to Splines");
             Undo.RecordObject(target.transform, "Snapped to Splines");
-                    
+
             target.FindClosestSegment();
 
             var transform = target.transform;

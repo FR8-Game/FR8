@@ -11,10 +11,24 @@ namespace FR8Editor.Inspector
     public class TrackSegmentEditor : Editor
     {
         public TrackSegment Segment => target as TrackSegment;
-        
+
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
+
+            var connectionConfiguration = 0b0;
+            if (Segment.StartConnection) connectionConfiguration |= 0b1 << 0;
+            if (Segment.EndConnection) connectionConfiguration |= 0b1 << 1;
+
+            EditorGUILayout.HelpBox(connectionConfiguration switch
+            {
+                0 => "Segment Has No Connections",
+                1 => $"Connected at Start: [{Segment.StartConnection.segment.name}]",
+                2 => $"Connected at End:   [{Segment.EndConnection.segment.name}]",
+                3 => $"Connected at Start: [{Segment.StartConnection.segment.name}]\n" +
+                     $"Connected at End:   [{Segment.EndConnection.segment.name}]",
+                _ => throw new ArgumentOutOfRangeException()
+            }, MessageType.Info);
 
             if (Button(Count("Zero Track Origin{0}")))
             {
@@ -27,7 +41,7 @@ namespace FR8Editor.Inspector
                 {
                     var knots = s.KnotContainer();
                     var knotCount = knots.childCount;
-                    
+
                     if (knotCount <= 0) return;
 
                     var bounds = new Bounds(knots.GetChild(0).position, Vector3.zero);
@@ -46,7 +60,7 @@ namespace FR8Editor.Inspector
             {
                 Segment.AddKnot();
             }
-            
+
             Segment.UpdateKnotNames();
         }
 
@@ -65,14 +79,14 @@ namespace FR8Editor.Inspector
             rect.height = 1.0f;
             EditorGUI.DrawRect(rect, new Color(1.0f, 1.0f, 1.0f, 0.1f));
         }
-        
+
         private void ShiftTransform(TrackSegment segment, Vector3 newPosition, string undoText)
         {
             Undo.RecordObjects(new Object[] { segment.transform, segment }, undoText);
 
             var knots = segment.KnotContainer();
             var knotCount = knots.childCount;
-            
+
             var worldPoints = new Vector3[knotCount];
 
             for (var i = 0; i < worldPoints.Length; i++)
