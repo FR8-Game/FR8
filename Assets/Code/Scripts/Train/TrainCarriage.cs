@@ -27,6 +27,8 @@ namespace FR8Runtime.Train
 
         protected TrackSegment segment;
 
+        private float softAnchorPositionOnSpline;
+
         public TrackSegment Segment
         {
             get => segment;
@@ -38,6 +40,8 @@ namespace FR8Runtime.Train
         public Vector3 DriverDirection { get; private set; }
         public float ReferenceWeight => referenceWeight;
         public Vector3 TangentialForce { get; private set; }
+        public float PositionOnSpline { get; private set; }
+        public float LastPositionOnSpline { get; private set; }
 
         public Vector3 HardAnchorPosition => (Rigidbody ? Rigidbody.position : transform.position) + transform.forward * trainLength * 0.5f;
         public Vector3 SoftAnchorPosition => (Rigidbody ? Rigidbody.position : transform.position) - transform.forward * trainLength * 0.5f;
@@ -98,8 +102,14 @@ namespace FR8Runtime.Train
 
         protected virtual void FixedUpdate()
         {
+            LastPositionOnSpline = PositionOnSpline;
+            PositionOnSpline = segment.GetClosestPoint(HardAnchorPosition);
+            softAnchorPositionOnSpline = segment.GetClosestPoint(SoftAnchorPosition);
+
             ApplyDrag();
             ApplyCorrectiveForce();
+            
+            if(segment) segment.UpdateConnection(this);
         }
 
         private void ApplyDrag()
@@ -115,10 +125,10 @@ namespace FR8Runtime.Train
         private void ApplyCorrectiveForce()
         {
             // Calculate pose of front wheel assembly
-            var th = segment.GetClosestPoint(HardAnchorPosition);
+            var th = PositionOnSpline;
             var hardTrackPosition = segment.SamplePoint(th);
 
-            var ts = segment.GetClosestPoint(SoftAnchorPosition);
+            var ts = softAnchorPositionOnSpline;
             var softTrackPosition = segment.SamplePoint(ts);
 
             var center = (hardTrackPosition + softTrackPosition) / 2.0f;
@@ -144,8 +154,10 @@ namespace FR8Runtime.Train
             var normalVelocity = Rigidbody.velocity;
             force -= normalVelocity * retentionDamping;
 
+            var onTrack = PositionOnSpline >= 0.0f && PositionOnSpline <= 1.0f && softAnchorPositionOnSpline >= 0.0f && softAnchorPositionOnSpline <= 1.0f;
+            
             // Apply Force
-            force -= direction * Vector3.Dot(direction, force);
+            if (onTrack) force -= direction * Vector3.Dot(direction, force);
             Rigidbody.AddForce(force, ForceMode.Acceleration);
             TangentialForce = transform.InverseTransformVector(force);
         }
