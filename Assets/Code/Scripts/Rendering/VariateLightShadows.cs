@@ -1,8 +1,11 @@
 using System;
 using UnityEngine;
 using HBCore.Utility;
-using UnityEditor;
 using ColorUtility = HBCore.Utility.ColorUtility;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace FR8Runtime.Rendering
 {
@@ -11,15 +14,15 @@ namespace FR8Runtime.Rendering
     {
         [SerializeField] private float shadowCullDistance = 5.0f;
         [SerializeField] private float shadowFadeDistance = 1.0f;
-        [SerializeField][Range(0.0f, 1.0f)] private float shadowMaxStrength = 1.0f;
+        [SerializeField] [Range(0.0f, 1.0f)] private float shadowMaxStrength = 1.0f;
         [SerializeField] private LightShadows mode = LightShadows.Soft;
-        
+
         private Camera mainCamera;
         private new Light light;
 
         private float Inner => shadowCullDistance;
         private float Outer => shadowCullDistance + shadowFadeDistance;
-        
+
         private void Awake()
         {
             mainCamera = Camera.main;
@@ -41,13 +44,15 @@ namespace FR8Runtime.Rendering
 
         private void OnDrawGizmosSelected()
         {
+#if UNITY_EDITOR
             if (Selection.activeGameObject != gameObject) return;
-            
+
             Gizmos.matrix = transform.localToWorldMatrix;
             Gizmos.color = ColorUtility.Gray(1.0f);
             Gizmos.DrawWireSphere(Vector3.zero, Inner);
             Gizmos.color = ColorUtility.Gray(1.0f, 0.2f);
             Gizmos.DrawWireSphere(Vector3.zero, Outer);
+#endif
         }
     }
 }
