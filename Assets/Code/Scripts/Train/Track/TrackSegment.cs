@@ -25,9 +25,8 @@ namespace FR8Runtime.Train.Track
         private Connection endConnection = new();
 
         private float totalLength;
-
-        private Dictionary<TrainCarriage, Vector3> trainMetadata = new();
         private List<Vector3> points;
+        private List<TrackSegment> segmentsConnectedToThis = new();
 
         public Connection StartConnection => startConnection;
         public Connection EndConnection => endConnection;
@@ -52,13 +51,16 @@ namespace FR8Runtime.Train.Track
             }
         }
 
-        private void FixedUpdate()
+        private void OnEnable()
         {
-            var trains = TrainCarriage.All;
+            if (startConnection) startConnection.segment.segmentsConnectedToThis.Add(this);
+            if (endConnection) endConnection.segment.segmentsConnectedToThis.Add(this);
+        }
 
-            UpdateConnection(trains, ConnectionType.Start);
-            UpdateConnection(trains, ConnectionType.End);
-            UpdateTrainMetadata(trains);
+        private void OnDisable()
+        {
+            if (startConnection) startConnection.segment.segmentsConnectedToThis.Remove(this);
+            if (endConnection) endConnection.segment.segmentsConnectedToThis.Remove(this);
         }
 
         public void DrawGizmos(bool main, Color selectedColor, Color otherColor)
@@ -125,16 +127,16 @@ namespace FR8Runtime.Train.Track
             }
         }
 
-        private void UpdateTrainMetadata(List<TrainCarriage> trains)
+        public void UpdateConnection(TrainCarriage train)
         {
-            foreach (var train in trains)
+            foreach (var other in segmentsConnectedToThis)
             {
-                if (!trainMetadata.ContainsKey(train)) trainMetadata.Add(train, train.Rigidbody.position);
-                else trainMetadata[train] = train.Rigidbody.position;
+                other.UpdateConnection(train, ConnectionType.Start);
+                other.UpdateConnection(train, ConnectionType.End);
             }
         }
 
-        private void UpdateConnection(List<TrainCarriage> trains, ConnectionType type)
+        private void UpdateConnection(TrainCarriage train, ConnectionType type)
         {
             var connection = type switch
             {
@@ -143,26 +145,18 @@ namespace FR8Runtime.Train.Track
                 _ => throw new ArgumentOutOfRangeException()
             };
 
-            var other = connection.segment;
-
             if (!connection) return;
+
+            var other = connection.segment;
             if (connection.connectionActive)
             {
-                foreach (var train in trains)
-                {
-                    if (train.Segment != other) continue;
-                    if (!trainMetadata.ContainsKey(train)) continue;
+                if (train.Segment != other) return;
 
-                    TryExplicitJump(other, connection, train);
-                }
+                if (TryExplicitJump(other, connection, train)) return;
             }
 
-            foreach (var train in trains)
-            {
-                if (train.Segment != this) continue;
-
-                TryImplicitJump(type, train, connection);
-            }
+            if (train.Segment != this) return;
+            TryImplicitJump(type, train, connection);
         }
 
         private void TryImplicitJump(ConnectionType type, TrainCarriage train, Connection connection)
@@ -174,6 +168,7 @@ namespace FR8Runtime.Train.Track
                 {
                     if (p < 0.0f)
                     {
+                        Debug.Log($"Performed Implicit Jump to: {connection.segment}");
                         train.Segment = connection.segment;
                     }
 
@@ -183,6 +178,7 @@ namespace FR8Runtime.Train.Track
                 {
                     if (p > 1.0f)
                     {
+                        Debug.Log($"Performed Implicit Jump to: {connection.segment}");
                         train.Segment = connection.segment;
                     }
 
@@ -192,7 +188,7 @@ namespace FR8Runtime.Train.Track
             }
         }
 
-        private void TryExplicitJump(TrackSegment other, Connection connection, TrainCarriage train)
+        private bool TryExplicitJump(TrackSegment other, Connection connection, TrainCarriage train)
         {
             float difference(float p0, float p1, bool loop)
             {
@@ -206,15 +202,19 @@ namespace FR8Runtime.Train.Track
 
             var knotPercent = connection.t;
 
-            var lastSign = difference(other.GetClosestPoint(trainMetadata[train]), knotPercent, other.closedLoop) > 0.0f;
-            var d0 = difference(other.GetClosestPoint(train.Rigidbody.position), knotPercent, other.closedLoop);
+            var lastSign = difference(train.LastPositionOnSpline, knotPercent, other.closedLoop) > 0.0f;
+            var d0 = difference(train.PositionOnSpline, knotPercent, other.closedLoop);
             var sign = d0 > 0.0f;
             var switchSign = connection.direction > 0.0f;
-
+            
             if (sign == switchSign && lastSign != switchSign)
             {
+                Debug.Log($"Performed Explicit Jump to: {connection.segment}");
                 train.Segment = this;
+                return true;
             }
+
+            return false;
         }
 
         public Vector3 KnotVelocity(int index) => SampleVelocity(GetKnotPercent(index));

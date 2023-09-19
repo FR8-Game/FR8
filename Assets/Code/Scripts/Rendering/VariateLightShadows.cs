@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using HBCore.Utility;
+using UnityEditor;
 using ColorUtility = HBCore.Utility.ColorUtility;
 
 namespace FR8Runtime.Rendering
@@ -40,6 +41,8 @@ namespace FR8Runtime.Rendering
 
         private void OnDrawGizmosSelected()
         {
+            if (Selection.activeGameObject != gameObject) return;
+            
             Gizmos.matrix = transform.localToWorldMatrix;
             Gizmos.color = ColorUtility.Gray(1.0f);
             Gizmos.DrawWireSphere(Vector3.zero, Inner);
