@@ -1,7 +1,11 @@
 ﻿using System;
+using System.IO;
 using FR8Runtime.Train.Track;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 namespace FR8Editor.Inspector
 {
@@ -20,7 +24,14 @@ namespace FR8Editor.Inspector
         {
             if (!EditorUtility.DisplayDialog("Bake All Meshes", "Are you sure you want to bake all Track Meshes in this Scene\nThis will take a long time", "Bake All", "Cancel")) return;
 
-            AllAction(e => e.BakeMesh());
+            AllAction(e => e.BakeFinalMesh());
+        }
+
+        public static string GetBakeDataPath(Scene scene)
+        {
+            var path = Path.Combine(scene.path, "Track Bake");
+            if (Directory.Exists(path)) return path;
+            return Path.Combine(scene.path, scene.name, "Track Bake");
         }
 
         [MenuItem("Actions/Track Mesh/Clear All Meshes")]
@@ -51,14 +62,16 @@ namespace FR8Editor.Inspector
 
             using (new EditorGUI.DisabledScope(Application.isPlaying))
             {
-                if (GUILayout.Button(Count("Bake{0}") + append, GUILayout.Height(30)))
-                {
-                    ExecuteAll(target => TrackMesh.ExecuteAndRefreshAssets(target.BakeMesh));
-                }
+                button("Bake Shape Mesh", target => target.BakeShapeMesh());
+                button("Bake Final Mesh", target => target.BakeFinalMesh());
+                button("Clear Tracks", target => target.Clear());
+            }
 
-                if (GUILayout.Button(Count("Clear Tracks{0}") + append, GUILayout.Height(30)))
+            void button(string text, Action<TrackMesh> callback)
+            {
+                if (GUILayout.Button(Count(text + "{0}") + append, GUILayout.Height(30)))
                 {
-                    ExecuteAll(target => TrackMesh.ExecuteAndRefreshAssets(target.Clear));
+                    ExecuteAll(e => TrackMesh.ExecuteAndRefreshAssets(() => callback(e)));
                 }
             }
         }
