@@ -41,11 +41,14 @@ namespace FR8Editor.Tools
             return knotMask >= 0 && knotMask < trackSegment.Count ? new[] { trackSegment[knotMask] } : new Transform[0];
         }
 
+        public override void OnActivated()
+        {
+            all = new List<TrackSegment>(FindObjectsOfType<TrackSegment>());
+            terrainList = new List<Terrain>(FindObjectsOfType<Terrain>());
+        }
+
         public override void OnToolGUI(EditorWindow window)
         {
-            if (all == null) all = new List<TrackSegment>(FindObjectsOfType<TrackSegment>());
-            if (terrainList == null) terrainList = new List<Terrain>(FindObjectsOfType<Terrain>());
-
             var gameObject = target as GameObject;
             if (!gameObject) return;
 
