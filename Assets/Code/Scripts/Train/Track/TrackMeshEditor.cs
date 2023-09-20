@@ -8,6 +8,8 @@ using FR8Runtime.Rendering;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.UI;
+using Object = System.Object;
 
 namespace FR8Runtime.Train.Track
 {
@@ -41,13 +43,90 @@ namespace FR8Runtime.Train.Track
             }
         }
 
-        public partial void BakeMesh()
+        public Mesh GetShapeMesh()
+        {
+            var shapeMesh = new Mesh();
+            shapeMesh.name = "[PROC] TrackMesh.ShapeMesh";
+            shapeMesh.hideFlags = HideFlags.HideAndDontSave;
+
+            var bounds = new Bounds(Vector3.up * 0.5f, new Vector3(7.0f, 1.0f, 15.0f));
+            if (baseMesh) bounds = baseMesh.bounds;
+
+            shapeMesh.vertices = new[]
+            {
+                vertex(-1, -1, -1),
+                vertex(1, -1, -1),
+                vertex(1, -1, 1),
+                vertex(-1, -1, 1),
+
+                vertex(-1, 1, -1),
+                vertex(1, 1, -1),
+                vertex(1, 1, 1),
+                vertex(-1, 1, 1),
+            };
+
+            shapeMesh.triangles = new[]
+            {
+                6, 5, 4,
+                4, 7, 6,
+
+                0, 7, 4,
+                0, 3, 7,
+
+                6, 2, 1,
+                5, 6, 1,
+            };
+
+            shapeMesh.normals = new[]
+            {
+                normal(-1, -1, -1),
+                normal(1, -1, -1),
+                normal(1, -1, 1),
+                normal(-1, -1, 1),
+
+                normal(-1, 1, -1),
+                normal(1, 1, -1),
+                normal(1, 1, 1),
+                normal(-1, 1, 1),
+            };
+
+            shapeMesh.uv = new[]
+            {
+                new Vector2(1.0f, 0.0f),
+                new Vector2(1.0f, 1.0f),
+                new Vector2(0.0f, 1.0f),
+                new Vector2(0.0f, 0.0f),
+
+                new Vector2(0.0f, 0.0f),
+                new Vector2(0.0f, 1.0f),
+                new Vector2(1.0f, 1.0f),
+                new Vector2(1.0f, 0.0f),
+            };
+
+            return shapeMesh;
+
+            Vector3 vertex(int x, int y, int z) => bounds.center + new Vector3(bounds.size.x * x, bounds.size.y * y, bounds.size.z * z) * 0.5f;
+            Vector3 normal(int x, int y, int z) => new Vector3(x, y, 0.0f).normalized;
+        }
+
+        public void BakeShapeMesh()
+        {
+            var shapeMesh = GetShapeMesh();
+            BakeMesh(shapeMesh);
+            DestroyImmediate(shapeMesh);
+        }
+
+        public void BakeFinalMesh() => BakeMesh(baseMesh);
+
+        public void BakeMesh(Mesh baseMesh)
         {
             var rendererContainer = GetRendererContainer(true);
             var segment = GetComponent<TrackSegment>();
+            segment.BakeData();
+
             BakeConversionGraph(segment);
 
-            bakeData = new TrackMeshBakeData(this, segment);
+            bakeData = new TrackMeshBakeData(this, baseMesh, segment);
 
             while (!bakeData.Done) { }
 
@@ -58,6 +137,13 @@ namespace FR8Runtime.Train.Track
                 var meshData = bakeData.meshes[i];
                 SplitMesh(i, meshData.vertices, meshData.normals, meshData.indices, meshData.uvs, rendererContainer);
             }
+
+            var toDelete = new List<UnityEngine.Object>();
+            for (var i = bakeData.meshes.Count; i < rendererContainer.childCount; i++)
+            {
+                toDelete.Add(rendererContainer.GetChild(i).gameObject);
+            }
+            foreach (var e in toDelete) DestroyImmediate(e);
 
             bakeData = null;
             Debug.Log($"Finished Baking {name}");
@@ -229,7 +315,7 @@ namespace FR8Runtime.Train.Track
             }
         }
 
-        public partial void Clear()
+        public void Clear()
         {
             ExecuteAndRefreshAssets(() =>
             {
