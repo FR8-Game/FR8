@@ -34,6 +34,7 @@ namespace FR8Runtime.Train.Track
 
         private float totalLength;
         private List<Vector3> points;
+        private List<Vector3> velocities;
         private List<TrackSegment> segmentsConnectedToThis = new();
         private List<UnityEngine.Terrain> terrainList;
 
@@ -135,10 +136,13 @@ namespace FR8Runtime.Train.Track
         public void BakeData()
         {
             points = new List<Vector3>();
+            velocities = new List<Vector3>();
+            
             for (var i = 0; i < resolution; i++)
             {
-                var p = i / (resolution - 1.0f);
-                points.Add(SamplePoint(p));
+                var p = i / (closedLoop ? resolution : resolution - 1.0f);
+                points.Add(SampleSpline(p, (spline, t) => spline.EvaluatePoint(t), i => (this[i].position, this[i].forward), Count));
+                velocities.Add(SampleSpline(p, (spline, t) => spline.EvaluateVelocity(t), i => (this[i].position, this[i].forward), Count));
             }
 
             terrainList = new List<UnityEngine.Terrain>(FindObjectsOfType<UnityEngine.Terrain>());
@@ -238,13 +242,29 @@ namespace FR8Runtime.Train.Track
 
         public int FromEnd(int i) => Count - i;
 
-        public Vector3 SamplePoint(float t) => Sample(t, (spline, t) => TryConformToTerrain(spline.EvaluatePoint(t)));
+        public Vector3 SamplePoint(float t) => Sample(t, points);
+        public Vector3 SampleVelocity(float t) => Sample(t, velocities);
         public Vector3 SampleTangent(float t) => SampleVelocity(t).normalized;
-        public Vector3 SampleVelocity(float t) => Sample(t, (spline, t) => spline.EvaluateVelocity(t));
 
-        public T Sample<T>(float t, Func<Spline, float, T> callback) => Sample(t, callback, i => (this[i].position, this[i].forward), Count);
+        public Vector3 Sample(float t, IList<Vector3> bakeData)
+        {
+            var i0 = Mathf.FloorToInt(t * points.Count);
+            var i1 = i0;
 
-        public static T Sample<T>(float t, Func<Spline, float, T> callback, Func<int, (Vector3, Vector3)> list, int count)
+            if (i1 >= points.Count)
+            {
+                i1 = points.Count - 1;
+                i0 = points.Count - 2;
+            }
+
+            var a = bakeData[i0];
+            var b = bakeData[i1];
+
+            return Vector3.Lerp(a, b, Mathf.InverseLerp(i0, i1, t));
+        }
+        
+        private T SampleSpline<T>(float t, Func<Spline, float, T> callback) => SampleSpline(t, callback, i => (this[i].position, this[i].forward), Count);
+        private static T SampleSpline<T>(float t, Func<Spline, float, T> callback, Func<int, (Vector3, Vector3)> list, int count)
         {
             t = Mathf.Clamp01(t);
 

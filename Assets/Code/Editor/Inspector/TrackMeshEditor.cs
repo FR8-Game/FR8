@@ -2,10 +2,8 @@
 using System.IO;
 using FR8Runtime.Train.Track;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UIElements;
 
 namespace FR8Editor.Inspector
 {
