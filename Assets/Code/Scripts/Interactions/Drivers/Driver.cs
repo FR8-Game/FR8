@@ -63,7 +63,7 @@ namespace FR8Runtime.Interactions.Drivers
             driverNetwork = GetComponentInParent<DriverNetwork>();
         }
 
-        protected void Start()
+        protected virtual void Start()
         {
             origin = transform.localPosition;
             
