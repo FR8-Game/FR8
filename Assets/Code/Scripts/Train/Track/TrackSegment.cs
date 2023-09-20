@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using FR8Runtime.CodeUtility;
 using FR8Runtime.Train.Splines;
 using UnityEditor;
 using UnityEngine;
@@ -10,24 +11,33 @@ namespace FR8Runtime.Train.Track
     [SelectionBase, DisallowMultipleComponent]
     public class TrackSegment : MonoBehaviour, IEnumerable<Transform>
     {
+        // --- Constants ---
         public const float ConnectionDistance = 3.0f;
         public static readonly Spline.SplineProfile SplineProfile = Spline.Cubic;
 
+        // --- Legacy ---
         [SerializeField] [HideInInspector] private List<Vector3> knots;
+        
+        // --- Properties ---
         public TrackJunction junctionPrefab;
 
         [Space]
         [SerializeField] private int resolution = 100;
-
         [SerializeField] private bool closedLoop;
-
+        [SerializeField] private bool conformToTerrain = true;
+        
+        // --- Internal Fields ---
         private Connection startConnection = new();
         private Connection endConnection = new();
+
+        private Transform knotContainer;
 
         private float totalLength;
         private List<Vector3> points;
         private List<TrackSegment> segmentsConnectedToThis = new();
+        private List<UnityEngine.Terrain> terrainList;
 
+        // --- Properties ---
         public Connection StartConnection => startConnection;
         public Connection EndConnection => endConnection;
         public int Resolution => resolution;
@@ -35,7 +45,7 @@ namespace FR8Runtime.Train.Track
 
         private void Awake()
         {
-            BakePoints();
+            BakeData();
         }
 
         private void Start()
@@ -65,7 +75,7 @@ namespace FR8Runtime.Train.Track
 
         public void DrawGizmos(bool main, Color selectedColor, Color otherColor)
         {
-            BakePoints();
+            BakeData();
             var linePoints = new List<Vector3>();
 
             foreach (var e in points)
@@ -75,6 +85,11 @@ namespace FR8Runtime.Train.Track
 
             GizmosDrawLine(main ? selectedColor : otherColor, 1.0f, linePoints.ToArray());
             DrawLineBetweenKnots();
+
+            foreach (Transform e in KnotContainer())
+            {
+                DrawDistanceFromGround(e.position);
+            }
         }
 
         private void DrawLineBetweenKnots()
@@ -117,7 +132,7 @@ namespace FR8Runtime.Train.Track
 #endif
         }
 
-        private void BakePoints()
+        public void BakeData()
         {
             points = new List<Vector3>();
             for (var i = 0; i < resolution; i++)
@@ -125,6 +140,8 @@ namespace FR8Runtime.Train.Track
                 var p = i / (resolution - 1.0f);
                 points.Add(SamplePoint(p));
             }
+
+            terrainList = new List<UnityEngine.Terrain>(FindObjectsOfType<UnityEngine.Terrain>());
         }
 
         public void UpdateConnection(TrainCarriage train)
@@ -221,7 +238,7 @@ namespace FR8Runtime.Train.Track
 
         public int FromEnd(int i) => Count - i;
 
-        public Vector3 SamplePoint(float t) => Sample(t, (spline, t) => spline.EvaluatePoint(t));
+        public Vector3 SamplePoint(float t) => Sample(t, (spline, t) => TryConformToTerrain(spline.EvaluatePoint(t)));
         public Vector3 SampleTangent(float t) => SampleVelocity(t).normalized;
         public Vector3 SampleVelocity(float t) => Sample(t, (spline, t) => spline.EvaluateVelocity(t));
 
@@ -248,6 +265,11 @@ namespace FR8Runtime.Train.Track
             return callback(SplineProfile(knotPos0, p1, p2, knotPos1), t - i0);
         }
 
+        public Vector3 TryConformToTerrain(Vector3 point)
+        {
+            return conformToTerrain ? TerrainUtility.GetPointOnTerrain(terrainList, point) : point;
+        }
+        
         public void OnValidate()
         {
             if (!Valid(this)) return;
@@ -279,7 +301,7 @@ namespace FR8Runtime.Train.Track
 
         public float GetClosestPoint(Vector3 point)
         {
-            if (points == null || points.Count == 0) BakePoints();
+            if (points == null || points.Count == 0) BakeData();
             if (points.Count == 0) return default;
 
             FindClosestPair(point, out var best, out var other);
@@ -387,19 +409,19 @@ namespace FR8Runtime.Train.Track
 
         public Transform KnotContainer()
         {
-            var container = transform.Find("Knots");
-            if (container) return container;
+            if (!knotContainer) knotContainer = transform.Find("Knots");
+            if (knotContainer) return knotContainer;
 
-            container = new GameObject("Knots").transform;
-            container.SetParent(transform);
+            knotContainer = new GameObject("Knots").transform;
+            knotContainer.SetParent(transform);
 
-            container.localPosition = Vector3.zero;
-            container.localRotation = Quaternion.identity;
-            container.localScale = Vector3.one;
+            knotContainer.localPosition = Vector3.zero;
+            knotContainer.localRotation = Quaternion.identity;
+            knotContainer.localScale = Vector3.one;
 
-            container.SetAsFirstSibling();
+            knotContainer.SetAsFirstSibling();
 
-            return container;
+            return knotContainer;
         }
 
         public void UpdateKnotNames()
