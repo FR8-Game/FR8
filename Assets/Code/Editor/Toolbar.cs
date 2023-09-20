@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -22,13 +23,16 @@ namespace FR8Editor
         private static void SceneSwitchGUI()
         {
             var buildScenes = GetBuildScenes();
-            var currentScene = AssetDatabase.AssetPathToGUID(SceneManager.GetActiveScene().path);
+            var currentScenePath = SceneManager.GetActiveScene().path;
+            var currentSceneGuid = AssetDatabase.AssetPathToGUID(currentScenePath);
             var menu = new GenericMenu();
 
-            if (EditorGUILayout.DropdownButton(new GUIContent("Switch Scenes"), FocusType.Passive, GUILayout.Width(120)))
+            if (EditorGUILayout.DropdownButton(new GUIContent(Path.GetFileNameWithoutExtension(currentScenePath)), FocusType.Passive, GUILayout.ExpandWidth(false)))
             {
                 var otherScenes = GetAllScenes(buildScenes);
              
+                addScene(currentScenePath, "Reload ");
+                menu.AddSeparator(string.Empty);
                 listScenes(buildScenes);
                 menu.AddSeparator(string.Empty);
                 listScenes(otherScenes);
@@ -40,21 +44,25 @@ namespace FR8Editor
             {
                 foreach (var e in list)
                 {
-                    if (currentScene == e) continue;
+                    if (currentSceneGuid == e) continue;
                     
                     var path = AssetDatabase.GUIDToAssetPath(e);
-                    var name = Path.GetFileNameWithoutExtension(path);
 
                     if (path.Contains("Packages/")) continue;
                     if (path.Contains("Plugins/")) continue;
-                    
-                    menu.AddItem(new GUIContent(name), false, () =>
-                    {
-                        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
-                        
-                        EditorSceneManager.OpenScene(path);
-                    });
+
+                    addScene(path);
                 }
+            }
+
+            void addScene(string path, string prepend = "", string append = "")
+            {
+                var name = Path.GetFileNameWithoutExtension(path);
+                menu.AddItem(new GUIContent(prepend + name + append), false, () =>
+                {
+                    if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+                    EditorSceneManager.OpenScene(path);
+                });
             }
         }
 
