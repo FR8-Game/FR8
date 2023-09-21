@@ -56,12 +56,16 @@ namespace FR8Runtime.Train
         private void OnEnable()
         {
             All.Add(this);
-            FindClosestSegment();
         }
 
         private void OnDisable()
         {
             All.Remove(this);
+        }
+
+        protected virtual void Start()
+        {
+            FindClosestSegment();
         }
 
         public void FindClosestSegment()
@@ -74,7 +78,8 @@ namespace FR8Runtime.Train
             var segments = FindObjectsOfType<TrackSegment>();
             foreach (var segment in segments)
             {
-                var t = segment.GetClosestPoint(transform.position);
+                var t = Mathf.Clamp01(segment.GetClosestPoint(transform.position));
+                
                 var closestPoint = segment.SamplePoint(t);
                 var score = (closestPoint - transform.position).sqrMagnitude;
 
@@ -154,10 +159,8 @@ namespace FR8Runtime.Train
             var normalVelocity = Rigidbody.velocity;
             force -= normalVelocity * retentionDamping;
 
-            var onTrack = PositionOnSpline >= 0.0f && PositionOnSpline <= 1.0f && softAnchorPositionOnSpline >= 0.0f && softAnchorPositionOnSpline <= 1.0f;
-            
             // Apply Force
-            if (onTrack) force -= direction * Vector3.Dot(direction, force);
+            force -= direction * Vector3.Dot(direction, force);
             Rigidbody.AddForce(force, ForceMode.Acceleration);
             TangentialForce = transform.InverseTransformVector(force);
         }

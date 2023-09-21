@@ -3,8 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using FR8Runtime.CodeUtility;
 using FR8Runtime.Train.Splines;
-using UnityEditor;
 using UnityEngine;
+using ColorUtility = HBCore.Utility.ColorUtility;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace FR8Runtime.Train.Track
 {
@@ -17,7 +21,7 @@ namespace FR8Runtime.Train.Track
 
         // --- Legacy ---
         [SerializeField] [HideInInspector] private List<Vector3> knots;
-        
+
         // --- Properties ---
         public TrackJunction junctionPrefab;
 
@@ -25,6 +29,9 @@ namespace FR8Runtime.Train.Track
         [SerializeField] private int resolution = 100;
         [SerializeField] private bool closedLoop;
         [SerializeField] private bool conformToTerrain = true;
+
+        [Space]
+        [SerializeField] private bool initialConnectionState;
         
         // --- Internal Fields ---
         private Connection startConnection = new();
@@ -34,6 +41,7 @@ namespace FR8Runtime.Train.Track
 
         private float totalLength;
         private List<Vector3> points;
+        private List<Vector3> velocities;
         private List<TrackSegment> segmentsConnectedToThis = new();
         private List<UnityEngine.Terrain> terrainList;
 
@@ -46,17 +54,20 @@ namespace FR8Runtime.Train.Track
         private void Awake()
         {
             BakeData();
+            OnKnotsChanged();
         }
 
         private void Start()
         {
             if (startConnection)
             {
+                startConnection.connectionActive = initialConnectionState;
                 junctionPrefab.SpawnFromPrefab(this, this[0]);
             }
 
             if (endConnection)
             {
+                endConnection.connectionActive = initialConnectionState;
                 junctionPrefab.SpawnFromPrefab(this, this[FromEnd(1)]);
             }
         }
@@ -71,6 +82,12 @@ namespace FR8Runtime.Train.Track
         {
             if (startConnection) startConnection.segment.segmentsConnectedToThis.Remove(this);
             if (endConnection) endConnection.segment.segmentsConnectedToThis.Remove(this);
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            var col = new Color(0f, 0.84f, 1f);
+            DrawGizmos(true, col, ColorUtility.Invert(col));
         }
 
         public void DrawGizmos(bool main, Color selectedColor, Color otherColor)
@@ -135,10 +152,13 @@ namespace FR8Runtime.Train.Track
         public void BakeData()
         {
             points = new List<Vector3>();
+            velocities = new List<Vector3>();
+            
             for (var i = 0; i < resolution; i++)
             {
-                var p = i / (resolution - 1.0f);
-                points.Add(SamplePoint(p));
+                var p = i / (closedLoop ? resolution : resolution - 1.0f);
+                points.Add(SampleSpline(p, (spline, t) => spline.EvaluatePoint(t), i => (this[i].position, this[i].forward), Count));
+                velocities.Add(SampleSpline(p, (spline, t) => spline.EvaluateVelocity(t), i => (this[i].position, this[i].forward), Count));
             }
 
             terrainList = new List<UnityEngine.Terrain>(FindObjectsOfType<UnityEngine.Terrain>());
@@ -238,13 +258,36 @@ namespace FR8Runtime.Train.Track
 
         public int FromEnd(int i) => Count - i;
 
-        public Vector3 SamplePoint(float t) => Sample(t, (spline, t) => TryConformToTerrain(spline.EvaluatePoint(t)));
+        public Vector3 SamplePoint(float t) => Sample(t, points, Vector3.LerpUnclamped);
+        public Vector3 SampleVelocity(float t) => Sample(t, velocities, Vector3.Lerp);
         public Vector3 SampleTangent(float t) => SampleVelocity(t).normalized;
-        public Vector3 SampleVelocity(float t) => Sample(t, (spline, t) => spline.EvaluateVelocity(t));
 
-        public T Sample<T>(float t, Func<Spline, float, T> callback) => Sample(t, callback, i => (this[i].position, this[i].forward), Count);
+        public Vector3 Sample(float t0, IList<Vector3> bakeData, Func<Vector3, Vector3, float, Vector3> lerp)
+        {
+            var t1 = t0 * bakeData.Count;
+            var i0 = Mathf.FloorToInt(t1);
+            var i1 = i0 + 1;
 
-        public static T Sample<T>(float t, Func<Spline, float, T> callback, Func<int, (Vector3, Vector3)> list, int count)
+            if (i1 >= bakeData.Count)
+            {
+                i0 = bakeData.Count - 2;
+                i1 = bakeData.Count - 1;
+            }
+
+            if (i0 < 0)
+            {
+                i0 = 0;
+                i1 = 1;
+            }
+
+            var a = bakeData[i0];
+            var b = bakeData[i1];
+
+            return lerp(a, b, (t1 - i0) / (i1 - i0));
+        }
+        
+        private T SampleSpline<T>(float t, Func<Spline, float, T> callback) => SampleSpline(t, callback, i => (this[i].position, this[i].forward), Count);
+        private static T SampleSpline<T>(float t, Func<Spline, float, T> callback, Func<int, (Vector3, Vector3)> list, int count)
         {
             t = Mathf.Clamp01(t);
 
@@ -274,6 +317,7 @@ namespace FR8Runtime.Train.Track
         {
             if (!Valid(this)) return;
 
+            BakeData();
             OnKnotsChanged();
 
             var childCount = KnotContainer().childCount;
@@ -305,7 +349,8 @@ namespace FR8Runtime.Train.Track
             if (points.Count == 0) return default;
 
             FindClosestPair(point, out var best, out var other);
-            return InterpolatePoints(point, best, other);
+            var t = InterpolatePoints(point, best, other);
+            return t;
         }
 
         private float InterpolatePoints(Vector3 point, int best, int other)

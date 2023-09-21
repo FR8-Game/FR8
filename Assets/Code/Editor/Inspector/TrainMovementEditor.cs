@@ -1,4 +1,5 @@
 using FR8Runtime.Train;
+using FR8Runtime.Train.Track;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -42,6 +43,11 @@ namespace FR8Editor.Inspector
             {
                 var target = targets[0];
 
+                using (new EditorGUI.DisabledScope(true))
+                {
+                    EditorGUILayout.ObjectField(target.Segment, typeof(TrackSegment), false);
+                }
+                
                 if (GUILayout.Button("Snap To Spline", GUILayout.Height(30)))
                 {
                     SnapToSpline(target);
