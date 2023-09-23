@@ -30,6 +30,8 @@ namespace FR8Runtime.Interactions.Drivers
             return values.ContainsKey(key) ? values[key] : fallback;
         }
 
+        public bool HasValue(string key) => values.ContainsKey(key);
+        
         public IEnumerable<KeyValuePair<string, float>> GetEnumerator() => values;
     }
 }

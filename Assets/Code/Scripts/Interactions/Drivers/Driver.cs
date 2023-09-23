@@ -1,6 +1,5 @@
 ﻿using System;
 using FR8Runtime.Interactions.Drivers.Submodules;
-using JetBrains.Annotations;
 using UnityEngine;
 
 namespace FR8Runtime.Interactions.Drivers
@@ -11,7 +10,7 @@ namespace FR8Runtime.Interactions.Drivers
         [SerializeField] private string key;
         [SerializeField] private string displayName;
         [SerializeField] private float defaultValue;
-        
+
         private const float shakeAmplitude = 0.003f;
         private const float shakeFrequency = 100.0f;
         private const float shakeDecay = 12.0f;
@@ -19,17 +18,17 @@ namespace FR8Runtime.Interactions.Drivers
         private Vector3 origin;
         private DriverNetwork driverNetwork;
         private float shakeTime = float.MinValue;
-        
+
         public virtual bool CanInteract => true;
         public virtual string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
         public virtual string DisplayValue => $"{Mathf.RoundToInt(Value * 100.0f)}%";
-        
+
         public bool OverrideInteractDistance => false;
         public float InteractDistance => throw new NotImplementedException();
-        
+
         public float Value { get; private set; }
         public string Key => key;
-        
+
         public virtual void OnValueChanged(float newValue)
         {
             Value = newValue;
@@ -66,15 +65,18 @@ namespace FR8Runtime.Interactions.Drivers
         protected virtual void Start()
         {
             origin = transform.localPosition;
-            
-            SetValue(defaultValue);
-            OnValueChanged(defaultValue);
+
+            if (!driverNetwork.HasValue(key))
+            {
+                SetValue(defaultValue);
+                OnValueChanged(defaultValue);
+            }
         }
-        
+
         protected virtual void FixedUpdate()
         {
             var newValue = driverNetwork.GetValue(key);
-            
+
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (newValue != Value)
             {

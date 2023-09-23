@@ -5,32 +5,61 @@ using UnityEngine.UIElements;
 
 namespace FR8Runtime.Contracts
 {
-    [CreateAssetMenu(menuName = "Scriptable Objects/Contract")]
-    public class Contract : ScriptableObject
+    [AddComponentMenu("Contracts/Contract")]
+    public class Contract : MonoBehaviour
     {
-        public List<ContractPredicate> predicates;
+        private List<ContractPredicate> predicates;
+        
+        public List<ContractPredicate> Predicates
+        {
+            get
+            {
+                if (!Application.isPlaying || predicates == null)
+                {
+                    predicates = new List<ContractPredicate>();
+                    foreach (Transform child in transform)
+                    {
+                        if (!child.TryGetComponent(out ContractPredicate predicate)) continue;
+                        predicates.Add(predicate);
+                    }
+                }
+                
+                return predicates;
+            }
+        }
 
         public float Progress { get; private set; }
         public int PredicatesCompleted { get; private set; }
-        public bool Done => PredicatesCompleted == predicates.Count;
-        
+        public bool Done => PredicatesCompleted == Predicates.Count;
+
+        public static readonly List<Contract> ActiveContracts = new();
+
+        private void OnEnable()
+        {
+            ActiveContracts.Add(this);
+        }
+
+        private void OnDisable()
+        {
+            ActiveContracts.Remove(this);
+        }
+
         public void Update()
         {
             PredicatesCompleted = 0;
-            foreach (var e in predicates)
+            foreach (var e in Predicates)
             {
-                e.Update();
-                Progress += e.Progress / predicates.Count;
+                Progress += e.Progress / Predicates.Count;
                 PredicatesCompleted++;
             }
         }
 
-        public string BuildTitle() => $"{name} [{PredicatesCompleted}/{predicates.Count}]".ToUpper();
+        public string BuildTitle() => $"{name} [{PredicatesCompleted}/{Predicates.Count}]".ToUpper();
         
         public override string ToString()
         {
             var str = $"{BuildTitle()}\n";
-            foreach (var e in predicates)
+            foreach (var e in Predicates)
             {
                 str += e.ToString();
             }
@@ -56,7 +85,7 @@ namespace FR8Runtime.Contracts
             content.style.maxWidth = 350;
             root.Add(content);
 
-            foreach (var e in predicates)
+            foreach (var e in Predicates)
             {
                 content.Add(e.BuildUI());
                 e.UpdateUI();

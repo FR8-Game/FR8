@@ -79,6 +79,7 @@ namespace FR8Runtime.Interactions.Drivers
 
         protected virtual void OnValidate()
         {
+            testValue = Mathf.Clamp(testValue, range.x, range.y);
             animator.OnValidate(testValue);
         }
     }

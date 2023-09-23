@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using FR8Runtime.UI;
 using UnityEngine;
 using Object = UnityEngine.Object;
