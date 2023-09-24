@@ -1,4 +1,5 @@
 using FR8Runtime.Train;
+using FR8Runtime.Train.Track;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -15,8 +16,8 @@ namespace FR8Editor.Inspector
             if (!train.Segment) return;
 
             var a = train.transform.position;
+            var p = Application.isPlaying ? train.PositionOnSpline : train.Segment.GetClosestPoint(a);
 
-            var p = train.Segment.GetClosestPoint(a);
             var b = train.Segment.SamplePoint(p);
             var t = train.Segment.SampleTangent(p);
 
@@ -36,12 +37,17 @@ namespace FR8Editor.Inspector
             base.OnInspectorGUI();
 
             if (PrefabStageUtility.GetCurrentPrefabStage()) return;
-            
+
             if (targets.Length == 0) return;
             if (targets.Length == 1)
             {
                 var target = targets[0];
 
+                using (new EditorGUI.DisabledScope(true))
+                {
+                    EditorGUILayout.ObjectField(target.Segment, typeof(TrackSegment), false);
+                }
+                
                 if (GUILayout.Button("Snap To Spline", GUILayout.Height(30)))
                 {
                     SnapToSpline(target);
@@ -60,7 +66,7 @@ namespace FR8Editor.Inspector
         {
             Undo.RecordObject(target, "Snapped to Splines");
             Undo.RecordObject(target.transform, "Snapped to Splines");
-                    
+
             target.FindClosestSegment();
 
             var transform = target.transform;

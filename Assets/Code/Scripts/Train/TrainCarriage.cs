@@ -27,6 +27,8 @@ namespace FR8Runtime.Train
 
         protected TrackSegment segment;
 
+        private float softAnchorPositionOnSpline;
+
         public TrackSegment Segment
         {
             get => segment;
@@ -38,6 +40,8 @@ namespace FR8Runtime.Train
         public Vector3 DriverDirection { get; private set; }
         public float ReferenceWeight => referenceWeight;
         public Vector3 TangentialForce { get; private set; }
+        public float PositionOnSpline { get; private set; }
+        public float LastPositionOnSpline { get; private set; }
 
         public Vector3 HardAnchorPosition => (Rigidbody ? Rigidbody.position : transform.position) + transform.forward * trainLength * 0.5f;
         public Vector3 SoftAnchorPosition => (Rigidbody ? Rigidbody.position : transform.position) - transform.forward * trainLength * 0.5f;
@@ -52,12 +56,16 @@ namespace FR8Runtime.Train
         private void OnEnable()
         {
             All.Add(this);
-            FindClosestSegment();
         }
 
         private void OnDisable()
         {
             All.Remove(this);
+        }
+
+        protected virtual void Start()
+        {
+            FindClosestSegment();
         }
 
         public void FindClosestSegment()
@@ -70,7 +78,8 @@ namespace FR8Runtime.Train
             var segments = FindObjectsOfType<TrackSegment>();
             foreach (var segment in segments)
             {
-                var t = segment.GetClosestPoint(transform.position);
+                var t = Mathf.Clamp01(segment.GetClosestPoint(transform.position));
+                
                 var closestPoint = segment.SamplePoint(t);
                 var score = (closestPoint - transform.position).sqrMagnitude;
 
@@ -98,8 +107,14 @@ namespace FR8Runtime.Train
 
         protected virtual void FixedUpdate()
         {
+            LastPositionOnSpline = PositionOnSpline;
+            PositionOnSpline = segment.GetClosestPoint(HardAnchorPosition);
+            softAnchorPositionOnSpline = segment.GetClosestPoint(SoftAnchorPosition);
+
             ApplyDrag();
             ApplyCorrectiveForce();
+            
+            if(segment) segment.UpdateConnection(this);
         }
 
         private void ApplyDrag()
@@ -115,10 +130,10 @@ namespace FR8Runtime.Train
         private void ApplyCorrectiveForce()
         {
             // Calculate pose of front wheel assembly
-            var th = segment.GetClosestPoint(HardAnchorPosition);
+            var th = PositionOnSpline;
             var hardTrackPosition = segment.SamplePoint(th);
 
-            var ts = segment.GetClosestPoint(SoftAnchorPosition);
+            var ts = softAnchorPositionOnSpline;
             var softTrackPosition = segment.SamplePoint(ts);
 
             var center = (hardTrackPosition + softTrackPosition) / 2.0f;
