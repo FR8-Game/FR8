@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using FR8Runtime.CodeUtility;
 using FR8Runtime.Contracts;
+using FR8Runtime.UI;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using Compass = FR8Runtime.UI.CustomControls.Compass;
+using Cursor = UnityEngine.Cursor;
 using Object = UnityEngine.Object;
+using SceneUtility = FR8Runtime.CodeUtility.SceneUtility;
 
 namespace FR8Runtime.Player.Submodules
 {
@@ -43,7 +49,7 @@ namespace FR8Runtime.Player.Submodules
         private Label latitude;
         private VisualElement vignette;
         private VisualElement deathScreen;
-        private VisualElement deathCover;
+        private VisualElement endScreen;
         private Label lookingAt;
         private Label contractText;
 
@@ -76,10 +82,14 @@ namespace FR8Runtime.Player.Submodules
             vignette = avatar.transform.Find("Vignette").GetComponent<UIDocument>().rootVisualElement.Q("vignette");
 
             SetupDeathUI();
+            HideEndgameUI();
         }
 
         private void Update()
         {
+            if (Keyboard.current.f2Key.wasPressedThisFrame) ShowEndgameUI();
+            if (Keyboard.current.f3Key.wasPressedThisFrame) HideEndgameUI();
+
             compass.FaceAngle = avatar.transform.eulerAngles.y;
 
             var lookingAt = avatar.interactionManager.HighlightedObject;
@@ -108,7 +118,7 @@ namespace FR8Runtime.Player.Submodules
 
             longitude.text = $"LONG: {avatar.transform.position.x / 80000.0f + 23.6f:N5}";
             latitude.text = $"LAT: {avatar.transform.position.z / 80000.0f + 94.2f:N5}";
-            
+
             BuildContractUI();
         }
 
@@ -152,7 +162,6 @@ namespace FR8Runtime.Player.Submodules
         {
             var root = avatar.transform.Find("Death Screen").GetComponent<UIDocument>().rootVisualElement;
             deathScreen = root;
-            deathCover = root.Q("cover");
 
             var respawn = root.Q<Button>("respawn");
             respawn.clickable.clicked += avatar.vitality.Revive;
@@ -177,18 +186,88 @@ namespace FR8Runtime.Player.Submodules
 
             IEnumerator routine()
             {
-                yield return new WaitForSecondsRealtime(1.0f);
-                deathCover.style.opacity = 1.0f;
+                var root = deathScreen;
 
-                var p = 0.0f;
-                while (p < 1.0f)
+                var typewritterElements = new List<TextElement>();
+                typewritterElements.Add(root.Q<Label>("subtitle"));
+                typewritterElements.Add(root.Q<Label>("title"));
+
+                var buttonContainer = root.Q("buttons");
+                foreach (var child in buttonContainer.Children())
                 {
-                    deathCover.style.opacity = 1.0f - p;
-                    p += Time.unscaledDeltaTime / 2.0f;
-                    yield return null;
+                    if (child is TextElement textElement)
+                    {
+                        typewritterElements.Add(textElement);
+                        textElement.visible = false;
+                    }
                 }
 
-                deathCover.visible = false;
+                const float typewriterCps = 25.0f;
+                const float postDelay = 0.5f;
+
+                yield return UitkUtility.Typewriter(typewriterCps, postDelay, typewritterElements.ToArray());
+            }
+        }
+
+        private VisualElement GetEndgameUI()
+        {
+            if (endScreen == null) endScreen = avatar.transform.Find("End Screen").GetComponent<UIDocument>().rootVisualElement;
+            return endScreen;
+        }
+
+        private void HideEndgameUI()
+        {
+            var root = GetEndgameUI();
+            root.visible = false;
+        }
+
+        private void ShowEndgameUI()
+        {
+            Pause.SetPaused(true);
+            Cursor.lockState = CursorLockMode.None;
+            var root = GetEndgameUI();
+            root.visible = true;
+
+            var subtitle = root.Q<Label>("subtitle");
+            var title = root.Q<Label>("title");
+            var content = root.Q<Label>("content");
+            var exit = root.Q<Button>("exit");
+
+            exit.clickable.clicked += UIActions.Load(SceneUtility.Scene.Menu);
+            
+            var ratio = 1.45f / content.resolvedStyle.fontSize;
+
+            content.text = "";
+            appendContent("time", "way too long");
+            appendContent("cargo damage", "110%");
+            appendContent("maidens", "none");
+            appendContent("bread", "missing");
+            appendContent("touched grass", "false");
+            appendContent("mother", "fucked");
+
+            avatar.StartCoroutine(routine());
+
+            void appendContent(object key, object value)
+            {
+                var keyStr = key.ToString().ToUpper();
+                var valueStr = value.ToString().ToUpper();
+
+                var textWidth = (keyStr.Length + valueStr.Length + 3) / ratio;
+                var padding = Mathf.FloorToInt((content.layout.width - textWidth) * ratio);
+
+                content.text += $">{keyStr} {new string('-', padding)} {valueStr}\n";
+            }
+
+            IEnumerator routine()
+            {
+                var routines = new[]
+                {
+                    UitkUtility.Typewriter(25.0f, 0.5f, subtitle, title),
+                    UitkUtility.Typewriter(100.0f, 0.5f, content),
+                    UitkUtility.Typewriter(25.0f, 0.5f, exit)
+                };
+
+                foreach (var r in routines) yield return avatar.StartCoroutine(r);
             }
         }
 
@@ -196,17 +275,32 @@ namespace FR8Runtime.Player.Submodules
         {
             contractText.Clear();
 
-            if (Contract.ActiveContracts.Count == 0)
+            contractText.text = string.Empty;
+            switch (Contract.ActiveContracts.Count)
             {
-                contractText.text = "No Contracts Currently Active";
-            }
-            else
-            {
-                contractText.text = $"Active Contract{(Contract.ActiveContracts.Count > 1 ? "s" : "")}\n";
-                foreach (var contract in Contract.ActiveContracts)
+                case 0:
                 {
+                    contractText.text += "No Contracts Currently Active";
+                    break;
+                }
+                case 1:
+                {
+                    var contract = Contract.ActiveContracts[0];
                     if (!contract) return;
-                    contractText.text += contract.BuildUI();
+                    contractText.text = contract.BuildUI();
+
+                    break;
+                }
+                default:
+                {
+                    contractText.text = $"Active Contract{(Contract.ActiveContracts.Count > 1 ? "s" : "")}\n";
+                    foreach (var contract in Contract.ActiveContracts)
+                    {
+                        if (!contract) return;
+                        contractText.text += contract.BuildUI();
+                    }
+
+                    break;
                 }
             }
 

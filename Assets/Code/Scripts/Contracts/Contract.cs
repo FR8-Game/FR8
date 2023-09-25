@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Text;
 using FR8Runtime.Contracts.Predicates;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace FR8Runtime.Contracts
 {
@@ -13,6 +12,7 @@ namespace FR8Runtime.Contracts
 
         private string displayName;
         private List<ContractPredicate> predicates;
+        private int activePredicate;
 
         public List<ContractPredicate> Predicates
         {
@@ -51,17 +51,23 @@ namespace FR8Runtime.Contracts
         public void Update()
         {
             PredicatesCompleted = 0;
-            foreach (var e in Predicates)
+            for (var i = 0; i < Predicates.Count; i++)
             {
-                Progress += e.Progress / Predicates.Count;
-                if (!e.Done) continue;
+                var predicate = Predicates[i];
+                Progress += predicate.Progress / Predicates.Count;
+                if (!predicate.Done)
+                {
+                    activePredicate = i;
+                    break;
+                }
+
                 PredicatesCompleted++;
             }
         }
 
         public string BuildTitle()
         {
-            var name = !string.IsNullOrWhiteSpace(displayName) ? displayName : "Contract";
+            var name = !string.IsNullOrWhiteSpace(displayName) ? displayName : "Active Contract";
             return $"{name} [{(PredicatesCompleted == predicates.Count ? "Done" : $"{PredicatesCompleted}/{Predicates.Count}")}]".ToUpper();
         }
 
@@ -81,20 +87,20 @@ namespace FR8Runtime.Contracts
             var sb = new StringBuilder();
 
             if (Done) sb.Append("<color=#00ff00>");
-            
+
             div();
             sb.AppendLine(BuildTitle());
 
-            foreach (var e in predicates)
-            {
-                e.BuildUI(sb);
-            }
+            if (activePredicate > 0 && !Done) buildPredicate(activePredicate - 1);
+            buildPredicate(activePredicate);
+            
             div();
 
             if (Done) sb.Append("</color>");
             return sb.ToString();
 
             void div() => sb.AppendLine(new string('-', divLength));
+            void buildPredicate(int i) => predicates[i].BuildUI(sb, i, i == activePredicate);
         }
     }
 }

@@ -18,7 +18,6 @@ namespace FR8Runtime.Player.Submodules
 
         public float exposureDamageFrequency = 4.0f;
 
-        private List<PlayerSpawnPoint> spawnPointStack = new();
         private int currentHealth;
         private float currentShields;
 
@@ -181,32 +180,11 @@ namespace FR8Runtime.Player.Submodules
             IsAlive = true;
             LastDamageTime = float.MinValue;
 
-            var (spawnPosition, spawnOrientation) = GetSpawnPoint();
-
-            avatar.transform.position = spawnPosition;
-            avatar.transform.rotation = spawnOrientation;
-
             ReviveEvent?.Invoke();
             HealthChangeEvent?.Invoke();
             IsAliveChangedEvent?.Invoke();
 
             Pause.SetPaused(false);
-        }
-
-        public (Vector3, Quaternion) GetSpawnPoint()
-        {
-            for (var i = spawnPointStack.Count; i > 0; i--)
-            {
-                var p = spawnPointStack[i - 1];
-                if (p.enabled) return (p.Position, p.Orientation);
-            }
-
-            if (PlayerSpawnPoint.Default)
-            {
-                return (PlayerSpawnPoint.Default.Position, PlayerSpawnPoint.Default.Orientation);
-            }
-
-            return (avatar.transform.position, avatar.transform.rotation);
         }
 
         [Serializable]

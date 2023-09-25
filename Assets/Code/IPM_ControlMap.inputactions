@@ -195,12 +195,21 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Fly",
+                    "name": "Hotbar.Next",
                     "type": "Button",
-                    "id": "e3a62710-2745-4e8b-93a3-afeb1a6545a2",
+                    "id": "fa09c832-2089-495b-b501-9c2bba63e109",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "MultiTap",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Hotbar.Last",
+                    "type": "Button",
+                    "id": "ff947d27-3792-4ac5-8b4b-4b8aa831ca97",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
                     "initialStateCheck": false
                 }
             ],
@@ -438,8 +447,30 @@
                 },
                 {
                     "name": "",
+                    "id": "8726fb18-c997-428e-b69d-fd63ecda8f06",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ZoomCam",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "a9c31f6e-5f9e-4001-aed9-4acaa2f7a7e5",
                     "path": "<Keyboard>/leftShift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Sprint",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c28a4326-1aec-42b6-8ebf-3921e4c009fa",
+                    "path": "<Gamepad>/leftStickPress",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -457,6 +488,39 @@
                     "action": "Pee",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "Controller",
+                    "id": "818a40ce-752d-49d6-a9ba-4aff888d2587",
+                    "path": "OneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pee",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "11c5d8fd-5158-449b-9be4-017db919b541",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pee",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "binding",
+                    "id": "8f15dc98-5a5d-434d-9160-74fd7d976711",
+                    "path": "<XInputController>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pee",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 },
                 {
                     "name": "",
@@ -570,12 +634,23 @@
                 },
                 {
                     "name": "",
-                    "id": "54832443-e8df-491f-a84b-1485b3c478f3",
-                    "path": "<Keyboard>/space",
+                    "id": "07a43783-ee0f-489f-931f-547e3ada1c78",
+                    "path": "<Gamepad>/dpad/right",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Fly",
+                    "action": "Hotbar.Next",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b1a3828b-353b-4715-9591-2e1831799f29",
+                    "path": "<Gamepad>/dpad/left",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Hotbar.Last",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

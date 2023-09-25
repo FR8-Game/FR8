@@ -14,7 +14,7 @@ namespace FR8Runtime.Contracts.Predicates
         public List<TrainCarriage> carriages;
         public TrackSection deliveryLocation;
 
-        protected override string BuildString()
+        protected override string GetDisplay()
         {
             var sb = new StringBuilder();
 

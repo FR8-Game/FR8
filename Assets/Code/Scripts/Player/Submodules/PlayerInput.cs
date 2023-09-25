@@ -7,9 +7,9 @@ namespace FR8Runtime.Player.Submodules
     public class PlayerInput
     {
         [SerializeField] private InputActionAsset inputMap;
-        [Range(0.0f, 1.0f)]
+        [Range(0.1f, 1.0f)]
         [SerializeField] private float mouseSensitivity = 0.3f;
-        [Range(0.0f, 1.0f)]
+        [Range(0.1f, 1.0f)]
         [SerializeField] private float controllerSensitivity = 0.4f;
 
         private Camera mainCamera;
@@ -28,6 +28,8 @@ namespace FR8Runtime.Player.Submodules
         private InputActionReference peeAction;
         private InputActionReference flyAction;
         private InputActionReference[] hotbarActions;
+        private InputActionReference hotbarNext;
+        private InputActionReference hotbarLast;
         
         public Vector3 Move
         {
@@ -43,7 +45,7 @@ namespace FR8Runtime.Player.Submodules
         public bool Jump => jumpInput.State();
         public Vector2 LookFrameDelta => GetLookFrameDelta();
 
-        public int Nudge => Mathf.Clamp(Mathf.RoundToInt(nudgeAction.action?.ReadValue<float>() ?? 0.0f), -1, 1);
+        public int Nudge => (nudgeAction.action?.WasPerformedThisFrame() ?? false) ? Mathf.Clamp(Mathf.RoundToInt(nudgeAction.action?.ReadValue<float>() ?? 0.0f), -1, 1) : 0;
         public bool Press => pressAction.action?.WasPerformedThisFrame() ?? false;
         public bool Drag => pressAction.State();
         public bool FreeCam => freeCamAction.action?.WasPerformedThisFrame() ?? false;
@@ -65,6 +67,8 @@ namespace FR8Runtime.Player.Submodules
                 return -1;
             }
         }
+
+        public int MoveHotbar => (hotbarNext.action?.WasPerformedThisFrame() ?? false ? 1 : 0) - (hotbarLast.action?.WasPerformedThisFrame() ?? false ? 1 : 0);
 
         public bool Crouch => crouchAction.State();
 
@@ -91,7 +95,7 @@ namespace FR8Runtime.Player.Submodules
 
         private Vector2 GetAdditiveLookInput()
         {
-            return lookAction.action?.ReadValue<Vector2>() * controllerSensitivity * Time.deltaTime ?? Vector2.zero;
+            return lookAction.action?.ReadValue<Vector2>() * controllerSensitivity * 1000.0f * Time.deltaTime ?? Vector2.zero;
         }
 
         private float GetFovSensitivity() => Mathf.Tan(mainCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
@@ -123,6 +127,9 @@ namespace FR8Runtime.Player.Submodules
             {
                 hotbarActions[i] = bind($"Hotbar.{i + 1}");
             }
+            
+            hotbarNext = bind("Hotbar.Next");
+            hotbarLast = bind("Hotbar.Last");
             
             // Set Camera
             mainCamera = Camera.main;

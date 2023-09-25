@@ -31,12 +31,14 @@ namespace FR8Runtime.Contracts.Predicates
 
         protected override int CalculateTaskCount() => children.Count;
 
-        protected override string BuildString()
+        protected override string ProgressString() => string.Empty;
+
+        protected override string GetDisplay()
         {
-            var str = string.Empty;
+            var str = $"{name} [{base.ProgressString()}]\n";
             for (var i = 0; i < children.Count; i++)
             {
-                str += children.Count;
+                str += $"   >{children[i].ToString(true)}";
                 if (i != children.Count - 1) str += '\n';
             }
             return str;
