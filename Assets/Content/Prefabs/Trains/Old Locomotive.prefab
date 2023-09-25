@@ -353,8 +353,8 @@ Light:
   serializedVersion: 10
   m_Type: 0
   m_Shape: 0
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 3000
+  m_Color: {r: 1, g: 0.85247177, b: 0.7706442, a: 1}
+  m_Intensity: 20
   m_Range: 50
   m_SpotAngle: 49.67501
   m_InnerSpotAngle: 26.9347
@@ -437,7 +437,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state: 0
-  color: {r: 1, g: 0.14693816, b: 0, a: 1}
+  temperature: 5600
+  color: {r: 1, g: 0.85247177, b: 0.7706442, a: 1}
   lightIntensity: 20
   materialIntensity: 2
   warmUpTime: 0.5
@@ -564,8 +565,8 @@ Light:
   serializedVersion: 10
   m_Type: 0
   m_Shape: 0
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 3000
+  m_Color: {r: 1, g: 0.85247177, b: 0.7706442, a: 1}
+  m_Intensity: 20
   m_Range: 50
   m_SpotAngle: 49.67501
   m_InnerSpotAngle: 26.9347
@@ -648,7 +649,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state: 0
-  color: {r: 1, g: 0.14693816, b: 0, a: 1}
+  temperature: 5600
+  color: {r: 1, g: 0.85247177, b: 0.7706442, a: 1}
   lightIntensity: 20
   materialIntensity: 2
   warmUpTime: 0.5
@@ -1151,12 +1153,47 @@ MonoBehaviour:
   drag: 12
   referenceWeight: 100000
   cornerLean: 0.6
+  handbrakeDefault: 1
+  handbrakeConstant: 0
+  handbrakeEfficiencyCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 3
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.5
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 3
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 4
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 3
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   retentionSpring: 1250
   retentionDamping: 25
   retentionTorqueConstant: 0.05
-  segment: {fileID: 0}
-  dynamicBrakeConstant: 30
-  staticBrakeConstant: 25
+  trainLength: 20
+  brakeConstant: 30
+  initialVelocity: 0
 --- !u!114 &6888675464939285067
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1241,6 +1278,14 @@ MonoBehaviour:
     octaves: 4
     lacunarity: 2
     persistence: 0.5
+  engineSounds:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  running: 0
 --- !u!114 &6644183762511143645
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2396,13 +2441,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec82d84e2f30255438c24fa453fa663c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  key: 
-  displayName: 
-  defaultValue: 0
   settings: {fileID: 11400000, guid: 9826cd7c0dba1394b8a24b0110955138, type: 2}
+  engaged: 1
   anchor: {fileID: 8853930767191054095}
   magnetFX: {fileID: 0}
   fxTransitionSpeed: 6
+  offset: {x: 0, y: 0, z: 0}
 --- !u!1 &6823709371480325566 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -6413956847900099605, guid: 2de40a509088b6e428ef0e687f8a2358, type: 3}

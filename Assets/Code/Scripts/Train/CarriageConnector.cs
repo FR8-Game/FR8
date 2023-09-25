@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using FR8Runtime.Interactions.Drivers.Submodules;
@@ -48,7 +49,6 @@ namespace FR8Runtime.Train
         protected void Awake()
         {
             Carriage = GetComponentInParent<TrainCarriage>();
-            rigidbody = Carriage.Body;
 
             if (magnetFX)
             {
@@ -67,6 +67,11 @@ namespace FR8Runtime.Train
         private void OnDisable()
         {
             all.Remove(this);
+        }
+
+        private void Start()
+        {
+            rigidbody = Carriage.Body;
         }
 
         protected void FixedUpdate()
@@ -184,12 +189,14 @@ namespace FR8Runtime.Train
         {
             if (other == this) return;
 
+            Debug.Log($"{Carriage.name} Connected to {other.Carriage.name}");
             other.Connection = this;
             Connection = other;
         }
 
         public void Disconnect()
         {
+            Debug.Log($"{Carriage.name} Disconnected from {Connection.Carriage.name}");
             Connection.Connection = null;
             Connection = null;
         }
