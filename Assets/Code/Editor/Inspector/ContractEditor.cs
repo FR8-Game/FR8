@@ -31,7 +31,7 @@ namespace FR8Editor.Inspector
 
         private void OnSceneGUI()
         {
-            foreach (var e in Target.predicates)
+            foreach (var e in Target.Predicates)
             {
                 var editor = CreateEditor(e);
                 editor.GetType().GetMethod(nameof(OnSceneGUI), BindingFlags.Instance | BindingFlags.NonPublic)?.Invoke(editor, null);
@@ -42,70 +42,36 @@ namespace FR8Editor.Inspector
         {
             root.Clear();
 
-            if (Target.predicates.Count > 0)
+            if (Target.Predicates.Count <= 0)
             {
-                var container = Section("Predicates", root);
-
-                foreach (var e in Target.predicates)
-                {
-                    var subContainer = Section(e.name, container);
-                    var editor = CreateEditor(e);
-                    var element = editor.CreateInspectorGUI() ?? new IMGUIContainer(editor.OnInspectorGUI);
-                    subContainer.Add(element);
-
-                    var delButton = new Button(DeletePredicate(e));
-                    delButton.text = "<b>Delete Forever</b>";
-                    delButton.style.height = 40;
-                    delButton.style.marginTop = 15;
-                    Border(delButton, Color.red, 3.0f, 3.0f);
-                    subContainer.Add(delButton);
-                }
+                var helpBox = new HelpBox("Contract Has No Predicates\n\nTo Get Started, add a child object with a Contract Predicate Component [Found in AddComponent::Contracts/Predicates/]", HelpBoxMessageType.Info);
+                root.Add(helpBox);
+                return;
             }
 
-            foreach (var t in types)
+            foreach (var e in Target.Predicates)
             {
-                var button = new Button();
-                button.text = $"<b>Add {t.Name}</b>";
-                button.clickable.clicked += CreatePredicate(t);
-                button.style.height = 40;
-                button.style.marginTop = 15;
-                Border(button, Color.green, 3.0f, 3.0f);
-
-                root.Add(button);
+                var section = new VisualElement();
+                section.AddToClassList("unity-help-box");
+                section.style.marginTop = 6;
+                
+                var foldout = new Foldout();
+                foldout.text = Application.isPlaying ? $"{e.name}[{e.Progress * 100.0f:N0}%]" : e.name;
+                foldout.style.flexGrow = 1.0f;
+                foldout.style.flexShrink = 0.0f;
+                foldout.style.marginLeft = 16;
+                foldout.style.unityFontStyleAndWeight = FontStyle.Bold;
+                
+                var editor = CreateEditor(e);
+                var element = editor.CreateInspectorGUI() ?? new IMGUIContainer(() => editor.DrawDefaultInspector());
+                element.style.marginTop = 6;
+                element.style.marginBottom = 6;
+                element.style.marginRight = 6;
+                
+                foldout.Add(element);
+                section.Add(foldout);
+                root.Add(section);
             }
         }
-
-        private Action DeletePredicate(ContractPredicate predicate) => () =>
-        {
-            if (!EditorUtility.DisplayDialog("Delete Contract Predicate", $"Are you sure you want to delete \"{predicate.name}\"\nThis Cannot be Undone", "Delete Forever", "Cancel")) return;
-
-            Target.predicates.Remove(predicate);
-            AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(predicate));
-            DestroyImmediate(predicate);
-
-            EditorUtility.SetDirty(Target);
-            AssetDatabase.SaveAssets();
-
-            BuildInspector();
-        };
-
-        private Action CreatePredicate(Type type) => () =>
-        {
-            var predicate = (ContractPredicate)CreateInstance(type);
-            predicate.name = $"{Target.name} Predicate.{Target.predicates.Count}";
-            Target.predicates.Add(predicate);
-
-            var dir = Path.Combine(Path.GetDirectoryName(AssetDatabase.GetAssetPath(Target)), Target.name);
-            Directory.CreateDirectory(dir);
-
-            var filename = Path.Combine(dir, $"{predicate.name}.asset");
-            AssetDatabase.CreateAsset(predicate, filename);
-
-            EditorUtility.SetDirty(Target);
-            AssetDatabase.SaveAssets();
-            
-            BuildInspector();
-            Repaint();
-        };
     }
 }

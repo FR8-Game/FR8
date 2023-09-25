@@ -1,6 +1,4 @@
-using System;
 using UnityEngine;
-using HBCore.Utility;
 using ColorUtility = HBCore.Utility.ColorUtility;
 
 #if UNITY_EDITOR
