@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Content/UI/Style%20Sheets/Game%20UI%20Stylesheet.uss?fileID=7433441132597879392&amp;guid=acd50812ec1cbb044a0297b17ba892a4&amp;type=3#Game UI Stylesheet" />
+    <ui:VisualElement name="background" class="background-opaque" style="opacity: 1; justify-content: center; padding-left: 100px; padding-right: 100px; padding-top: 100px; padding-bottom: 100px;">
+        <ui:VisualElement name="header">
+            <ui:Label text="&gt;CONTRACT STATUS" display-tooltip-when-elided="true" name="subtitle" class="subtitle" />
+            <ui:Label text="SUCCESS" display-tooltip-when-elided="true" name="title" class="title" style="color: rgb(0, 255, 0);" />
+        </ui:VisualElement>
+        <ui:Label text="&gt;TIME: WAY TOO LONG&#10;&gt;CARGO DAMAGE: 110%&#10;&gt;MAIDENS : NONE&#10;&gt;BREAD : MISSING&#10;&gt;TOUCHED GRASS : FALSE&#10;&gt;MOTHER : FUCKED" display-tooltip-when-elided="true" name="content" style="flex-grow: 1; font-size: 22px;" />
+        <ui:VisualElement name="footer">
+            <ui:Button text="&gt;RETURN TO MENU" display-tooltip-when-elided="true" name="exit" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

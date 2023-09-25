@@ -1,6 +1,7 @@
 ﻿using FR8Runtime.CodeUtility;
 using FR8Runtime.Pickups;
 using FR8Runtime.UI;
+using UnityEngine.UIElements;
 
 namespace FR8Runtime.Player.Submodules
 {
@@ -42,13 +43,23 @@ namespace FR8Runtime.Player.Submodules
             var input = avatar.input.SwitchHotbar;
             if (input != -1)
             {
-                StowItem();
-                index = input;
-                GetItem();
-                dirty = true;
+                ChangeItem(input);
+            }
+            var move = avatar.input.MoveHotbar;
+            if (move != 0)
+            {
+                ChangeItem(index + move);
             }
 
             UpdateUI();
+        }
+
+        private void ChangeItem(int index)
+        {
+            StowItem();
+            this.index = index;
+            GetItem();
+            dirty = true;
         }
 
         private void StowItem()
