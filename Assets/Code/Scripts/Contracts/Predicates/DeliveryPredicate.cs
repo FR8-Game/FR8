@@ -14,8 +14,6 @@ namespace FR8Runtime.Contracts.Predicates
         public List<TrainCarriage> carriages;
         public TrackSection deliveryLocation;
 
-        private ProgressBar uiProgressBar;
-
         protected override string BuildString()
         {
             var sb = new StringBuilder();
@@ -35,21 +33,7 @@ namespace FR8Runtime.Contracts.Predicates
 
         protected override string ProgressString() => $"{carriagesDelivered}/{carriages.Count}";
 
-        public override VisualElement BuildUI()
-        {
-            uiProgressBar = new ProgressBar();
-            uiProgressBar.title = ToString(true);
-            return uiProgressBar;
-        }
-
-        public override void UpdateUI()
-        {
-            uiProgressBar.lowValue = 0.0f;
-            uiProgressBar.highValue = carriages.Count;
-            uiProgressBar.value = carriagesDelivered;
-        }
-
-        protected override int TasksDone()
+        protected override int CalculateTasksDone()
         {
             carriagesDelivered = 0;
             foreach (var e in carriages)
@@ -63,6 +47,6 @@ namespace FR8Runtime.Contracts.Predicates
             return carriagesDelivered;
         }
 
-        protected override int TaskCount() => carriages.Count;
+        protected override int CalculateTaskCount() => carriages.Count;
     }
 }

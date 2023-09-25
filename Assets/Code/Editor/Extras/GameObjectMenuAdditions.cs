@@ -43,5 +43,7 @@ namespace FR8Editor.Extras
         
         [MenuItem("GameObject/Contract/Predicates/Delivery Predicate")]
         public static void AddDeliveryPredicate() => AddPredicate<DeliveryPredicate>();
+        [MenuItem("GameObject/Contract/Predicates/Debug Predicate")]
+        public static void AddDebugPredicate() => AddPredicate<DebugPredicate>();
     }
 }
