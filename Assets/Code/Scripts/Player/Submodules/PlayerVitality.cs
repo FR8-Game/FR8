@@ -206,7 +206,7 @@ namespace FR8Runtime.Player.Submodules
                 return (PlayerSpawnPoint.Default.Position, PlayerSpawnPoint.Default.Orientation);
             }
 
-            return (avatar.transform.position, avatar.transform.rotation);
+            return (Vector3.zero, Quaternion.identity);
         }
 
         [Serializable]

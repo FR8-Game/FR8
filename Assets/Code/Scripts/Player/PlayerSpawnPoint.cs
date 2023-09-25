@@ -33,8 +33,6 @@ namespace FR8Runtime.Player
                     return e;
                 }
 
-                if (all.Length == 0) return null;
-                
                 _default = all[0];
                 _default.defaultSpawn = true;
                 return _default;

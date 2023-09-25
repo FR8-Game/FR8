@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Text;
 using FR8Runtime.Contracts.Predicates;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -9,11 +8,8 @@ namespace FR8Runtime.Contracts
     [AddComponentMenu("Contracts/Contract")]
     public class Contract : MonoBehaviour
     {
-        private const int divLength = 20;
-
-        private string displayName;
         private List<ContractPredicate> predicates;
-
+        
         public List<ContractPredicate> Predicates
         {
             get
@@ -27,7 +23,7 @@ namespace FR8Runtime.Contracts
                         predicates.Add(predicate);
                     }
                 }
-
+                
                 return predicates;
             }
         }
@@ -54,17 +50,12 @@ namespace FR8Runtime.Contracts
             foreach (var e in Predicates)
             {
                 Progress += e.Progress / Predicates.Count;
-                if (!e.Done) continue;
                 PredicatesCompleted++;
             }
         }
 
-        public string BuildTitle()
-        {
-            var name = !string.IsNullOrWhiteSpace(displayName) ? displayName : "Contract";
-            return $"{name} [{(PredicatesCompleted == predicates.Count ? "Done" : $"{PredicatesCompleted}/{Predicates.Count}")}]".ToUpper();
-        }
-
+        public string BuildTitle() => $"{name} [{PredicatesCompleted}/{Predicates.Count}]".ToUpper();
+        
         public override string ToString()
         {
             var str = $"{BuildTitle()}\n";
@@ -72,29 +63,35 @@ namespace FR8Runtime.Contracts
             {
                 str += e.ToString();
             }
-
+            
             return str;
         }
 
-        public string BuildUI()
+        public VisualElement BuildUI()
         {
-            var sb = new StringBuilder();
+            var root = new VisualElement();
+            root.AddToClassList("contract");
 
-            if (Done) sb.Append("<color=#00ff00>");
-            
-            div();
-            sb.AppendLine(BuildTitle());
+            root.style.marginLeft = 10;
+            root.style.marginBottom = 6;
 
-            foreach (var e in predicates)
+            var header = new Label(BuildTitle());
+            root.name = "#header";
+            root.Add(header);
+
+            var content = new VisualElement();
+            content.name = "#predicates";
+            content.style.marginLeft = 10;
+            content.style.maxWidth = 350;
+            root.Add(content);
+
+            foreach (var e in Predicates)
             {
-                e.BuildUI(sb);
+                content.Add(e.BuildUI());
+                e.UpdateUI();
             }
-            div();
 
-            if (Done) sb.Append("</color>");
-            return sb.ToString();
-
-            void div() => sb.AppendLine(new string('-', divLength));
+            return root;
         }
     }
 }
