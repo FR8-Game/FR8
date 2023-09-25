@@ -65,6 +65,8 @@ namespace FR8Runtime.Train.Track
                 ConnectionEnd.End => segment.FromEnd(1),
                 _ => throw new ArgumentOutOfRangeException()
             }];
+
+            SetState(GetState());
             
             transform.position = knot.position;
             transform.rotation = RotationOffset(knot.rotation);

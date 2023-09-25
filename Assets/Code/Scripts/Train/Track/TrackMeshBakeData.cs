@@ -13,12 +13,12 @@ namespace FR8Runtime.Train.Track
         public List<MeshSegment> meshes = new();
 
         private List<(float, float)> conversionGraph;
-        private MeshSegment baseMesh;
+        private MeshSegment baseMeshData;
         private float baseMeshLength;
         private float baseMeshZMin;
         private float baseMeshZMax;
         private Matrix4x4 matrix;
-        private List<(Vector3, Vector3)> spline;
+        private TrackSegment segment;
 
         private Thread thread;
         private int taskID;
@@ -26,35 +26,30 @@ namespace FR8Runtime.Train.Track
         private Stopwatch threadTimer;
 
         public MeshSegment Segment => meshes[^1];
-        public bool Done => !thread.IsAlive;
+        public bool Done => true;
 
-        public TrackMeshBakeData(TrackMesh trackMesh, TrackSegment segment)
+        public TrackMeshBakeData(TrackMesh trackMesh, Mesh baseMesh, TrackSegment segment)
         {
             trackName = trackMesh.name;
             conversionGraph = trackMesh.conversionGraph;
-
-            baseMesh = new MeshSegment();
-            for (var i = 0; i < trackMesh.baseMesh.vertexCount; i++)
+            this.segment = segment;
+            
+            baseMeshData = new MeshSegment();
+            for (var i = 0; i < baseMesh.vertexCount; i++)
             {
-                baseMesh.vertices.Add(trackMesh.baseMesh.vertices[i]);
-                baseMesh.normals.Add(trackMesh.baseMesh.normals[i]);
-                baseMesh.uvs.Add(trackMesh.baseMesh.uv[i]);
+                baseMeshData.vertices.Add(baseMesh.vertices[i]);
+                baseMeshData.normals.Add(baseMesh.normals[i]);
+                baseMeshData.uvs.Add(baseMesh.uv[i]);
             }
 
-            foreach (var t in trackMesh.baseMesh.triangles)
+            foreach (var t in baseMesh.triangles)
             {
-                baseMesh.indices.Add(t);
+                baseMeshData.indices.Add(t);
             }
 
-            baseMeshLength = trackMesh.baseMesh.bounds.size.z;
-            baseMeshZMin = trackMesh.baseMesh.bounds.min.z;
-            baseMeshZMax = trackMesh.baseMesh.bounds.max.z;
-
-            spline = new List<(Vector3, Vector3)>();
-            foreach (Transform knot in segment)
-            {
-                spline.Add((knot.position, knot.forward));
-            }
+            baseMeshLength = baseMesh.bounds.size.z;
+            baseMeshZMin = baseMesh.bounds.min.z;
+            baseMeshZMax = baseMesh.bounds.max.z;
 
             matrix = trackMesh.transform.worldToLocalMatrix;
             Split();
@@ -64,8 +59,7 @@ namespace FR8Runtime.Train.Track
             threadTimer = new Stopwatch();
             threadTimer.Start();
 
-            thread = new Thread(ThreadAction);
-            thread.Start();
+            ThreadAction();
         }
 
         private void Split() => meshes.Add(new MeshSegment());
@@ -79,7 +73,7 @@ namespace FR8Runtime.Train.Track
             var t0 = 0.0f;
             var t1 = 0.0f;
 
-            var meshesPerFile = (ushort.MaxValue / baseMesh.vertices.Count) - 1;
+            var meshesPerFile = (ushort.MaxValue / baseMeshData.vertices.Count) - 1;
 
             while (workingLength < totalLength)
             {
@@ -90,16 +84,17 @@ namespace FR8Runtime.Train.Track
                 meshCount++;
                 var indexBase = Segment.vertices.Count;
 
-                for (var k = 0; k < baseMesh.vertices.Count; k++)
+                for (var k = 0; k < baseMeshData.vertices.Count; k++)
                 {
-                    var vertex = baseMesh.vertices[k];
-                    var normal = baseMesh.normals[k];
+                    var vertex = baseMeshData.vertices[k];
+                    var normal = baseMeshData.normals[k];
 
                     var p2 = Mathf.Lerp(t0, t1, Mathf.InverseLerp(baseMeshZMin, baseMeshZMax, vertex.z));
                     vertex.z = 0.0f;
 
-                    var splinePoint = TrackSegment.Sample(p2, (spline, t) => spline.EvaluatePoint(t), i => spline[i], spline.Count);
-                    var splineTangent = TrackSegment.Sample(p2, (spline, t) => spline.EvaluateVelocity(t).normalized, i => spline[i], spline.Count);
+                    //var splinePoint = TrackSegment.Sample(p2, (spline, t) => spline.EvaluatePoint(t), i => spline[i], spline.Count);
+                    var splinePoint = segment.SamplePoint(p2);
+                    var splineTangent = segment.SampleTangent(p2);
                     var r = Quaternion.LookRotation(splineTangent);
 
                     vertex = r * new Vector3(vertex.x, vertex.y, 0.0f) + splinePoint;
@@ -109,12 +104,12 @@ namespace FR8Runtime.Train.Track
                     Segment.normals.Add(matrix.MultiplyVector(normal).normalized);
                 }
 
-                foreach (var t in baseMesh.indices)
+                foreach (var t in baseMeshData.indices)
                 {
                     Segment.indices.Add(indexBase + t);
                 }
 
-                foreach (var uv in baseMesh.uvs)
+                foreach (var uv in baseMeshData.uvs)
                 {
                     Segment.uvs.Add(uv);
                 }

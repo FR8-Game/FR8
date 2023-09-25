@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using FR8Runtime.CodeUtility;
 using FR8Runtime.Train.Track;
 using UnityEditor;
 using UnityEditor.EditorTools;
@@ -15,11 +17,15 @@ namespace FR8Editor.Tools
         private static readonly Color OtherGizmoColor = ColorUtility.Invert(SelectedGizmoColor);
 
         private TrackSegment trackSegment;
+        private List<TrackSegment> all;
+        private List<Terrain> terrainList;
         private Transform transform;
         private int knotMask = -1;
         private bool child;
 
         private (TrackSegment, int) lastSelectedSegment;
+
+        public static float handleScale = 1.0f;
 
         public Transform[] Knots()
         {
@@ -37,7 +43,8 @@ namespace FR8Editor.Tools
 
         public override void OnToolGUI(EditorWindow window)
         {
-            var segments = FindObjectsOfType<TrackSegment>();
+            if (all == null) all = new List<TrackSegment>(FindObjectsOfType<TrackSegment>());
+            if (terrainList == null) terrainList = new List<Terrain>(FindObjectsOfType<Terrain>());
 
             var gameObject = target as GameObject;
             if (!gameObject) return;
@@ -74,7 +81,7 @@ namespace FR8Editor.Tools
             {
                 if (DoHandle(i, knot))
                 {
-                    foreach (var s in segments)
+                    foreach (var s in all)
                     {
                         if (s == trackSegment) continue;
 
@@ -95,7 +102,7 @@ namespace FR8Editor.Tools
 
             if (Handles.ShouldRenderGizmos())
             {
-                foreach (var s in segments)
+                foreach (var s in all)
                 {
                     s.DrawGizmos(s == trackSegment, SelectedGizmoColor, OtherGizmoColor);
                 }
@@ -119,21 +126,50 @@ namespace FR8Editor.Tools
 
         private bool DoHandle(int i, Transform knot)
         {
-            var selected = !lastSelectedSegment.Item1 || lastSelectedSegment.Item2 == i;
+            var pointOnTerrain = TerrainUtility.GetPointOnTerrain(terrainList, knot.position);
+            var heightAtKnot = pointOnTerrain.y;
+
+            var dist = Mathf.Abs(knot.position.y - heightAtKnot) * 2.0f;
+            var ease = dist;
+
+            Handles.color = Color.green;
+            Handles.DrawLine(knot.position, pointOnTerrain);
+            Handles.DrawWireDisc(pointOnTerrain, Vector3.up, ease);
 
             EditorGUI.BeginChangeCheck();
+
+            // const float fadeMin = 140.0f;
+            // const float fadeMax = 250.0f;
+            // const float alphaMin = 0.1f;
+
+            var handleScale = HandleUtility.GetHandleSize(knot.position) * TrackSegmentTool.handleScale;
+
+            // var screenPosition = (Vector2)Camera.current.WorldToScreenPoint(knot.transform.position);
+            // var mousePosition = Mouse.current.position.ReadValue();
+            // mousePosition = new Vector2(mousePosition.x, Screen.height - mousePosition.y);
+            // var screenDistance = (screenPosition - mousePosition).magnitude;
+            //
+            // handleScale *= screenDistance < fadeMin ? 1.0f : (1.0f - alphaMin) * Mathf.Exp(-sqr(2.0f * (screenDistance - fadeMin) / (fadeMax - fadeMin))) + alphaMin;
 
             // ReSharper disable once ReplaceWithSingleAssignment.True
             var drawDiscs = true;
             if (i == 0 && trackSegment.StartConnection) drawDiscs = false;
             if (i == trackSegment.FromEnd(1) && trackSegment.EndConnection) drawDiscs = false;
 
-            var newPosition = Handles.PositionHandle(knot.position, knot.rotation);
+            var newPosition = knot.position;
+            var offset = Vector3.zero;
+
+            setHandleColor(Handles.xAxisColor);
+            newPosition = Handles.Slider(newPosition, knot.right, handleScale, Handles.ArrowHandleCap, 0.0f);
+            setHandleColor(Handles.yAxisColor);
+            newPosition = Handles.Slider(newPosition, Vector3.up, handleScale, Handles.ArrowHandleCap, 0.0f);
+            newPosition = Handles.Slider2D(newPosition, Vector3.up, Vector3.right, Vector3.forward, handleScale * 0.3f, Handles.RectangleHandleCap, 0.0f);
+            setHandleColor(Handles.zAxisColor);
+            newPosition = Handles.Slider(newPosition, knot.forward, handleScale, Handles.ArrowHandleCap, 0.0f);
 
             var newRotation = knot.rotation;
             if (drawDiscs)
             {
-                var handleScale = HandleUtility.GetHandleSize(knot.position);
                 Handles.color = Handles.yAxisColor;
                 newRotation = Handles.Disc(newRotation, knot.position, Vector3.up, handleScale * 1.5f, false, 0.0f);
                 Handles.color = Handles.xAxisColor;
@@ -185,9 +221,17 @@ namespace FR8Editor.Tools
                 }
             }
 
-            knot.position = newPosition;
+            if (Keyboard.current.leftCtrlKey.isPressed)
+            {
+                newPosition.y = pointOnTerrain.y;
+            }
+
+            knot.position = newPosition + offset;
             knot.rotation = newRotation;
+
             return true;
+
+            void setHandleColor(Color color) => Handles.color = color;
         }
 
         private void ModifyKnots(ModifyKnotCallback callback)

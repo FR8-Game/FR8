@@ -12,55 +12,67 @@ namespace FR8Runtime.Train
     [RequireComponent(typeof(DriverNetwork), typeof(TrainMonitor), typeof(LocomotiveAudio))]
     public class Locomotive : TrainCarriage
     {
-        [FormerlySerializedAs("brakeConstant")] 
-        [SerializeField] private float dynamicBrakeConstant = 0.5f;
-        [SerializeField] private float staticBrakeConstant = 25.0f;
+        [FormerlySerializedAs("dynamicBrakeConstant")] [SerializeField] private float brakeConstant = 0.5f;
+
+        [Space]
+        [Header("Testing")]
+        [SerializeField] private float initialVelocity;
 
         private const string BrakeKey = "Brake";
         private const string GearKey = "Gear";
         private const string SpeedometerKey = "Speed";
 
-        private DriverNetwork driverNetwork;
-        
         private float engineVelocity;
         private float enginePower;
 
-        public float Brake => driverNetwork.GetValue(BrakeKey);
-        public int Gear => Mathf.RoundToInt(driverNetwork.GetValue(GearKey));
+        public float Brake => DriverNetwork.GetValue(BrakeKey);
+        public int Gear => Mathf.RoundToInt(DriverNetwork.GetValue(GearKey));
 
         protected override void Configure()
         {
             base.Configure();
+
+            brakeConstant = Mathf.Max(0.0f, brakeConstant);
+        }
+
+        protected override void Start()
+        {
+            base.Start();
             
-            dynamicBrakeConstant = Mathf.Max(0.0f, dynamicBrakeConstant);
-            driverNetwork = GetComponentInParent<DriverNetwork>();
+            DriverNetwork.SetValue(BrakeKey, 1.0f);
+            DriverNetwork.SetValue(GearKey, 0.0f);
+            
+#if UNITY_EDITOR
+            var t = segment.GetClosestPoint(Body.position);
+            var dir = segment.SampleTangent(t);
+            Body.AddForce(dir * initialVelocity / 3.6f, ForceMode.VelocityChange);
+#endif
         }
 
         protected override void FixedUpdate()
         {
             ApplyBrake();
             base.FixedUpdate();
-            
+
             UpdateDriverGroups();
         }
 
         private void ApplyBrake()
         {
             var fwdSpeed = GetForwardSpeed();
-            var constant = Mathf.Abs(fwdSpeed) > 1.0f ? dynamicBrakeConstant : staticBrakeConstant;
-            
-            var force = constant * Brake * -fwdSpeed;
 
-            var velocityChange = force * referenceWeight / Rigidbody.mass * Time.deltaTime;
+            var force = brakeConstant * Brake * -fwdSpeed;
+
+            var velocityChange = force * referenceWeight / Body.mass * Time.deltaTime;
             if (Mathf.Abs(velocityChange) > Mathf.Abs(fwdSpeed)) velocityChange = -fwdSpeed;
 
-            Rigidbody.AddForce(DriverDirection * velocityChange, ForceMode.VelocityChange);
+            Body.AddForce(DriverDirection * velocityChange, ForceMode.VelocityChange);
         }
-        
+
         public void UpdateDriverGroups()
         {
             var fwdSpeed = Mathf.Abs(ToKmpH(GetForwardSpeed()));
-            driverNetwork.SetValue(SpeedometerKey, fwdSpeed);
+            DriverNetwork.SetValue(SpeedometerKey, fwdSpeed);
         }
     }
 }

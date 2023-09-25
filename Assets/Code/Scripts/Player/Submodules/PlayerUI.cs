@@ -31,7 +31,6 @@ namespace FR8Runtime.Player.Submodules
         [SerializeField] [Range(0.0f, 1.0f)] private float flashSplit = 0.5f;
 
         private PlayerAvatar avatar;
-        private PlayerContractManager contractManager;
         private UIDocument hud;
         private Renderer hudRenderer;
         private MaterialPropertyBlock hudRendererProperties;
@@ -53,7 +52,6 @@ namespace FR8Runtime.Player.Submodules
         public void Init(PlayerAvatar avatar)
         {
             this.avatar = avatar;
-            contractManager = avatar.GetComponent<PlayerContractManager>();
 
             avatar.vitality.IsAliveChangedEvent += UpdateDeathUI;
             avatar.vitality.HealthChangeEvent += UpdateBars;
@@ -194,9 +192,7 @@ namespace FR8Runtime.Player.Submodules
         {
             contractContainer.Clear();
 
-            if (!contractManager) return;
-
-            foreach (var contract in contractManager.ActiveContracts)
+            foreach (var contract in Contract.ActiveContracts)
             {
                 if (!contract) return;
                 contractContainer.Add(contract.BuildUI());

@@ -1,4 +1,5 @@
 ﻿using System;
+using FR8Editor.Tools;
 using FR8Runtime.Train.Track;
 using UnityEditor;
 using UnityEngine;
@@ -30,6 +31,12 @@ namespace FR8Editor.Inspector
                 _ => throw new ArgumentOutOfRangeException()
             }, MessageType.Info);
 
+            Div();
+
+            TrackSegmentTool.handleScale = EditorGUILayout.Slider("Handle Scale", TrackSegmentTool.handleScale, 0.0f, 1.0f);
+            
+            Div();
+            
             if (Button(Count("Zero Track Origin{0}")))
             {
                 ExecuteAll(s => ShiftTransform(s, Vector3.zero, "Zero Track Origin"));

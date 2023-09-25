@@ -1,33 +1,51 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using FR8Runtime.CodeUtility;
 using FR8Runtime.Train.Splines;
-using UnityEditor;
 using UnityEngine;
+using ColorUtility = HBCore.Utility.ColorUtility;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace FR8Runtime.Train.Track
 {
     [SelectionBase, DisallowMultipleComponent]
     public class TrackSegment : MonoBehaviour, IEnumerable<Transform>
     {
+        // --- Constants ---
         public const float ConnectionDistance = 3.0f;
         public static readonly Spline.SplineProfile SplineProfile = Spline.Cubic;
 
+        // --- Legacy ---
         [SerializeField] [HideInInspector] private List<Vector3> knots;
+
+        // --- Properties ---
         public TrackJunction junctionPrefab;
 
         [Space]
         [SerializeField] private int resolution = 100;
-
         [SerializeField] private bool closedLoop;
+        [SerializeField] private bool conformToTerrain = true;
 
+        [Space]
+        [SerializeField] private bool initialConnectionState;
+        
+        // --- Internal Fields ---
         private Connection startConnection = new();
         private Connection endConnection = new();
 
+        private Transform knotContainer;
+
         private float totalLength;
         private List<Vector3> points;
+        private List<Vector3> velocities;
         private List<TrackSegment> segmentsConnectedToThis = new();
+        private List<UnityEngine.Terrain> terrainList;
 
+        // --- Properties ---
         public Connection StartConnection => startConnection;
         public Connection EndConnection => endConnection;
         public int Resolution => resolution;
@@ -35,18 +53,21 @@ namespace FR8Runtime.Train.Track
 
         private void Awake()
         {
-            BakePoints();
+            BakeData();
+            OnKnotsChanged();
         }
 
         private void Start()
         {
             if (startConnection)
             {
+                startConnection.connectionActive = initialConnectionState;
                 junctionPrefab.SpawnFromPrefab(this, this[0]);
             }
 
             if (endConnection)
             {
+                endConnection.connectionActive = initialConnectionState;
                 junctionPrefab.SpawnFromPrefab(this, this[FromEnd(1)]);
             }
         }
@@ -63,9 +84,15 @@ namespace FR8Runtime.Train.Track
             if (endConnection) endConnection.segment.segmentsConnectedToThis.Remove(this);
         }
 
+        private void OnDrawGizmosSelected()
+        {
+            var col = new Color(0f, 0.84f, 1f);
+            DrawGizmos(true, col, ColorUtility.Invert(col));
+        }
+
         public void DrawGizmos(bool main, Color selectedColor, Color otherColor)
         {
-            BakePoints();
+            BakeData();
             var linePoints = new List<Vector3>();
 
             foreach (var e in points)
@@ -75,6 +102,11 @@ namespace FR8Runtime.Train.Track
 
             GizmosDrawLine(main ? selectedColor : otherColor, 1.0f, linePoints.ToArray());
             DrawLineBetweenKnots();
+
+            foreach (Transform e in KnotContainer())
+            {
+                DrawDistanceFromGround(e.position);
+            }
         }
 
         private void DrawLineBetweenKnots()
@@ -117,14 +149,19 @@ namespace FR8Runtime.Train.Track
 #endif
         }
 
-        private void BakePoints()
+        public void BakeData()
         {
             points = new List<Vector3>();
+            velocities = new List<Vector3>();
+            
             for (var i = 0; i < resolution; i++)
             {
-                var p = i / (resolution - 1.0f);
-                points.Add(SamplePoint(p));
+                var p = i / (closedLoop ? resolution : resolution - 1.0f);
+                points.Add(SampleSpline(p, (spline, t) => spline.EvaluatePoint(t), i => (this[i].position, this[i].forward), Count));
+                velocities.Add(SampleSpline(p, (spline, t) => spline.EvaluateVelocity(t), i => (this[i].position, this[i].forward), Count));
             }
+
+            terrainList = new List<UnityEngine.Terrain>(FindObjectsOfType<UnityEngine.Terrain>());
         }
 
         public void UpdateConnection(TrainCarriage train)
@@ -161,7 +198,7 @@ namespace FR8Runtime.Train.Track
 
         private void TryImplicitJump(ConnectionType type, TrainCarriage train, Connection connection)
         {
-            var p = GetClosestPoint(train.Rigidbody.position);
+            var p = GetClosestPoint(train.Body.position);
             switch (type)
             {
                 case ConnectionType.Start:
@@ -221,13 +258,36 @@ namespace FR8Runtime.Train.Track
 
         public int FromEnd(int i) => Count - i;
 
-        public Vector3 SamplePoint(float t) => Sample(t, (spline, t) => spline.EvaluatePoint(t));
+        public Vector3 SamplePoint(float t) => Sample(t, points, Vector3.LerpUnclamped);
+        public Vector3 SampleVelocity(float t) => Sample(t, velocities, Vector3.Lerp);
         public Vector3 SampleTangent(float t) => SampleVelocity(t).normalized;
-        public Vector3 SampleVelocity(float t) => Sample(t, (spline, t) => spline.EvaluateVelocity(t));
 
-        public T Sample<T>(float t, Func<Spline, float, T> callback) => Sample(t, callback, i => (this[i].position, this[i].forward), Count);
+        public Vector3 Sample(float t0, IList<Vector3> bakeData, Func<Vector3, Vector3, float, Vector3> lerp)
+        {
+            var t1 = t0 * bakeData.Count;
+            var i0 = Mathf.FloorToInt(t1);
+            var i1 = i0 + 1;
 
-        public static T Sample<T>(float t, Func<Spline, float, T> callback, Func<int, (Vector3, Vector3)> list, int count)
+            if (i1 >= bakeData.Count)
+            {
+                i0 = bakeData.Count - 2;
+                i1 = bakeData.Count - 1;
+            }
+
+            if (i0 < 0)
+            {
+                i0 = 0;
+                i1 = 1;
+            }
+
+            var a = bakeData[i0];
+            var b = bakeData[i1];
+
+            return lerp(a, b, (t1 - i0) / (i1 - i0));
+        }
+        
+        private T SampleSpline<T>(float t, Func<Spline, float, T> callback) => SampleSpline(t, callback, i => (this[i].position, this[i].forward), Count);
+        private static T SampleSpline<T>(float t, Func<Spline, float, T> callback, Func<int, (Vector3, Vector3)> list, int count)
         {
             t = Mathf.Clamp01(t);
 
@@ -248,10 +308,16 @@ namespace FR8Runtime.Train.Track
             return callback(SplineProfile(knotPos0, p1, p2, knotPos1), t - i0);
         }
 
+        public Vector3 TryConformToTerrain(Vector3 point)
+        {
+            return conformToTerrain ? TerrainUtility.GetPointOnTerrain(terrainList, point) : point;
+        }
+        
         public void OnValidate()
         {
             if (!Valid(this)) return;
 
+            BakeData();
             OnKnotsChanged();
 
             var childCount = KnotContainer().childCount;
@@ -279,11 +345,12 @@ namespace FR8Runtime.Train.Track
 
         public float GetClosestPoint(Vector3 point)
         {
-            if (points == null || points.Count == 0) BakePoints();
+            if (points == null || points.Count == 0) BakeData();
             if (points.Count == 0) return default;
 
             FindClosestPair(point, out var best, out var other);
-            return InterpolatePoints(point, best, other);
+            var t = InterpolatePoints(point, best, other);
+            return t;
         }
 
         private float InterpolatePoints(Vector3 point, int best, int other)
@@ -387,19 +454,19 @@ namespace FR8Runtime.Train.Track
 
         public Transform KnotContainer()
         {
-            var container = transform.Find("Knots");
-            if (container) return container;
+            if (!knotContainer) knotContainer = transform.Find("Knots");
+            if (knotContainer) return knotContainer;
 
-            container = new GameObject("Knots").transform;
-            container.SetParent(transform);
+            knotContainer = new GameObject("Knots").transform;
+            knotContainer.SetParent(transform);
 
-            container.localPosition = Vector3.zero;
-            container.localRotation = Quaternion.identity;
-            container.localScale = Vector3.one;
+            knotContainer.localPosition = Vector3.zero;
+            knotContainer.localRotation = Quaternion.identity;
+            knotContainer.localScale = Vector3.one;
 
-            container.SetAsFirstSibling();
+            knotContainer.SetAsFirstSibling();
 
-            return container;
+            return knotContainer;
         }
 
         public void UpdateKnotNames()

@@ -7,7 +7,7 @@ namespace FR8Runtime.Train
     {
         private void Start()
         {
-            GetComponentInChildren<TMP_Text>().text = GetComponentInParent<INameplateProvider>().Name;
+            GetComponentInChildren<TMP_Text>().text = GetComponentInParent<INameplateProvider>().Name.ToUpper();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace FR8Runtime.Interactions.Drivers
@@ -8,12 +9,16 @@ namespace FR8Runtime.Interactions.Drivers
     {
         private Dictionary<string, float> values = new();
 
+        public event Action<string, float> ValueChangedEvent;
+        
         public void SetValue(string key, float value)
         {
             key = Simplify(key);
-
+            
             if (values.ContainsKey(key)) values[key] = value;
             else values.Add(key, value);
+            
+            ValueChangedEvent?.Invoke(key, value);
         }
 
         public static bool CompareKeys(string a, string b) => Simplify(a) == Simplify(b);
@@ -24,5 +29,9 @@ namespace FR8Runtime.Interactions.Drivers
             key = Simplify(key);
             return values.ContainsKey(key) ? values[key] : fallback;
         }
+
+        public bool HasValue(string key) => values.ContainsKey(key);
+        
+        public IEnumerable<KeyValuePair<string, float>> GetEnumerator() => values;
     }
 }
