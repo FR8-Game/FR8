@@ -25,6 +25,7 @@ namespace FR8Runtime.Player.Submodules
 
         [Space]
         [SerializeField] private Color baseColor = Color.white;
+
         [SerializeField] private Color shieldColor = Color.cyan;
         [SerializeField] private Color flashColor = Color.red;
         [SerializeField] private float flashTiming = 1.0f;
@@ -44,7 +45,7 @@ namespace FR8Runtime.Player.Submodules
         private VisualElement deathScreen;
         private VisualElement deathCover;
         private Label lookingAt;
-        private VisualElement contractContainer;
+        private Label contractText;
 
         private const string VitalityRootPath = "UI/Vitality";
         private const string CoverPath = VitalityRootPath + "/Death";
@@ -66,16 +67,15 @@ namespace FR8Runtime.Player.Submodules
             longitude = root.Q<Label>("long");
             latitude = root.Q<Label>("lat");
             lookingAt = root.Q<Label>("looking-at");
-            contractContainer = root.Q("contracts").Q("content");
+            contractText = root.Q<Label>("contracts");
 
             hudRenderer = avatar.transform.Find("Head/HUD Quad/Quad").GetComponent<Renderer>();
             hudRendererProperties = new MaterialPropertyBlock();
             hudRenderer.SetPropertyBlock(hudRendererProperties);
-            
+
             vignette = avatar.transform.Find("Vignette").GetComponent<UIDocument>().rootVisualElement.Q("vignette");
 
             SetupDeathUI();
-            BuildContractUI();
         }
 
         private void Update()
@@ -97,22 +97,26 @@ namespace FR8Runtime.Player.Submodules
             {
                 hudColor = shieldColor;
             }
+
             if (avatar.vitality.CurrentShields <= 5.0f)
             {
                 hudColor = Time.time / GetFlashTiming() % 1.0f > flashSplit ? hudColor : flashColor;
             }
+
             hudRendererProperties.SetColor("_Color", hudColor);
             hudRenderer.SetPropertyBlock(hudRendererProperties);
 
             longitude.text = $"LONG: {avatar.transform.position.x / 80000.0f + 23.6f:N5}";
             latitude.text = $"LAT: {avatar.transform.position.z / 80000.0f + 94.2f:N5}";
+            
+            BuildContractUI();
         }
 
         private float GetFlashTiming()
         {
             if (avatar.vitality.CurrentHealth / (float)avatar.vitality.maxHealth < 0.5f) return flashTiming * 0.2f;
             if (avatar.vitality.CurrentShields <= 0.1f) return flashTiming * 0.5f;
-           
+
             return flashTiming;
         }
 
@@ -175,7 +179,7 @@ namespace FR8Runtime.Player.Submodules
             {
                 yield return new WaitForSecondsRealtime(1.0f);
                 deathCover.style.opacity = 1.0f;
-                
+
                 var p = 0.0f;
                 while (p < 1.0f)
                 {
@@ -183,20 +187,30 @@ namespace FR8Runtime.Player.Submodules
                     p += Time.unscaledDeltaTime / 2.0f;
                     yield return null;
                 }
-                
+
                 deathCover.visible = false;
             }
         }
 
         private void BuildContractUI()
         {
-            contractContainer.Clear();
+            contractText.Clear();
 
-            foreach (var contract in Contract.ActiveContracts)
+            if (Contract.ActiveContracts.Count == 0)
             {
-                if (!contract) return;
-                contractContainer.Add(contract.BuildUI());
+                contractText.text = "No Contracts Currently Active";
             }
+            else
+            {
+                contractText.text = $"Active Contract{(Contract.ActiveContracts.Count > 1 ? "s" : "")}\n";
+                foreach (var contract in Contract.ActiveContracts)
+                {
+                    if (!contract) return;
+                    contractText.text += contract.BuildUI();
+                }
+            }
+
+            contractText.text = contractText.text.ToUpper();
         }
     }
 }
