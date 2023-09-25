@@ -49,8 +49,7 @@ namespace FR8Runtime.Train
             set => segment = value;
         }
 
-        protected DriverNetwork DriverNetwork { get; private set; }
-        
+        public DriverNetwork DriverNetwork { get; private set; }
         public string Name => name;
         public Rigidbody Body { get; private set; }
         public Vector3 DriverDirection { get; private set; }
