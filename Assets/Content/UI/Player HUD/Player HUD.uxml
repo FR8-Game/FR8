@@ -1,5 +1,4 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:Template name="Contract" src="project://database/Assets/Content/UI/Player%20HUD/Contract.uxml?fileID=9197481963319205126&amp;guid=d3169c27548604a4caeaaa1087505fdf&amp;type=3#Contract" />
     <Style src="project://database/Assets/Content/UI/Style%20Sheets/Game%20UI%20Stylesheet.uss?fileID=7433441132597879392&amp;guid=acd50812ec1cbb044a0297b17ba892a4&amp;type=3#Game UI Stylesheet" />
     <Style src="project://database/Assets/Content/UI/Style%20Sheets/Player%20HUD%20Stylesheet.uss?fileID=7433441132597879392&amp;guid=16ebe3e8f8de923429c5a2f54cba6847&amp;type=3#Player HUD Stylesheet" />
     <ui:VisualElement name="vitality" style="position: absolute; left: 30%; right: 30%; bottom: 40px;">
@@ -9,14 +8,7 @@
             <ui:Label text="[ ACTIVE | 30 s ]" display-tooltip-when-elided="true" name="shields-text" style="-unity-paragraph-spacing: -60px;" />
         </ui:VisualElement>
     </ui:VisualElement>
-    <ui:VisualElement name="contracts" style="position: absolute; margin-left: 30px; margin-right: 30px; margin-top: 30px; margin-bottom: 30px; left: 4px; top: 4px;">
-        <ui:Label text="ACTIVE CONTRACTS" display-tooltip-when-elided="true" name="header" style="font-size: 24px; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;" />
-        <ui:VisualElement name="content">
-            <ui:Instance template="Contract" name="Contract" />
-            <ui:Instance template="Contract" name="Contract" />
-            <ui:Instance template="Contract" name="Contract" />
-        </ui:VisualElement>
-    </ui:VisualElement>
+    <ui:Label text="Label" display-tooltip-when-elided="true" name="contracts" style="position: absolute; left: 30px; top: 30px; font-size: 22px;" />
     <ui:VisualElement name="spatial-info" style="position: absolute; top: 30px; right: 30%; left: 30%;">
         <ui:VisualElement name="long-lat" style="align-items: flex-start; flex-direction: row; justify-content: center;">
             <ui:Label text="LONG: 20.2341" display-tooltip-when-elided="true" name="long" style="flex-grow: 1; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;" />
