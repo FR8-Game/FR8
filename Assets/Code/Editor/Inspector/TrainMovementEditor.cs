@@ -13,6 +13,8 @@ namespace FR8Editor.Inspector
         private void OnSceneGUI()
         {
             var train = target as TrainCarriage;
+            Handles.Label(train.transform.position + Vector3.up * 12.0f, train.GetDebugInfo());
+
             if (!train.Segment) return;
 
             var a = train.transform.position;

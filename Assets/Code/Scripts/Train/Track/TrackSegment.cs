@@ -198,7 +198,7 @@ namespace FR8Runtime.Train.Track
 
         private void TryImplicitJump(ConnectionType type, TrainCarriage train, Connection connection)
         {
-            var p = GetClosestPoint(train.Rigidbody.position);
+            var p = GetClosestPoint(train.Body.position);
             switch (type)
             {
                 case ConnectionType.Start:
