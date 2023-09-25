@@ -8,7 +8,7 @@
             <ui:Label text="[ ACTIVE | 30 s ]" display-tooltip-when-elided="true" name="shields-text" style="-unity-paragraph-spacing: -60px;" />
         </ui:VisualElement>
     </ui:VisualElement>
-    <ui:Label text="Label" display-tooltip-when-elided="true" name="contracts" style="position: absolute; left: 30px; top: 30px; font-size: 22px;" />
+    <ui:Label display-tooltip-when-elided="true" name="contracts" text="Label" style="position: absolute; left: 30px; top: 30px; font-size: 22px; max-width: 20%; white-space: normal;" />
     <ui:VisualElement name="spatial-info" style="position: absolute; top: 30px; right: 30%; left: 30%;">
         <ui:VisualElement name="long-lat" style="align-items: flex-start; flex-direction: row; justify-content: center;">
             <ui:Label text="LONG: 20.2341" display-tooltip-when-elided="true" name="long" style="flex-grow: 1; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;" />
