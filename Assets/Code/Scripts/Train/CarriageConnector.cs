@@ -17,7 +17,6 @@ namespace FR8Runtime.Train
         private Vector3 anchorOrigin;
         private float anchorConnectionDistance;
         private new Rigidbody rigidbody;
-        private CarriageConnector connection;
 
         private float magnetFXPercent;
         private Vector3 magnetFXScale;
@@ -29,8 +28,11 @@ namespace FR8Runtime.Train
         public string DisplayValue => engaged ? "Engaged" : "Disengaged";
         public bool OverrideInteractDistance { get; }
         public float InteractDistance { get; }
+        public CarriageConnector Connection { get; private set; }
+
         public Vector3 AnchorPosition => transform.TransformPoint(anchorOrigin);
-        
+        public TrainCarriage Carriage { get; set; }
+
         public void Nudge(int direction)
         {
             engaged = direction > 0;
@@ -45,7 +47,8 @@ namespace FR8Runtime.Train
 
         protected void Awake()
         {
-            rigidbody = GetComponentInParent<Rigidbody>();
+            Carriage = GetComponentInParent<TrainCarriage>();
+            rigidbody = Carriage.Body;
 
             if (magnetFX)
             {
@@ -72,20 +75,20 @@ namespace FR8Runtime.Train
 
             if (!engaged)
             {
-                connection = null;
+                Connection = null;
                 return;
             }
 
-            if (connection)
+            if (Connection)
             {
-                if (!connection.engaged)
+                if (!Connection.engaged)
                 {
-                    connection = null;
+                    Connection = null;
                     return;
                 }
                 
                 ApplyForce();
-                PositionAnchor(connection.transform, 1.0f);
+                PositionAnchor(Connection.transform, 1.0f);
 
                 return;
             }
@@ -135,11 +138,11 @@ namespace FR8Runtime.Train
 
         private void ApplyForce()
         {
-            var displacement = connection.transform.position - transform.position;
-            displacement = displacement.normalized * (displacement.magnitude - anchorConnectionDistance - connection.anchorConnectionDistance);
+            var displacement = Connection.transform.position - transform.position;
+            displacement = displacement.normalized * (displacement.magnitude - anchorConnectionDistance - Connection.anchorConnectionDistance);
 
             var mass = rigidbody.mass;
-            var otherMass = connection.rigidbody.mass;
+            var otherMass = Connection.rigidbody.mass;
             var totalMass = mass + otherMass;
 
             var force = displacement / (Time.deltaTime * Time.deltaTime);
@@ -149,7 +152,7 @@ namespace FR8Runtime.Train
             force = transform.forward * Vector3.Dot(transform.forward, force);
 
             rigidbody.AddForce(force / 2.0f);
-            connection.rigidbody.AddForce(-force / 2.0f);
+            Connection.rigidbody.AddForce(-force / 2.0f);
         }
 
         private void UpdateFX(bool engaged)
@@ -181,14 +184,14 @@ namespace FR8Runtime.Train
         {
             if (other == this) return;
 
-            other.connection = this;
-            connection = other;
+            other.Connection = this;
+            Connection = other;
         }
 
         public void Disconnect()
         {
-            connection.connection = null;
-            connection = null;
+            Connection.Connection = null;
+            Connection = null;
         }
 
         private void OnValidate()

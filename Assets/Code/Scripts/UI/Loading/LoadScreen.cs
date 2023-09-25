@@ -4,7 +4,6 @@ using FR8Runtime.UI.CustomControls;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
-using Cursor = UnityEngine.Cursor;
 
 namespace FR8Runtime.UI.Loading
 {

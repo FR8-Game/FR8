@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 namespace FR8Runtime.Contracts.Predicates
 {
-    public abstract class ContractPredicate : ScriptableObject
+    public abstract class ContractPredicate : MonoBehaviour
     {
         public const string ScriptableObjectLocation = "Scriptable Objects/Contracts/";
 
@@ -37,9 +37,12 @@ namespace FR8Runtime.Contracts.Predicates
         protected abstract string BuildString();
         protected virtual string ProgressString() => StringUtility.Percent(Progress);
 
-        public sealed override string ToString()
+        public sealed override string ToString() => ToString(false);
+        public string ToString(bool withTags)
         {
-            return $"{BuildString()} [{(Done ? "Done" : ProgressString().PadLeft(4))}]".ToUpper();
+            return $"{BuildString()} {tag("<nobr>")}[{(Done ? "Done" : ProgressString())}]{tag("</nobr>")}".ToUpper();
+            
+            string tag(string tag) => withTags ? tag : string.Empty;
         }
 
         public abstract VisualElement BuildUI();

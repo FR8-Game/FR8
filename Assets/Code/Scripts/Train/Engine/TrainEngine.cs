@@ -93,7 +93,7 @@ namespace FR8Runtime.Train.Engine
             var efficiency = loadCurve.Evaluate(load);
 
             throttleAcceleration = GetThrottleForce(throttleActual);
-            locomotive.Rigidbody.AddForce(locomotive.DriverDirection * throttleAcceleration * efficiency * locomotive.ReferenceWeight);
+            locomotive.Body.AddForce(locomotive.DriverDirection * throttleAcceleration * efficiency * locomotive.ReferenceWeight);
         }
 
         private float GetThrottleForce(float throttle)

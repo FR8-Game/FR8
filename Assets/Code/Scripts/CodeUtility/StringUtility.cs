@@ -1,6 +1,4 @@
 ﻿
-using UnityEngine;
-
 namespace FR8Runtime.CodeUtility
 {
     public static class StringUtility

@@ -542,7 +542,6 @@ GameObject:
   - component: {fileID: 6340694338387009680}
   - component: {fileID: 9181333738834071068}
   - component: {fileID: 3391095386003189697}
-  - component: {fileID: 3030373661538375866}
   m_Layer: 7
   m_Name: PFB_Player
   m_TagString: Untagged
@@ -598,7 +597,7 @@ MonoBehaviour:
     zoomFieldOfView: 20
     fovSmoothTime: 0.06
     nearPlane: 0.02
-    farPlane: 1000
+    farPlane: 10000
     shakeModule:
       cosAmplitude: {x: 0, y: 0, z: 0}
       sinAmplitude: {x: 0.06, y: 0, z: 0}
@@ -739,19 +738,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b071571d9a945618a7e5f62f09a2f56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &3030373661538375866
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6066431375291976688}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b322482dbe14a7aa7c8c6240ebb816a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  initialContracts: []
 --- !u!1 &6175040964584373461
 GameObject:
   m_ObjectHideFlags: 0
