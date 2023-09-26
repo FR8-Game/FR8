@@ -164,7 +164,7 @@ namespace FR8Runtime.Player.Submodules
             deathScreen = root;
 
             var respawn = root.Q<Button>("respawn");
-            respawn.clickable.clicked += avatar.vitality.Revive;
+            respawn.clickable.clicked += UIActions.Load(SceneUtility.Scene.Game);
             var exit = root.Q<Button>("exit");
             exit.clickable.clicked += () =>
             {
