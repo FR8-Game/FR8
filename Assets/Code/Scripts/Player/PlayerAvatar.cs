@@ -23,10 +23,12 @@ namespace FR8Runtime.Player
         public event Action UpdateEvent;
         public event Action FixedUpdateEvent;
         public event Action DisableEvent;
+        public event Action<PlayerMount> MountChangedEvent;
 
         public bool IsAlive => vitality.IsAlive;
         public Transform Head { get; private set; }
         public Rigidbody Body { get; private set; }
+        public PlayerMount CurrentMount { get; private set; }
 
         public Vector3 MoveDirection
         {
@@ -89,6 +91,12 @@ namespace FR8Runtime.Player
         private void FixedUpdate()
         {
             FixedUpdateEvent?.Invoke();
+        }
+
+        public void SetMount(PlayerMount mount)
+        {
+            MountChangedEvent?.Invoke(mount);
+            CurrentMount = mount;
         }
     }
 }
