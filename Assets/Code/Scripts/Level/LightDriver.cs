@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace FR8Runtime.Level
@@ -7,7 +8,8 @@ namespace FR8Runtime.Level
     public class LightDriver : MonoBehaviour
     {
         public bool state;
-        public Color color = Mathf.CorrelatedColorTemperatureToRGB(1500.0f);
+        [Range(500.0f, 15000.0f)] public float temperature = 5600.0f;
+        public Color color;
         public float lightIntensity = 20.0f;
         public float materialIntensity = 2.0f;
         public float warmUpTime = 0.5f;
@@ -23,6 +25,8 @@ namespace FR8Runtime.Level
         private Material material;
         private new Light light;
 
+        public Color EvaluatedColor => Mathf.CorrelatedColorTemperatureToRGB(temperature);
+
         protected virtual void Awake()
         {
             if (renderer && renderer.sharedMaterials.Length > materialIndex)
@@ -35,7 +39,7 @@ namespace FR8Runtime.Level
                 material.hideFlags = HideFlags.HideAndDontSave;
             }
 
-            light = GetComponentInChildren<Light>();
+            light = GetLight();
         }
 
         protected virtual void FixedUpdate()
@@ -46,12 +50,12 @@ namespace FR8Runtime.Level
             if (material)
             {
                 material.SetKeyword(new LocalKeyword(material.shader, "_EMISSION"), true);
-                material.SetColor(materialEmissionPropertyName, color * smoothedPercent * materialIntensity);
+                material.SetColor(materialEmissionPropertyName, EvaluatedColor * smoothedPercent * materialIntensity);
             }
 
             if (light)
             {
-                light.color = color;
+                light.color = EvaluatedColor;
                 light.intensity = smoothedPercent * lightIntensity;
             }
         }
@@ -60,5 +64,17 @@ namespace FR8Runtime.Level
         {
             renderer = GetComponentInChildren<Renderer>();
         }
+
+        private void OnValidate()
+        {
+            color = EvaluatedColor;
+            var light = GetLight();
+            
+            if (!light) return;
+            light.color = EvaluatedColor;
+            light.intensity = lightIntensity;
+        }
+
+        private Light GetLight() => GetComponentInChildren<Light>();
     }
 }
