@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4396678181819410874}
+  - component: {fileID: 6381145668903284956}
   m_Layer: 0
   m_Name: BoschSwitch
   m_TagString: Untagged
@@ -25,14 +26,74 @@ Transform:
   m_GameObject: {fileID: 2670391831153269219}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.54941, y: 0.54941, z: 0.54941}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2767627866832167652}
+  - {fileID: 6361231098554999183}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &2441566298803373327
+--- !u!114 &6381145668903284956
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2670391831153269219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39bd86096eec427ab1095ca10a9fa1b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: 
+  displayName: 
+  defaultValue: 0
+  testValue: 0
+  animator:
+    handle: {fileID: 5962834162554452841}
+    valueRange: {x: 0, y: 1}
+    animationSpring:
+      springConstant: 350
+      dampingConstant: 75
+      clamped: 1
+      range: {x: 0, y: 1}
+      bounce: 0.4
+      currentPosition: 0
+      targetPosition: 0
+      velocity: 0
+    animatePosition: 0
+    slidePoseAPosition: {x: 0, y: 0, z: 0}
+    slidePoseBPosition: {x: 0, y: 0, z: 0}
+    animateRotation: 1
+    slidePoseARotation: {x: 180, y: 0, z: 0}
+    slidePoseBRotation: {x: 0, y: 0, z: 0}
+  sounds:
+    clickReference:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  indicator:
+    handle: {fileID: 0}
+    valueRange: {x: 0, y: 1}
+    animationSpring:
+      springConstant: 350
+      dampingConstant: 75
+      clamped: 1
+      range: {x: 0, y: 1}
+      bounce: 0
+      currentPosition: 0
+      targetPosition: 0
+      velocity: 0
+    animatePosition: 0
+    slidePoseAPosition: {x: 0, y: 0, z: 0}
+    slidePoseBPosition: {x: 0, y: 0, z: 0}
+    animateRotation: 0
+    slidePoseARotation: {x: 0, y: 0, z: 0}
+    slidePoseBRotation: {x: 0, y: 0, z: 0}
+--- !u!1001 &6903200769331463780
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -61,15 +122,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8f054584645435342bd3246353416842, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8f054584645435342bd3246353416842, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8f054584645435342bd3246353416842, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8f054584645435342bd3246353416842, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -83,22 +144,27 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -3630147554964350715, guid: 8f054584645435342bd3246353416842, type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: b948ed61018be564fbfd1386c9bf4678, type: 2}
-    - target: {fileID: -2477902582020724653, guid: 8f054584645435342bd3246353416842, type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 02197cbf433c55d489e047b831708775, type: 2}
+    - target: {fileID: -8282921729199981299, guid: 8f054584645435342bd3246353416842, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.00000004371139
+      objectReference: {fileID: 0}
+    - target: {fileID: -8282921729199981299, guid: 8f054584645435342bd3246353416842, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 8f054584645435342bd3246353416842, type: 3}
       propertyPath: m_Name
-      value: BoschSwich
+      value: Knife Switch
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8f054584645435342bd3246353416842, type: 3}
---- !u!4 &2767627866832167652 stripped
+--- !u!4 &5962834162554452841 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8282921729199981299, guid: 8f054584645435342bd3246353416842, type: 3}
+  m_PrefabInstance: {fileID: 6903200769331463780}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6361231098554999183 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 8f054584645435342bd3246353416842, type: 3}
-  m_PrefabInstance: {fileID: 2441566298803373327}
+  m_PrefabInstance: {fileID: 6903200769331463780}
   m_PrefabAsset: {fileID: 0}

@@ -3,13 +3,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using FR8Runtime.Rendering;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.UI;
-using Object = System.Object;
 
 namespace FR8Runtime.Train.Track
 {

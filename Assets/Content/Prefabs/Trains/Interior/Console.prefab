@@ -181,6 +181,47 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: abd2abf41cd662449bc358a0e8a0716d, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 14cbf64f4742e284ab18d2d877a62b32, type: 3}
+--- !u!4 &2194935673415689393 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7465247748602776678, guid: 14cbf64f4742e284ab18d2d877a62b32, type: 3}
+  m_PrefabInstance: {fileID: 8785424580220463319}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5852995265238626043 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -6280800516287904212, guid: 14cbf64f4742e284ab18d2d877a62b32, type: 3}
+  m_PrefabInstance: {fileID: 8785424580220463319}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3597612588340113540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5852995265238626043}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2763b8e16e449d2b03233c6e61219dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  testValue: 0
+  animator:
+    handle: {fileID: 2194935673415689393}
+    valueRange: {x: 0, y: 1}
+    animationSpring:
+      springConstant: 350
+      dampingConstant: 25
+      clamped: 1
+      range: {x: 0, y: 1}
+      bounce: 0.4
+      currentPosition: 0
+      targetPosition: 0
+      velocity: 0
+    animatePosition: 0
+    slidePoseAPosition: {x: 0, y: 0, z: 0}
+    slidePoseBPosition: {x: 0, y: 0, z: 0}
+    animateRotation: 1
+    slidePoseARotation: {x: 0, y: 0, z: 0}
+    slidePoseBRotation: {x: 0, y: -90, z: 0}
 --- !u!4 &9108143659433054012 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 14cbf64f4742e284ab18d2d877a62b32, type: 3}

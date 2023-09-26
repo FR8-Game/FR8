@@ -50,12 +50,18 @@ namespace FR8Runtime.Player.Submodules
 
             Avatar.UpdateEvent += Update;
             Avatar.FixedUpdateEvent += FixedUpdate;
+            Avatar.EnableEvent += OnEnable;
 
             cameraLocked = true;
             wasCameraLocked = !cameraLocked;
 
             SaveManager.PersistantSave.DataChangedEvent += OnPersistantSaveDataChanged;
             OnPersistantSaveDataChanged();
+        }
+
+        private void OnEnable()
+        {
+            Yaw = Camera.transform.eulerAngles.x;
         }
 
         private void OnPersistantSaveDataChanged()

@@ -1,68 +1,106 @@
 using System.Collections.Generic;
+using System.Text;
 using FR8Runtime.Contracts.Predicates;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace FR8Runtime.Contracts
 {
-    [CreateAssetMenu(menuName = "Scriptable Objects/Contract")]
-    public class Contract : ScriptableObject
+    [AddComponentMenu("Contracts/Contract")]
+    public class Contract : MonoBehaviour
     {
-        public List<ContractPredicate> predicates;
+        private const int divLength = 20;
+
+        private string displayName;
+        private List<ContractPredicate> predicates;
+        private int activePredicate;
+
+        public List<ContractPredicate> Predicates
+        {
+            get
+            {
+                if (!Application.isPlaying || predicates == null)
+                {
+                    predicates = new List<ContractPredicate>();
+                    foreach (Transform child in transform)
+                    {
+                        if (!child.TryGetComponent(out ContractPredicate predicate)) continue;
+                        predicates.Add(predicate);
+                    }
+                }
+
+                return predicates;
+            }
+        }
 
         public float Progress { get; private set; }
         public int PredicatesCompleted { get; private set; }
-        public bool Done => PredicatesCompleted == predicates.Count;
-        
+        public bool Done => PredicatesCompleted == Predicates.Count;
+
+        public static readonly List<Contract> ActiveContracts = new();
+
+        private void OnEnable()
+        {
+            ActiveContracts.Add(this);
+        }
+
+        private void OnDisable()
+        {
+            ActiveContracts.Remove(this);
+        }
+
         public void Update()
         {
             PredicatesCompleted = 0;
-            foreach (var e in predicates)
+            for (var i = 0; i < Predicates.Count; i++)
             {
-                e.Update();
-                Progress += e.Progress / predicates.Count;
+                var predicate = Predicates[i];
+                Progress += predicate.Progress / Predicates.Count;
+                if (!predicate.Done)
+                {
+                    activePredicate = i;
+                    break;
+                }
+
                 PredicatesCompleted++;
             }
         }
 
-        public string BuildTitle() => $"{name} [{PredicatesCompleted}/{predicates.Count}]".ToUpper();
-        
+        public string BuildTitle()
+        {
+            var name = !string.IsNullOrWhiteSpace(displayName) ? displayName : "Active Contract";
+            return $"{name} [{(PredicatesCompleted == predicates.Count ? "Done" : $"{PredicatesCompleted}/{Predicates.Count}")}]".ToUpper();
+        }
+
         public override string ToString()
         {
             var str = $"{BuildTitle()}\n";
-            foreach (var e in predicates)
+            foreach (var e in Predicates)
             {
                 str += e.ToString();
             }
-            
+
             return str;
         }
 
-        public VisualElement BuildUI()
+        public string BuildUI()
         {
-            var root = new VisualElement();
-            root.AddToClassList("contract");
+            var sb = new StringBuilder();
 
-            root.style.marginLeft = 10;
-            root.style.marginBottom = 6;
+            if (Done) sb.Append("<color=#00ff00>");
 
-            var header = new Label(BuildTitle());
-            root.name = "#header";
-            root.Add(header);
+            div();
+            sb.AppendLine(BuildTitle());
 
-            var content = new VisualElement();
-            content.name = "#predicates";
-            content.style.marginLeft = 10;
-            content.style.maxWidth = 350;
-            root.Add(content);
+            if (activePredicate > 0 && !Done) buildPredicate(activePredicate - 1);
+            buildPredicate(activePredicate);
+            
+            div();
 
-            foreach (var e in predicates)
-            {
-                content.Add(e.BuildUI());
-                e.UpdateUI();
-            }
+            if (Done) sb.Append("</color>");
+            return sb.ToString();
 
-            return root;
+            void div() => sb.AppendLine(new string('-', divLength));
+            void buildPredicate(int i) => predicates[i].BuildUI(sb, i, i == activePredicate);
         }
     }
 }

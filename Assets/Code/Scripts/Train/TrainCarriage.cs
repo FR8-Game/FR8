@@ -1,5 +1,6 @@
-using System;
 using System.Collections.Generic;
+using System.Text;
+using FR8Runtime.Interactions.Drivers;
 using FR8Runtime.Train.Track;
 using UnityEngine;
 
@@ -12,20 +13,33 @@ namespace FR8Runtime.Train
     {
         [Space]
         public string saveTypeReference = "TrainCarriage";
-        
+
         [Space]
         [SerializeField] protected float drag = 12.0f;
+
         [SerializeField] protected float referenceWeight;
         [SerializeField] protected float cornerLean = 0.6f;
 
         [Space]
+        [SerializeField][Range(0.0f, 1.0f)] private float handbrakeDefault = 1.0f;
+        [SerializeField] private float handbrakeConstant;
+        [SerializeField] private AnimationCurve handbrakeEfficiencyCurve = new
+        (
+            new Keyframe(0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f),
+            new Keyframe(0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f),
+            new Keyframe(4.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f)
+        );
+
+        [Space]
         [SerializeField] protected float retentionSpring = 2500.0f;
+
         [SerializeField] protected float retentionDamping = 50.0f;
         [SerializeField] protected float retentionTorqueConstant = 0.2f;
-        
+
         [SerializeField] protected float trainLength = 20.0f;
 
         protected TrackSegment segment;
+        private List<CarriageConnector> carriageConnectors;
 
         private float softAnchorPositionOnSpline;
 
@@ -35,22 +49,31 @@ namespace FR8Runtime.Train
             set => segment = value;
         }
 
+        public DriverNetwork DriverNetwork { get; private set; }
         public string Name => name;
-        public Rigidbody Rigidbody { get; private set; }
+        public Rigidbody Body { get; private set; }
         public Vector3 DriverDirection { get; private set; }
         public float ReferenceWeight => referenceWeight;
         public Vector3 TangentialForce { get; private set; }
         public float PositionOnSpline { get; private set; }
         public float LastPositionOnSpline { get; private set; }
+        public List<TrainCarriage> ConnectedCarriages { get; } = new();
 
-        public Vector3 HardAnchorPosition => (Rigidbody ? Rigidbody.position : transform.position) + transform.forward * trainLength * 0.5f;
-        public Vector3 SoftAnchorPosition => (Rigidbody ? Rigidbody.position : transform.position) - transform.forward * trainLength * 0.5f;
-        
+        public bool Stationary { get; private set; }
+
+        public Vector3 HardAnchorPosition => (Body ? Body.position : transform.position) + transform.forward * trainLength * 0.5f;
+        public Vector3 SoftAnchorPosition => (Body ? Body.position : transform.position) - transform.forward * trainLength * 0.5f;
+
         public static readonly List<TrainCarriage> All = new();
+
+        public const string HandbrakeKey = "handbrake";
         
         private void Awake()
         {
             Configure();
+
+            carriageConnectors = new List<CarriageConnector>(GetComponentsInChildren<CarriageConnector>());
+            DriverNetwork = GetComponent<DriverNetwork>();
         }
 
         private void OnEnable()
@@ -66,55 +89,105 @@ namespace FR8Runtime.Train
         protected virtual void Start()
         {
             FindClosestSegment();
+            DriverNetwork.SetValue(HandbrakeKey, handbrakeDefault);
         }
 
         public void FindClosestSegment()
         {
-            var best = (TrackSegment)null;
-            var bestScore = float.MaxValue;
-            var point = transform.position;
-            var tangent = transform.forward;
-            
-            var segments = FindObjectsOfType<TrackSegment>();
-            foreach (var segment in segments)
-            {
-                var t = Mathf.Clamp01(segment.GetClosestPoint(transform.position));
-                
-                var closestPoint = segment.SamplePoint(t);
-                var score = (closestPoint - transform.position).sqrMagnitude;
+            float t;
+            (segment, t) = TrackUtility.FindClosestSegment(transform.position);
 
-                if (score > bestScore) continue;
-
-                bestScore = score;
-                best = segment;
-                point = closestPoint;
-                tangent = segment.SampleTangent(t);
-            }
-
-            segment = best;
-            transform.position = point;
-            transform.rotation = Quaternion.LookRotation(tangent, Vector3.up);
+            transform.position = segment.SamplePoint(t);
+            transform.rotation = Quaternion.LookRotation(segment.SampleTangent(t), Vector3.up);
         }
 
         protected virtual void Configure()
         {
-            Rigidbody = GetComponent<Rigidbody>();
+            Body = GetComponent<Rigidbody>();
             if (!Application.isPlaying)
             {
-                referenceWeight = Rigidbody.mass;
+                referenceWeight = Body.mass;
             }
         }
 
         protected virtual void FixedUpdate()
         {
+            FindConnectedCarriages(ConnectedCarriages);
+            
             LastPositionOnSpline = PositionOnSpline;
             PositionOnSpline = segment.GetClosestPoint(HardAnchorPosition);
             softAnchorPositionOnSpline = segment.GetClosestPoint(SoftAnchorPosition);
 
             ApplyDrag();
+            ApplyHandbrake();
             ApplyCorrectiveForce();
+
+            Stationary = IsStationary();
+
+            if (segment) segment.UpdateConnection(this);
+
+        }
+
+        private bool IsStationary()
+        {
+            var isHandbrakeOn = false;
+            foreach (var e in ConnectedCarriages)
+            {
+                if (e is Locomotive) return false;
+            }
+                
+            foreach (var e in ConnectedCarriages)
+            {
+                if (e.DriverNetwork.GetValue(HandbrakeKey) < 0.95f) continue;
+                isHandbrakeOn = true;
+                break;
+            }
+
+            if (!isHandbrakeOn) return false;
+
+            var fwdSpeed = Mathf.Abs(GetForwardSpeed());
+            if (fwdSpeed > 0.1f) return false;
             
-            if(segment) segment.UpdateConnection(this);
+            return true;
+        }
+
+        private void ApplyHandbrake()
+        {
+            var speed = GetForwardSpeed();
+            var force = DriverDirection * -speed * Mathf.Clamp01(GetHandbrakeConstant() * DriverNetwork.GetValue(HandbrakeKey)) * handbrakeConstant;
+
+            Body.AddForce(force * referenceWeight);
+        }
+
+        public float GetHandbrakeConstant()
+        {
+            var speed = Mathf.Abs(GetForwardSpeed());
+            return handbrakeEfficiencyCurve.Evaluate(speed);
+        }
+
+        private void FindConnectedCarriages(List<TrainCarriage> list)
+        {
+            list.Clear();
+            list.Add(this);
+
+            var openList = new Queue<CarriageConnector>(carriageConnectors);
+            while (openList.Count > 0)
+            {
+                var h = openList.Dequeue();
+
+                if (!h.Connection) continue;
+
+                var other = h.Connection.Carriage;
+                if (list.Contains(other)) continue;
+
+                list.Add(other);
+                foreach (var c in other.carriageConnectors)
+                {
+                    if (c == h) continue;
+                    if (c == h.Connection) continue;
+                    openList.Enqueue(c);
+                }
+            }
         }
 
         private void ApplyDrag()
@@ -122,9 +195,9 @@ namespace FR8Runtime.Train
             var fwdSpeed = GetForwardSpeed();
             var drag = -fwdSpeed * Mathf.Abs(fwdSpeed) * this.drag;
 
-            var force = drag * referenceWeight / Rigidbody.mass;
-            
-            Rigidbody.AddForce(DriverDirection * force);
+            var force = drag * referenceWeight / Body.mass;
+
+            Body.AddForce(DriverDirection * force);
         }
 
         private void ApplyCorrectiveForce()
@@ -143,9 +216,9 @@ namespace FR8Runtime.Train
             if (alignmentDot < 0.0f) normal = -normal;
 
             DriverDirection = normal;
-            
+
             ApplyCorrectiveForce(center, normal);
-            
+
             var orientation = CalculateOrientation(normal);
             ApplyCorrectiveTorque(orientation);
         }
@@ -153,15 +226,15 @@ namespace FR8Runtime.Train
         private void ApplyCorrectiveForce(Vector3 position, Vector3 direction)
         {
             // Calculate alignment delta as a force
-            var force = (position - Rigidbody.position) * retentionSpring;
+            var force = (position - Body.position) * retentionSpring;
 
             // Calculate damping force
-            var normalVelocity = Rigidbody.velocity;
+            var normalVelocity = Body.velocity;
             force -= normalVelocity * retentionDamping;
 
             // Apply Force
             force -= direction * Vector3.Dot(direction, force);
-            Rigidbody.AddForce(force, ForceMode.Acceleration);
+            Body.AddForce(force, ForceMode.Acceleration);
             TangentialForce = transform.InverseTransformVector(force);
         }
 
@@ -178,13 +251,13 @@ namespace FR8Runtime.Train
         {
             var deltaRotation = CalculateDeltaRotation(rotation);
 
-            var torque = (deltaRotation * retentionSpring - Rigidbody.angularVelocity * retentionDamping) * retentionTorqueConstant;
-            Rigidbody.AddTorque(torque, ForceMode.Acceleration);
+            var torque = (deltaRotation * retentionSpring - Body.angularVelocity * retentionDamping) * retentionTorqueConstant;
+            Body.AddTorque(torque, ForceMode.Acceleration);
         }
 
         private Vector3 CalculateDeltaRotation(Quaternion rotation)
         {
-            (rotation * Quaternion.Inverse(Rigidbody.rotation)).ToAngleAxis(out var angle, out var axis);
+            (rotation * Quaternion.Inverse(Body.rotation)).ToAngleAxis(out var angle, out var axis);
             if (angle > 180.0f) angle -= 360.0f;
             axis.Normalize();
             if (!float.IsFinite(axis.x) || !float.IsFinite(axis.y) || !float.IsFinite(axis.z)) axis = Vector3.zero;
@@ -193,8 +266,8 @@ namespace FR8Runtime.Train
             return deltaRotation;
         }
 
-        public float GetForwardSpeed() => Vector3.Dot(DriverDirection, Rigidbody.velocity);
-        
+        public float GetForwardSpeed() => Vector3.Dot(DriverDirection, Body.velocity);
+
         private void OnValidate()
         {
             trainLength = Mathf.Max(0.0f, trainLength);
@@ -208,6 +281,30 @@ namespace FR8Runtime.Train
         {
             Gizmos.color = Color.magenta;
             Gizmos.DrawLine(HardAnchorPosition, SoftAnchorPosition);
+        }
+
+        public string GetDebugInfo()
+        {
+            var sb = new StringBuilder();
+
+            sb.AppendLine($"[{GetType().Name}]{name}");
+            
+            if (Application.isPlaying) AppendDebugInfoPlaymode(sb);
+            else AppendDebugInfo(sb);
+            
+            sb.Append(new string('-', 10));
+            
+            return sb.ToString();
+        }
+
+        protected virtual void AppendDebugInfo(StringBuilder sb)
+        {
+            
+        }
+
+        protected virtual void AppendDebugInfoPlaymode(StringBuilder sb)
+        {
+            sb.AppendLine($"Handbrake Efficiency: {GetHandbrakeConstant() * 100.0f,3:N0}%");
         }
     }
 }

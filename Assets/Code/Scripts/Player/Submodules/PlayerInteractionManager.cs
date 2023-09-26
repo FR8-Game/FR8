@@ -1,5 +1,4 @@
 using System;
-using System.Net;
 using FR8Runtime.Interactions.Drivers.Submodules;
 using FR8Runtime.Pickups;
 using FR8Runtime.Rendering.Passes;
@@ -137,6 +136,7 @@ namespace FR8Runtime.Player.Submodules
 
             var interactable = hit.collider.GetComponentInParent<IInteractable>();
             if (!(Object)interactable) return null;
+            if (!interactable.isActiveAndEnabled) return null;
 
             var distance = interactable.OverrideInteractDistance ? interactable.InteractDistance : interactionDistance;
             return (hit.distance < distance) ? interactable : null;

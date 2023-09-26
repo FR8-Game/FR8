@@ -19,6 +19,7 @@ namespace FR8Runtime.Player
         
         public Func<Vector3> getCenter;
 
+        public event Action EnableEvent;
         public event Action UpdateEvent;
         public event Action FixedUpdateEvent;
         public event Action DisableEvent;
@@ -61,6 +62,7 @@ namespace FR8Runtime.Player
         private void OnEnable()
         {
             All.Add(this);
+            EnableEvent?.Invoke();
         }
 
         private void OnDisable()

@@ -1,84 +1,52 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using FR8Runtime.Train;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace FR8Runtime.Contracts.Predicates
 {
-    [CreateAssetMenu(menuName = ScriptableObjectLocation + "Delivery Predicate")]
+    [AddComponentMenu("Contracts/Predicates/Delivery Predicate")]
     public class DeliveryPredicate : ContractPredicate
-    {
+    {   
         private int carriagesDelivered;
 
-        public string[] carriageNames;
-        public string deliveryLocationName;
+        public List<TrainCarriage> carriages;
+        public TrackSection deliveryLocation;
 
-        private bool initialized;
-        private List<TrainCarriage> carriages;
-        private TrackSection deliveryLocation;
-        private ProgressBar uiProgressBar;
-
-        protected override string BuildString()
+        protected override string GetDisplay()
         {
             var sb = new StringBuilder();
 
             sb.Append("Deliver ");
-            for (var i = 0; i < carriageNames.Length; i++)
+            for (var i = 0; i < carriages.Count; i++)
             {
-                if (i == 0) sb.Append($"{carriageNames[i]}");
-                else if (i == sb.Length - 1) sb.Append($", {carriageNames[i]}");
-                else sb.Append($", and {carriageNames[i]}");
+                if (i == 0) sb.Append($"{carriages[i].name}");
+                else if (i == sb.Length - 1) sb.Append($", {carriages[i].name}");
+                else sb.Append($", and {carriages[i].name}");
             }
 
-            sb.Append($" to {deliveryLocationName}");
+            sb.Append($" to {deliveryLocation.name}");
 
             return sb.ToString();
         }
 
-        protected override string ProgressString() => $"{carriagesDelivered}/{carriageNames.Length}";
+        protected override string ProgressString() => $"{carriagesDelivered}/{carriages.Count}";
 
-        public override VisualElement BuildUI()
+        protected override int CalculateTasksDone()
         {
-            uiProgressBar = new ProgressBar();
-            uiProgressBar.title = ToString();
-            return uiProgressBar;
-        }
-
-        public override void UpdateUI()
-        {
-            uiProgressBar.lowValue = 0.0f;
-            uiProgressBar.highValue = carriageNames.Length;
-            uiProgressBar.value = carriagesDelivered;
-        }
-
-        protected override int TasksDone()
-        {
-            if (!initialized) Initialize();
-            
             carriagesDelivered = 0;
             foreach (var e in carriages)
             {
-                if (deliveryLocation.Contains(e.transform.position)) carriagesDelivered++;
+                if (!e.Stationary) continue;
+                if (!deliveryLocation.Contains(e.transform.position)) continue;
+
+                carriagesDelivered++;
             }
 
             return carriagesDelivered;
         }
 
-        private void Initialize()
-        {
-            carriages = new List<TrainCarriage>();
-            deliveryLocation = GameObject.Find(deliveryLocationName).GetComponent<TrackSection>();
-
-            foreach (var name in carriageNames)
-            {
-                var find = GameObject.Find(name);
-                if (find) carriages.Add(find.GetComponent<TrainCarriage>());
-            }
-        }
-
-        protected override int TaskCount() => carriageNames.Length;
+        protected override int CalculateTaskCount() => carriages.Count;
     }
 }
