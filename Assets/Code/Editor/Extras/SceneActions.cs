@@ -1,6 +1,7 @@
 ﻿
 using FR8Runtime.Train;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -8,24 +9,44 @@ namespace FR8Editor.Extras
 {
     public static class SceneActions
     {
-        [MenuItem("Actions/Scene/Center Scene Around Locomotive")]
-        public static void CenterSceneAroundLocomotive()
-        {
-            if (!EditorUtility.DisplayDialog("Center Scene Around Locomotive", "Are you sure?\nTHIS ACTION CANNOT BE UNDONE", "Yes", "Cancel")) return;
-            if (!EditorUtility.DisplayDialog("Center Scene Around Locomotive", "Are you really sure???\nTHIS ACTION CANNOT BE UNDONE", "Absolutely", "Cancel")) return;
+        [MenuItem("Actions/Scene/Center Scene Around Selection")]
+        public static void CenterSceneAroundSelection() => CenterSceneAroundSelection(new Vector3(-1.0f, 0.0f, -1.0f));
+        
+        
+        [MenuItem("Actions/Scene/Set Scene Elevation Around Selection")]
+        public static void SetSceneElevationAroundSelection() => CenterSceneAroundSelection(new Vector3(0.0f, -1.0f, 0.0f));
 
-            var offset = Vector3.zero;
-            var list = Object.FindObjectsOfType<Locomotive>();
+        private static void CenterSceneAroundSelection(Vector3 scalar)
+        {
+            var center = Vector3.zero;
+            var list = Selection.gameObjects;
+
+            if (list.Length == 0)
+            {
+                Debug.LogError("Cannot center scene, No GameObjects are selected");
+                return;
+            }
+            
             foreach (var locomotive in list)
             {
-                offset += locomotive.transform.position / list.Length;
+                center += locomotive.transform.position / list.Length;
             }
 
-            var rootObjects = SceneManager.GetActiveScene().GetRootGameObjects();
+            var offset = new Vector3
+            {
+                x = scalar.x * center.x,
+                y = scalar.y * center.y,
+                z = scalar.z * center.z,
+            };
+
+            var scene = SceneManager.GetActiveScene();
+            var rootObjects = scene.GetRootGameObjects();
             foreach (var e in rootObjects)
             {
-                e.transform.position -= offset;
+                Undo.RecordObject(e.transform, "Center Scene Around Locomotive");
+                e.transform.position += offset;
             }
+            EditorSceneManager.MarkSceneDirty(scene);
         }
     }
 }
