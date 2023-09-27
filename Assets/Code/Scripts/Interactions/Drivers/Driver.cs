@@ -66,7 +66,7 @@ namespace FR8Runtime.Interactions.Drivers
         {
             origin = transform.localPosition;
 
-            if (!driverNetwork.HasValue(key))
+            //if (!driverNetwork.HasValue(key))
             {
                 SetValue(defaultValue);
                 OnValueChanged(defaultValue);

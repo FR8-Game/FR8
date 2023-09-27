@@ -22,6 +22,7 @@ namespace FR8Runtime.Player.Submodules
 
         [Header("Movement")]
         public float maxGroundedSpeed = 4.0f;
+
         public float accelerationTime = 0.12f;
         public float sprintSpeedScalar = 2.0f;
 
@@ -35,10 +36,12 @@ namespace FR8Runtime.Player.Submodules
 
         [Space]
         public float groundSpring = 500.0f;
+
         public float groundDamping = 25.0f;
 
         [Space]
         public float downGravityScale = 3.0f;
+
         public float upGravityScale = 2.0f;
 
         [Space]
@@ -49,18 +52,13 @@ namespace FR8Runtime.Player.Submodules
         public float ladderClimbDamper = 3000.0f;
         public float ladderJumpForce = 5.0f;
 
-        [Space]
-        public bool canFlyInBuild = false;
-        public bool canFlyInEditor = true;
-        public MovementType movementType = MovementType.Normal;
-
         [Header("Audio")]
         public EventReference footstepSound;
 
         public float footstepFrequency;
 
         private PlayerAvatar avatar;
-        private CapsuleCollider collider;
+        private new CapsuleCollider collider;
 
         private bool jumpTrigger;
         private float lastJumpTime;
@@ -114,26 +112,35 @@ namespace FR8Runtime.Player.Submodules
             }
         }
 
-#if UNITY_EDITOR
-        public bool CanFly => canFlyInEditor;
-#else
-        public bool CanFly => canFlyInBuild;
-#endif
-
         private void OnEnable()
         {
             avatar = GetComponent<PlayerAvatar>();
 
             ConfigureRigidbody();
             ConfigureCollider();
-            
+
             avatar.getCenter = () => collider.transform.TransformPoint(collider.center);
+            avatar.MountChangedEvent += OnMountChanged;
+
+            var camera = Camera.main;
+            transform.position = camera.transform.position - cameraOffset;
+            transform.rotation = Quaternion.Euler(0.0f, camera.transform.eulerAngles.y, 0.0f);
         }
+
 
         private void OnDisable()
         {
             avatar.Body.isKinematic = true;
+            avatar.MountChangedEvent -= OnMountChanged;
             Destroy(collider);
+        }
+
+        private void OnMountChanged(PlayerMount newMount)
+        {
+            if (!newMount && avatar.CurrentMount)
+            {
+                avatar.Body.position = avatar.CurrentMount.DismountPosition;
+            }
         }
 
         private void ConfigureRigidbody()
@@ -188,17 +195,6 @@ namespace FR8Runtime.Player.Submodules
         {
             ConstrainTransform();
             SetJumpTrigger();
-
-            if (avatar.input.Fly && CanFly)
-            {
-                movementType = movementType switch
-                {
-                    MovementType.Normal => MovementType.NoClip,
-                    MovementType.Flying => MovementType.Normal,
-                    MovementType.NoClip => MovementType.Normal,
-                    _ => throw new ArgumentOutOfRangeException()
-                };
-            }
         }
 
         private void SetJumpTrigger()
@@ -208,37 +204,45 @@ namespace FR8Runtime.Player.Submodules
 
         private void FixedUpdate()
         {
+            if (avatar.CurrentMount)
+            {
+                avatar.Body.position = avatar.CurrentMount.Position;
+                avatar.Body.rotation = avatar.CurrentMount.Rotation;
+                avatar.Body.velocity = avatar.CurrentMount.Velocity;
+                avatar.Body.detectCollisions = false;
+
+                if (avatar.input.Crouch)
+                {
+                    avatar.SetMount(null);
+                }
+
+                return;
+            }
+
+            avatar.Body.detectCollisions = true;
+
             if (LookForLadder()) return;
 
-            switch (movementType)
-            {
-                case MovementType.Normal:
-                {
-                    Crouch();
-                    Move();
-                    Jump();
-                    CheckForGround();
-                    ApplyGravity();
-                    MoveWithGround();
+            Crouch();
+            Move();
+            Jump();
+            CheckForGround();
+            ApplyGravity();
+            MoveWithGround();
 
-                    PlayFootstepAudio();
-                    break;
-                }
-                case MovementType.Flying:
-                case MovementType.NoClip:
-                {
-                    Fly();
-                    break;
-                }
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-            
+            //PlayFootstepAudio();
+
             UpdateFlags();
         }
 
         private void ConstrainTransform()
         {
+            if (avatar.CurrentMount)
+            {
+                avatar.Head.rotation = avatar.CurrentMount.ConstrainRotation(avatar.Head.rotation);
+                return;
+            }
+
             var rotation = avatar.Head.rotation;
             transform.rotation = Quaternion.Euler(0.0f, rotation.eulerAngles.y, 0.0f);
             avatar.Head.rotation = rotation;
@@ -464,16 +468,6 @@ namespace FR8Runtime.Player.Submodules
 
         private void ApplyGravity()
         {
-            switch (movementType)
-            {
-                case MovementType.Flying:
-                case MovementType.NoClip:
-                    return;
-                default:
-                case MovementType.Normal:
-                    break;
-            }
-
             avatar.Body.AddForce(Gravity, ForceMode.Acceleration);
         }
 
@@ -513,13 +507,6 @@ namespace FR8Runtime.Player.Submodules
             Gizmos.matrix = transform.localToWorldMatrix;
 
             GizmoUtility.DrawCapsule(Vector3.up * collisionHeight / 2.0f, Quaternion.identity, collisionHeight, collisionRadius);
-        }
-
-        public enum MovementType
-        {
-            Normal = 0b1 << 0,
-            Flying = 0b1 << 1,
-            NoClip = 0b1 << 2,
         }
     }
 }

@@ -10,17 +10,23 @@
 
 .title {
     -unity-text-align: middle-left;
-    font-size: 180px;
+    font-size: 120px;
     margin-left: 0;
     margin-right: 0;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    margin-top: 0;
+    margin-bottom: 60px;
     padding-left: 0;
     padding-right: 0;
     padding-top: 0;
     padding-bottom: 0;
     flex-direction: row;
     -unity-font-definition: url('project://database/Assets/Content/Fonts/Assets/VT323/VT323-Regular%20NoVSpace.asset?fileID=11400000&guid=e168ad3775b6c6241898e583e21ff317&type=2#VT323-Regular NoVSpace');
+    -unity-paragraph-spacing: -140px;
+}
+
+.subtitle {
+    font-size: 20px;
+    margin-bottom: 10px;
 }
 
 .title .unity-label {
@@ -104,7 +110,7 @@
     top: 0;
     right: 0;
     bottom: 0;
-    background-color: rgb(17, 17, 17);
+    background-color: rgb(8, 8, 8);
 }
 
 .unity-progress-bar {
@@ -184,4 +190,13 @@
     scale: 1 1;
     padding-bottom: 10px;
     padding-left: 20px;
+}
+
+.cover {
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 255);
 }

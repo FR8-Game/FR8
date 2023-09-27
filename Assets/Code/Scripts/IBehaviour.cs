@@ -8,5 +8,6 @@ namespace FR8Runtime
     {
         GameObject gameObject { get; }
         Transform transform { get; }
+        bool isActiveAndEnabled { get; }
     }
 }

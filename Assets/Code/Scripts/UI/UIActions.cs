@@ -8,6 +8,7 @@ namespace FR8Runtime.UI
     {
         public static Action Load(SceneUtility.Scene scene) => () =>
         {
+            Pause.SetPaused(false);
             SceneUtility.LoadScene(scene);
         };
 

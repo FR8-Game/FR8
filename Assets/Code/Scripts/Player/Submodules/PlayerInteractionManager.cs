@@ -136,6 +136,7 @@ namespace FR8Runtime.Player.Submodules
 
             var interactable = hit.collider.GetComponentInParent<IInteractable>();
             if (!(Object)interactable) return null;
+            if (!interactable.isActiveAndEnabled) return null;
 
             var distance = interactable.OverrideInteractDistance ? interactable.InteractDistance : interactionDistance;
             return (hit.distance < distance) ? interactable : null;
