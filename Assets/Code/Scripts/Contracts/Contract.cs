@@ -47,6 +47,7 @@ namespace FR8Runtime.Contracts
 
         public void Update()
         {
+            activePredicateIndex = 0;
             PredicatesCompleted = 0;
             Progress = 0.0f;
             
