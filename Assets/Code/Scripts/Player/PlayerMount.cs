@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using FR8Runtime.Interactions.Drivers.Submodules;
 using UnityEngine;
 
@@ -20,7 +21,8 @@ namespace FR8Runtime.Player
         public string DisplayValue => "";
         public bool OverrideInteractDistance => false;
         public float InteractDistance { get; }
-        
+        public IEnumerable<Renderer> Visuals { get; private set; }
+
         public Vector3 Position => transform.TransformPoint(offset);
         public Quaternion Rotation => transform.rotation;
         public Vector3 Velocity => body ? body.velocity : Vector3.zero;
@@ -44,6 +46,7 @@ namespace FR8Runtime.Player
         private void Awake()
         {
             body = GetComponentInParent<Rigidbody>();
+            Visuals = GetComponentsInChildren<Renderer>();
         }
 
         public void Nudge(int direction) { }

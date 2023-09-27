@@ -26,6 +26,8 @@ namespace FR8Runtime.Contracts.Predicates
         [SerializeField] private int a;
         [SerializeField] private int b;
 
+        public string Key => key;
+        
         private void Reset()
         {
             driverNetwork = FindObjectOfType<Locomotive>().GetComponent<DriverNetwork>();

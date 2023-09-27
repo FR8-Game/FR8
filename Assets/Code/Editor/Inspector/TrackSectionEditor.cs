@@ -1,8 +1,6 @@
-﻿using System;
-using FR8Runtime.Contracts;
+﻿using FR8Runtime.Contracts;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 namespace FR8Editor.Inspector
