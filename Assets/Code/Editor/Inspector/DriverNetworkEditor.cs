@@ -1,6 +1,4 @@
-﻿
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using FR8Runtime.Interactions.Drivers;
 using UnityEditor;
@@ -66,21 +64,22 @@ namespace FR8Editor.Inspector
         {
             private DriverNetwork target;
             private string key;
-            private VisualElement root;
             private FloatField value;
             private FloatField newValue;
-            private Button submit;
 
             public EntryTree(DriverNetwork target, string key, VisualElement parent)
             {
                 this.target = target;
                 this.key = key;
                 
-                parent.Add(root = new VisualElement());
+                var root = new VisualElement();
+                parent.Add(root);
                 root.Add(value = new FloatField(key));
 
                 root.Add(newValue = new FloatField());
-                root.Add(submit = new Button());
+                
+                var submit = new Button();
+                root.Add(submit);
 
                 value.SetEnabled(false);
                 submit.clickable.clicked += Submit;

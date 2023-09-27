@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using FR8Runtime.Rendering.Passes;
 using UnityEngine;
 
@@ -7,9 +8,17 @@ namespace FR8Runtime.Rendering
     [DisallowMultipleComponent]
     public sealed class SelectionOutline : MonoBehaviour
     {
-        private void Update()
+        private IEnumerable<Renderer> renderers;
+
+        private void OnEnable()
         {
-            SelectionOutlinePass.Add(gameObject);
+            renderers = GetComponentsInChildren<Renderer>();
+            SelectionOutlinePass.Add(renderers);
+        }
+
+        private void OnDisable()
+        {
+            SelectionOutlinePass.Remove(renderers);
         }
     }
 }

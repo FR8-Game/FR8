@@ -8,12 +8,35 @@ namespace FR8Runtime.Contracts
     {
         [SerializeField] private TrackSegment track;
         [SerializeField] private GameObject signPrefab;
-        [SerializeField] public Vector3 endPosition;
-        [SerializeField] public Quaternion endRotation = Quaternion.identity;
+        [SerializeField] public Vector3 localStartPosition;
+        [SerializeField] public Quaternion localStartRotation = Quaternion.identity;
+        [SerializeField] public Vector3 localEndPosition;
+        [SerializeField] public Quaternion localEndRotation = Quaternion.identity;
 
         private Vector3 lastStartPosition;
         private Vector3 lastEndPosition;
 
+        public Vector3 StartPosition
+        {
+            get => transform.TransformPoint(localStartPosition); 
+            set => localStartPosition = transform.InverseTransformPoint(value);
+        }
+        public Quaternion StartRotation
+        {
+            get => transform.rotation * localStartRotation;
+            set => localStartRotation = Quaternion.Inverse(transform.rotation) * value;
+        }
+        public Vector3 EndPosition
+        {
+            get => transform.TransformPoint(localEndPosition); 
+            set => localEndPosition = transform.InverseTransformPoint(value);
+        }
+        public Quaternion EndRotation
+        {
+            get => transform.rotation * localEndRotation;
+            set => localEndRotation = Quaternion.Inverse(transform.rotation) * value;
+        }
+        
         public float SectionStart { get; private set; }
         public float SectionEnd { get; private set; }
         public string Name => name;
@@ -54,8 +77,8 @@ namespace FR8Runtime.Contracts
             if (!track) return;
             Gizmos.color = Color.yellow;
 
-            drawEndCap(SectionStart, transform.position);
-            drawEndCap(SectionEnd, endPosition);
+            drawEndCap(SectionStart, StartPosition);
+            drawEndCap(SectionEnd, EndPosition);
 
             var step = 1.0f / 100;
             for (var p = 0.0f; p < 1.0f - step; p += step)
@@ -63,7 +86,7 @@ namespace FR8Runtime.Contracts
                 Gizmos.DrawLine(track.SamplePoint(Mathf.Lerp(SectionStart, SectionEnd, p)), track.SamplePoint(Mathf.Lerp(SectionStart, SectionEnd, p + step)));
             }
             
-            HBCore.Utility.GizmoUtility.Label((transform.position + endPosition) / 2.0f + Vector3.up * 10.0f, name);
+            HBCore.Utility.GizmoUtility.Label((StartPosition + EndPosition) / 2.0f + Vector3.up * 10.0f, name);
 
             void drawEndCap(float t, Vector3 from, float scale = 1.0f)
             {
@@ -85,16 +108,19 @@ namespace FR8Runtime.Contracts
         {
             GetTrackIfMissing();
 
-            var startPosition = transform.position;
+            var (startPosition, startRotation) = SnapToSpline(StartPosition);
+            var (endPosition, endRotation) = SnapToSpline(EndPosition);
 
-            SnapToSpline(ref startPosition, out var startRotation);
-            SnapToSpline(ref endPosition, out endRotation);
-
-            transform.position = startPosition;
-            transform.rotation = startRotation;
+            transform.position = (startPosition + endPosition) / 2.0f;
+            transform.rotation = Quaternion.Slerp(startRotation, endRotation, 0.5f);
+            
+            StartPosition = startPosition;
+            StartRotation = startRotation;
+            EndPosition = endPosition;
+            EndRotation = endRotation;
         }
 
-        private void SnapToSpline(ref Vector3 position, out Quaternion rotation)
+        private (Vector3, Quaternion) SnapToSpline(Vector3 position)
         {
             var t = track.GetClosestPoint(position);
 
@@ -105,7 +131,9 @@ namespace FR8Runtime.Contracts
             var offset = vec - tangent * Vector3.Dot(vec, tangent);
             
             position += offset;
-            rotation = Quaternion.LookRotation(track.SampleTangent(t), Vector3.up);
+            var rotation = Quaternion.LookRotation(track.SampleTangent(t), Vector3.up);
+
+            return (position, rotation);
         }
 
         public void GetTrackIfMissing()
@@ -115,27 +143,29 @@ namespace FR8Runtime.Contracts
 
         public void UpdateEndsIfDirty()
         {
-            var startPosition = transform.position;
-            if (startPosition == lastStartPosition && endPosition == lastEndPosition) return;
+            if (StartPosition == lastStartPosition && EndPosition == lastEndPosition) return;
 
             UpdateEnds();
             
-            lastStartPosition = startPosition;
-            lastEndPosition = endPosition;
+            lastStartPosition = StartPosition;
+            lastEndPosition = EndPosition;
         }
         
         public void UpdateEnds()
         {
             GetTrackIfMissing();
 
-            SectionStart = track.GetClosestPoint(transform.position);
-            SectionEnd = track.GetClosestPoint(endPosition);
+            SectionStart = track.GetClosestPoint(StartPosition);
+            SectionEnd = track.GetClosestPoint(EndPosition);
         }
 
         private void Reset()
         {
-            endPosition = transform.position + transform.forward * 5.0f;
-            endRotation = transform.rotation;
+            localStartPosition = Vector3.back * 5.0f;
+            localStartRotation = Quaternion.identity;
+            
+            localEndPosition = Vector3.forward * 5.0f;
+            localEndRotation = Quaternion.identity;
         }
     }
 }

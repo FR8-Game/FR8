@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using FR8Runtime.Interactions.Drivers.Submodules;
 using UnityEngine;
 
@@ -23,6 +24,7 @@ namespace FR8Runtime.Train.Track
         public string DisplayValue => state ? "Engaged" : "Disengaged";
         public bool OverrideInteractDistance => true;
         public float InteractDistance => float.MaxValue;
+        public IEnumerable<Renderer> Visuals { get; private set; }
 
         public TrackJunction SpawnFromPrefab(TrackSegment segment, Transform knot)
         {
@@ -48,6 +50,11 @@ namespace FR8Runtime.Train.Track
             FindConnectionEnd();
 
             Animate(testActive ? 1.0f : 0.0f);
+        }
+
+        private void Awake()
+        {
+            Visuals = GetComponentsInChildren<Renderer>();
         }
 
         private void Start()

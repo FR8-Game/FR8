@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FR8Runtime.CodeUtility;
 using FR8Runtime.Train.Track;
 using UnityEditor;

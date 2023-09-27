@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using FR8Runtime.Interactions.Drivers.Submodules;
 using FR8Runtime.Player;
 using UnityEngine;
@@ -17,7 +18,13 @@ namespace FR8Runtime.Interactions
         public string DisplayValue => verb;
         public bool OverrideInteractDistance => false;
         public float InteractDistance => throw new NotImplementedException();
-        
+        public IEnumerable<Renderer> Visuals { get; private set; }
+
+        private void Awake()
+        {
+            Visuals = GetComponentsInChildren<Renderer>();
+        }
+
         public void Nudge(int direction) { }
 
         public void BeginInteract(GameObject interactingObject)

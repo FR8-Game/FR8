@@ -1,4 +1,5 @@
-﻿using FR8Runtime.Interactions.Drivables;
+﻿using System.Collections.Generic;
+using FR8Runtime.Interactions.Drivables;
 using FR8Runtime.Interactions.Drivers.Submodules;
 using UnityEngine;
 
@@ -18,10 +19,12 @@ namespace FR8Runtime.Interactions.Drivers
 
         public bool OverrideInteractDistance => false;
         public float InteractDistance => throw new System.NotImplementedException();
-        
+        public IEnumerable<Renderer> Visuals { get; private set; }
+
         protected virtual void Awake()
         {
             SetValue(testValue ? 1.0f : 0.0f);
+            Visuals = GetComponentsInChildren<Renderer>();
         }
 
         public void OnValueChanged(float newValue) { }

@@ -12,9 +12,6 @@ namespace FR8Runtime.Contracts.Predicates
 
         protected override int CalculateTaskCount() => Mathf.Max(1, maxProgress);
 
-        protected override string GetDisplay()
-        {
-            return "Debug Contract Predicate";
-        }
+        protected override string GetDisplay() => name;
     }
 }

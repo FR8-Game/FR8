@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using FR8Runtime.Contracts;
+using FR8Runtime.Contracts.Predicates;
 using FR8Runtime.Interactions.Drivers.Submodules;
+using FR8Runtime.Rendering.Passes;
 using UnityEngine;
 
 namespace FR8Runtime.Interactions.Drivers
@@ -11,9 +15,11 @@ namespace FR8Runtime.Interactions.Drivers
         [SerializeField] private string displayName;
         [SerializeField] private float defaultValue;
 
-        private const float shakeAmplitude = 0.003f;
-        private const float shakeFrequency = 100.0f;
-        private const float shakeDecay = 12.0f;
+        private const float ShakeAmplitude = 0.0015f;
+        private const float ShakeFrequency = 100.0f;
+        private const float ShakeDecay = 12.0f;
+
+        private bool highlighted;
 
         private Vector3 origin;
         private DriverNetwork driverNetwork;
@@ -25,6 +31,7 @@ namespace FR8Runtime.Interactions.Drivers
 
         public bool OverrideInteractDistance => false;
         public float InteractDistance => throw new NotImplementedException();
+        public IEnumerable<Renderer> Visuals { get; private set; }
 
         public float Value { get; private set; }
         public string Key => key;
@@ -60,6 +67,7 @@ namespace FR8Runtime.Interactions.Drivers
         protected virtual void Awake()
         {
             driverNetwork = GetComponentInParent<DriverNetwork>();
+            Visuals = GetComponentsInChildren<Renderer>();
         }
 
         protected virtual void Start()
@@ -75,6 +83,58 @@ namespace FR8Runtime.Interactions.Drivers
 
         protected virtual void FixedUpdate()
         {
+            UpdateValueIfChanged();
+            ShakeOnInteract();
+            Highlight();
+        }
+
+        private void Highlight()
+        {
+            var isHighlighted = false;
+            foreach (var contract in Contract.ActiveContracts)
+            {
+                checkPredicate(contract.ActivePredicate);
+            }
+
+            if (isHighlighted != highlighted)
+            {
+                if (isHighlighted)
+                {
+                    SelectionOutlinePass.Add(Visuals);
+                }
+                else
+                {
+                    SelectionOutlinePass.Remove(Visuals);
+                }
+                highlighted = isHighlighted;
+            }
+
+            void checkPredicate(ContractPredicate predicate)
+            {
+                switch (predicate)
+                {
+                    case PredicateGroup group:
+                    {
+                        foreach (var e in group)
+                        {
+                            checkPredicate(e);
+                        }
+
+                        break;
+                    }
+                    case DriverNetworkPredicate driverPredicate:
+                    {
+                        if (!DriverNetwork.CompareKeys(driverPredicate.Key, key)) break;
+
+                        isHighlighted = true;
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void UpdateValueIfChanged()
+        {
             var newValue = driverNetwork.GetValue(key);
 
             // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -82,16 +142,19 @@ namespace FR8Runtime.Interactions.Drivers
             {
                 OnValueChanged(newValue);
             }
+        }
 
-            var t = Time.time * shakeFrequency;
+        private void ShakeOnInteract()
+        {
+            var t = Time.time * ShakeFrequency;
             var noise = new Vector3
             {
                 x = Mathf.PerlinNoise(t, 10.5f) * 2.0f - 1.0f,
                 y = Mathf.PerlinNoise(t, 20.5f) * 2.0f - 1.0f,
                 z = Mathf.PerlinNoise(t, 30.5f) * 2.0f - 1.0f,
-            } * shakeAmplitude;
+            } * ShakeAmplitude;
 
-            noise *= Mathf.Exp((Time.time - shakeTime) * -shakeDecay);
+            noise *= Mathf.Exp((Time.time - shakeTime) * -ShakeDecay);
             transform.localPosition = origin + noise;
         }
     }
