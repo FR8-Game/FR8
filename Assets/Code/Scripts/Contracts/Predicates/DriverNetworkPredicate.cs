@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Data.Common;
+using FR8Runtime.Interactions.Drivers;
 using FR8Runtime.Train;
 using UnityEngine;
 
 namespace FR8Runtime.Contracts.Predicates
 {
     [SelectionBase, DisallowMultipleComponent]
-    public class LocomotivePredicate : ContractPredicate
+    public class DriverNetworkPredicate : ContractPredicate
     {
         [Header("TARGET")]
-        [SerializeField] private Locomotive locomotive;
+        [SerializeField] private DriverNetwork driverNetwork;
         [SerializeField] private string key;
         
         [Header("SETTINGS")]
@@ -27,12 +28,12 @@ namespace FR8Runtime.Contracts.Predicates
 
         private void Reset()
         {
-            locomotive = FindObjectOfType<Locomotive>();
+            driverNetwork = FindObjectOfType<Locomotive>().GetComponent<DriverNetwork>();
         }
 
         protected override string GetDisplay()
         {
-            if (!locomotive) return $"Contract \"{name}\" is missing a target locomotive";
+            if (!driverNetwork) return $"Contract \"{name}\" is missing a target";
 
             var value = GetValue();
             var delta = targetValue - value;
@@ -69,7 +70,7 @@ namespace FR8Runtime.Contracts.Predicates
 
         protected override int CalculateTasksDone() => Compare(GetValue()) ? 1 : 0;
         protected override int CalculateTaskCount() => 1;
-        private float GetValue() => locomotive ? locomotive.DriverNetwork.GetValue(key, fallback) : fallback;
+        private float GetValue() => driverNetwork ? driverNetwork.GetValue(key, fallback) : fallback;
 
         public bool Compare(float value)
         {
