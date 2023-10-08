@@ -1,8 +1,6 @@
-﻿using System;
-using FR8Runtime.Contracts;
+﻿using FR8Runtime.Contracts;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 namespace FR8Editor.Inspector
@@ -36,41 +34,43 @@ namespace FR8Editor.Inspector
         
         private void OnSceneGUI()
         {
-            var startScale = HandleUtility.GetHandleSize(Target.transform.position);
-            var endScale = HandleUtility.GetHandleSize(Target.endPosition);
+            var startScale = HandleUtility.GetHandleSize(Target.StartPosition);
+            var endScale = HandleUtility.GetHandleSize(Target.EndPosition);
             
-            Handles.Label(Target.transform.position - Target.transform.forward * startScale, "Start");
-            Handles.Label(Target.endPosition + Target.endRotation * Vector3.forward * endScale * 2.0f, "End");
+            Handles.Label(Target.StartPosition + Target.StartRotation * Vector3.back * startScale, "Start");
+            Handles.Label(Target.EndPosition + Target.EndRotation * Vector3.forward * endScale * 2.0f, "End");
+
+            var startPosition = Target.StartPosition;
+            var startRotation = Target.StartRotation.normalized;
             
-            var endPosition = Target.endPosition;
-            var endRotation = Target.endRotation.normalized;
+            var endPosition = Target.EndPosition;
+            var endRotation = Target.EndRotation.normalized;
             
             switch (UnityEditor.Tools.current)
             {
                 case Tool.Move:
+                    startPosition = Handles.PositionHandle(startPosition, startRotation);
                     endPosition = Handles.PositionHandle(endPosition, endRotation);
                     break;
                 case Tool.Rotate:
+                    startRotation = Handles.RotationHandle(startRotation, startPosition);
                     endRotation = Handles.RotationHandle(endRotation, endPosition);
-                    break;
-                case Tool.Rect:
-                    break;
-                default:
-                case Tool.View:
-                case Tool.Custom:
-                case Tool.None:
                     break;
             }
             
             if
             (
-                endPosition == Target.endPosition
-                && endRotation == Target.endRotation
+                startPosition == Target.StartPosition
+                && startRotation == Target.StartRotation
+                && endPosition == Target.EndPosition
+                && endRotation == Target.EndRotation
             ) return;
 
             Undo.RecordObject(Target, $"Moved {Target.name} End Handle");
-            Target.endPosition = endPosition;
-            Target.endRotation = endRotation;
+            Target.StartPosition = startPosition;
+            Target.StartRotation = startRotation;
+            Target.EndPosition = endPosition;
+            Target.EndRotation = endRotation;
         }
 
         public void Update()

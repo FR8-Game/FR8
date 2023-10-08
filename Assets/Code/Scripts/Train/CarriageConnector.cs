@@ -29,6 +29,7 @@ namespace FR8Runtime.Train
         public string DisplayValue => engaged ? "Engaged" : "Disengaged";
         public bool OverrideInteractDistance { get; }
         public float InteractDistance { get; }
+        public IEnumerable<Renderer> Visuals { get; private set; }
         public CarriageConnector Connection { get; private set; }
 
         public Vector3 AnchorPosition => transform.TransformPoint(anchorOrigin);
@@ -49,6 +50,7 @@ namespace FR8Runtime.Train
         protected void Awake()
         {
             Carriage = GetComponentInParent<TrainCarriage>();
+            Visuals = GetComponentsInChildren<Renderer>();
 
             if (magnetFX)
             {
