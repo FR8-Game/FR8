@@ -8,7 +8,7 @@ namespace FR8Editor.Inspector
     [CustomEditor(typeof(WindSettings))]
     public class WindSettingsEditor : Editor
     {
-        private float t = 0.0f;
+        private float t;
 
         public override void OnInspectorGUI()
         {

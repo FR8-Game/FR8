@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 using FR8Runtime.CodeUtility;
 using UnityEngine;
@@ -61,7 +63,7 @@ namespace FR8Runtime.Contracts.Predicates
         };
 
         public sealed override string ToString() => ToString(false);
-
+        
         public string ToString(bool withTags)
         {
             var str = string.IsNullOrWhiteSpace(overrideDisplayText) ? GetDisplay() : overrideDisplayText;

@@ -1,9 +1,5 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using FR8Runtime.Contracts;
-using FR8Runtime.Contracts.Predicates;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -15,13 +11,6 @@ namespace FR8Editor.Inspector
     {
         private VisualElement root;
 
-        private Type[] types;
-
-        private void OnEnable()
-        {
-            types = typeof(ContractPredicate).Assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(ContractPredicate))).ToArray();
-        }
-
         public override void AddInspectorGUI(VisualElement root)
         {
             this.root = new VisualElement();
@@ -31,7 +20,7 @@ namespace FR8Editor.Inspector
 
         private void OnSceneGUI()
         {
-            foreach (var e in Target.Predicates)
+            foreach (var e in Target.PredicateTree)
             {
                 var editor = CreateEditor(e);
                 editor.GetType().GetMethod(nameof(OnSceneGUI), BindingFlags.Instance | BindingFlags.NonPublic)?.Invoke(editor, null);
@@ -42,14 +31,14 @@ namespace FR8Editor.Inspector
         {
             root.Clear();
 
-            if (Target.Predicates.Count <= 0)
+            if (Target.PredicateTree.Count <= 0)
             {
                 var helpBox = new HelpBox("Contract Has No Predicates\n\nTo Get Started, add a child object with a Contract Predicate Component [Found in AddComponent::Contracts/Predicates/]", HelpBoxMessageType.Info);
                 root.Add(helpBox);
                 return;
             }
 
-            foreach (var e in Target.Predicates)
+            foreach (var e in Target.PredicateTree)
             {
                 var section = new VisualElement();
                 section.AddToClassList("unity-help-box");

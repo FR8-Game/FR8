@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FR8Runtime.CodeUtility;
 using FR8Runtime.Train.Track;
 using UnityEditor;
@@ -27,6 +26,12 @@ namespace FR8Editor.Tools
 
         public static float handleScale = 1.0f;
 
+        public override void OnActivated()
+        {
+            all = new List<TrackSegment>(FindObjectsOfType<TrackSegment>());
+            terrainList = new List<Terrain>(FindObjectsOfType<Terrain>());
+        }
+
         public Transform[] Knots()
         {
             if (!trackSegment) return new Transform[0];
@@ -43,9 +48,6 @@ namespace FR8Editor.Tools
 
         public override void OnToolGUI(EditorWindow window)
         {
-            if (all == null) all = new List<TrackSegment>(FindObjectsOfType<TrackSegment>());
-            if (terrainList == null) terrainList = new List<Terrain>(FindObjectsOfType<Terrain>());
-
             var gameObject = target as GameObject;
             if (!gameObject) return;
 
@@ -85,7 +87,7 @@ namespace FR8Editor.Tools
                     {
                         if (s == trackSegment) continue;
 
-                        var t = s.GetClosestPoint(knot.position);
+                        var t = s.GetClosestPoint(knot.position, true);
                         var closest = s.SamplePoint(t);
                         if ((knot.position - closest).sqrMagnitude > TrackSegment.ConnectionDistance * TrackSegment.ConnectionDistance) continue;
 
@@ -263,7 +265,7 @@ namespace FR8Editor.Tools
             }
 
 
-            if (dirty) trackSegment.OnKnotsChanged();
+            if (dirty) trackSegment.LookForConnections();
         }
 
         private delegate bool ModifyKnotCallback(int i, Transform knot);
