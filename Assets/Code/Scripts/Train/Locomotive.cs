@@ -43,7 +43,7 @@ namespace FR8Runtime.Train
             DriverNetwork.SetValue(GearKey, 0.0f);
             
 #if UNITY_EDITOR
-            var t = segment.GetClosestPoint(Body.position);
+            var t = segment.GetClosestPoint(Body.position, true);
             var dir = segment.SampleTangent(t);
             Body.AddForce(dir * initialVelocity / 3.6f, ForceMode.VelocityChange);
 #endif

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -13,6 +14,8 @@ namespace FR8Runtime.UI.Loading
     [RequireComponent(typeof(UIDocument))]
     public sealed class LoadScreen : MonoBehaviour
     {
+        private const float TimeScale = 2.0f;
+
         [SerializeField] private float fadeTime = 0.5f;
         [SerializeField] private AnimationCurve fadeCurve = AnimationCurve.EaseInOut(0.0f, 0.0f, 1.0f, 1.0f);
 
@@ -57,10 +60,11 @@ namespace FR8Runtime.UI.Loading
 
             var lines = new List<string>();
             lines.Add($"FR8 OS [Version {Application.unityVersion}]");
-            lines.Add($"(c) FR8 Corporation. All rights reserved.\n\n");
+            lines.Add("(c) FR8 Corporation. All rights reserved.\n\n");
 
-            var sceneName = $"{SceneManager.GetSceneByBuildIndex(buildIndex).name}.scene";
-
+            var sceneName = $"{SceneManager.GetSceneByBuildIndex(buildIndex).path}.scene";
+            sceneName = Path.GetFileName(sceneName);
+            
             apply();
 
             yield return StartCoroutine(startCommand($"scene-manager.exe -load-new {sceneName}", 1.0f));
@@ -69,9 +73,10 @@ namespace FR8Runtime.UI.Loading
 
             var finishedLoading = false;
             var t = 0.0f;
+            lines.Add("");
             yield return StartCoroutine(loadCallback(buildIndex, progress =>
             {
-                t += Time.deltaTime;
+                t += Time.unscaledDeltaTime;
 
                 if (progress < 0.9f)
                 {
@@ -94,14 +99,14 @@ namespace FR8Runtime.UI.Loading
             {
                 lines[^1] = $"{prepend}{command}";
                 apply();
-                yield return new WaitForSeconds(wait);
+                yield return new WaitForSecondsRealtime(wait / TimeScale);
             }
 
             IEnumerator appendOutput(string output, float wait = 0.12f)
             {
                 lines.Add(output);
                 apply();
-                yield return new WaitForSeconds(wait);
+                yield return new WaitForSecondsRealtime(wait / TimeScale);
             }
 
             void modifyLastLine(string newLine)
@@ -160,10 +165,10 @@ namespace FR8Runtime.UI.Loading
                 {
                     timer -= timerMax;
                     step++;
-                    timerMax = Random.Range(0.2f, 0.4f);
+                    timerMax = Random.Range(0.0f, 0.2f) / TimeScale;
                 }
                 
-                timer += Time.deltaTime;
+                timer += Time.unscaledDeltaTime;
                 loadCallback(step / (float)steps);
                 yield return null;
             }
@@ -177,7 +182,7 @@ namespace FR8Runtime.UI.Loading
             while (p < 1.0f)
             {
                 root.style.opacity = fadeCurve.Evaluate(remap(p));
-                p += Time.deltaTime / fadeTime;
+                p += Time.unscaledDeltaTime / fadeTime;
                 yield return null;
             }
 
