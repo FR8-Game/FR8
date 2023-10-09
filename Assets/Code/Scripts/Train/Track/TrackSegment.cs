@@ -19,9 +19,6 @@ namespace FR8Runtime.Train.Track
         public const float ConnectionDistance = 3.0f;
         public static readonly Spline.SplineProfile SplineProfile = Spline.Cubic;
 
-        // --- Legacy ---
-        [SerializeField] [HideInInspector] private List<Vector3> knots;
-
         // --- Properties ---
         public TrackJunction junctionPrefab;
 
@@ -54,7 +51,7 @@ namespace FR8Runtime.Train.Track
         private void Awake()
         {
             BakeData();
-            OnKnotsChanged();
+            LookForConnections();
         }
 
         private void Start()
@@ -94,11 +91,8 @@ namespace FR8Runtime.Train.Track
         {
             BakeData();
             var linePoints = new List<Vector3>();
-
-            foreach (var e in points)
-            {
-                linePoints.Add(e);
-            }
+            linePoints.AddRange(points);
+            if (closedLoop) linePoints.Add(points[0]);
 
             GizmosDrawLine(main ? selectedColor : otherColor, 1.0f, linePoints.ToArray());
             DrawLineBetweenKnots();
@@ -151,12 +145,13 @@ namespace FR8Runtime.Train.Track
 
         public void BakeData()
         {
+            // Bakes down the track segment to a list of line segments and their corresponding velocities.
             points = new List<Vector3>();
             velocities = new List<Vector3>();
             
             for (var i = 0; i < resolution; i++)
             {
-                var p = i / (closedLoop ? resolution : resolution - 1.0f);
+                var p = i / (resolution - 1.0f);
                 points.Add(SampleSpline(p, (spline, t) => spline.EvaluatePoint(t), i => (this[i].position, this[i].forward), Count));
                 velocities.Add(SampleSpline(p, (spline, t) => spline.EvaluateVelocity(t), i => (this[i].position, this[i].forward), Count));
             }
@@ -164,16 +159,19 @@ namespace FR8Runtime.Train.Track
             terrainList = new List<UnityEngine.Terrain>(FindObjectsOfType<UnityEngine.Terrain>());
         }
 
-        public void UpdateConnection(TrainCarriage train)
+        // Called externally by the train carriage
+        public TrackSegment CheckForJunctions(Vector3 position, float positionOnSpline, float lastPositionOnSpline, TrackSegment segment)
         {
             foreach (var other in segmentsConnectedToThis)
             {
-                other.UpdateConnection(train, ConnectionType.Start);
-                other.UpdateConnection(train, ConnectionType.End);
+                segment = other.CheckForJunctions(ConnectionType.Start, position, positionOnSpline, lastPositionOnSpline, segment);
+                segment = other.CheckForJunctions(ConnectionType.End, position, positionOnSpline, lastPositionOnSpline, segment);
             }
+            return segment;
         }
 
-        private void UpdateConnection(TrainCarriage train, ConnectionType type)
+        // Is called on all track segments that the train COULD jump to.
+        private TrackSegment CheckForJunctions(ConnectionType type, Vector3 position, float positionOnSpline, float lastPositionOnSpline, TrackSegment segment)
         {
             var connection = type switch
             {
@@ -182,23 +180,26 @@ namespace FR8Runtime.Train.Track
                 _ => throw new ArgumentOutOfRangeException()
             };
 
-            if (!connection) return;
+            if (!connection) return segment;
 
             var other = connection.segment;
             if (connection.connectionActive)
             {
-                if (train.Segment != other) return;
+                if (segment != other) return segment;
 
-                if (TryExplicitJump(other, connection, train)) return;
+                return TryExplicitJump(other, connection, positionOnSpline, lastPositionOnSpline, segment);
             }
 
-            if (train.Segment != this) return;
-            TryImplicitJump(type, train, connection);
+            if (segment != this) return segment;
+            return TryImplicitJump(type, position, segment, connection);
         }
 
-        private void TryImplicitJump(ConnectionType type, TrainCarriage train, Connection connection)
+        // See if the train is in the position to do an implicit jump, and if so perform it.
+        // An implicit jump is when a train changes tracks without any input, eg. a track merging into another track.
+        private TrackSegment TryImplicitJump(ConnectionType type, Vector3 position, TrackSegment segment, Connection connection)
         {
-            var p = GetClosestPoint(train.Body.position);
+            // Recalculate position on THIS spline.
+            var p = GetClosestPoint(position, false);
             switch (type)
             {
                 case ConnectionType.Start:
@@ -206,7 +207,7 @@ namespace FR8Runtime.Train.Track
                     if (p < 0.0f)
                     {
                         Debug.Log($"Performed Implicit Jump to: {connection.segment}");
-                        train.Segment = connection.segment;
+                        return connection.segment;
                     }
 
                     break;
@@ -216,16 +217,19 @@ namespace FR8Runtime.Train.Track
                     if (p > 1.0f)
                     {
                         Debug.Log($"Performed Implicit Jump to: {connection.segment}");
-                        train.Segment = connection.segment;
+                        return connection.segment;
                     }
 
                     break;
                 }
                 default: throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
+            return segment;
         }
 
-        private bool TryExplicitJump(TrackSegment other, Connection connection, TrainCarriage train)
+        // See if the train is in the position to do an explicit jump, and if so perform it.
+        // An explicit jump is when a train changes tracks through a junction.
+        private TrackSegment TryExplicitJump(TrackSegment other, Connection connection, float positionOnSpline, float lastPositionOnSpline, TrackSegment segment)
         {
             float difference(float p0, float p1, bool loop)
             {
@@ -239,19 +243,18 @@ namespace FR8Runtime.Train.Track
 
             var knotPercent = connection.t;
 
-            var lastSign = difference(train.LastPositionOnSpline, knotPercent, other.closedLoop) > 0.0f;
-            var d0 = difference(train.PositionOnSpline, knotPercent, other.closedLoop);
+            var lastSign = difference(lastPositionOnSpline, knotPercent, other.closedLoop) > 0.0f;
+            var d0 = difference(positionOnSpline, knotPercent, other.closedLoop);
             var sign = d0 > 0.0f;
             var switchSign = connection.direction > 0.0f;
             
             if (sign == switchSign && lastSign != switchSign)
             {
                 Debug.Log($"Performed Explicit Jump to: {connection.segment}");
-                train.Segment = this;
-                return true;
+                return this;
             }
 
-            return false;
+            return segment;
         }
 
         public Vector3 KnotVelocity(int index) => SampleVelocity(GetKnotPercent(index));
@@ -268,16 +271,24 @@ namespace FR8Runtime.Train.Track
             var i0 = Mathf.FloorToInt(t1);
             var i1 = i0 + 1;
 
-            if (i1 >= bakeData.Count)
+            if (closedLoop)
             {
-                i0 = bakeData.Count - 2;
-                i1 = bakeData.Count - 1;
+                i0 = (i0 % bakeData.Count + bakeData.Count) % bakeData.Count;
+                i1 = (i1 % bakeData.Count + bakeData.Count) % bakeData.Count;
             }
-
-            if (i0 < 0)
+            else
             {
-                i0 = 0;
-                i1 = 1;
+                if (i1 >= bakeData.Count)
+                {
+                    i0 = bakeData.Count - 2;
+                    i1 = bakeData.Count - 1;
+                }
+
+                if (i0 < 0)
+                {
+                    i0 = 0;
+                    i1 = 1;
+                }   
             }
 
             var a = bakeData[i0];
@@ -286,7 +297,6 @@ namespace FR8Runtime.Train.Track
             return lerp(a, b, (t1 - i0) / (i1 - i0));
         }
         
-        private T SampleSpline<T>(float t, Func<Spline, float, T> callback) => SampleSpline(t, callback, i => (this[i].position, this[i].forward), Count);
         private static T SampleSpline<T>(float t, Func<Spline, float, T> callback, Func<int, (Vector3, Vector3)> list, int count)
         {
             t = Mathf.Clamp01(t);
@@ -318,7 +328,7 @@ namespace FR8Runtime.Train.Track
             if (!Valid(this)) return;
 
             BakeData();
-            OnKnotsChanged();
+            LookForConnections();
 
             var childCount = KnotContainer().childCount;
 
@@ -327,29 +337,16 @@ namespace FR8Runtime.Train.Track
             endConnection.OnValidate();
         }
 
-        [ContextMenu("Update Legacy Knots")]
-        public void UpdateLegacyKnots()
-        {
-            var container = KnotContainer();
-            for (var i = 0; i < knots.Count; i++)
-            {
-                var knot = new GameObject($"Knot.{i + 1}").transform;
-                knot.SetParent(container);
-                knot.localPosition = knots[i];
-                knot.localRotation = Quaternion.identity;
-                knot.localScale = Vector3.one;
-            }
-
-            knots.Clear();
-        }
-
-        public float GetClosestPoint(Vector3 point)
+        public float GetClosestPoint(Vector3 point, bool clamp)
         {
             if (points == null || points.Count == 0) BakeData();
             if (points.Count == 0) return default;
 
             FindClosestPair(point, out var best, out var other);
             var t = InterpolatePoints(point, best, other);
+
+            if (clamp && !closedLoop) t = Mathf.Clamp01(t);
+            
             return t;
         }
 
@@ -409,13 +406,15 @@ namespace FR8Runtime.Train.Track
             return false;
         }
 
-        public void OnKnotsChanged()
+        public void LookForConnections()
         {
+            // Fina all segments in the scene.
             var segments = FindObjectsOfType<TrackSegment>();
 
             var container = KnotContainer();
             var childCount = container.childCount;
 
+            // Update start and end
             updateEnd(0, 1, startConnection);
             updateEnd(childCount - 1, childCount - 2, endConnection);
 
@@ -431,7 +430,7 @@ namespace FR8Runtime.Train.Track
                     if (!Valid(s)) continue;
                     if (s == this) continue;
 
-                    var t = s.GetClosestPoint(knot.position);
+                    var t = s.GetClosestPoint(knot.position, true);
                     var closestPoint = s.SamplePoint(t);
                     if ((knot.position - closestPoint).sqrMagnitude > ConnectionDistance * ConnectionDistance) continue;
 
