@@ -23,11 +23,17 @@ namespace FR8Runtime.Rendering.Passes
             renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
         }
 
-        public static void Add(GameObject gameObject) => RenderList.AddRange(gameObject.GetComponentsInChildren<Renderer>());
-
-        public static void Remove(GameObject gameObject)
+        public static void Add(IEnumerable<Renderer> renderers)
         {
-            foreach (var r in gameObject.GetComponentsInChildren<Renderer>()) RenderList.Remove(r);
+            foreach (var r in renderers)
+            {
+                RenderList.Add(r);
+            }
+        }
+
+        public static void Remove(IEnumerable<Renderer> renderers)
+        {
+            foreach (var r in renderers) RenderList.Remove(r);
         }
 
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)

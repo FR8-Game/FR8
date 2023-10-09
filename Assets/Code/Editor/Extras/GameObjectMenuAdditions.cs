@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using FR8Runtime.Contracts;
 using FR8Runtime.Contracts.Predicates;
 using UnityEditor;
@@ -47,8 +46,8 @@ namespace FR8Editor.Extras
         public static void AddDeliveryPredicate() => AddPredicate<DeliveryPredicate>();
         [MenuItem("GameObject/Contract/Predicates/Debug Predicate")]
         public static void AddDebugPredicate() => AddPredicate<DebugPredicate>();
-        [MenuItem("GameObject/Contract/Predicates/Locomotive Predicate")]
-        public static void AddLocomotivePredicate() => AddPredicate<LocomotivePredicate>();
+        [MenuItem("GameObject/Contract/Predicates/Driver Network Predicate")]
+        public static void AddLocomotivePredicate() => AddPredicate<DriverNetworkPredicate>();
         [MenuItem("GameObject/Contract/Predicate Group")]
         public static void AddPredicateGroup() => AddPredicate<PredicateGroup>();
     }

@@ -13,7 +13,7 @@ namespace FR8Runtime.CodeUtility
 
             if (loadScreen)
             {
-                loadScreen.LoadScene((int)scene);
+                loadScreen.StartSceneLoad((int)scene);
             }
             else
             {

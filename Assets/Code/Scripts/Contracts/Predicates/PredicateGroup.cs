@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace FR8Runtime.Contracts.Predicates
 {
     [SelectionBase, DisallowMultipleComponent]
-    public class PredicateGroup : ContractPredicate
+    public class PredicateGroup : ContractPredicate, IEnumerable<ContractPredicate>
     {
         private List<ContractPredicate> children;
 
@@ -43,5 +44,8 @@ namespace FR8Runtime.Contracts.Predicates
             }
             return str;
         }
+
+        public IEnumerator<ContractPredicate> GetEnumerator() => children.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

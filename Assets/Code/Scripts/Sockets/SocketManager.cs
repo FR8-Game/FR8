@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using FR8Runtime.Interactions.Drivers.Submodules;
 using FR8Runtime.Player;
@@ -20,10 +21,13 @@ namespace FR8Runtime.Sockets
         public virtual string DisplayValue => string.Empty;
         public bool OverrideInteractDistance => false;
         public float InteractDistance => throw new NotImplementedException();
-        
+        public IEnumerable<Renderer> Visuals { get; private set; }
+
         protected virtual void Awake()
         {
             collider = GetComponentsInChildren<Collider>();
+            Visuals = GetComponentsInChildren<Renderer>();
+            
             SetCollision(true);
         }
 
