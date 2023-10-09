@@ -47,6 +47,16 @@ namespace FR8Runtime.CodeUtility
             sound.release();
         }
 
+        public static void PlayOnChange(bool state, bool newState, EventReference sound) => PlayOnChange(state, newState, sound, sound);
+
+        public static void PlayOnChange(bool state, bool newState, EventReference? onSound, EventReference? offSound)
+        {
+            if (newState == state) return;
+            var sound = newState ? onSound : offSound;
+            if (sound == null) return;
+            PlayOneShot(sound.Value);
+        }
+
         public static void LogGeneric(string reason)
         {
             if (!logErrors) return;

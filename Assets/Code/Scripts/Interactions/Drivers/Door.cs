@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using FMODUnity;
+using FR8Runtime.CodeUtility;
 using FR8Runtime.Interactions.Drivables;
 using FR8Runtime.Interactions.Drivers.Submodules;
 using UnityEngine;
@@ -10,6 +12,10 @@ namespace FR8Runtime.Interactions.Drivers
     {
         [SerializeField] private bool testValue;
         [SerializeField] private TwoPoseDrivableAnimator animator;
+        
+        [Space]
+        [SerializeField] private EventReference openSound;
+        [SerializeField] private EventReference closeSound;
 
         public string Key => string.Empty;
         public virtual bool CanInteract => true;
@@ -27,7 +33,10 @@ namespace FR8Runtime.Interactions.Drivers
             Visuals = GetComponentsInChildren<Renderer>();
         }
 
-        public void OnValueChanged(float newValue) { }
+        public void OnValueChanged(float newValue)
+        {
+            SoundUtility.PlayOneShot(Open ? openSound : closeSound, gameObject);
+        }
 
         protected virtual void SetValue(float newValue)
         {

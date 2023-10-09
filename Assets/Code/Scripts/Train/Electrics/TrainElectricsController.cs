@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using FMODUnity;
+using FR8Runtime.CodeUtility;
 using FR8Runtime.Interactions.Drivers;
 using UnityEngine;
 
@@ -10,6 +12,7 @@ namespace FR8Runtime.Train.Electrics
     public sealed class TrainElectricsController : MonoBehaviour
     {
         [SerializeField] private float baselineGeneration = 5.0f;
+        [SerializeField] private EventReference fuseBlownSound;
 
         private DriverNetwork driverNetwork;
         
@@ -71,6 +74,7 @@ namespace FR8Runtime.Train.Electrics
                 clockSpeed = 0.0f;
                 SetConnected(false);
                 FuseBlown?.Invoke();
+                SoundUtility.PlayOneShot(fuseBlownSound, gameObject);
             }
 
             foreach (var e in generators) e.SetClockSpeed(clockSpeed);
