@@ -13,7 +13,7 @@ namespace FR8Runtime.Train.Track
         {
             if (!segment) return;
 
-            if (useClosestPoint) t = segment.GetClosestPoint(transform.position);
+            if (useClosestPoint) t = segment.GetClosestPoint(transform.position, true);
 
             var p = segment.SamplePoint(t);
             var v = segment.SampleVelocity(t);

@@ -61,7 +61,7 @@ namespace FR8Runtime.Contracts
 
         public bool Contains(Vector3 point)
         {
-            var t = track.GetClosestPoint(point);
+            var t = track.GetClosestPoint(point, false);
             return t > SectionStart && t < SectionEnd;
         }
         
@@ -122,7 +122,7 @@ namespace FR8Runtime.Contracts
 
         private (Vector3, Quaternion) SnapToSpline(Vector3 position)
         {
-            var t = track.GetClosestPoint(position);
+            var t = track.GetClosestPoint(position, true);
 
             var point = track.SamplePoint(t);
             var tangent = track.SampleTangent(t);
@@ -155,8 +155,8 @@ namespace FR8Runtime.Contracts
         {
             GetTrackIfMissing();
 
-            SectionStart = track.GetClosestPoint(StartPosition);
-            SectionEnd = track.GetClosestPoint(EndPosition);
+            SectionStart = track.GetClosestPoint(StartPosition, true);
+            SectionEnd = track.GetClosestPoint(EndPosition, true);
         }
 
         private void Reset()

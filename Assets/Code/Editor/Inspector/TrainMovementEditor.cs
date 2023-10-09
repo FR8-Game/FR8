@@ -18,7 +18,7 @@ namespace FR8Editor.Inspector
             if (!train.Segment) return;
 
             var a = train.transform.position;
-            var p = Application.isPlaying ? train.PositionOnSpline : train.Segment.GetClosestPoint(a);
+            var p = Application.isPlaying ? train.PositionOnSpline : train.Segment.GetClosestPoint(a, true);
 
             var b = train.Segment.SamplePoint(p);
             var t = train.Segment.SampleTangent(p);
@@ -74,7 +74,7 @@ namespace FR8Editor.Inspector
             var transform = target.transform;
             var track = target.Segment;
 
-            var t = track.GetClosestPoint(transform.position);
+            var t = track.GetClosestPoint(transform.position, true);
             transform.position = track.SamplePoint(t);
             transform.rotation = Quaternion.LookRotation(track.SampleTangent(t), Vector3.up);
         }
