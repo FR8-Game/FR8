@@ -36,11 +36,7 @@ namespace FR8Runtime.Testing
             if (reset)
             {
                 reset = false;
-                
                 transform.position = startPosition;
-                speed = 0.0f;
-
-                float t;
                 runner = new TrackRunner(transform.position);
             }
         }
@@ -67,7 +63,7 @@ namespace FR8Runtime.Testing
 
         private void OnDrawGizmos()
         {
-            Gizmos.color = Color.cyan;
+            Gizmos.color = Color.blue;
             Gizmos.DrawLine(transform.position, splinePoint);
             Gizmos.color = Color.yellow;
             Gizmos.DrawRay(transform.position, splineVelocity);

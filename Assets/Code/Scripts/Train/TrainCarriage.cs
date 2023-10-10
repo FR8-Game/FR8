@@ -134,8 +134,15 @@ namespace FR8Runtime.Train
 
             Stationary = IsStationary();
 
-            if (segment) segment = segment.CheckForJunctions(transform.position, PositionOnSpline, LastPositionOnSpline, segment);
-
+            if (segment.IsOffStartOfTrack(Body.position))
+            {
+                segment = segment.GetNextTrackStart();
+            }
+            else if (segment.IsOffEndOfTrack(Body.position))
+            {
+                segment = segment.GetNextTrackEnd();
+            }
+            
             evaluatedBrakeLoad = GetBrakeLoad();
             brakeSound.setParameterByName("BrakeLoad", evaluatedBrakeLoad);
         }

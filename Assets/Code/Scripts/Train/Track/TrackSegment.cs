@@ -24,22 +24,19 @@ namespace FR8Runtime.Train.Track
 
         [Space]
         [SerializeField] private int resolution = 100;
+
         [SerializeField] private bool closedLoop;
         [SerializeField] private bool conformToTerrain = true;
 
-        [Space]
-        [SerializeField] private bool initialConnectionState;
-        
         // --- Internal Fields ---
-        private Connection startConnection = new();
-        private Connection endConnection = new();
+        [SerializeField] private Connection startConnection = new();
+        [SerializeField] private Connection endConnection = new();
 
         private Transform knotContainer;
 
         private float totalLength;
         private List<Vector3> points;
         private List<Vector3> velocities;
-        private List<TrackSegment> segmentsConnectedToThis = new();
         private List<UnityEngine.Terrain> terrainList;
 
         // --- Properties ---
@@ -47,42 +44,25 @@ namespace FR8Runtime.Train.Track
         public Connection EndConnection => endConnection;
         public int Resolution => resolution;
         public int Count => KnotContainer().childCount;
-        
+
         private void Awake()
         {
             BakeData();
-            LookForConnections();
         }
 
         private void Start()
         {
-            if (startConnection)
+            LookForConnections();
+
+            if (endConnection.connections.Count > 1)
             {
-                startConnection.connectionActive = initialConnectionState;
                 junctionPrefab.SpawnFromPrefab(this, this[0]);
             }
 
-            if (endConnection)
+            if (endConnection.connections.Count > 1)
             {
-                endConnection.connectionActive = initialConnectionState;
                 junctionPrefab.SpawnFromPrefab(this, this[FromEnd(1)]);
             }
-        }
-
-        private void OnEnable()
-        {
-            TrackBake.Add(this);
-            
-            if (startConnection) startConnection.segment.segmentsConnectedToThis.Add(this);
-            if (endConnection) endConnection.segment.segmentsConnectedToThis.Add(this);
-        }
-
-        private void OnDisable()
-        {
-            TrackBake.Remove(this);
-            
-            if (startConnection) startConnection.segment.segmentsConnectedToThis.Remove(this);
-            if (endConnection) endConnection.segment.segmentsConnectedToThis.Remove(this);
         }
 
         private void OnDrawGizmosSelected()
@@ -152,7 +132,7 @@ namespace FR8Runtime.Train.Track
             // Bakes down the track segment to a list of line segments and their corresponding velocities.
             points = new List<Vector3>();
             velocities = new List<Vector3>();
-            
+
             for (var i = 0; i < resolution; i++)
             {
                 var p = i / (resolution - 1.0f);
@@ -161,104 +141,6 @@ namespace FR8Runtime.Train.Track
             }
 
             terrainList = new List<UnityEngine.Terrain>(FindObjectsOfType<UnityEngine.Terrain>());
-        }
-
-        // Called externally by the train carriage
-        public TrackSegment CheckForJunctions(Vector3 position, float positionOnSpline, float lastPositionOnSpline, TrackSegment segment)
-        {
-            foreach (var other in segmentsConnectedToThis)
-            {
-                segment = other.CheckForJunctions(ConnectionType.Start, position, positionOnSpline, lastPositionOnSpline, segment);
-                segment = other.CheckForJunctions(ConnectionType.End, position, positionOnSpline, lastPositionOnSpline, segment);
-            }
-            return segment;
-        }
-
-        // Is called on all track segments that the train COULD jump to.
-        private TrackSegment CheckForJunctions(ConnectionType type, Vector3 position, float positionOnSpline, float lastPositionOnSpline, TrackSegment segment)
-        {
-            var connection = type switch
-            {
-                ConnectionType.Start => startConnection,
-                ConnectionType.End => endConnection,
-                _ => throw new ArgumentOutOfRangeException()
-            };
-
-            if (!connection) return segment;
-
-            var other = connection.segment;
-            if (connection.connectionActive)
-            {
-                if (segment != other) return segment;
-
-                return TryExplicitJump(other, connection, positionOnSpline, lastPositionOnSpline, segment);
-            }
-
-            if (segment != this) return segment;
-            return TryImplicitJump(type, position, segment, connection);
-        }
-
-        // See if the train is in the position to do an implicit jump, and if so perform it.
-        // An implicit jump is when a train changes tracks without any input, eg. a track merging into another track.
-        private TrackSegment TryImplicitJump(ConnectionType type, Vector3 position, TrackSegment segment, Connection connection)
-        {
-            // Recalculate position on THIS spline.
-            var p = GetClosestPoint(position, false);
-            switch (type)
-            {
-                case ConnectionType.Start:
-                {
-                    if (p < 0.0f)
-                    {
-                        Debug.Log($"Performed Implicit Jump to: {connection.segment}");
-                        return connection.segment;
-                    }
-
-                    break;
-                }
-                case ConnectionType.End:
-                {
-                    if (p > 1.0f)
-                    {
-                        Debug.Log($"Performed Implicit Jump to: {connection.segment}");
-                        return connection.segment;
-                    }
-
-                    break;
-                }
-                default: throw new ArgumentOutOfRangeException(nameof(type), type, null);
-            }
-            return segment;
-        }
-
-        // See if the train is in the position to do an explicit jump, and if so perform it.
-        // An explicit jump is when a train changes tracks through a junction.
-        private TrackSegment TryExplicitJump(TrackSegment other, Connection connection, float positionOnSpline, float lastPositionOnSpline, TrackSegment segment)
-        {
-            float difference(float p0, float p1, bool loop)
-            {
-                var diff = p0 - p1;
-                if (!loop) return diff;
-
-                if (diff > 0.5f) diff -= 1.0f;
-                if (diff < -0.5f) diff += 1.0f;
-                return diff;
-            }
-
-            var knotPercent = connection.t;
-
-            var lastSign = difference(lastPositionOnSpline, knotPercent, other.closedLoop) > 0.0f;
-            var d0 = difference(positionOnSpline, knotPercent, other.closedLoop);
-            var sign = d0 > 0.0f;
-            var switchSign = connection.direction > 0.0f;
-            
-            if (sign == switchSign && lastSign != switchSign)
-            {
-                Debug.Log($"Performed Explicit Jump to: {connection.segment}");
-                return this;
-            }
-
-            return segment;
         }
 
         public Vector3 KnotVelocity(int index) => SampleVelocity(GetKnotPercent(index));
@@ -292,7 +174,7 @@ namespace FR8Runtime.Train.Track
                 {
                     i0 = 0;
                     i1 = 1;
-                }   
+                }
             }
 
             var a = bakeData[i0];
@@ -300,7 +182,7 @@ namespace FR8Runtime.Train.Track
 
             return lerp(a, b, (t1 - i0) / (i1 - i0));
         }
-        
+
         private static T SampleSpline<T>(float t, Func<Spline, float, T> callback, Func<int, (Vector3, Vector3)> list, int count)
         {
             t = Mathf.Clamp01(t);
@@ -326,19 +208,15 @@ namespace FR8Runtime.Train.Track
         {
             return conformToTerrain ? TerrainUtility.GetPointOnTerrain(terrainList, point) : point;
         }
-        
+
         public void OnValidate()
         {
             if (!Valid(this)) return;
 
             BakeData();
-            LookForConnections();
 
             var childCount = KnotContainer().childCount;
-
             resolution = Mathf.Max(resolution, childCount);
-            startConnection.OnValidate();
-            endConnection.OnValidate();
         }
 
         public float GetClosestPoint(Vector3 point, bool clamp)
@@ -350,7 +228,7 @@ namespace FR8Runtime.Train.Track
             var t = InterpolatePoints(point, best, other);
 
             if (clamp && !closedLoop) t = Mathf.Clamp01(t);
-            
+
             return t;
         }
 
@@ -402,61 +280,70 @@ namespace FR8Runtime.Train.Track
             return i;
         }
 
-        public bool ConnectedTo(TrackSegment other)
-        {
-            if (startConnection.segment == other) return true;
-            if (endConnection.segment == other) return true;
-
-            return false;
-        }
-
         public void LookForConnections()
         {
             if (!Valid(this)) return;
             
-            // Fina all segments in the scene.
             var segments = FindObjectsOfType<TrackSegment>();
 
-            var container = KnotContainer();
-            var childCount = container.childCount;
-
             // Update start and end
-            updateEnd(0, 1, startConnection);
-            updateEnd(childCount - 1, childCount - 2, endConnection);
+            CheckConnectionEnd(segments, startConnection, 0);
+            CheckConnectionEnd(segments, endConnection, 1);
+        }
 
-            void updateEnd(int i, int p, Connection connection)
+        private void CheckConnectionEnd(IEnumerable<TrackSegment> segments, Connection connection, int end)
+        {
+            var direction = end == 1 ? 1.0f : -1.0f;
+            var position = SamplePoint(end);
+            var normal = (SampleVelocity(end) * direction).normalized;
+            
+            foreach (var other in segments)
             {
-                connection.segment = null;
+                if (!Valid(other)) continue;
+                if (other == this) continue;
 
-                var knot = container.GetChild(i);
-                var d0 = knot.position - container.GetChild(p).position;
-
-                foreach (var s in segments)
+                if (CheckConnectionEnd(position, normal, other, 0) || CheckConnectionEnd(position, normal, other, 1))
                 {
-                    if (!Valid(s)) continue;
-                    if (s == this) continue;
-
-                    var t = s.GetClosestPoint(knot.position, true);
-                    var closestPoint = s.SamplePoint(t);
-                    if ((knot.position - closestPoint).sqrMagnitude > ConnectionDistance * ConnectionDistance) continue;
-
-                    connection.segment = s;
-                    connection.t = t;
-
-                    var d1 = s.SampleVelocity(t);
-                    connection.direction = -(int)Mathf.Sign(Vector3.Dot(d0, d1));
-
-                    knot.position = closestPoint;
-
-                    var tangent = s.SampleTangent(t);
-                    if (Vector3.Dot(tangent, knot.forward) < 0.0f) tangent *= -1.0f;
-                    knot.rotation = Quaternion.LookRotation(tangent, Vector3.up);
-
-                    break;
+                    if (!connection.connections.Contains(other))
+                    {
+                        connection.connections.Add(other);
+                    }
                 }
             }
         }
 
+        private bool CheckConnectionEnd(Vector3 position, Vector3 normal, TrackSegment other, int end)
+        {
+            var direction = end == 1 ? 1.0f : -1.0f;
+            var otherPosition = other.SamplePoint(end);
+            var otherNormal = (other.SampleVelocity(end) * direction).normalized;
+            
+            if ((position - otherPosition).magnitude > ConnectionDistance) return false;
+
+            var dot = Vector3.Dot(normal, otherNormal);
+            return dot < 0.0f;
+        }
+
+        public bool IsOffStartOfTrack(Vector3 position)
+        {
+            var point = SamplePoint(0.0f);
+            var normal = SampleVelocity(0.0f);
+
+            return Vector3.Dot(position - point, normal) < 0.0f;
+        }
+
+        public TrackSegment GetNextTrackStart() => startConnection.ActiveSegment;
+        
+        public bool IsOffEndOfTrack(Vector3 position)
+        {
+            var point = SamplePoint(1.0f);
+            var normal = SampleVelocity(1.0f);
+
+            return Vector3.Dot(position - point, normal) > 0.0f;
+        }
+
+        public TrackSegment GetNextTrackEnd() => endConnection.ActiveSegment;
+        
         public Transform KnotContainer()
         {
             if (!knotContainer) knotContainer = transform.Find("Knots");
@@ -481,30 +368,26 @@ namespace FR8Runtime.Train.Track
                 knot.name = $"Knot.{knot.GetSiblingIndex() + 1}";
             }
         }
-
+        
         [Serializable]
         public class Connection
         {
-            public const int AdditionalKnotsPerConnection = 3;
+            public List<TrackSegment> connections = new();
+            public int activeIndex;
 
-            public TrackSegment segment;
-            public float t;
-            public int direction;
-            public bool connectionActive;
-
-            public Vector3 Knot0 => segment.SamplePoint(t) - segment.SampleVelocity(t) * direction / 3.0f;
-            public Vector3 Knot1 => segment.SamplePoint(t);
-            public Vector3 Knot2 => segment.SamplePoint(t) + segment.SampleVelocity(t) * direction / 3.0f;
-
-            public void OnValidate() { }
-
-            public static implicit operator bool(Connection connection) => connection.segment;
+            public TrackSegment ActiveSegment => activeIndex >= 0 && activeIndex < connections.Count ? connections[activeIndex] : null;
         }
 
-        private enum ConnectionType
+        public struct TrackSample
         {
-            Start,
-            End,
+            public Vector3 position;
+            public Vector3 normal;
+
+            public TrackSample Lerp(TrackSample a, TrackSample b, float t) => new()
+            {
+                position = Vector3.Lerp(a.position, b.position, t),
+                normal = Vector3.Lerp(a.normal, b.normal, t).normalized,
+            };
         }
 
         public void AddKnot()
