@@ -115,8 +115,8 @@ namespace FR8Runtime.Train
             FindConnectedCarriages(ConnectedCarriages);
             
             LastPositionOnSpline = PositionOnSpline;
-            PositionOnSpline = segment.GetClosestPoint(HardAnchorPosition);
-            softAnchorPositionOnSpline = segment.GetClosestPoint(SoftAnchorPosition);
+            PositionOnSpline = segment.GetClosestPoint(HardAnchorPosition, true);
+            softAnchorPositionOnSpline = segment.GetClosestPoint(SoftAnchorPosition, true);
 
             ApplyDrag();
             ApplyHandbrake();
@@ -124,7 +124,7 @@ namespace FR8Runtime.Train
 
             Stationary = IsStationary();
 
-            if (segment) segment.UpdateConnection(this);
+            if (segment) segment = segment.CheckForJunctions(transform.position, PositionOnSpline, LastPositionOnSpline, segment);
 
         }
 

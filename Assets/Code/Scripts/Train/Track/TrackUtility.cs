@@ -13,7 +13,7 @@ namespace FR8Runtime.Train.Track
             var segments = Object.FindObjectsOfType<TrackSegment>();
             foreach (var segment in segments)
             {
-                var t = Mathf.Clamp01(segment.GetClosestPoint(position));
+                var t = Mathf.Clamp01(segment.GetClosestPoint(position, true));
                 
                 var closestPoint = segment.SamplePoint(t);
                 var score = (closestPoint - position).sqrMagnitude;
