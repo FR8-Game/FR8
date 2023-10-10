@@ -3,6 +3,7 @@ using FMODUnity;
 using FR8Runtime.CodeUtility;
 using FR8Runtime.Interactions.Drivables;
 using FR8Runtime.Interactions.Drivers.Submodules;
+using FR8Runtime.References;
 using UnityEngine;
 
 namespace FR8Runtime.Interactions.Drivers
@@ -12,10 +13,6 @@ namespace FR8Runtime.Interactions.Drivers
     {
         [SerializeField] private bool testValue;
         [SerializeField] private TwoPoseDrivableAnimator animator;
-        
-        [Space]
-        [SerializeField] private EventReference openSound;
-        [SerializeField] private EventReference closeSound;
 
         public string Key => string.Empty;
         public virtual bool CanInteract => true;
@@ -35,7 +32,7 @@ namespace FR8Runtime.Interactions.Drivers
 
         public void OnValueChanged(float newValue)
         {
-            SoundUtility.PlayOneShot(Open ? openSound : closeSound, gameObject);
+            SoundUtility.PlayOneShot(Open ? SoundReference.DoorOpen : SoundReference.DoorClosed, gameObject);
         }
 
         protected virtual void SetValue(float newValue)

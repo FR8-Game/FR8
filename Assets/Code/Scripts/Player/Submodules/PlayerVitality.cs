@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using FMOD.Studio;
 using FMODUnity;
 using FR8Runtime.CodeUtility;
+using FR8Runtime.References;
 using FR8Runtime.UI;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -31,6 +33,8 @@ namespace FR8Runtime.Player.Submodules
         private IVitalityBooster vitalityBooster;
         private float shieldRegenBuffer;
 
+        private EventInstance shield;
+
         public int CurrentHealth => currentHealth;
         public float CurrentShields => currentShields;
         public bool IsAlive { get; private set; }
@@ -55,6 +59,8 @@ namespace FR8Runtime.Player.Submodules
 
             LastDamageTime = float.MinValue;
             Revive();
+            
+            shield = SoundReference.PlayerShields.InstanceAndStart();
         }
 
         public void FixedUpdate()
@@ -62,7 +68,9 @@ namespace FR8Runtime.Player.Submodules
             GetExposed();
 
             var exposed = !(Object)vitalityBooster;
-            SoundUtility.PlayOnChange(Exposed, exposed, shieldBreakSound, shieldRegenSound);
+            shield.set3DAttributes(avatar.gameObject.To3DAttributes());
+            shield.setParameterByName("ShieldPercent", currentShields / shieldDuration);
+            shield.setParameterByName("Exposed", exposed ? 1 : 0);
             
             Exposed = exposed;
             if (Exposed)
@@ -140,7 +148,7 @@ namespace FR8Runtime.Player.Submodules
             DamageEvent?.Invoke(damageInstance);
             HealthChangeEvent?.Invoke();
             
-            SoundUtility.PlayOneShot(damageSound, avatar.gameObject);
+            SoundReference.PlayerDamage.PlayOneShot(avatar.gameObject);
 
             if (currentHealth == 0)
             {

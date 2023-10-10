@@ -2,6 +2,7 @@ using FMOD.Studio;
 using FMODUnity;
 using FR8Runtime.Interactions.Drivers;
 using FR8Runtime.Level;
+using FR8Runtime.References;
 using UnityEngine;
 
 namespace FR8Runtime.Train.Electrics
@@ -12,9 +13,6 @@ namespace FR8Runtime.Train.Electrics
         [SerializeField] private float powerDrawWatts = 40.0f;
         [SerializeField] private float threshold = 0.5f;
         
-        [Space]
-        [SerializeField] private EventReference lightHumSound;
-
         private EventInstance soundInstance;
         private DriverNetwork driverNetwork;
 
@@ -26,7 +24,7 @@ namespace FR8Runtime.Train.Electrics
         {
             base.Awake();
             
-            soundInstance = RuntimeManager.CreateInstance(lightHumSound);
+            soundInstance = SoundReference.LightHum.Instance();
             driverNetwork = GetComponentInParent<DriverNetwork>();
         }
 

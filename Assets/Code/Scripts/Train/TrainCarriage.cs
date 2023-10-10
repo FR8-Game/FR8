@@ -1,7 +1,10 @@
 using System.Collections.Generic;
 using System.Text;
+using FMOD.Studio;
 using FR8Runtime.Interactions.Drivers;
+using FR8Runtime.References;
 using FR8Runtime.Train.Track;
+using Unity.Collections;
 using UnityEngine;
 
 namespace FR8Runtime.Train
@@ -37,11 +40,16 @@ namespace FR8Runtime.Train
         [SerializeField] protected float retentionTorqueConstant = 0.2f;
 
         [SerializeField] protected float trainLength = 20.0f;
+        
+        [Space]
+        [ReadOnly][SerializeField] private float evaluatedBrakeLoad;
 
         protected TrackSegment segment;
         private List<CarriageConnector> carriageConnectors;
 
         private float softAnchorPositionOnSpline;
+        private EventInstance brakeSound;
+        private float handbrakeLoad;
 
         public TrackSegment Segment
         {
@@ -71,6 +79,8 @@ namespace FR8Runtime.Train
         private void Awake()
         {
             Configure();
+
+            brakeSound = SoundReference.TrainBrake.InstanceAndStart();
 
             carriageConnectors = new List<CarriageConnector>(GetComponentsInChildren<CarriageConnector>());
             DriverNetwork = GetComponent<DriverNetwork>();
@@ -126,6 +136,8 @@ namespace FR8Runtime.Train
 
             if (segment) segment = segment.CheckForJunctions(transform.position, PositionOnSpline, LastPositionOnSpline, segment);
 
+            evaluatedBrakeLoad = GetBrakeLoad();
+            brakeSound.setParameterByName("BrakeLoad", evaluatedBrakeLoad);
         }
 
         private bool IsStationary()
@@ -156,8 +168,12 @@ namespace FR8Runtime.Train
             var speed = GetForwardSpeed();
             var force = DriverDirection * -speed * Mathf.Clamp01(GetHandbrakeConstant() * DriverNetwork.GetValue(HandbrakeKey)) * handbrakeConstant;
 
+            handbrakeLoad = Mathf.Abs(Vector3.Dot(DriverDirection, force));
+            
             Body.AddForce(force * referenceWeight);
         }
+        
+        protected virtual float GetBrakeLoad() => handbrakeLoad;
 
         public float GetHandbrakeConstant()
         {

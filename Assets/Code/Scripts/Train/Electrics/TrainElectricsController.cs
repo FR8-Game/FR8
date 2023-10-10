@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FMODUnity;
 using FR8Runtime.CodeUtility;
 using FR8Runtime.Interactions.Drivers;
+using FR8Runtime.References;
 using UnityEngine;
 
 namespace FR8Runtime.Train.Electrics
@@ -74,7 +75,7 @@ namespace FR8Runtime.Train.Electrics
                 clockSpeed = 0.0f;
                 SetConnected(false);
                 FuseBlown?.Invoke();
-                SoundUtility.PlayOneShot(fuseBlownSound, gameObject);
+                SoundReference.BlownFuse.PlayOneShot();
             }
 
             foreach (var e in generators) e.SetClockSpeed(clockSpeed);

@@ -47,7 +47,7 @@ namespace FR8Runtime.Train.Track
         public Connection EndConnection => endConnection;
         public int Resolution => resolution;
         public int Count => KnotContainer().childCount;
-
+        
         private void Awake()
         {
             BakeData();
@@ -71,12 +71,16 @@ namespace FR8Runtime.Train.Track
 
         private void OnEnable()
         {
+            TrackBake.Add(this);
+            
             if (startConnection) startConnection.segment.segmentsConnectedToThis.Add(this);
             if (endConnection) endConnection.segment.segmentsConnectedToThis.Add(this);
         }
 
         private void OnDisable()
         {
+            TrackBake.Remove(this);
+            
             if (startConnection) startConnection.segment.segmentsConnectedToThis.Remove(this);
             if (endConnection) endConnection.segment.segmentsConnectedToThis.Remove(this);
         }
@@ -408,6 +412,8 @@ namespace FR8Runtime.Train.Track
 
         public void LookForConnections()
         {
+            if (!Valid(this)) return;
+            
             // Fina all segments in the scene.
             var segments = FindObjectsOfType<TrackSegment>();
 
