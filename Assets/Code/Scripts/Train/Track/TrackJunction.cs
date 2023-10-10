@@ -16,7 +16,7 @@ namespace FR8Runtime.Train.Track
         
         [Space]
         [SerializeField] private ConnectionEnd connectionEnd;
-
+        
         private bool state;
 
         public bool CanInteract => true;

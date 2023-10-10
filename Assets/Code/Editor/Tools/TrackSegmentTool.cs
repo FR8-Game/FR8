@@ -87,7 +87,7 @@ namespace FR8Editor.Tools
                     {
                         if (s == trackSegment) continue;
 
-                        var t = s.GetClosestPoint(knot.position);
+                        var t = s.GetClosestPoint(knot.position, true);
                         var closest = s.SamplePoint(t);
                         if ((knot.position - closest).sqrMagnitude > TrackSegment.ConnectionDistance * TrackSegment.ConnectionDistance) continue;
 
@@ -265,7 +265,7 @@ namespace FR8Editor.Tools
             }
 
 
-            if (dirty) trackSegment.OnKnotsChanged();
+            if (dirty) trackSegment.LookForConnections();
         }
 
         private delegate bool ModifyKnotCallback(int i, Transform knot);
