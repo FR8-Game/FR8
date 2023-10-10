@@ -120,17 +120,27 @@ namespace FR8Runtime.Player.Submodules
             ConfigureCollider();
 
             avatar.getCenter = () => collider.transform.TransformPoint(collider.center);
-
+            avatar.MountChangedEvent += OnMountChanged;
 
             var camera = Camera.main;
             transform.position = camera.transform.position - cameraOffset;
             transform.rotation = Quaternion.Euler(0.0f, camera.transform.eulerAngles.y, 0.0f);
         }
 
+
         private void OnDisable()
         {
             avatar.Body.isKinematic = true;
+            avatar.MountChangedEvent -= OnMountChanged;
             Destroy(collider);
+        }
+
+        private void OnMountChanged(PlayerMount newMount)
+        {
+            if (!newMount && avatar.CurrentMount)
+            {
+                avatar.Body.position = avatar.CurrentMount.DismountPosition;
+            }
         }
 
         private void ConfigureRigidbody()
@@ -194,6 +204,23 @@ namespace FR8Runtime.Player.Submodules
 
         private void FixedUpdate()
         {
+            if (avatar.CurrentMount)
+            {
+                avatar.Body.position = avatar.CurrentMount.Position;
+                avatar.Body.rotation = avatar.CurrentMount.Rotation;
+                avatar.Body.velocity = avatar.CurrentMount.Velocity;
+                avatar.Body.detectCollisions = false;
+
+                if (avatar.input.Crouch)
+                {
+                    avatar.SetMount(null);
+                }
+
+                return;
+            }
+
+            avatar.Body.detectCollisions = true;
+
             if (LookForLadder()) return;
 
             Crouch();
@@ -210,6 +237,12 @@ namespace FR8Runtime.Player.Submodules
 
         private void ConstrainTransform()
         {
+            if (avatar.CurrentMount)
+            {
+                avatar.Head.rotation = avatar.CurrentMount.ConstrainRotation(avatar.Head.rotation);
+                return;
+            }
+
             var rotation = avatar.Head.rotation;
             transform.rotation = Quaternion.Euler(0.0f, rotation.eulerAngles.y, 0.0f);
             avatar.Head.rotation = rotation;

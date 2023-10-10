@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using FR8Runtime.Interactions.Drivers.Submodules;
 using FR8Runtime.Player;
 using UnityEngine;
@@ -34,6 +35,7 @@ namespace FR8Runtime.Pickups
 
         public bool OverrideInteractDistance => false;
         public float InteractDistance => throw new System.NotImplementedException();
+        public IEnumerable<Renderer> Visuals { get; private set; }
 
         public void Nudge(int direction) { }
 
@@ -74,6 +76,7 @@ namespace FR8Runtime.Pickups
         protected virtual void Awake()
         {
             Rigidbody = GetComponent<Rigidbody>();
+            Visuals = GetComponentsInChildren<Renderer>();
             Rigidbody.gameObject.layer = PickupLayer;
 
             transform.SetParent(null);

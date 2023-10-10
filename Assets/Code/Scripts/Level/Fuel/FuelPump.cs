@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using FR8Runtime.Interactions.Drivers.Submodules;
 using UnityEngine;
 
@@ -24,6 +25,7 @@ namespace FR8Runtime.Level.Fuel
         {
             lines = GetComponentInChildren<LineRenderer>();
             handle = GetComponentInChildren<FuelPumpHandle>();
+            Visuals = GetComponentsInChildren<Renderer>();
             handle.Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
 
             rope = new CodeUtility.Rope();
@@ -118,6 +120,7 @@ namespace FR8Runtime.Level.Fuel
         public string DisplayValue => "Rotate";
         public bool OverrideInteractDistance => false;
         public float InteractDistance => throw new NotImplementedException();
+        public IEnumerable<Renderer> Visuals { get; private set; }
 
         public void Nudge(int direction)
         {
