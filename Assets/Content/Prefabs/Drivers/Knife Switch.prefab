@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1405971581292269082}
+  - component: {fileID: 2584190912155483421}
   m_Layer: 0
   m_Name: Knife Switch
   m_TagString: Untagged
@@ -32,6 +33,56 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!114 &2584190912155483421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4544524209986317411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39bd86096eec427ab1095ca10a9fa1b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultValue: 0
+  testValue: 0
+  animator:
+    handle: {fileID: 0}
+    valueRange: {x: 0, y: 1}
+    animationSpring:
+      springConstant: 350
+      dampingConstant: 25
+      clamped: 1
+      range: {x: 0, y: 1}
+      bounce: 0.4
+      currentPosition: 0
+      targetPosition: 0
+      velocity: 0
+    animatePosition: 0
+    slidePoseAPosition: {x: 0, y: 0, z: 0}
+    slidePoseBPosition: {x: 0, y: 0, z: 0}
+    animateRotation: 0
+    slidePoseARotation: {x: 0, y: 0, z: 0}
+    slidePoseBRotation: {x: 0, y: 0, z: 0}
+  indicator:
+    handle: {fileID: 738718053148958015}
+    valueRange: {x: 0, y: 1}
+    animationSpring:
+      springConstant: 350
+      dampingConstant: 25
+      clamped: 1
+      range: {x: 0, y: 1}
+      bounce: 0.4
+      currentPosition: 0
+      targetPosition: 0
+      velocity: 0
+    animatePosition: 0
+    slidePoseAPosition: {x: 0, y: 0, z: 0}
+    slidePoseBPosition: {x: 0, y: 0, z: 0}
+    animateRotation: 1
+    slidePoseARotation: {x: 0, y: 0, z: 0}
+    slidePoseBRotation: {x: 180, y: 0, z: 0}
 --- !u!1001 &3046003864768426325
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -42,6 +93,18 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 0e115b05853c10244a1d1a2fa05091f3, type: 3}
       propertyPath: m_RootOrder
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 0e115b05853c10244a1d1a2fa05091f3, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 0e115b05853c10244a1d1a2fa05091f3, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 0e115b05853c10244a1d1a2fa05091f3, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 0e115b05853c10244a1d1a2fa05091f3, type: 3}
       propertyPath: m_LocalPosition.x
@@ -83,6 +146,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 0e115b05853c10244a1d1a2fa05091f3, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 0e115b05853c10244a1d1a2fa05091f3, type: 3}
       propertyPath: m_Name
       value: Knife Switch
@@ -91,8 +158,17 @@ PrefabInstance:
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2307496982545017962, guid: 0e115b05853c10244a1d1a2fa05091f3, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0e115b05853c10244a1d1a2fa05091f3, type: 3}
+--- !u!4 &738718053148958015 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2307496982545017962, guid: 0e115b05853c10244a1d1a2fa05091f3, type: 3}
+  m_PrefabInstance: {fileID: 3046003864768426325}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2775622209231653892 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 0e115b05853c10244a1d1a2fa05091f3, type: 3}

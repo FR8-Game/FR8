@@ -17,6 +17,8 @@ namespace FR8Runtime.Train
         [Space]
         [Header("Testing")]
         [SerializeField] private float initialVelocity;
+        
+        private float brakeLoad;
 
         private const string BrakeKey = "Brake";
         private const string GearKey = "Gear";
@@ -62,6 +64,7 @@ namespace FR8Runtime.Train
             var fwdSpeed = GetForwardSpeed();
 
             var force = brakeConstant * Brake * -fwdSpeed;
+            brakeLoad = force;
 
             var velocityChange = force * referenceWeight / Body.mass * Time.deltaTime;
             if (Mathf.Abs(velocityChange) > Mathf.Abs(fwdSpeed)) velocityChange = -fwdSpeed;
@@ -74,5 +77,7 @@ namespace FR8Runtime.Train
             var fwdSpeed = Mathf.Abs(ToKmpH(GetForwardSpeed()));
             DriverNetwork.SetValue(SpeedometerKey, fwdSpeed);
         }
+
+        protected override float GetBrakeLoad() => Mathf.Max(base.GetBrakeLoad(), brakeLoad);
     }
 }

@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
+using FMODUnity;
+using FR8Runtime.CodeUtility;
 using FR8Runtime.Interactions.Drivables;
 using FR8Runtime.Interactions.Drivers.Submodules;
+using FR8Runtime.References;
 using UnityEngine;
 
 namespace FR8Runtime.Interactions.Drivers
@@ -27,7 +30,10 @@ namespace FR8Runtime.Interactions.Drivers
             Visuals = GetComponentsInChildren<Renderer>();
         }
 
-        public void OnValueChanged(float newValue) { }
+        public void OnValueChanged(float newValue)
+        {
+            SoundUtility.PlayOneShot(Open ? SoundReference.DoorOpen : SoundReference.DoorClosed, gameObject);
+        }
 
         protected virtual void SetValue(float newValue)
         {

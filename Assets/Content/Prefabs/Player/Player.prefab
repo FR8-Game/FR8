@@ -132,7 +132,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6683561945710446942}
   - component: {fileID: 568072915241985606}
-  m_Layer: 7
+  m_Layer: 5
   m_Name: HUD Quad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -334,14 +334,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5823797194895132387}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: -0, y: -0.011298984, z: -0, w: 0.9999362}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6066431375291976692}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -1.295, z: 0}
 --- !u!114 &7599972378657822286
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -431,12 +431,34 @@ MonoBehaviour:
       sinAmplitude: {x: 0.06, y: 0, z: 0}
       frequency: 1.8
       slope: 0.2
+    cameraSmoothing: 0
   vitality:
     maxHealth: 100
     shieldDuration: 15
     shieldRegenRate: 1
     exposureDamageInstance:
       amount: 18
+    shieldBreakSound:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+    shieldRegenSound:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+    damageSound:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
     exposureDamageFrequency: 0.5
   ui:
     healthVignetteCurve:
@@ -5548,7 +5570,7 @@ GameObject:
   - component: {fileID: 4230308369897707433}
   - component: {fileID: 2222988163713770808}
   - component: {fileID: 7832292491560048294}
-  m_Layer: 7
+  m_Layer: 5
   m_Name: Quad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
