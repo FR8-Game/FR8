@@ -1,5 +1,6 @@
 using FMODUnity;
 using FR8Runtime.CodeUtility;
+using FR8Runtime.References;
 using UnityEngine;
 
 namespace FR8Runtime.Interactions.Drivers.Submodules
@@ -7,8 +8,6 @@ namespace FR8Runtime.Interactions.Drivers.Submodules
     [System.Serializable]
     public sealed class DriverSounds
     {
-        [SerializeField] private EventReference clickReference;
-        
         private GameObject gameObject;
         private float lastValue;
 
@@ -24,7 +23,7 @@ namespace FR8Runtime.Interactions.Drivers.Submodules
 
             if (index != lastIndex)
             {
-                SoundUtility.PlayOneShot(clickReference);
+                SoundUtility.PlayOneShot(SoundReference.LeverClick);
             }
 
             lastValue = newValue;

@@ -154,7 +154,8 @@ namespace FR8Runtime.Contracts
         public void UpdateEnds()
         {
             GetTrackIfMissing();
-
+            if (!track) return;
+            
             SectionStart = track.GetClosestPoint(StartPosition, true);
             SectionEnd = track.GetClosestPoint(EndPosition, true);
         }
