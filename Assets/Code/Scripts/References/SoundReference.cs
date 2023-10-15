@@ -18,8 +18,8 @@ namespace FR8Runtime.References
         public static readonly SoundReference PlayerShields = "{ff7980fc-84df-4dba-abf9-02f4c6bf9ed9}";
         public static readonly SoundReference PlayerDamage = "{04cad4ab-9907-4dab-b0f6-dcfde0d0b06c}";
         public static readonly SoundReference Engine = "{c793dcfe-3f65-46f2-80ae-83cee0b242b3}";
-        public static readonly SoundReference TitleMusic = "";
-        public static readonly SoundReference Ambiance = "";
+        public static readonly SoundReference TitleMusic = "{9a601097-2e7b-4124-9c81-224c45cb4e1c}";
+        public static readonly SoundReference Ambiance = "{fbcafde3-4539-43e2-822e-b75ec64c52f6}";
         public static readonly SoundReference Stereo = "";
         public static readonly SoundReference Radio = "";
         public static readonly SoundReference TrainBrake = "";
