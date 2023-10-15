@@ -1,22 +1,21 @@
 using System;
-using FR8Runtime.Contracts;
 using FR8Runtime.Train.Track;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
 
 namespace FR8Runtime.Testing
 {
+    [RequireComponent(typeof(Rigidbody))]
     public class TestingKart : MonoBehaviour
     {
         [SerializeField] private float speed;
         [SerializeField] private bool reset;
 
-        private TrackSegment segment;
         private Rigidbody body;
+        private TrackRunner runner;
 
-        private float positionOnSpline;
-        private float lastPositionOnSpline;
         private Vector3 startPosition;
+        private Vector3 splinePoint;
+        private Vector3 splineVelocity;
 
         private void Awake()
         {
@@ -25,31 +24,20 @@ namespace FR8Runtime.Testing
 
             startPosition = transform.position;
 
-            float t;
-            (segment, t) = TrackUtility.FindClosestSegment(transform.position);
-            body.position = segment.SamplePoint(t);
+            runner = new TrackRunner(transform.position);
         }
 
         private void FixedUpdate()
         {
-            segment = segment.CheckForJunctions(transform.position, positionOnSpline, lastPositionOnSpline, segment);
-            
-            lastPositionOnSpline = positionOnSpline;
-            positionOnSpline = segment.GetClosestPoint(transform.position, true);
-
+            runner.FixedUpdate(body.position);
             ApplyConstraintForce();
             ApplyDriveForce();
 
             if (reset)
             {
                 reset = false;
-                
                 transform.position = startPosition;
-                speed = 0.0f;
-
-                float t;
-                (segment, t) = TrackUtility.FindClosestSegment(transform.position);
-                body.position = segment.SamplePoint(t);
+                runner = new TrackRunner(transform.position);
             }
         }
 
@@ -62,15 +50,23 @@ namespace FR8Runtime.Testing
 
         private void ApplyConstraintForce()
         {
-            var point = segment.SamplePoint(positionOnSpline);
-            var tangent = segment.SampleTangent(positionOnSpline);
+            splinePoint = runner.Position;
+            splineVelocity = runner.Direction;
 
-            var force = (point - body.position) / Time.deltaTime;
+            var force = (splinePoint - body.position) / Time.deltaTime;
             force -= body.velocity;
-            force -= tangent * Vector3.Dot(tangent, force);
+            force -= splineVelocity * Vector3.Dot(splineVelocity, force);
             
             body.AddForce(force, ForceMode.VelocityChange);
-            transform.rotation = Quaternion.LookRotation(tangent, Vector3.up);
+            transform.rotation = Quaternion.LookRotation(splineVelocity, Vector3.up);
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(transform.position, splinePoint);
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawRay(transform.position, splineVelocity);
         }
     }
 }

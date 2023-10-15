@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Text;
 using FR8Runtime.CodeUtility;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace FR8Runtime.Contracts.Predicates
 {
