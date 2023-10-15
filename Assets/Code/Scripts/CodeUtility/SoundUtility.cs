@@ -4,41 +4,34 @@ using FMOD.Studio;
 using FMODUnity;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using Object = UnityEngine.Object;
 
 namespace FR8Runtime.CodeUtility
 {
     public static class SoundUtility
     {
-        public static bool logErrors = false;
+        public static bool log = false;
 
-        private static EventReference reference;
         private static GameObject emitter;
 
-        public static void PlayOneShot(EventReference reference)
+        public static void PlayOneShot(string guid)
         {
-            PlayOneShot(reference, _ => { });
+            PlayOneShot(guid, _ => { });
         }
 
-        public static void PlayOneShot(EventReference reference, GameObject emitter)
+        private static void PlayOneShot(string guid, Action<EventInstance> callback)
         {
-            SoundUtility.emitter = emitter;
-            PlayOneShot(reference, sound => sound.set3DAttributes(emitter.To3DAttributes()));
-        }
-        
-        private static void PlayOneShot(EventReference reference, Action<EventInstance> callback)
-        {
-            SoundUtility.reference = reference;
-            
-            if (reference.IsNull || reference.Guid == new GUID())
+            if (string.IsNullOrWhiteSpace(guid))
             {
-                LogGeneric("could not be found!");
+                LogGeneric("Null", "could not be found!", Debug.LogError);
                 return;
             }
             
+            var reference = FromGuid(guid);
             var sound = RuntimeManager.CreateInstance(reference);
             if (!sound.isValid())
             {
-                LogGeneric("is not valid!");
+                LogGeneric(guid, "is not valid!", Debug.LogError);
                 return;
             }
 
@@ -46,13 +39,33 @@ namespace FR8Runtime.CodeUtility
             sound.start();
             sound.release();
         }
+        
+        private static EventReference FromGuid(string guid) => new() { Guid = string.IsNullOrWhiteSpace(guid) ? new GUID() : new GUID(Guid.Parse(guid)) };
 
-        public static void LogGeneric(string reason)
+        public static void PlayOneShot(string guid, GameObject emitter)
         {
-            if (!logErrors) return;
+            SoundUtility.emitter = emitter;
+            PlayOneShot(guid, sound => sound.set3DAttributes(emitter.To3DAttributes()));
+        }
 
-            var ex = new Exception($"Sound \"{reference.Guid}\" {reason}!");
+        public static void PlayOnChange(bool state, bool newState, string guid) => PlayOnChange(state, newState, guid, guid);
+
+        public static void PlayOnChange(bool state, bool newState, string onGuid, string offGuid)
+        {
+            if (newState == state) return;
+            var guid = newState ? onGuid : offGuid;
+            PlayOneShot(guid);
+        }
+
+        public static void LogGeneric(string guid, string message, Action<string, Object> debugCallback = null)
+        {
+            if (!log) return;
+            if (debugCallback == null) debugCallback = Debug.Log;
+
+            var ex = new Exception($"Sound \"{guid}\" {message}!");
             Debug.LogWarning(ex, emitter);
         }
+
+        public static EventInstance Instance(string guid) => string.IsNullOrWhiteSpace(guid) ? new EventInstance() : RuntimeManager.CreateInstance(FromGuid(guid));
     }
 }

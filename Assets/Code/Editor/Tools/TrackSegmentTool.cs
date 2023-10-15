@@ -87,12 +87,17 @@ namespace FR8Editor.Tools
                     {
                         if (s == trackSegment) continue;
 
-                        var t = s.GetClosestPoint(knot.position, true);
-                        var closest = s.SamplePoint(t);
-                        if ((knot.position - closest).sqrMagnitude > TrackSegment.ConnectionDistance * TrackSegment.ConnectionDistance) continue;
-
-                        knot.position = closest;
-
+                        var start = s.SamplePoint(0.0f);
+                        var end = s.SamplePoint(1.0f);
+                        if ((knot.position - start).sqrMagnitude < TrackSegment.ConnectionDistance * TrackSegment.ConnectionDistance)
+                        {
+                            knot.position = start;
+                        }
+                        else if ((knot.position - end).sqrMagnitude < TrackSegment.ConnectionDistance * TrackSegment.ConnectionDistance)
+                        {
+                            knot.position = end;
+                        }
+                        
                         return true;
                     }
 
@@ -140,23 +145,10 @@ namespace FR8Editor.Tools
 
             EditorGUI.BeginChangeCheck();
 
-            // const float fadeMin = 140.0f;
-            // const float fadeMax = 250.0f;
-            // const float alphaMin = 0.1f;
-
             var handleScale = HandleUtility.GetHandleSize(knot.position) * TrackSegmentTool.handleScale;
-
-            // var screenPosition = (Vector2)Camera.current.WorldToScreenPoint(knot.transform.position);
-            // var mousePosition = Mouse.current.position.ReadValue();
-            // mousePosition = new Vector2(mousePosition.x, Screen.height - mousePosition.y);
-            // var screenDistance = (screenPosition - mousePosition).magnitude;
-            //
-            // handleScale *= screenDistance < fadeMin ? 1.0f : (1.0f - alphaMin) * Mathf.Exp(-sqr(2.0f * (screenDistance - fadeMin) / (fadeMax - fadeMin))) + alphaMin;
 
             // ReSharper disable once ReplaceWithSingleAssignment.True
             var drawDiscs = true;
-            if (i == 0 && trackSegment.StartConnection) drawDiscs = false;
-            if (i == trackSegment.FromEnd(1) && trackSegment.EndConnection) drawDiscs = false;
 
             var newPosition = knot.position;
             var offset = Vector3.zero;

@@ -111,6 +111,7 @@ MonoBehaviour:
   retentionDamping: 60
   retentionTorqueConstant: 0.1
   trainLength: 10
+  evaluatedBrakeLoad: 0
 --- !u!114 &4261063563864887811
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -430,6 +431,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -463095271211977284, guid: 0f40e324dc0a6654ba0a96dc9d5da97e, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: f481b9930b53ad7428c1be911ea7f18b, type: 2}
     - target: {fileID: 919132149155446097, guid: 0f40e324dc0a6654ba0a96dc9d5da97e, type: 3}
       propertyPath: m_Name
       value: WellCar

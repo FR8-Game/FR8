@@ -1,5 +1,4 @@
-﻿using System;
-using FMODUnity;
+﻿using FMODUnity;
 using FR8Runtime.CodeUtility;
 using FR8Runtime.Level;
 using UnityEngine;

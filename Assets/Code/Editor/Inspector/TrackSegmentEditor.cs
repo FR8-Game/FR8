@@ -17,20 +17,6 @@ namespace FR8Editor.Inspector
         {
             base.OnInspectorGUI();
 
-            var connectionConfiguration = 0b0;
-            if (Segment.StartConnection) connectionConfiguration |= 0b1 << 0;
-            if (Segment.EndConnection) connectionConfiguration |= 0b1 << 1;
-
-            EditorGUILayout.HelpBox(connectionConfiguration switch
-            {
-                0 => "Segment Has No Connections",
-                1 => $"Connected at Start: [{Segment.StartConnection.segment.name}]",
-                2 => $"Connected at End:   [{Segment.EndConnection.segment.name}]",
-                3 => $"Connected at Start: [{Segment.StartConnection.segment.name}]\n" +
-                     $"Connected at End:   [{Segment.EndConnection.segment.name}]",
-                _ => throw new ArgumentOutOfRangeException()
-            }, MessageType.Info);
-
             Div();
 
             TrackSegmentTool.handleScale = EditorGUILayout.Slider("Handle Scale", TrackSegmentTool.handleScale, 0.0f, 1.0f);

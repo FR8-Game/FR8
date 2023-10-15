@@ -138,9 +138,8 @@ namespace FR8Runtime.Train.Track
             _ => throw new ArgumentOutOfRangeException()
         };
 
-        public bool GetState() => GetConnection().connectionActive;
-
-        public void SetState(bool state) => GetConnection().connectionActive = state;
+        public bool GetState() => GetConnection().activeIndex == 1;
+        public void SetState(bool state) => GetConnection().activeIndex = state ? 1 : 0;
 
         public void ContinueInteract(GameObject interactingObject) { }
     }

@@ -11,8 +11,6 @@ namespace FR8Runtime.Interactions.Drivers
     [SelectionBase, DisallowMultipleComponent]
     public abstract class Driver : MonoBehaviour, IDriver
     {
-        [SerializeField] private string key;
-        [SerializeField] private string displayName;
         [SerializeField] private float defaultValue;
 
         private const float ShakeAmplitude = 0.0015f;
@@ -26,7 +24,7 @@ namespace FR8Runtime.Interactions.Drivers
         private float shakeTime = float.MinValue;
 
         public virtual bool CanInteract => true;
-        public virtual string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
+        public virtual string DisplayName => name;
         public virtual string DisplayValue => $"{Mathf.RoundToInt(Value * 100.0f)}%";
 
         public bool OverrideInteractDistance => false;
@@ -34,7 +32,7 @@ namespace FR8Runtime.Interactions.Drivers
         public IEnumerable<Renderer> Visuals { get; private set; }
 
         public float Value { get; private set; }
-        public string Key => key;
+        public string Key => name;
 
         public virtual void OnValueChanged(float newValue)
         {
@@ -49,13 +47,13 @@ namespace FR8Runtime.Interactions.Drivers
 
         protected virtual void SetValue(float newValue)
         {
-            if (string.IsNullOrEmpty(key))
+            if (string.IsNullOrEmpty(Key))
             {
                 OnValueChanged(newValue);
                 return;
             }
 
-            if (driverNetwork) driverNetwork.SetValue(key, newValue);
+            if (driverNetwork) driverNetwork.SetValue(Key, newValue);
         }
 
         public abstract void Nudge(int direction);
@@ -124,7 +122,7 @@ namespace FR8Runtime.Interactions.Drivers
                     }
                     case DriverNetworkPredicate driverPredicate:
                     {
-                        if (!DriverNetwork.CompareKeys(driverPredicate.Key, key)) break;
+                        if (!DriverNetwork.CompareKeys(driverPredicate.Key, Key)) break;
 
                         isHighlighted = true;
                         return;
@@ -135,7 +133,7 @@ namespace FR8Runtime.Interactions.Drivers
 
         private void UpdateValueIfChanged()
         {
-            var newValue = driverNetwork.GetValue(key);
+            var newValue = driverNetwork.GetValue(Key);
 
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (newValue != Value)
