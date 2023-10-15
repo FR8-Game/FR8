@@ -122,6 +122,7 @@ namespace FR8Runtime.Interactions.Drivers
                     }
                     case DriverNetworkPredicate driverPredicate:
                     {
+                        if (driverPredicate.Target != driverNetwork) break;
                         if (!DriverNetwork.CompareKeys(driverPredicate.Key, Key)) break;
 
                         isHighlighted = true;
