@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using FR8Runtime.Interactions.Drivers.Submodules;
 using FR8Runtime.Player;
+using FR8Runtime.Rendering.Passes;
 using UnityEngine;
 
 namespace FR8Runtime.Interactions
@@ -13,16 +14,17 @@ namespace FR8Runtime.Interactions
         [SerializeField] private string verb;
         [SerializeField] private bool destroyOnConsumption;
         
+        private IEnumerable<Renderer> visuals;
+        
         public bool CanInteract => true;
         public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
         public string DisplayValue => verb;
         public bool OverrideInteractDistance => false;
         public float InteractDistance => throw new NotImplementedException();
-        public IEnumerable<Renderer> Visuals { get; private set; }
 
         private void Awake()
         {
-            Visuals = GetComponentsInChildren<Renderer>();
+            visuals = GetComponentsInChildren<Renderer>();
         }
 
         public void Nudge(int direction) { }
@@ -34,5 +36,10 @@ namespace FR8Runtime.Interactions
         }
 
         public void ContinueInteract(GameObject interactingObject) { }
+        public void Highlight(bool highlight)
+        {
+            if (highlight) SelectionOutlinePass.Add(visuals);
+            else SelectionOutlinePass.Remove(visuals);
+        }
     }
 }

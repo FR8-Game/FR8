@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using FR8Runtime.Interactions.Drivers.Submodules;
+using FR8Runtime.Rendering.Passes;
 using UnityEngine;
 
 namespace FR8Runtime.Train.Track
@@ -18,13 +18,13 @@ namespace FR8Runtime.Train.Track
         [SerializeField] private ConnectionEnd connectionEnd;
         
         private bool state;
+        private Renderer[] visuals;
 
         public bool CanInteract => true;
         public string DisplayName => "Train Signal";
         public string DisplayValue => state ? "Engaged" : "Disengaged";
         public bool OverrideInteractDistance => true;
         public float InteractDistance => float.MaxValue;
-        public IEnumerable<Renderer> Visuals { get; private set; }
 
         public TrackJunction SpawnFromPrefab(TrackSegment segment, Transform knot)
         {
@@ -54,7 +54,7 @@ namespace FR8Runtime.Train.Track
 
         private void Awake()
         {
-            Visuals = GetComponentsInChildren<Renderer>();
+            visuals = GetComponentsInChildren<Renderer>();
         }
 
         private void Start()
@@ -142,5 +142,11 @@ namespace FR8Runtime.Train.Track
         public void SetState(bool state) => GetConnection().activeIndex = state ? 1 : 0;
 
         public void ContinueInteract(GameObject interactingObject) { }
+
+        public void Highlight(bool highlight)
+        {
+            if (highlight) SelectionOutlinePass.Add(visuals);
+            else SelectionOutlinePass.Remove(visuals);
+        }
     }
 }

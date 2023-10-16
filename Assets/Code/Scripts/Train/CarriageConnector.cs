@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using FR8Runtime.Interactions.Drivers.Submodules;
+using FR8Runtime.Rendering.Passes;
 using UnityEngine;
 
 namespace FR8Runtime.Train
@@ -22,13 +23,13 @@ namespace FR8Runtime.Train
         private Vector3 magnetFXScale;
 
         private static HashSet<CarriageConnector> all = new();
+        private Renderer[] visuals;
 
         public bool CanInteract => true;
         public string DisplayName => "Carriage Connector";
         public string DisplayValue => engaged ? "Engaged" : "Disengaged";
         public bool OverrideInteractDistance { get; }
         public float InteractDistance { get; }
-        public IEnumerable<Renderer> Visuals { get; private set; }
         public CarriageConnector Connection { get; private set; }
 
         public Vector3 AnchorPosition => transform.TransformPoint(anchorOrigin);
@@ -46,10 +47,18 @@ namespace FR8Runtime.Train
 
         public void ContinueInteract(GameObject interactingObject) { }
 
+        public void Highlight(bool highlight)
+        {
+            Debug.Log(highlight);
+            
+            if (highlight) SelectionOutlinePass.Add(visuals);
+            else SelectionOutlinePass.Remove(visuals);
+        }
+
         protected void Awake()
         {
             Carriage = GetComponentInParent<TrainCarriage>();
-            Visuals = GetComponentsInChildren<Renderer>();
+            visuals = GetComponentsInChildren<Renderer>();
 
             if (magnetFX)
             {

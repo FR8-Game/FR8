@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using FR8Runtime.Train;
 using UnityEngine;
@@ -11,6 +10,7 @@ namespace FR8Runtime.Contracts.Predicates
         private int progress;
 
         public List<TrainCarriage> carriages;
+        public List<CarriageConnector> highlighted;
 
         protected override string GetDisplay()
         {
@@ -32,13 +32,36 @@ namespace FR8Runtime.Contracts.Predicates
         protected override int CalculateTasksDone()
         {
             progress = 0;
+            var locomotives = new List<Locomotive>();
             foreach (var e in carriages)
             {
-                if (!e.Stationary) continue;
+                if (!e.IsStationary(locomotives)) continue;
                 progress++;
             }
 
+            foreach (var locomotive in locomotives)
+            {
+                foreach (var connector in locomotive.CarriageConnectors)
+                {
+                    if (!connector.Connection) continue;
+                    
+                    connector.Highlight(true);
+                    connector.Connection.Highlight(true);
+                    
+                    if (!highlighted.Contains(connector)) highlighted.Add(connector);
+                    if (!highlighted.Contains(connector.Connection)) highlighted.Add(connector.Connection);
+                }
+            }
+
             return progress;
+        }
+
+        public override void OnTaskDone()
+        {
+            foreach (var e in highlighted)
+            {
+                e.Highlight(false);
+            }
         }
 
         protected override int CalculateTaskCount() => carriages.Count;
