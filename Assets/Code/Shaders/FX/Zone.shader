@@ -64,11 +64,11 @@
 
                 float3 worldNormal = normalize(input.normal);
                 float3 worldScale = abs(float3
-                (
-                    length(float3(unity_ObjectToWorld[0].x, unity_ObjectToWorld[1].x, unity_ObjectToWorld[2].x)), // scale x axis
-                    length(float3(unity_ObjectToWorld[0].y, unity_ObjectToWorld[1].y, unity_ObjectToWorld[2].y)), // scale y axis
-                    length(float3(unity_ObjectToWorld[0].z, unity_ObjectToWorld[1].z, unity_ObjectToWorld[2].z)) // scale z axis
-                ));
+                    (
+                        length(float3(unity_ObjectToWorld[0].x, unity_ObjectToWorld[1].x, unity_ObjectToWorld[2].x)), // scale x axis
+                        length(float3(unity_ObjectToWorld[0].y, unity_ObjectToWorld[1].y, unity_ObjectToWorld[2].y)), // scale y axis
+                        length(float3(unity_ObjectToWorld[0].z, unity_ObjectToWorld[1].z, unity_ObjectToWorld[2].z)) // scale z axis
+                    ));
 
                 output.uv = triplanar(input.vertex * worldScale, worldNormal);
                 output.margin = triplanar(worldScale / 2, worldNormal);
@@ -81,13 +81,56 @@
             float _Dots;
             float _FadeDistance, _FadeWidth;
 
-            float dottedLine(float uvx, float uvy)
+            float Line(float uvx, float width = 1.0)
             {
                 uvx += _Time.x * _Speed;
-                uvy += _Time.x * _Speed;
 
                 float x1 = (uvx % _Size + _Size) % _Size;
-                return (x1 < _Width) * ((uvy * _Dots % 1 + 1) % 1 > 0.5);
+                return x1 < (_Width * width);
+            }
+
+            float DottedLine(float uvx, float uvy)
+            {
+                uvy += _Time.x * _Speed;
+
+                float x1 = Line(uvx);
+                return x1 * ((uvy * _Dots % 1 + 1) % 1 > 0.5);
+            }
+
+            float Lod0(Varyings input)
+            {
+                float lines = DottedLine(input.uv.x, input.uv.y) + DottedLine(input.uv.y, -input.uv.x);
+
+                float2 marginSS = (abs(input.uv) - input.margin);
+                float margin = -max(marginSS.x, marginSS.y);
+
+                float bands = lines + (margin < _Width);
+
+                return saturate(bands);
+            }
+
+            float Lod1(Varyings input)
+            {
+                float width = 3.0;
+
+                float lines = Line(input.uv.x, width) + Line(input.uv.y, width);
+
+                float2 marginSS = (abs(input.uv) - input.margin);
+                float margin = -max(marginSS.x, marginSS.y);
+
+                float bands = lines + (margin < _Width * width);
+
+                return saturate(bands) / width;
+            }
+
+            float Lod2(Varyings input)
+            {
+                float width = 9.0;
+
+                float2 marginSS = (abs(input.uv) - input.margin);
+                float margin = -max(marginSS.x, marginSS.y);
+
+                return (margin < _Width * width) / width;
             }
 
             half4 frag(Varyings input) : SV_Target
@@ -95,22 +138,30 @@
                 float4 col = float4(_Color.rgb * pow(2, _Brightness) * _Color.a, 1.0);
 
                 float dist = length(input.worldPos - _WorldSpaceCameraPos);
-                float fade = (dist - _FadeDistance) / _FadeWidth;
-
-                float dither = fade - InterleavedGradientNoise(input.vertex, 0) > 0.0;
-                if (dither)
+                float fade[] =
                 {
-                    return col * _Width;
-                }
-                
-                float bands = dottedLine(input.uv.x, input.uv.y) + dottedLine(input.uv.y, -input.uv.x);
+                    (dist - _FadeDistance) / _FadeWidth,
+                    (dist - _FadeDistance * 4.0) / _FadeWidth,
+                };
 
-                float2 margin = (abs(input.uv) - input.margin);
-                bands += max(margin.x, margin.y) > -_Width;
+                float dither[] =
+                {
+                    fade[0] - InterleavedGradientNoise(input.vertex, 0) > 0.0,
+                    fade[1] - InterleavedGradientNoise(input.vertex, 0) > 0.0,
+                };
 
-                clip(bands - 0.5);
+                float lods[] =
+                {
+                    Lod0(input),
+                    Lod1(input),
+                    Lod2(input),
+                };
 
-                return col;
+                float value = lerp(lerp(lods[0], lods[1], dither[0]), lods[2], dither[1]);
+
+                clip(value - 0.1);
+
+                return col * value;
             }
             ENDHLSL
         }
