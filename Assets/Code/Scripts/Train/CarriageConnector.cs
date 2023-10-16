@@ -49,8 +49,6 @@ namespace FR8Runtime.Train
 
         public void Highlight(bool highlight)
         {
-            Debug.Log(highlight);
-            
             if (highlight) SelectionOutlinePass.Add(visuals);
             else SelectionOutlinePass.Remove(visuals);
         }
