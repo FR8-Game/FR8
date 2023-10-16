@@ -12,12 +12,12 @@ namespace FR8Runtime.Interactions.Drivers.Submodules
         
         bool OverrideInteractDistance { get; }
         float InteractDistance { get; }
-        
-        IEnumerable<Renderer> Visuals { get; }
 
         void Nudge(int direction);
         
         void BeginInteract(GameObject interactingObject);
         void ContinueInteract(GameObject interactingObject);
+
+        void Highlight(bool highlight);
     }
 }
