@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using FR8Runtime.Interactions.Drivers.Submodules;
+using FR8Runtime.Rendering.Passes;
 using UnityEngine;
 
 namespace FR8Runtime.Player
@@ -15,13 +16,13 @@ namespace FR8Runtime.Player
         [SerializeField] private Vector3 dismountOffset;
 
         private Rigidbody body;
+        private IEnumerable<Renderer> visuals;
         
         public bool CanInteract => true;
         public string DisplayName => name;
         public string DisplayValue => "";
         public bool OverrideInteractDistance => false;
         public float InteractDistance { get; }
-        public IEnumerable<Renderer> Visuals { get; private set; }
 
         public Vector3 Position => transform.TransformPoint(offset);
         public Quaternion Rotation => transform.rotation;
@@ -46,7 +47,7 @@ namespace FR8Runtime.Player
         private void Awake()
         {
             body = GetComponentInParent<Rigidbody>();
-            Visuals = GetComponentsInChildren<Renderer>();
+            visuals = GetComponentsInChildren<Renderer>();
         }
 
         public void Nudge(int direction) { }
@@ -60,5 +61,11 @@ namespace FR8Runtime.Player
         }
 
         public void ContinueInteract(GameObject interactingObject) { }
+        
+        public void Highlight(bool highlight)
+        {
+            if (highlight) SelectionOutlinePass.Add(visuals);
+            else SelectionOutlinePass.Remove(visuals);
+        }
     }
 }

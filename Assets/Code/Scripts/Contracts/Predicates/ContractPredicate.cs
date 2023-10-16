@@ -34,7 +34,11 @@ namespace FR8Runtime.Contracts.Predicates
             var isDone = tasksDone == taskCount;
 
             if (!isDone) CompletedTime = 0.0f;
-            else if (!Done) CompletedTime = Time.time;
+            else if (!Done)
+            {
+                CompletedTime = Time.time;
+                OnTaskDone();
+            }
 
             Done = isDone;
 
@@ -48,6 +52,7 @@ namespace FR8Runtime.Contracts.Predicates
 
         protected abstract int CalculateTasksDone();
         protected abstract int CalculateTaskCount();
+        public virtual void OnTaskDone() { }
 
         protected virtual string GetDisplay() => $"Type {GetType().Name} Does not support automatic naming";
 
@@ -60,7 +65,7 @@ namespace FR8Runtime.Contracts.Predicates
         };
 
         public sealed override string ToString() => ToString(false);
-        
+
         public string ToString(bool withTags)
         {
             var str = string.IsNullOrWhiteSpace(overrideDisplayText) ? GetDisplay() : overrideDisplayText;

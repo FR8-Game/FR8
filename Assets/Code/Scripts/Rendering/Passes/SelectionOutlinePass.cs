@@ -27,7 +27,7 @@ namespace FR8Runtime.Rendering.Passes
         {
             foreach (var r in renderers)
             {
-                RenderList.Add(r);
+                if (!RenderList.Contains(r)) RenderList.Add(r);
             }
         }
 

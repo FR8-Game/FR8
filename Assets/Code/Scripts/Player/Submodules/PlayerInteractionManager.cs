@@ -36,7 +36,7 @@ namespace FR8Runtime.Player.Submodules
 
         public void OnDisable()
         {
-            if ((Object)lastHighlightedObject) SelectionOutlinePass.Remove(lastHighlightedObject.Visuals);
+            if ((Object)lastHighlightedObject) lastHighlightedObject.Highlight(false);
         }
         
         public void Update()
@@ -77,8 +77,8 @@ namespace FR8Runtime.Player.Submodules
 
             if (lastHighlightedObject == HighlightedObject) return;
             
-            if ((Object)lastHighlightedObject) SelectionOutlinePass.Remove(lastHighlightedObject.Visuals);
-            if ((Object)HighlightedObject) SelectionOutlinePass.Add(HighlightedObject.Visuals);
+            if ((Object)lastHighlightedObject) lastHighlightedObject.Highlight(false);
+            if ((Object)HighlightedObject) HighlightedObject.Highlight(true);
             
             lastHighlightedObject = HighlightedObject;
         }

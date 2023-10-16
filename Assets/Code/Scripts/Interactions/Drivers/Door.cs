@@ -4,6 +4,7 @@ using FR8Runtime.CodeUtility;
 using FR8Runtime.Interactions.Drivables;
 using FR8Runtime.Interactions.Drivers.Submodules;
 using FR8Runtime.References;
+using FR8Runtime.Rendering.Passes;
 using UnityEngine;
 
 namespace FR8Runtime.Interactions.Drivers
@@ -14,6 +15,8 @@ namespace FR8Runtime.Interactions.Drivers
         [SerializeField] private bool testValue;
         [SerializeField] private TwoPoseDrivableAnimator animator;
 
+        private Renderer[] visuals;
+        
         public string Key => string.Empty;
         public virtual bool CanInteract => true;
         public string DisplayName => "Door";
@@ -22,12 +25,11 @@ namespace FR8Runtime.Interactions.Drivers
 
         public bool OverrideInteractDistance => false;
         public float InteractDistance => throw new System.NotImplementedException();
-        public IEnumerable<Renderer> Visuals { get; private set; }
 
         protected virtual void Awake()
         {
             SetValue(testValue ? 1.0f : 0.0f);
-            Visuals = GetComponentsInChildren<Renderer>();
+            visuals = GetComponentsInChildren<Renderer>();
         }
 
         public void OnValueChanged(float newValue)
@@ -53,6 +55,12 @@ namespace FR8Runtime.Interactions.Drivers
 
         public void ContinueInteract(GameObject interactingObject)
         {
+        }
+
+        public void Highlight(bool highlight)
+        {
+            if (highlight) SelectionOutlinePass.Add(visuals);
+            else SelectionOutlinePass.Remove(visuals);
         }
 
         private void Update()
