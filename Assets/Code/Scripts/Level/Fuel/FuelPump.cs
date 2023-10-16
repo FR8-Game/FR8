@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FR8Runtime.Interactions.Drivers.Submodules;
+using FR8Runtime.Rendering.Passes;
 using UnityEngine;
 
 namespace FR8Runtime.Level.Fuel
@@ -20,12 +21,19 @@ namespace FR8Runtime.Level.Fuel
         private CodeUtility.Rope rope;
         private LineRenderer lines;
         private FuelPumpHandle handle;
+        
+        public bool CanInteract => true;
+        public string DisplayName => "Fuel Gantry";
+        public string DisplayValue => "Rotate";
+        public bool OverrideInteractDistance => false;
+        public float InteractDistance => throw new NotImplementedException();
+        private Renderer[] visuals;
 
         private void Awake()
         {
             lines = GetComponentInChildren<LineRenderer>();
             handle = GetComponentInChildren<FuelPumpHandle>();
-            Visuals = GetComponentsInChildren<Renderer>();
+            visuals = GetComponentsInChildren<Renderer>();
             handle.Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
 
             rope = new CodeUtility.Rope();
@@ -115,13 +123,6 @@ namespace FR8Runtime.Level.Fuel
             }
         }
 
-        public bool CanInteract => true;
-        public string DisplayName => "Fuel Gantry";
-        public string DisplayValue => "Rotate";
-        public bool OverrideInteractDistance => false;
-        public float InteractDistance => throw new NotImplementedException();
-        public IEnumerable<Renderer> Visuals { get; private set; }
-
         public void Nudge(int direction)
         {
             rotationSpring.Target(rotationSpring.targetPosition + direction);
@@ -130,5 +131,10 @@ namespace FR8Runtime.Level.Fuel
         public void BeginInteract(GameObject interactingObject) { }
 
         public void ContinueInteract(GameObject interactingObject) { }
+        public void Highlight(bool highlight)
+        {
+            if (highlight) SelectionOutlinePass.Add(visuals);
+            else SelectionOutlinePass.Remove(visuals);
+        }
     }
 }

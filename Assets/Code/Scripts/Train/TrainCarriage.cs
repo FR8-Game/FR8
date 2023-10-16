@@ -4,6 +4,7 @@ using FMOD.Studio;
 using FR8Runtime.Interactions.Drivers;
 using FR8Runtime.References;
 using FR8Runtime.Train.Track;
+using JetBrains.Annotations;
 using Unity.Collections;
 using UnityEngine;
 
@@ -45,7 +46,6 @@ namespace FR8Runtime.Train
         [ReadOnly][SerializeField] private float evaluatedBrakeLoad;
 
         protected TrackSegment segment;
-        private List<CarriageConnector> carriageConnectors;
 
         private float softAnchorPositionOnSpline;
         private EventInstance brakeSound;
@@ -66,6 +66,7 @@ namespace FR8Runtime.Train
         public float PositionOnSpline { get; private set; }
         public float LastPositionOnSpline { get; private set; }
         public List<TrainCarriage> ConnectedCarriages { get; } = new();
+        public List<CarriageConnector> CarriageConnectors { get; private set; }
 
         public bool Stationary { get; private set; }
 
@@ -82,7 +83,7 @@ namespace FR8Runtime.Train
 
             brakeSound = SoundReference.TrainBrake.InstanceAndStart();
 
-            carriageConnectors = new List<CarriageConnector>(GetComponentsInChildren<CarriageConnector>());
+            CarriageConnectors = new List<CarriageConnector>(GetComponentsInChildren<CarriageConnector>());
             DriverNetwork = GetComponent<DriverNetwork>();
         }
 
@@ -147,13 +148,16 @@ namespace FR8Runtime.Train
             brakeSound.setParameterByName("BrakeLoad", evaluatedBrakeLoad);
         }
 
-        private bool IsStationary()
+        public bool IsStationary(List<Locomotive> connectedLocomotives = null)
         {
             var isHandbrakeOn = false;
             foreach (var e in ConnectedCarriages)
             {
-                if (e is Locomotive) return false;
+                if (e is not Locomotive locomotive) continue;
+                connectedLocomotives?.Add(locomotive);
             }
+
+            if (connectedLocomotives != null && connectedLocomotives.Count > 0) return false;
                 
             foreach (var e in ConnectedCarriages)
             {
@@ -193,7 +197,7 @@ namespace FR8Runtime.Train
             list.Clear();
             list.Add(this);
 
-            var openList = new Queue<CarriageConnector>(carriageConnectors);
+            var openList = new Queue<CarriageConnector>(CarriageConnectors);
             while (openList.Count > 0)
             {
                 var h = openList.Dequeue();
@@ -204,7 +208,7 @@ namespace FR8Runtime.Train
                 if (list.Contains(other)) continue;
 
                 list.Add(other);
-                foreach (var c in other.carriageConnectors)
+                foreach (var c in other.CarriageConnectors)
                 {
                     if (c == h) continue;
                     if (c == h.Connection) continue;
