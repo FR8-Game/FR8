@@ -48,6 +48,8 @@ namespace FR8Editor.Extras
         public static void AddDebugPredicate() => AddPredicate<DebugPredicate>();
         [MenuItem("GameObject/Contract/Predicates/Driver Network Predicate")]
         public static void AddLocomotivePredicate() => AddPredicate<DriverNetworkPredicate>();
+        [MenuItem("GameObject/Contract/Predicates/Stationary Predicate")]
+        public static void AddStationaryPredicate() => AddPredicate<StationaryPredicate>();
         [MenuItem("GameObject/Contract/Predicate Group")]
         public static void AddPredicateGroup() => AddPredicate<PredicateGroup>();
     }
