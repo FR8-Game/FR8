@@ -21,10 +21,10 @@ namespace FR8Runtime.References
         public static readonly SoundReference TitleMusic = "{9a601097-2e7b-4124-9c81-224c45cb4e1c}";
         public static readonly SoundReference Ambiance = "{fbcafde3-4539-43e2-822e-b75ec64c52f6}";
         public static readonly SoundReference Stereo = "";
-        public static readonly SoundReference Radio = "";
+        public static readonly SoundReference Radio = "{10d74e18-1e48-41e7-91d9-6052a7e6d2b4}";
         public static readonly SoundReference TrainBrake = "";
         public static readonly SoundReference TrainChangeTracks = "";
-        public static readonly SoundReference MenuClick = "";
+        public static readonly SoundReference MenuClick = "{2ba267b2-f7a1-467c-956d-ca3191fa2679}";
         public static readonly SoundReference Wind = "";
         public static readonly SoundReference WindowWipers = "";
 
