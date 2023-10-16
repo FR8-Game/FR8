@@ -7,8 +7,8 @@ namespace FR8Runtime.Contracts.Predicates
 {
     [AddComponentMenu("Contracts/Predicates/Delivery Predicate")]
     public class DeliveryPredicate : ContractPredicate
-    {   
-        private int carriagesDelivered;
+    {
+        private int progress;
 
         public List<TrainCarriage> carriages;
         public TrackSection deliveryLocation;
@@ -30,20 +30,18 @@ namespace FR8Runtime.Contracts.Predicates
             return sb.ToString();
         }
 
-        protected override string ProgressString() => $"{carriagesDelivered}/{carriages.Count}";
+        protected override string ProgressString() => $"{progress}/{carriages.Count}";
 
         protected override int CalculateTasksDone()
         {
-            carriagesDelivered = 0;
+            progress = 0;
             foreach (var e in carriages)
             {
-                if (!e.Stationary) continue;
                 if (!deliveryLocation.Contains(e.transform.position)) continue;
-
-                carriagesDelivered++;
+                progress++;
             }
 
-            return carriagesDelivered;
+            return progress;
         }
 
         protected override int CalculateTaskCount() => carriages.Count;
