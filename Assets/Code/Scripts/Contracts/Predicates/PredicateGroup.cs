@@ -9,6 +9,16 @@ namespace FR8Runtime.Contracts.Predicates
     {
         private List<ContractPredicate> children;
 
+        public override bool IsActive
+        {
+            get => base.IsActive;
+            set
+            {
+                base.IsActive = value;
+                foreach (var e in children) e.IsActive = value;
+            }
+        }
+
         private void Awake()
         {
             children = new List<ContractPredicate>();

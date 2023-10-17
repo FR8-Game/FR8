@@ -12,15 +12,24 @@ namespace FR8Runtime.Contracts.Predicates
         [SerializeField] private bool persistant;
 
         public const string ScriptableObjectLocation = "Scriptable Objects/Contracts/";
-        
+
         public int TasksDone { get; private set; }
         public int TaskCount { get; private set; }
 
         public float Progress { get; private set; }
         public bool Done { get; private set; }
 
-        public float CompletedTime { get; private set; }
+        public virtual bool IsActive
+        {
+            get => gameObject.activeSelf;
+            set
+            {
+                if (value == gameObject.activeSelf) return;
+                gameObject.SetActive(value);
+            }
+        }
 
+        public float CompletedTime { get; private set; }
         public bool Dirty { get; private set; }
 
         public void Update()
