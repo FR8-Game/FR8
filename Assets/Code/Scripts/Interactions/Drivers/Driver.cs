@@ -22,6 +22,7 @@ namespace FR8Runtime.Interactions.Drivers
         private Vector3 origin;
         private DriverNetwork driverNetwork;
         private float shakeTime = float.MinValue;
+        private Renderer[] visuals;
 
         public virtual bool CanInteract => true;
         public virtual string DisplayName => name;
@@ -29,7 +30,6 @@ namespace FR8Runtime.Interactions.Drivers
 
         public bool OverrideInteractDistance => false;
         public float InteractDistance => throw new NotImplementedException();
-        public IEnumerable<Renderer> Visuals { get; private set; }
 
         public float Value { get; private set; }
         public string Key => name;
@@ -61,11 +61,17 @@ namespace FR8Runtime.Interactions.Drivers
         public abstract void BeginInteract(GameObject interactingObject);
 
         public abstract void ContinueInteract(GameObject interactingObject);
+        
+        public void Highlight(bool highlight)
+        {
+            if (highlight) SelectionOutlinePass.Add(visuals);
+            else SelectionOutlinePass.Remove(visuals);
+        }
 
         protected virtual void Awake()
         {
             driverNetwork = GetComponentInParent<DriverNetwork>();
-            Visuals = GetComponentsInChildren<Renderer>();
+            visuals = GetComponentsInChildren<Renderer>();
         }
 
         protected virtual void Start()
@@ -98,11 +104,11 @@ namespace FR8Runtime.Interactions.Drivers
             {
                 if (isHighlighted)
                 {
-                    SelectionOutlinePass.Add(Visuals);
+                    SelectionOutlinePass.Add(visuals);
                 }
                 else
                 {
-                    SelectionOutlinePass.Remove(Visuals);
+                    SelectionOutlinePass.Remove(visuals);
                 }
                 highlighted = isHighlighted;
             }
@@ -122,6 +128,7 @@ namespace FR8Runtime.Interactions.Drivers
                     }
                     case DriverNetworkPredicate driverPredicate:
                     {
+                        if (driverPredicate.Target != driverNetwork) break;
                         if (!DriverNetwork.CompareKeys(driverPredicate.Key, Key)) break;
 
                         isHighlighted = true;

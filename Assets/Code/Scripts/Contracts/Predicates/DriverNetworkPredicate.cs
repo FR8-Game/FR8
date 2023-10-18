@@ -26,6 +26,7 @@ namespace FR8Runtime.Contracts.Predicates
         [SerializeField] private int b;
 
         public string Key => key;
+        public DriverNetwork Target => driverNetwork;
         
         private void Reset()
         {
