@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using FR8Runtime.Interactions.Drivers.Submodules;
 using FR8Runtime.Player;
+using FR8Runtime.Rendering.Passes;
 using UnityEngine;
 
 namespace FR8Runtime.Pickups
@@ -26,6 +27,7 @@ namespace FR8Runtime.Pickups
 
         private Vector3 lastTargetPosition;
         private Quaternion lastTargetRotation;
+        private Renderer[] visuals;
 
         public Rigidbody Rigidbody { get; private set; }
         public virtual bool CanInteract => true;
@@ -35,7 +37,6 @@ namespace FR8Runtime.Pickups
 
         public bool OverrideInteractDistance => false;
         public float InteractDistance => throw new System.NotImplementedException();
-        public IEnumerable<Renderer> Visuals { get; private set; }
 
         public void Nudge(int direction) { }
 
@@ -69,6 +70,12 @@ namespace FR8Runtime.Pickups
         }
 
         public void ContinueInteract(GameObject interactingObject) { }
+        
+        public void Highlight(bool highlight)
+        {
+            if (highlight) SelectionOutlinePass.Add(visuals);
+            else SelectionOutlinePass.Remove(visuals);
+        }
 
         public Vector3 HoldTranslation => (pickupPose ? pickupPose.holdTranslation : Vector3.zero) + additionalTranslation;
         public Quaternion HoldRotation => Quaternion.Euler(pickupPose ? pickupPose.holdRotation : Vector3.zero) * Quaternion.Euler(additionalRotation);
@@ -76,7 +83,7 @@ namespace FR8Runtime.Pickups
         protected virtual void Awake()
         {
             Rigidbody = GetComponent<Rigidbody>();
-            Visuals = GetComponentsInChildren<Renderer>();
+            visuals = GetComponentsInChildren<Renderer>();
             Rigidbody.gameObject.layer = PickupLayer;
 
             transform.SetParent(null);

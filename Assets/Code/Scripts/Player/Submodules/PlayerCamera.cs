@@ -22,9 +22,7 @@ namespace FR8Runtime.Player.Submodules
         [SerializeField] private float nearPlane = 0.2f;
         [SerializeField] private float farPlane = 1000.0f;
         [SerializeField] private CameraShake shakeModule;
-        [SerializeField][Range(0.0f, 1.0f)] public float cameraSmoothing = 0.0f;
-        private Vector2 deltaAccumulator;
-        private Vector2 smoothedDelta;
+        
         private bool zoomCamera;
         private bool cameraLocked;
         private bool wasCameraLocked;
@@ -32,6 +30,7 @@ namespace FR8Runtime.Player.Submodules
         private float fieldOfView = 70.0f;
         
         private Vector3 translationOffset;
+        private Quaternion rotationalOffset = Quaternion.identity;
 
         private int lastCursorX, lastCursorY;
         private float fovVelocity;
@@ -104,9 +103,10 @@ namespace FR8Runtime.Player.Submodules
 
             wasCameraLocked = cameraLockedThisFrame;
 
+            var delta = Vector2.zero;
             if (cameraLockedThisFrame)
             {
-                deltaAccumulator += Avatar.input.LookFrameDelta;
+                delta += Avatar.input.LookFrameDelta;
             }
             else
             {
@@ -117,12 +117,15 @@ namespace FR8Runtime.Player.Submodules
                     normalizedCursorPos = normalizedCursorPos * 2.0f - Vector2.one;
 
                     var drift = cameraDrift * Mathf.Max(0.0f, (normalizedCursorPos.magnitude - cameraDriftDeadzone) / (1.0f - cameraDriftDeadzone));
-                    deltaAccumulator += normalizedCursorPos.normalized * drift * Time.deltaTime;
+                    delta += normalizedCursorPos.normalized * drift * Time.deltaTime;
                 }
             }
 
+            Yaw = Mathf.Clamp(Yaw + delta.y, -90.0f, 90.0f);
+            Camera.transform.rotation = Quaternion.Euler(-Yaw, Camera.transform.eulerAngles.y + delta.x, 0.0f) * rotationalOffset;
+            Avatar.Head.rotation = Camera.transform.rotation;
+            
             zoomCamera = Avatar.input.ZoomCam;
-            Camera.transform.rotation = Avatar.Head.transform.rotation;
 
             // Update additional camera variables.
             Camera.transform.position = Avatar.Head.position + Camera.transform.rotation * translationOffset;
@@ -133,17 +136,7 @@ namespace FR8Runtime.Player.Submodules
 
         private void FixedUpdate()
         {
-            // Get delta rotation input from controller
-            var delta = deltaAccumulator;
-            deltaAccumulator = Vector2.zero;
-
-            smoothedDelta = Vector2.Lerp(delta, smoothedDelta, cameraSmoothing);
-
-            // Apply input and clamp camera's yaw
-            Yaw = Mathf.Clamp(Yaw + smoothedDelta.y, -YawRange / 2.0f, YawRange / 2.0f);
-
             shakeModule.GetOffsets(this, out translationOffset, out var rotationalOffset);
-            Avatar.Head.transform.rotation = Quaternion.Euler(-Yaw, Avatar.Head.transform.eulerAngles.y + smoothedDelta.x, 0.0f) * rotationalOffset;
         }
 
         public void SetCameraLock(bool state)

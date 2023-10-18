@@ -12,15 +12,24 @@ namespace FR8Runtime.Contracts.Predicates
         [SerializeField] private bool persistant;
 
         public const string ScriptableObjectLocation = "Scriptable Objects/Contracts/";
-        
+
         public int TasksDone { get; private set; }
         public int TaskCount { get; private set; }
 
         public float Progress { get; private set; }
         public bool Done { get; private set; }
 
-        public float CompletedTime { get; private set; }
+        public virtual bool IsActive
+        {
+            get => gameObject.activeSelf;
+            set
+            {
+                if (value == gameObject.activeSelf) return;
+                gameObject.SetActive(value);
+            }
+        }
 
+        public float CompletedTime { get; private set; }
         public bool Dirty { get; private set; }
 
         public void Update()
@@ -34,7 +43,11 @@ namespace FR8Runtime.Contracts.Predicates
             var isDone = tasksDone == taskCount;
 
             if (!isDone) CompletedTime = 0.0f;
-            else if (!Done) CompletedTime = Time.time;
+            else if (!Done)
+            {
+                CompletedTime = Time.time;
+                OnTaskDone();
+            }
 
             Done = isDone;
 
@@ -48,6 +61,7 @@ namespace FR8Runtime.Contracts.Predicates
 
         protected abstract int CalculateTasksDone();
         protected abstract int CalculateTaskCount();
+        public virtual void OnTaskDone() { }
 
         protected virtual string GetDisplay() => $"Type {GetType().Name} Does not support automatic naming";
 
@@ -60,7 +74,7 @@ namespace FR8Runtime.Contracts.Predicates
         };
 
         public sealed override string ToString() => ToString(false);
-        
+
         public string ToString(bool withTags)
         {
             var str = string.IsNullOrWhiteSpace(overrideDisplayText) ? GetDisplay() : overrideDisplayText;
