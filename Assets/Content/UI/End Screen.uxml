@@ -5,8 +5,9 @@
             <ui:Label text="&gt;CONTRACT STATUS" display-tooltip-when-elided="true" name="subtitle" class="subtitle" />
             <ui:Label text="SUCCESS" display-tooltip-when-elided="true" name="title" class="title" style="color: rgb(0, 255, 0);" />
         </ui:VisualElement>
-        <ui:Label text="&gt;TIME: WAY TOO LONG&#10;&gt;CARGO DAMAGE: 110%&#10;&gt;MAIDENS : NONE&#10;&gt;BREAD : MISSING&#10;&gt;TOUCHED GRASS : FALSE&#10;&gt;MOTHER : FUCKED" display-tooltip-when-elided="true" name="content" style="flex-grow: 1; font-size: 22px;" />
+        <ui:Label text="&gt; YOU SUCCESSFULLY DELIVERED THE MATERIALS TO THE DROP OFF LOCATION.&#10;&#10;&gt; Time :&#10;" display-tooltip-when-elided="true" name="content" style="flex-grow: 1; font-size: 22px; height: 148px;" />
         <ui:VisualElement name="footer">
+            <ui:Button text="&gt;RETRY" display-tooltip-when-elided="true" name="retry" />
             <ui:Button text="&gt;RETURN TO MENU" display-tooltip-when-elided="true" name="exit" />
         </ui:VisualElement>
     </ui:VisualElement>
