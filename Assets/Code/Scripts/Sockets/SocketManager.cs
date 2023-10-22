@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using FR8Runtime.Interactions.Drivers.Submodules;
 using FR8Runtime.Player;
+using FR8Runtime.Rendering.Passes;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -21,12 +22,12 @@ namespace FR8Runtime.Sockets
         public virtual string DisplayValue => string.Empty;
         public bool OverrideInteractDistance => false;
         public float InteractDistance => throw new NotImplementedException();
-        public IEnumerable<Renderer> Visuals { get; private set; }
+        public Renderer[] visuals;
 
         protected virtual void Awake()
         {
             collider = GetComponentsInChildren<Collider>();
-            Visuals = GetComponentsInChildren<Renderer>();
+            visuals = GetComponentsInChildren<Renderer>();
             
             SetCollision(true);
         }
@@ -75,5 +76,11 @@ namespace FR8Runtime.Sockets
         }
         
         public void ContinueInteract(GameObject interactingObject) { }
+        
+        public void Highlight(bool highlight)
+        {
+            if (highlight) SelectionOutlinePass.Add(visuals);
+            else SelectionOutlinePass.Remove(visuals);
+        }
     }
 }

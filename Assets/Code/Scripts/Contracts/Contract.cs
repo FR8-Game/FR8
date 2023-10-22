@@ -60,6 +60,12 @@ namespace FR8Runtime.Contracts
                 activePredicateIndex++;
                 PredicatesCompleted++;
             }
+
+            for (var i = 0; i < predicateTree.Count; i++)
+            {
+                var predicate = PredicateTree[i];
+                predicate.IsActive = i <= activePredicateIndex;
+            }
         }
 
         public string BuildTitle()
@@ -113,6 +119,7 @@ namespace FR8Runtime.Contracts
             {
                 if (!child.TryGetComponent(out ContractPredicate predicate)) continue;
                 predicateTree.Add(predicate);
+                predicate.gameObject.SetActive(false);
             }
         }
 
