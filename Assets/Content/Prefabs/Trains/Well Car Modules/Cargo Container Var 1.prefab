@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &8608747032167575976
+--- !u!1 &3277568454317483713
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,7 +8,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2224236160570684709}
+  - component: {fileID: 4961341662798389836}
   m_Layer: 0
   m_Name: Cargo Container Var 1
   m_TagString: Untagged
@@ -16,28 +16,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2224236160570684709
+--- !u!4 &4961341662798389836
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8608747032167575976}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2008.8679, y: 0.010786176, z: 5516.733}
+  m_GameObject: {fileID: 3277568454317483713}
+  m_LocalRotation: {x: -0, y: -0.16378997, z: -0, w: 0.98649526}
+  m_LocalPosition: {x: -13.25, y: 0.0107860565, z: -21.73}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5359684679350358307}
+  - {fileID: 1181427606140831306}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &5614816298689459912
+  m_LocalEulerAnglesHint: {x: 0, y: -18.854, z: 0}
+--- !u!1001 &1724877938033172897
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 2224236160570684709}
+    m_TransformParent: {fileID: 4961341662798389836}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: dfe610dd1ea503944a58e41e3a9243af, type: 3}
       propertyPath: m_RootOrder
@@ -83,42 +83,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -1255605710908113952, guid: dfe610dd1ea503944a58e41e3a9243af, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -1255605710908113952, guid: dfe610dd1ea503944a58e41e3a9243af, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -1255605710908113952, guid: dfe610dd1ea503944a58e41e3a9243af, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -1255605710908113952, guid: dfe610dd1ea503944a58e41e3a9243af, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -1255605710908113952, guid: dfe610dd1ea503944a58e41e3a9243af, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -1255605710908113952, guid: dfe610dd1ea503944a58e41e3a9243af, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -1255605710908113952, guid: dfe610dd1ea503944a58e41e3a9243af, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
+    - target: {fileID: -1461304994638716399, guid: dfe610dd1ea503944a58e41e3a9243af, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 3c1d5ad76f5dcc5479f196f6c1070906, type: 2}
+    - target: {fileID: -1461304994638716399, guid: dfe610dd1ea503944a58e41e3a9243af, type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: c647d786939e577479f09f5aea18a6ab, type: 2}
+    - target: {fileID: -1461304994638716399, guid: dfe610dd1ea503944a58e41e3a9243af, type: 3}
+      propertyPath: m_Materials.Array.data[2]
+      value: 
+      objectReference: {fileID: 2100000, guid: 3cf0313ea53182548b873083ae67f7ed, type: 2}
     - target: {fileID: 919132149155446097, guid: dfe610dd1ea503944a58e41e3a9243af, type: 3}
       propertyPath: m_Name
       value: Cargo Container Var 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dfe610dd1ea503944a58e41e3a9243af, type: 3}
---- !u!4 &5359684679350358307 stripped
+--- !u!4 &1181427606140831306 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: dfe610dd1ea503944a58e41e3a9243af, type: 3}
-  m_PrefabInstance: {fileID: 5614816298689459912}
+  m_PrefabInstance: {fileID: 1724877938033172897}
   m_PrefabAsset: {fileID: 0}
