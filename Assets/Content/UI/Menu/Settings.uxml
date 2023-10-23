@@ -1,4 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="GeneralInfo" src="project://database/Assets/Content/UI/Menu/Settings%20Tabs/GeneralInfo.uxml?fileID=9197481963319205126&amp;guid=6645e548633152f4ab322cb36f4ad0c6&amp;type=3#GeneralInfo" />
     <Style src="project://database/Assets/Content/UI/Style%20Sheets/Game%20UI%20Stylesheet.uss?fileID=7433441132597879392&amp;guid=acd50812ec1cbb044a0297b17ba892a4&amp;type=3#Game UI Stylesheet" />
     <ui:VisualElement name="background" style="background-color: rgb(0, 0, 0); flex-grow: 1;">
         <ui:VisualElement name="header" style="flex-grow: 0.1;">
@@ -10,7 +11,9 @@
             <ui:Button text="AUDIO" display-tooltip-when-elided="true" name="Audio" enable-rich-text="false" class="setting-button" style="font-size: 30px; flex-grow: 1; -unity-text-align: upper-center;" />
             <ui:Button text="CONTROLS" display-tooltip-when-elided="true" name="Controls" class="setting-button" style="flex-grow: 1; font-size: 30px; -unity-text-align: upper-center;" />
         </ui:VisualElement>
-        <ui:VisualElement name="tabContent" focusable="false" style="flex-grow: 1.5;" />
+        <ui:VisualElement name="tabContent" focusable="false" style="flex-grow: 1.5;">
+            <ui:Instance template="GeneralInfo" name="GeneralInfo" />
+        </ui:VisualElement>
         <ui:VisualElement name="Footer" style="flex-grow: 0.3;" />
     </ui:VisualElement>
 </ui:UXML>
