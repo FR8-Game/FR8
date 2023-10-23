@@ -56,6 +56,7 @@ namespace FR8Runtime.Player.Submodules
         private VisualElement vignette;
         private VisualElement deathScreen;
         private VisualElement endScreen;
+        private VisualElement lookingAtRoot;
         private VisualElement lookingAtIcon;
         private Label lookingAtText;
         private Label contractText;
@@ -83,6 +84,7 @@ namespace FR8Runtime.Player.Submodules
             compass = root.Q<Compass>("compass");
             longitude = root.Q<Label>("long");
             latitude = root.Q<Label>("lat");
+            lookingAtRoot = root.Q("looking-at");
             lookingAtIcon = root.Q("looking-at-icon");
             lookingAtText = root.Q<Label>("looking-at-text");
             contractText = root.Q<Label>("contracts");
@@ -101,13 +103,11 @@ namespace FR8Runtime.Player.Submodules
 
         private void OnEnable()
         {
-            Debug.Log("enabled");
             Contract.ContractCompleteEvent += OnContractCompleted;
         }
 
         private void OnDisable()
         {
-            Debug.Log("disabled");
             Contract.ContractCompleteEvent -= OnContractCompleted;
         }
 
@@ -125,18 +125,21 @@ namespace FR8Runtime.Player.Submodules
             compass.FaceAngle = avatar.transform.eulerAngles.y;
 
             var lookingAt = avatar.interactionManager.HighlightedObject;
-            if (lookingAt)
+            if (lookingAt != null)
             {
-                
+                lookingAtRoot.visible = true;
+                lookingAtIcon.style.backgroundImage = lookingAt.Type switch
+                {
+                    IInteractable.InteractionType.Scroll => scrollIcon,
+                    IInteractable.InteractionType.Press => pressIcon,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+                lookingAtText.text = (Object)lookingAt ? $"{lookingAt.DisplayName}\n{lookingAt.DisplayValue}".ToUpper() : string.Empty;
             }
-            lookingAtIcon.style.backgroundImage = lookingAt.Type switch
+            else
             {
-                IInteractable.InteractionType.Scroll => scrollIcon,
-                IInteractable.InteractionType.Press => pressIcon,
-                _ => throw new ArgumentOutOfRangeException()
-            };
-            lookingAtText.text = (Object)lookingAt ? $"{lookingAt.DisplayName}\n{lookingAt.DisplayValue}".ToUpper() : string.Empty;
-            lookingAtText.EnableInClassList("active", (Object)lookingAt);
+                lookingAtRoot.visible = false;
+            }
 
             vignette.style.opacity = Mathf.Max
             (
