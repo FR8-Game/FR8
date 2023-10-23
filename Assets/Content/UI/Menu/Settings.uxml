@@ -1,31 +1,84 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Content/UI/Style%20Sheets/Game%20UI%20Stylesheet.uss?fileID=7433441132597879392&amp;guid=acd50812ec1cbb044a0297b17ba892a4&amp;type=3#Game UI Stylesheet" />
-<<<<<<< Updated upstream
     <ui:VisualElement name="background" style="background-color: rgb(0, 0, 0); flex-grow: 1;">
         <ui:VisualElement name="header" style="flex-grow: 0;">
             <ui:Label text="&gt; SETTINGS_" display-tooltip-when-elided="true" name="title" style="font-size: 70px;" />
         </ui:VisualElement>
         <ui:ScrollView name="Content" style="flex-grow: 4;">
-            <ui:VisualElement name="General">
-                <ui:Label text="GENERAL" display-tooltip-when-elided="true" name="GeneralTitle" style="font-size: 50px;" />
-                <ui:Slider picking-mode="Ignore" label="FIELD OF VIEW:" value="42" high-value="100" name="FOV" class="slider" style="font-size: 30px;" />
+            <ui:VisualElement name="Graphics">
+                <ui:Label text="GRAPHICS" display-tooltip-when-elided="true" name="GraphicsTitle" style="font-size: 50px;" />
+                <ui:VisualElement name="Resolution" style="flex-direction: row; height: 52px; width: 1926px;">
+                    <ui:VisualElement name="LeftOffSet" style="flex-grow: 0.2;" />
+                    <ui:Label text="Resolution    &#10;" display-tooltip-when-elided="true" name="ResLabel" style="font-size: 30px; flex-grow: 0.2;" />
+                    <ui:DropdownField index="-1" choices="System.Collections.Generic.List`1[System.String]" name="ResDropDown" style="flex-grow: 1;" />
+                    <ui:VisualElement name="RightOffSet" style="flex-grow: 2;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="Spacer" style="flex-grow: 1; height: 10px; width: 1920px;" />
+                <ui:VisualElement name="Quality" style="flex-direction: row; height: 52px; width: 1926px;">
+                    <ui:VisualElement name="LeftOffSet" style="flex-grow: 0.2;" />
+                    <ui:Label text="Quality" display-tooltip-when-elided="true" name="QualLabel" style="font-size: 30px; flex-grow: 0.329;" />
+                    <ui:DropdownField index="-1" choices="System.Collections.Generic.List`1[System.String]" name="QualDropDown" style="flex-grow: 1;" />
+                    <ui:VisualElement name="RightOffSet" style="flex-grow: 2;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="Spacer" style="flex-grow: 1; height: 10px; width: 1920px;" />
+                <ui:VisualElement name="Fullscreen" style="flex-direction: row; height: 52px; width: 1926px;">
+                    <ui:VisualElement name="LeftOffSet" style="flex-grow: 0.2;" />
+                    <ui:Label text="FullScreen" display-tooltip-when-elided="true" name="FullLabel" style="font-size: 30px; flex-grow: 0.2;" />
+                    <ui:DropdownField index="-1" choices="System.Collections.Generic.List`1[System.String]" name="FullDropDown" style="flex-grow: 1;" />
+                    <ui:VisualElement name="RightOffSet" style="flex-grow: 2;" />
+                </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="Audio" />
+            <ui:VisualElement name="Audio">
+                <ui:Label text="Audio" display-tooltip-when-elided="true" name="AudioTitle" style="font-size: 50px;" />
+                <ui:VisualElement name="MasterVol" style="flex-direction: row;">
+                    <ui:VisualElement name="LeftOffSet" style="flex-grow: 0.2;" />
+                    <ui:Slider picking-mode="Ignore" label="Master Volume: " value="100" high-value="100" name="MasterVolSlider" style="font-size: 30px; flex-grow: 2;" />
+                    <ui:VisualElement name="RightOffSet" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="Spacer" style="flex-grow: 1; height: 10px; width: 1920px;" />
+                <ui:VisualElement name="SFXVol" style="flex-direction: row;">
+                    <ui:VisualElement name="LeftOffSet" style="flex-grow: 0.2;" />
+                    <ui:Slider picking-mode="Ignore" label="Sound Effects:                                 " value="100" high-value="100" name="SFXVolSlider" style="font-size: 30px; flex-grow: 2;" />
+                    <ui:VisualElement name="RightOffSet" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="Spacer" style="flex-grow: 1; height: 10px; width: 1920px;" />
+                <ui:VisualElement name="MusicVol" style="flex-direction: row;">
+                    <ui:VisualElement name="LeftOffSet" style="flex-grow: 0.2;" />
+                    <ui:Slider picking-mode="Ignore" label="Music Volume:                              " value="100" high-value="100" name="MusicVolSlider" style="font-size: 30px; flex-grow: 2;" />
+                    <ui:VisualElement name="RightOffSet" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="Spacer" style="flex-grow: 1; height: 10px; width: 1920px;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="Accessibility">
+                <ui:Label text="Accessibility" display-tooltip-when-elided="true" name="AccessibilityTitle" style="font-size: 50px;" />
+                <ui:VisualElement name="Spacer" style="flex-grow: 1; height: 10px; width: 1920px;" />
+                <ui:VisualElement name="FOV" style="flex-direction: row;">
+                    <ui:VisualElement name="LeftOffSet" style="flex-grow: 0.2;" />
+                    <ui:Slider picking-mode="Ignore" label="Field Of View: " value="70" high-value="120" name="FOVSlider" low-value="60" style="font-size: 30px; flex-grow: 2;" />
+                    <ui:VisualElement name="RightOffSet" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="Spacer" style="flex-grow: 1; height: 10px; width: 1920px;" />
+                <ui:VisualElement name="WhiteNoise" style="flex-direction: row;">
+                    <ui:VisualElement name="LeftOffSet" style="flex-grow: 0.2;" />
+                    <ui:Slider picking-mode="Ignore" label="White Noise: " value="100" high-value="100" name="WhiteNoiseSlider" style="font-size: 30px; flex-grow: 2;" />
+                    <ui:VisualElement name="RightOffSet" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="Spacer" style="flex-grow: 1; height: 10px; width: 1920px;" />
+                <ui:VisualElement name="MouseSense" style="flex-direction: row;">
+                    <ui:VisualElement name="LeftOffSet" style="flex-grow: 0.2;" />
+                    <ui:Slider picking-mode="Ignore" label="Mouse Sensitivity: " value="70" high-value="120" name="MouseSensSlider" low-value="60" style="font-size: 30px; flex-grow: 2;" />
+                    <ui:VisualElement name="RightOffSet" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="Spacer" style="flex-grow: 1; height: 10px; width: 1920px;" />
+                <ui:VisualElement name="ConSense" style="flex-direction: row;">
+                    <ui:VisualElement name="LeftOffSet" style="flex-grow: 0.2;" />
+                    <ui:Slider picking-mode="Ignore" label="Controller Sensitivity: " value="100" high-value="100" name="ConSenseSlider" style="font-size: 30px; flex-grow: 2;" />
+                    <ui:VisualElement name="RightOffSet" style="flex-grow: 1;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
         </ui:ScrollView>
-        <ui:VisualElement name="Footer" style="flex-grow: 1;" />
-=======
-    <ui:VisualElement name="background" style="background-color: rgba(0, 0, 0, 255); flex-grow: 1;">
-        <ui:VisualElement name="header" style="flex-grow: 0.1;">
-            <ui:Label text="&gt; SETTINGS_" display-tooltip-when-elided="true" name="title" style="font-size: 70px;" />
+        <ui:VisualElement name="Footer" style="flex-grow: 1;">
+            <ui:Button text="Return" display-tooltip-when-elided="true" name="Return" style="font-size: 30px; height: 102px; width: 254px;" />
         </ui:VisualElement>
-        <ui:VisualElement name="buttons" style="flex-direction: row; flex-grow: -0.2; flex-shrink: 1;">
-            <ui:Button text="GRAPHICS&#10;&#10;" display-tooltip-when-elided="true" name="Graphics" class="setting-button" style="flex-grow: 1; font-size: 30px; -unity-text-align: upper-center;" />
-            <ui:Button text="AUDIO" display-tooltip-when-elided="true" name="Audio" enable-rich-text="false" class="setting-button" style="font-size: 30px; flex-grow: 1; -unity-text-align: upper-center;" />
-            <ui:Button text="CONTROLS" display-tooltip-when-elided="true" name="Controls" class="setting-button" style="flex-grow: 1; font-size: 30px; -unity-text-align: upper-center;" />
-            <ui:Button text="GENERAL" display-tooltip-when-elided="true" name="General" tabindex="1" class="setting-button" style="flex-grow: 1; -unity-text-align: upper-center; font-size: 30px;" />
-        </ui:VisualElement>
-        <ui:VisualElement name="Info" style="flex-grow: 1.5;" />
-        <ui:VisualElement name="Footer" style="flex-grow: 0.3;" />
->>>>>>> Stashed changes
     </ui:VisualElement>
 </ui:UXML>
