@@ -8,7 +8,6 @@ using FR8Runtime.UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
-using UnityEngine.WSA;
 using Compass = FR8Runtime.UI.CustomControls.Compass;
 using Cursor = UnityEngine.Cursor;
 using Object = UnityEngine.Object;
