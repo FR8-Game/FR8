@@ -9,6 +9,7 @@ namespace FR8Runtime.Interactions.Drivers.Submodules
         
         string DisplayName { get; }
         string DisplayValue { get; }
+        InteractionType Type { get; }
         
         bool OverrideInteractDistance { get; }
         float InteractDistance { get; }
@@ -19,5 +20,11 @@ namespace FR8Runtime.Interactions.Drivers.Submodules
         void ContinueInteract(GameObject interactingObject);
 
         void Highlight(bool highlight);
+
+        public enum InteractionType
+        {
+            Scroll,
+            Press,
+        }
     }
 }

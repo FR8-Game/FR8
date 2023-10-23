@@ -28,6 +28,7 @@ namespace FR8Runtime.Train
         public bool CanInteract => true;
         public string DisplayName => "Carriage Connector";
         public string DisplayValue => engaged ? "Engaged" : "Disengaged";
+        public IInteractable.InteractionType Type => IInteractable.InteractionType.Press;
         public bool OverrideInteractDistance { get; }
         public float InteractDistance { get; }
         public CarriageConnector Connection { get; private set; }

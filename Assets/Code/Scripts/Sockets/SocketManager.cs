@@ -20,6 +20,7 @@ namespace FR8Runtime.Sockets
         public bool CanInteract => !(Object)currentBinding;
         public string DisplayName => name;
         public virtual string DisplayValue => string.Empty;
+        public IInteractable.InteractionType Type => IInteractable.InteractionType.Press;
         public bool OverrideInteractDistance => false;
         public float InteractDistance => throw new NotImplementedException();
         public Renderer[] visuals;
