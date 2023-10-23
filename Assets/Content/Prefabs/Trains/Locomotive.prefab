@@ -3484,7 +3484,7 @@ MonoBehaviour:
     valueRange: {x: 0, y: 1}
     animationSpring:
       springConstant: 175
-      dampingConstant: 25
+      dampingConstant: 50
       clamped: 1
       range: {x: 0, y: 1}
       bounce: 0.4
@@ -3562,6 +3562,24 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.08555329, y: 1.7164364, z: 0.49124902}
   m_Center: {x: 1.5216832, y: 2.708123, z: 6.1981907}
+--- !u!1 &2841356479982983434 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4319684107007252362, guid: a86ca45e95b0c5e4fab8317f5ef8dd8f, type: 3}
+  m_PrefabInstance: {fileID: 2061557248377917056}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &1486604440355940461
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2841356479982983434}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.0007775674, y: 0.0012959457, z: 0.00033603926}
+  m_Center: {x: 0.00022959718, y: 0.000000014909839, z: -0.000057707577}
 --- !u!1 &2974103745161681761 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3880481083409028577, guid: a86ca45e95b0c5e4fab8317f5ef8dd8f, type: 3}
@@ -3586,7 +3604,7 @@ MonoBehaviour:
     valueRange: {x: 0, y: 1}
     animationSpring:
       springConstant: 175
-      dampingConstant: 25
+      dampingConstant: 50
       clamped: 1
       range: {x: 0, y: 1}
       bounce: 0.4
@@ -3657,8 +3675,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.0007775674, y: 0.0012959457, z: 0.00016748502}
-  m_Center: {x: 0.00022959345, y: 0.000000014901161, z: 0.000026569543}
+  m_Size: {x: 0.0007775674, y: 0.0012959457, z: 0.00031090624}
+  m_Center: {x: 0.00022959345, y: 0.000000014909439, z: -0.000045141147}
 --- !u!1 &4318286305975909685 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -6381110422747860043, guid: a86ca45e95b0c5e4fab8317f5ef8dd8f, type: 3}
@@ -3675,8 +3693,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.0007775674, y: 0.0012959456, z: 0.00016748502}
-  m_Center: {x: 0.000000007511754, y: 0.0000000148429535, z: -0.00004974869}
+  m_Size: {x: 0.0007775674, y: 0.0012959456, z: 0.00034298617}
+  m_Center: {x: 0.000000007512792, y: 0.000000014831028, z: -0.00013749927}
 --- !u!1 &4372594714103869850 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -6903300399443476710, guid: a86ca45e95b0c5e4fab8317f5ef8dd8f, type: 3}
@@ -3693,8 +3711,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.0007775674, y: 0.0012959457, z: 0.00016748502}
-  m_Center: {x: 0.00022959718, y: 0.000000014901161, z: 0.000026569543}
+  m_Size: {x: 0.0007775674, y: 0.0012959457, z: 0.00030401952}
+  m_Center: {x: 0.00022959718, y: 0.00000001490933, z: -0.00004169774}
 --- !u!1 &4531903015351019543 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2483896466678376087, guid: a86ca45e95b0c5e4fab8317f5ef8dd8f, type: 3}
@@ -3795,7 +3813,7 @@ MonoBehaviour:
     valueRange: {x: 0, y: 1}
     animationSpring:
       springConstant: 175
-      dampingConstant: 25
+      dampingConstant: 50
       clamped: 1
       range: {x: 0, y: 1}
       bounce: 0.4
@@ -3850,10 +3868,10 @@ MonoBehaviour:
     valueRange: {x: 0, y: 1}
     animationSpring:
       springConstant: 175
-      dampingConstant: 25
+      dampingConstant: 50
       clamped: 1
       range: {x: 0, y: 1}
-      bounce: 0.4
+      bounce: 0.1
       currentPosition: 0
       targetPosition: 0
       velocity: 0
