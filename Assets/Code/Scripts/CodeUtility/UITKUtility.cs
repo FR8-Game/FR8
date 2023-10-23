@@ -37,7 +37,8 @@ namespace FR8Runtime.CodeUtility
             while (p < 1.0f)
             {
                 var characterCount = Mathf.FloorToInt((str.Length - 1) * p) + 1;
-
+                if (str.Length < 2) break;
+                
                 target.text = $"{str[..characterCount]}_<alpha=#00>{str[(characterCount + 1)..]}</alpha>";
 
                 p += Time.unscaledDeltaTime / duration;

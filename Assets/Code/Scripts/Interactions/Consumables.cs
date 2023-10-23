@@ -21,6 +21,7 @@ namespace FR8Runtime.Interactions
         public string DisplayValue => verb;
         public bool OverrideInteractDistance => false;
         public float InteractDistance => throw new NotImplementedException();
+        public IInteractable.InteractionType Type => IInteractable.InteractionType.Press;
 
         private void Awake()
         {

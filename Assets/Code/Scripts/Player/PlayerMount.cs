@@ -23,6 +23,7 @@ namespace FR8Runtime.Player
         public string DisplayValue => "";
         public bool OverrideInteractDistance => false;
         public float InteractDistance { get; }
+        public IInteractable.InteractionType Type => IInteractable.InteractionType.Press;
 
         public Vector3 Position => transform.TransformPoint(offset);
         public Quaternion Rotation => transform.rotation;

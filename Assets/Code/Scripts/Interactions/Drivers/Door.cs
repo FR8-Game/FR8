@@ -22,6 +22,7 @@ namespace FR8Runtime.Interactions.Drivers
         public string DisplayName => "Door";
         public virtual string DisplayValue => Open ? "Open" : "Closed";
         public bool Open { get; private set; }
+        public IInteractable.InteractionType Type => IInteractable.InteractionType.Press;
 
         public bool OverrideInteractDistance => false;
         public float InteractDistance => throw new System.NotImplementedException();
