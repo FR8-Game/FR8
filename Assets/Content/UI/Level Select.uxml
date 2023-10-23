@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="LevelInformationEntry" src="project://database/Assets/Content/UI/LevelInformationEntry.uxml?fileID=9197481963319205126&amp;guid=6f6404de683243945944001df8fc4532&amp;type=3#LevelInformationEntry" />
+    <Style src="project://database/Assets/Content/UI/Style%20Sheets/Game%20UI%20Stylesheet.uss?fileID=7433441132597879392&amp;guid=acd50812ec1cbb044a0297b17ba892a4&amp;type=3#Game UI Stylesheet" />
+    <ui:VisualElement name="background" class="background-opaque">
+        <ui:GroupBox name="header">
+            <ui:Label text="&gt; CONTRACT SELECT_" display-tooltip-when-elided="true" name="Title" style="font-size: 50px;" />
+        </ui:GroupBox>
+        <ui:GroupBox name="Level_And_Info" style="flex-grow: 1; flex-direction: row;">
+            <ui:ScrollView name="Levels" style="flex-grow: 1; flex-shrink: 0;">
+                <ui:Button text="Button" display-tooltip-when-elided="true" name="Button" class="level-button" />
+            </ui:ScrollView>
+            <ui:GroupBox name="Information" style="flex-grow: 1;">
+                <ui:Instance template="LevelInformationEntry" name="LevelInformationEntry" style="flex-grow: 1; flex-shrink: 0;" />
+            </ui:GroupBox>
+        </ui:GroupBox>
+        <ui:GroupBox name="Footer" style="height: 106px; width: 1910px;">
+            <ui:Button text="&gt; RETURN TO MENU" display-tooltip-when-elided="true" name="Return" style="background-color: rgba(53, 52, 52, 0.82); height: 89px; width: 347px;" />
+        </ui:GroupBox>
+    </ui:VisualElement>
+</ui:UXML>

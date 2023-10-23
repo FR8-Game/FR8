@@ -229,7 +229,7 @@ namespace FR8Runtime.Player.Submodules
             ApplyGravity();
             MoveWithGround();
 
-            //PlayFootstepAudio();
+            PlayFootstepAudio();
 
             UpdateFlags();
         }
