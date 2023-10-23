@@ -54,10 +54,7 @@ namespace FR8Runtime.Player
             Body.isKinematic = true;
 
             getCenter = () => transform.position;
-        }
-
-        private void Start()
-        {
+            
             InitSubmodules();
         }
 

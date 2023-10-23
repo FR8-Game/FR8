@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using FR8Runtime.CodeUtility;
 using FR8Runtime.Contracts;
+using FR8Runtime.Interactions.Drivers.Submodules;
 using FR8Runtime.UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -36,6 +37,11 @@ namespace FR8Runtime.Player.Submodules
         [SerializeField] private float flashTiming = 1.0f;
         [SerializeField] [Range(0.0f, 1.0f)] private float flashSplit = 0.5f;
 
+        [Space]
+        [SerializeField] private Texture2D scrollIcon;
+
+        [SerializeField] private Texture2D pressIcon;
+
         private PlayerAvatar avatar;
         private UIDocument hud;
         private Renderer hudRenderer;
@@ -49,8 +55,12 @@ namespace FR8Runtime.Player.Submodules
         private VisualElement vignette;
         private VisualElement deathScreen;
         private VisualElement endScreen;
-        private Label lookingAt;
+        private VisualElement lookingAtRoot;
+        private VisualElement lookingAtIcon;
+        private Label lookingAtText;
         private Label contractText;
+
+        private float spawnTime;
 
         private const string VitalityRootPath = "UI/Vitality";
         private const string CoverPath = VitalityRootPath + "/Death";
@@ -62,6 +72,8 @@ namespace FR8Runtime.Player.Submodules
             avatar.vitality.IsAliveChangedEvent += UpdateDeathUI;
             avatar.vitality.HealthChangeEvent += UpdateBars;
             avatar.UpdateEvent += Update;
+            avatar.EnableEvent += OnEnable;
+            avatar.DisableEvent += OnDisable;
 
             hud = avatar.transform.Find("HUD").GetComponent<UIDocument>();
             var root = hud.rootVisualElement;
@@ -71,7 +83,9 @@ namespace FR8Runtime.Player.Submodules
             compass = root.Q<Compass>("compass");
             longitude = root.Q<Label>("long");
             latitude = root.Q<Label>("lat");
-            lookingAt = root.Q<Label>("looking-at");
+            lookingAtRoot = root.Q("looking-at");
+            lookingAtIcon = root.Q("looking-at-icon");
+            lookingAtText = root.Q<Label>("looking-at-text");
             contractText = root.Q<Label>("contracts");
 
             hudRenderer = avatar.transform.Find("Head/HUD Quad/Quad").GetComponent<Renderer>();
@@ -80,8 +94,26 @@ namespace FR8Runtime.Player.Submodules
 
             vignette = avatar.transform.Find("Vignette").GetComponent<UIDocument>().rootVisualElement.Q("vignette");
 
+            spawnTime = Time.time;
+
             SetupDeathUI();
             HideEndgameUI();
+        }
+
+        private void OnEnable()
+        {
+            Contract.ContractCompleteEvent += OnContractCompleted;
+        }
+
+        private void OnDisable()
+        {
+            Contract.ContractCompleteEvent -= OnContractCompleted;
+        }
+
+        private void OnContractCompleted(Contract contract)
+        {
+            if (Contract.ActiveContracts.Count > 0) return;
+            ShowEndgameUI();
         }
 
         private void Update()
@@ -92,8 +124,21 @@ namespace FR8Runtime.Player.Submodules
             compass.FaceAngle = avatar.transform.eulerAngles.y;
 
             var lookingAt = avatar.interactionManager.HighlightedObject;
-            this.lookingAt.text = (Object)lookingAt ? $"{lookingAt.DisplayName}\n{lookingAt.DisplayValue}".ToUpper() : string.Empty;
-            this.lookingAt.EnableInClassList("active", (Object)lookingAt);
+            if (lookingAt != null)
+            {
+                lookingAtRoot.visible = true;
+                lookingAtIcon.style.backgroundImage = lookingAt.Type switch
+                {
+                    IInteractable.InteractionType.Scroll => scrollIcon,
+                    IInteractable.InteractionType.Press => pressIcon,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+                lookingAtText.text = (Object)lookingAt ? $"{lookingAt.DisplayName}\n{lookingAt.DisplayValue}".ToUpper() : string.Empty;
+            }
+            else
+            {
+                lookingAtRoot.visible = false;
+            }
 
             vignette.style.opacity = Mathf.Max
             (
@@ -163,7 +208,7 @@ namespace FR8Runtime.Player.Submodules
             deathScreen = root;
 
             var respawn = root.Q<Button>("respawn");
-            respawn.clickable.clicked += UIActions.Load(SceneUtility.Scene.Game);
+            respawn.clickable.clicked += UIActions.Load(SceneUtility.Scene.Reload);
             var exit = root.Q<Button>("exit");
             exit.clickable.clicked += () =>
             {
@@ -230,19 +275,17 @@ namespace FR8Runtime.Player.Submodules
             var subtitle = root.Q<Label>("subtitle");
             var title = root.Q<Label>("title");
             var content = root.Q<Label>("content");
+            var retry = root.Q<Button>("retry");
             var exit = root.Q<Button>("exit");
 
+            retry.clickable.clicked += UIActions.Load(SceneUtility.Scene.Reload);
             exit.clickable.clicked += UIActions.Load(SceneUtility.Scene.Menu);
-            
+
             var ratio = 1.45f / content.resolvedStyle.fontSize;
 
+            var time = TimeSpan.FromSeconds(Time.time - spawnTime);
             content.text = "";
-            appendContent("time", "way too long");
-            appendContent("cargo damage", "110%");
-            appendContent("maidens", "none");
-            appendContent("bread", "missing");
-            appendContent("touched grass", "false");
-            appendContent("mother", "fucked");
+            appendContent("time", time.ToString("m\\:ss"));
 
             avatar.StartCoroutine(routine());
 
@@ -263,6 +306,7 @@ namespace FR8Runtime.Player.Submodules
                 {
                     UitkUtility.Typewriter(25.0f, 0.5f, subtitle, title),
                     UitkUtility.Typewriter(100.0f, 0.5f, content),
+                    UitkUtility.Typewriter(25.0f, 0.5f, retry),
                     UitkUtility.Typewriter(25.0f, 0.5f, exit)
                 };
 

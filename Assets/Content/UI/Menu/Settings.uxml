@@ -1,16 +1,31 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Content/UI/Style%20Sheets/Game%20UI%20Stylesheet.uss?fileID=7433441132597879392&amp;guid=acd50812ec1cbb044a0297b17ba892a4&amp;type=3#Game UI Stylesheet" />
+<<<<<<< Updated upstream
     <ui:VisualElement name="background" style="background-color: rgb(0, 0, 0); flex-grow: 1;">
+        <ui:VisualElement name="header" style="flex-grow: 0;">
+            <ui:Label text="&gt; SETTINGS_" display-tooltip-when-elided="true" name="title" style="font-size: 70px;" />
+        </ui:VisualElement>
+        <ui:ScrollView name="Content" style="flex-grow: 4;">
+            <ui:VisualElement name="General">
+                <ui:Label text="GENERAL" display-tooltip-when-elided="true" name="GeneralTitle" style="font-size: 50px;" />
+                <ui:Slider picking-mode="Ignore" label="FIELD OF VIEW:" value="42" high-value="100" name="FOV" class="slider" style="font-size: 30px;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="Audio" />
+        </ui:ScrollView>
+        <ui:VisualElement name="Footer" style="flex-grow: 1;" />
+=======
+    <ui:VisualElement name="background" style="background-color: rgba(0, 0, 0, 255); flex-grow: 1;">
         <ui:VisualElement name="header" style="flex-grow: 0.1;">
             <ui:Label text="&gt; SETTINGS_" display-tooltip-when-elided="true" name="title" style="font-size: 70px;" />
         </ui:VisualElement>
-        <ui:VisualElement name="tabs" style="flex-direction: row; flex-grow: -0.2; flex-shrink: 1;">
-            <ui:Button text="GENERAL" display-tooltip-when-elided="true" name="General" tabindex="1" class="setting-button" style="flex-grow: 1; -unity-text-align: upper-center; font-size: 30px;" />
+        <ui:VisualElement name="buttons" style="flex-direction: row; flex-grow: -0.2; flex-shrink: 1;">
             <ui:Button text="GRAPHICS&#10;&#10;" display-tooltip-when-elided="true" name="Graphics" class="setting-button" style="flex-grow: 1; font-size: 30px; -unity-text-align: upper-center;" />
             <ui:Button text="AUDIO" display-tooltip-when-elided="true" name="Audio" enable-rich-text="false" class="setting-button" style="font-size: 30px; flex-grow: 1; -unity-text-align: upper-center;" />
             <ui:Button text="CONTROLS" display-tooltip-when-elided="true" name="Controls" class="setting-button" style="flex-grow: 1; font-size: 30px; -unity-text-align: upper-center;" />
+            <ui:Button text="GENERAL" display-tooltip-when-elided="true" name="General" tabindex="1" class="setting-button" style="flex-grow: 1; -unity-text-align: upper-center; font-size: 30px;" />
         </ui:VisualElement>
-        <ui:VisualElement name="tabContent" focusable="false" style="flex-grow: 1.5;" />
+        <ui:VisualElement name="Info" style="flex-grow: 1.5;" />
         <ui:VisualElement name="Footer" style="flex-grow: 0.3;" />
+>>>>>>> Stashed changes
     </ui:VisualElement>
 </ui:UXML>

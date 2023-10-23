@@ -27,6 +27,7 @@ namespace FR8Runtime.Level.Fuel
         public string DisplayValue => "Rotate";
         public bool OverrideInteractDistance => false;
         public float InteractDistance => throw new NotImplementedException();
+        public IInteractable.InteractionType Type => IInteractable.InteractionType.Press;
         private Renderer[] visuals;
 
         private void Awake()
