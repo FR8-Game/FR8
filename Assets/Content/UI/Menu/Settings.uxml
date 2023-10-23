@@ -1,17 +1,16 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Content/UI/Style%20Sheets/Game%20UI%20Stylesheet.uss?fileID=7433441132597879392&amp;guid=acd50812ec1cbb044a0297b17ba892a4&amp;type=3#Game UI Stylesheet" />
-    <ui:VisualElement name="background" class="background-transparent" style="opacity: 1;" />
-    <ui:VisualElement name="pad" class="menu-pad">
-        <ui:Label text="SETTINGS" display-tooltip-when-elided="true" name="title" class="h1" />
-        <ui:VisualElement name="tabs" class="tab-header" style="flex-direction: row;">
-            <ui:Button text="GENERAL" display-tooltip-when-elided="true" name="General" style="width: 195px; font-size: 30px; border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; transition-property: all; transition-duration: 100ms; transition-timing-function: ease-out-circ; transition-delay: 0s;" />
-            <ui:Button text="GRAPHICS" display-tooltip-when-elided="true" name="Graphics" style="height: auto; width: 195px; font-size: 30px;" />
-            <ui:Button text="AUDIO" display-tooltip-when-elided="true" name="Audio" style="font-size: 30px; width: 195px;" />
-            <ui:Button text="CONTROLS" display-tooltip-when-elided="true" name="Controls" style="font-size: 30px; width: 195px;" />
+    <ui:VisualElement name="background" style="background-color: rgba(0, 0, 0, 255); flex-grow: 1;">
+        <ui:VisualElement name="header" style="flex-grow: 0.1;">
+            <ui:Label text="&gt; SETTINGS_" display-tooltip-when-elided="true" name="title" style="font-size: 70px;" />
         </ui:VisualElement>
+        <ui:VisualElement name="buttons" style="flex-direction: row; flex-grow: -0.2; flex-shrink: 1;">
+            <ui:Button text="GRAPHICS&#10;&#10;" display-tooltip-when-elided="true" name="Graphics" class="setting-button" style="flex-grow: 1; font-size: 30px; -unity-text-align: upper-center;" />
+            <ui:Button text="AUDIO" display-tooltip-when-elided="true" name="Audio" enable-rich-text="false" class="setting-button" style="font-size: 30px; flex-grow: 1; -unity-text-align: upper-center;" />
+            <ui:Button text="CONTROLS" display-tooltip-when-elided="true" name="Controls" class="setting-button" style="flex-grow: 1; font-size: 30px; -unity-text-align: upper-center;" />
+            <ui:Button text="GENERAL" display-tooltip-when-elided="true" name="General" tabindex="1" class="setting-button" style="flex-grow: 1; -unity-text-align: upper-center; font-size: 30px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="Info" style="flex-grow: 1.5;" />
+        <ui:VisualElement name="Footer" style="flex-grow: 0.3;" />
     </ui:VisualElement>
-    <ui:GroupBox name="GeneralContent">
-        <ui:Slider picking-mode="Ignore" label="Field Of View" value="80" high-value="120" low-value="80" name="FOVSlider" class="unity-base-slider" style="position: relative; height: 39px; width: 1206px; left: auto; font-size: 20px; opacity: 1; flex-direction: row;" />
-    </ui:GroupBox>
-    <ui:GroupBox name="GraphicsContent" style="align-items: stretch; justify-content: space-around;" />
 </ui:UXML>
