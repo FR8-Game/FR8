@@ -23,6 +23,7 @@ namespace FR8Runtime.Interactions.Drivers
         private DriverNetwork driverNetwork;
         private float shakeTime = float.MinValue;
         private Renderer[] visuals;
+        public virtual IInteractable.InteractionType Type => IInteractable.InteractionType.Scroll;
 
         public virtual bool CanInteract => true;
         public virtual string DisplayName => name;

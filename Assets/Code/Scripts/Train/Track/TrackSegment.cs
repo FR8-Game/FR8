@@ -15,6 +15,8 @@ namespace FR8Runtime.Train.Track
     [SelectionBase, DisallowMultipleComponent]
     public class TrackSegment : MonoBehaviour, IEnumerable<Transform>
     {
+        public const int TrackLayer = 12;
+        
         // --- Constants ---
         public const float ConnectionDistance = 3.0f;
         public static readonly Spline.SplineProfile SplineProfile = Spline.Cubic;
@@ -217,6 +219,13 @@ namespace FR8Runtime.Train.Track
 
             var childCount = KnotContainer().childCount;
             resolution = Mathf.Max(resolution, childCount);
+
+            var tree = transform.GetComponentsInChildren<Transform>();
+            gameObject.layer = TrackLayer;
+            foreach (var child in tree)
+            {
+                child.gameObject.layer = TrackLayer;
+            }
         }
 
         public float GetClosestPoint(Vector3 point, bool clamp)

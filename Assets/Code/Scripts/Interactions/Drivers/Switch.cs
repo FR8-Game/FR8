@@ -13,6 +13,7 @@ namespace FR8Runtime.Interactions.Drivers
         [SerializeField] private DriverSounds sounds;
 
         public override string DisplayValue => Value > 0.5f ? "On" : "Off";
+        public override IInteractable.InteractionType Type => IInteractable.InteractionType.Press;
 
         public override void OnValueChanged(float newValue)
         {
