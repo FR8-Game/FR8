@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -14,6 +15,7 @@ namespace FR8Runtime.Contracts
         private string displayName;
         private List<ContractPredicate> predicateTree;
         private int activePredicateIndex;
+        public float startTime;
 
         public List<ContractPredicate> PredicateTree
         {
@@ -35,9 +37,12 @@ namespace FR8Runtime.Contracts
 
         public static readonly List<Contract> ActiveContracts = new();
 
+        public static event Action<Contract> ContractCompleteEvent;
+
         private void OnEnable()
         {
             ActiveContracts.Add(this);
+            startTime = Time.time;
         }
 
         private void OnDisable()
@@ -65,6 +70,12 @@ namespace FR8Runtime.Contracts
             {
                 var predicate = PredicateTree[i];
                 predicate.IsActive = i <= activePredicateIndex;
+            }
+
+            if (PredicatesCompleted == predicateTree.Count)
+            {
+                gameObject.SetActive(false);
+                ContractCompleteEvent?.Invoke(this);
             }
         }
 

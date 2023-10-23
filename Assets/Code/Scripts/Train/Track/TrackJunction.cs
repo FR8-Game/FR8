@@ -25,6 +25,7 @@ namespace FR8Runtime.Train.Track
         public string DisplayValue => state ? "Engaged" : "Disengaged";
         public bool OverrideInteractDistance => true;
         public float InteractDistance => float.MaxValue;
+        public IInteractable.InteractionType Type => IInteractable.InteractionType.Press;
 
         public TrackJunction SpawnFromPrefab(TrackSegment segment, Transform knot)
         {
