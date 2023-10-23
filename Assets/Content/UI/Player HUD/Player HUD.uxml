@@ -17,7 +17,10 @@
         <ui:VisualElement name="divider" class="v-divider" />
         <FR8Runtime.UI.CustomControls.Compass name="compass" FaceAngle="0" TickSpacing="2" style="height: 20px;" />
     </ui:VisualElement>
-    <ui:VisualElement name="center-align" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; align-items: center; justify-content: center;">
-        <ui:Label text="Thing you are looking at&#10;Seccond Line" display-tooltip-when-elided="true" name="looking-at" style="width: auto; height: auto; font-size: 24px; opacity: 0.4; -unity-text-align: upper-left; position: absolute; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; top: 60%;" />
+    <ui:VisualElement name="center-align" style="position: absolute; left: -1px; top: -4px; right: 1px; bottom: 4px; align-items: center; justify-content: center;">
+        <ui:VisualElement name="looking-at" style="opacity: 0.4; top: 60%; position: absolute; flex-direction: row; align-items: center;">
+            <ui:VisualElement name="looking-at-icon" style="background-image: url(&apos;project://database/Assets/Config/Unity/UI%20Toolkit/UnityThemes/UnityDefaultRuntimeTheme.tss?fileID=-1304905567622442630&amp;guid=50932311828343649b1994c7da1efed9&amp;type=3#arrow-down@2x&apos;); flex-shrink: 0; -unity-background-scale-mode: stretch-to-fill; width: 64px; height: 64px;" />
+            <ui:Label text="Thing you are looking at&#10;Seccond Line" display-tooltip-when-elided="true" name="looking-at-text" style="font-size: 24px; -unity-text-align: upper-left; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

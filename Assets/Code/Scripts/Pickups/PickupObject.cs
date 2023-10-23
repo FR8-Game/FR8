@@ -34,6 +34,7 @@ namespace FR8Runtime.Pickups
         public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
         public virtual string DisplayValue => target ? "Drop" : "Pickup";
         public bool Held => target;
+        public IInteractable.InteractionType Type => IInteractable.InteractionType.Press;
 
         public bool OverrideInteractDistance => false;
         public float InteractDistance => throw new System.NotImplementedException();

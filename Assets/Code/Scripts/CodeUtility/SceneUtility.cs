@@ -11,13 +11,15 @@ namespace FR8Runtime.CodeUtility
         {
             var loadScreen = Object.FindObjectOfType<LoadScreen>();
 
+            var index = scene == Scene.Reload ? SceneManager.GetActiveScene().buildIndex : (int)scene;
+
             if (loadScreen)
             {
-                loadScreen.StartSceneLoad((int)scene);
+                loadScreen.StartSceneLoad(index);
             }
             else
             {
-                SceneManager.LoadScene((int)scene);
+                SceneManager.LoadScene(index);
             }
         }
         
@@ -34,6 +36,8 @@ namespace FR8Runtime.CodeUtility
         {
             Menu = 0,
             Game = 1,
+            
+            Reload = 2,
         }
     }
 }
