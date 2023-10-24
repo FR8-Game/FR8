@@ -1,10 +1,10 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Content/UI/Style%20Sheets/Game%20UI%20Stylesheet.uss?fileID=7433441132597879392&amp;guid=acd50812ec1cbb044a0297b17ba892a4&amp;type=3#Game UI Stylesheet" />
     <ui:VisualElement name="background" class="background-transparent" style="flex-grow: 1;">
-        <ui:VisualElement name="header" style="flex-grow: 0;">
-            <ui:Label text="&gt; SETTINGS_" display-tooltip-when-elided="true" name="title" style="font-size: 70px;" />
+        <ui:VisualElement name="header" style="flex-grow: 1.7;">
+            <ui:Label text="&gt; SETTINGS_" display-tooltip-when-elided="true" name="title" style="font-size: 70px; flex-grow: 1;" />
         </ui:VisualElement>
-        <ui:ScrollView name="Content" style="flex-grow: 4;">
+        <ui:ScrollView name="Content" style="flex-grow: 4; height: 910px; width: 1918px;">
             <ui:VisualElement name="Graphics">
                 <ui:Label text="GRAPHICS" display-tooltip-when-elided="true" name="GraphicsTitle" style="font-size: 50px;" />
                 <ui:VisualElement name="Resolution" style="flex-direction: row; height: 52px; width: 1926px;">

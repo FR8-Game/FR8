@@ -1,9 +1,12 @@
 using FR8Runtime.CodeUtility;
 using FR8Runtime.Save;
+using FR8Runtime.References;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using Cursor = UnityEngine.Cursor;
+using FMODUnity;
+using FMOD.Studio;
 
 namespace FR8Runtime.UI
 {
@@ -11,10 +14,13 @@ namespace FR8Runtime.UI
     public class MainMenu : MonoBehaviour
     {
         private UIDocument docs;
+        private EventInstance titleMusic;
+
 
         private void Awake()
         {
             docs = GetComponent<UIDocument>();
+            titleMusic = SoundReference.TitleMusic.InstanceAndStart();
         }
 
         private void Start()

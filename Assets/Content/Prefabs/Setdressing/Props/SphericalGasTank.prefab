@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &4327394641345254055
+--- !u!1 &4623315556241066531
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,7 +8,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8847844498146342627}
+  - component: {fileID: 4749830402520942549}
   m_Layer: 0
   m_Name: SphericalGasTank
   m_TagString: Untagged
@@ -16,28 +16,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8847844498146342627
+--- !u!4 &4749830402520942549
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4327394641345254055}
+  m_GameObject: {fileID: 4623315556241066531}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 6654331148515707823}
+  - {fileID: 4300244478359254852}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &6616447083306413124
+--- !u!1001 &4334486959713767599
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 8847844498146342627}
+    m_TransformParent: {fileID: 4749830402520942549}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: f4ed0b4efb2002b40851eb236362be7b, type: 3}
       propertyPath: m_RootOrder
@@ -83,18 +83,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -7214419139619616519, guid: f4ed0b4efb2002b40851eb236362be7b, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: f4ed0b4efb2002b40851eb236362be7b, type: 3}
       propertyPath: m_Name
       value: SphericalGasTank
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f4ed0b4efb2002b40851eb236362be7b, type: 3}
---- !u!4 &6654331148515707823 stripped
+--- !u!4 &4300244478359254852 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f4ed0b4efb2002b40851eb236362be7b, type: 3}
-  m_PrefabInstance: {fileID: 6616447083306413124}
+  m_PrefabInstance: {fileID: 4334486959713767599}
   m_PrefabAsset: {fileID: 0}

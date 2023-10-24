@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.02.02.00">
 	<object class="MixerGroup" id="{77b67ed1-9b2d-440d-9b21-75442674048b}">
 		<property name="name">
-			<value>Game</value>
+			<value>SFX</value>
 		</property>
 		<relationship name="automators">
 			<destination>{a722334f-c485-4b74-875a-b16dc7327bcf}</destination>
@@ -43,6 +43,9 @@
 		</relationship>
 	</object>
 	<object class="SFXReverbEffect" id="{124e0920-891f-4b0c-b47a-4e9aba13cfc4}">
+		<property name="bypass">
+			<value>true</value>
+		</property>
 		<property name="decayTime">
 			<value>1000</value>
 		</property>
