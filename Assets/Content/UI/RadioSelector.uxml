@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Content/UI/Style%20Sheets/Game%20UI%20Stylesheet.uss?fileID=7433441132597879392&amp;guid=acd50812ec1cbb044a0297b17ba892a4&amp;type=3#Game UI Stylesheet" />
+    <ui:VisualElement name="Background" class="background-transparent" style="top: 160px; left: 872px; bottom: 276px; right: 218px;">
+        <ui:ScrollView name="SongList" style="flex-grow: 0.9;">
+            <ui:Button text="Space Ranger" display-tooltip-when-elided="true" name="Track1" class="song-button" />
+            <ui:Button text="Dead Signal" display-tooltip-when-elided="true" name="Track2" class="song-button" />
+            <ui:Button text="A Walk Downtown" display-tooltip-when-elided="true" name="Track3" class="song-button" />
+        </ui:ScrollView>
+        <ui:Button text="Close" display-tooltip-when-elided="true" name="Close" style="flex-grow: 0.001; height: 67px; width: 166px; bottom: -33px;" />
+    </ui:VisualElement>
+</ui:UXML>
