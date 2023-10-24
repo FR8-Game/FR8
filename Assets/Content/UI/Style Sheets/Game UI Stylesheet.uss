@@ -208,73 +208,144 @@
 }
 
 .unity-base-field {
+    color: rgb(255, 255, 255);
 }
 
 .unity-base-slider {
     -unity-text-outline-color: rgb(0, 0, 0);
+    color: rgb(255, 255, 255);
 }
 
 .level-button {
-    background-color: rgba(63, 63, 63, 255);
+    background-color: rgb(63, 63, 63);
 }
 
 .level-button:hover {
-    background-color: rgba(255, 255, 255, 255);
-    color: rgba(0, 0, 0, 255);
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
 }
 
 .contract-button {
-    background-color: rgba(63, 63, 63, 255);
+    background-color: rgb(63, 63, 63);
 }
 
 .contract-button:hover {
-    -unity-background-image-tint-color: rgba(0, 0, 0, 255);
-    background-color: rgba(9, 118, 31, 255);
+    -unity-background-image-tint-color: rgb(0, 0, 0);
+    background-color: rgb(9, 118, 31);
 }
 
 .setting-button {
-    background-color: rgba(84, 84, 84, 255);
+    background-color: rgb(84, 84, 84);
 }
 
 .setting-button:hover {
-    background-color: rgba(173, 173, 173, 255);
+    background-color: rgb(173, 173, 173);
 }
 
 .setting-button:active {
-    background-color: rgba(255, 255, 255, 255);
-    color: rgba(0, 0, 0, 255);
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
+}
+
+.level-button {
+    background-color: rgb(63, 63, 63);
+}
+
+.level-button:hover {
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
+}
+
+.contract-button {
+    background-color: rgb(63, 63, 63);
+}
+
+.contract-button:hover {
+    -unity-background-image-tint-color: rgb(0, 0, 0);
+    background-color: rgb(9, 118, 31);
+}
+
+.setting-button {
+    background-color: rgb(84, 84, 84);
+}
+
+.setting-button:hover {
+    background-color: rgb(173, 173, 173);
+}
+
+.setting-button:active {
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
 }
 
 .slider {
 }
 
-.level-button {
-    background-color: rgba(63, 63, 63, 255);
+.slider-base-field {
 }
 
-.level-button:hover {
-    background-color: rgba(255, 255, 255, 255);
-    color: rgba(0, 0, 0, 255);
+.slider-base-slider {
 }
 
-.contract-button {
-    background-color: rgba(63, 63, 63, 255);
+.slider-label {
 }
 
-.contract-button:hover {
-    -unity-background-image-tint-color: rgba(0, 0, 0, 255);
-    background-color: rgba(9, 118, 31, 255);
+.unity-toggle__checkmark {
+    width: 50px;
+    height: 50px;
 }
 
-.setting-button {
-    background-color: rgba(84, 84, 84, 255);
+.unity-toggle__input {
 }
 
-.setting-button:hover {
-    background-color: rgba(173, 173, 173, 255);
+.unity-base-field-input {
 }
 
-.setting-button:active {
-    background-color: rgba(255, 255, 255, 255);
-    color: rgba(0, 0, 0, 255);
+.unity-toggle {
+}
+
+.unity-base-field--no-label {
+}
+
+.unity-base-slider__tracker {
+    height: 41px;
+    background-image: url('project://database/Assets/Files/Textures/UI/Rectangle.png?fileID=21300000&guid=d13beca3caf428140a482873a0981571&type=3#Rectangle');
+    -unity-slice-left: 1000;
+    -unity-slice-top: 300;
+    -unity-slice-right: 1000;
+    -unity-slice-bottom: 300;
+}
+
+.unity-base-slider__dragger {
+    height: 48px;
+    top: -37px;
+}
+
+.unity-base-slider__dragger-border {
+    background-color: rgb(0, 0, 0);
+    height: 60px;
+    background-image: url('project://database/Assets/Files/Textures/UI/Rectangle.png?fileID=2800000&guid=d13beca3caf428140a482873a0981571&type=3#Rectangle');
+}
+
+.unity-base-slider__drag-container {
+}
+
+.unity-base-popup-field {
+}
+
+.unity-popup-field {
+}
+
+.unity-base-popup-field__input {
+}
+
+.unity-popup-field__input {
+    background-image: url('project://database/Assets/Files/Textures/UI/Rectangle.png?fileID=21300000&guid=d13beca3caf428140a482873a0981571&type=3#Rectangle');
+    -unity-slice-left: 500;
+    -unity-slice-top: 300;
+    -unity-slice-right: 500;
+    -unity-slice-bottom: 300;
+}
+
+.unity-base-field__input {
 }
