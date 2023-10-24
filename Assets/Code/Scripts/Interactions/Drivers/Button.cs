@@ -1,6 +1,9 @@
 ﻿using FR8Runtime.Interactions.Drivables;
 using FR8Runtime.Interactions.Drivers.Submodules;
+using FR8Runtime.References;
 using UnityEngine;
+using FMOD.Studio;
+using FMODUnity;
 
 namespace FR8Runtime.Interactions.Drivers
 {
@@ -8,7 +11,6 @@ namespace FR8Runtime.Interactions.Drivers
     {
         [SerializeField] private TwoPoseDrivableAnimator animator;
         [SerializeField] private bool testValue;
-        [SerializeField] private DriverSounds sounds;
 
         private bool state;
 
@@ -18,13 +20,13 @@ namespace FR8Runtime.Interactions.Drivers
         {
             base.OnValueChanged(newValue);
             animator.SetValue(newValue);
-            sounds.SetValue(newValue, 2);
+
+            SoundReference.ButtonPress.PlayOneShot();        
         }
 
         protected override void Awake()
         {
             base.Awake();
-            sounds.Awake(gameObject);
         }
 
         protected override void FixedUpdate()
