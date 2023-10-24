@@ -35,7 +35,9 @@ namespace FR8Runtime.Interactions.Drivers
 
         public void OnValueChanged(float newValue)
         {
-            SoundUtility.PlayOneShot(Open ? SoundReference.DoorOpen : SoundReference.DoorClosed, gameObject);
+            //Debug.Log("Door Sound?");
+            //SoundReference.DoorOpen.PlayOneShot();
+            //SoundUtility.PlayOneShot(Open ? SoundReference.DoorOpen : SoundReference.DoorClosed, gameObject);
         }
 
         protected virtual void SetValue(float newValue)
@@ -51,6 +53,7 @@ namespace FR8Runtime.Interactions.Drivers
 
         public void BeginInteract(GameObject interactingObject)
         {
+            SoundReference.DoorOpen.PlayOneShot();
             SetValue(Open ? 0.0f : 1.0f);
         }
 
