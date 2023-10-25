@@ -39,6 +39,8 @@ namespace FR8Runtime.UI
             UIActions.BindButton(pauseMenu, "return", HideAnd(UIActions.Load(SceneUtility.Scene.Menu)));
             UIActions.BindButton(pauseMenu, "quit", HideAnd(UIActions.QuitToDesktop));
 
+            //UIActions.ClickSfx();
+
             BindBackButtons();
             HideMenu();
         }
@@ -82,6 +84,8 @@ namespace FR8Runtime.UI
 
         public void SetMenu(int index)
         {
+            UIActions.ClickSfx();
+
             this.index = index;
 
             if (!avatar.IsAlive) this.index = -1;
