@@ -63,6 +63,7 @@ namespace FR8Runtime.UI
         {
             root.Q<Button>("start").clickable.clicked += UIActions.Load(SceneUtility.Scene.Game);
             root.Q<Button>("exit").clickable.clicked += UIActions.QuitToDesktop;
+            root.Q<Button>().clickable.clicked += UIActions.ClickSfx;
         }
     }
 }
