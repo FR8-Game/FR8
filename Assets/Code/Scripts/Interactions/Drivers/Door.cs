@@ -49,6 +49,8 @@ namespace FR8Runtime.Interactions.Drivers
         public void Nudge(int direction)
         {
             SetValue(direction);
+            SoundReference.DoorOpen.PlayOneShot();
+
         }
 
         public void BeginInteract(GameObject interactingObject)
