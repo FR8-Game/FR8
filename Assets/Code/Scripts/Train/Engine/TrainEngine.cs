@@ -37,6 +37,8 @@ namespace FR8Runtime.Train.Engine
 
         public float ThrottleInput => driverNetwork.GetValue(ThrottleKey);
 
+        public float GetNormalizedForwardSpeed() => Mathf.InverseLerp(0.0f, maxSpeedKmpH, Mathf.Abs(locomotive.GetForwardSpeed()));
+
         private void Awake()
         {
             locomotive = GetComponent<Locomotive>();

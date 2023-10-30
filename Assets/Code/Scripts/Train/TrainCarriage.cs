@@ -4,7 +4,6 @@ using FMOD.Studio;
 using FR8Runtime.Interactions.Drivers;
 using FR8Runtime.References;
 using FR8Runtime.Train.Track;
-using JetBrains.Annotations;
 using Unity.Collections;
 using UnityEngine;
 
@@ -22,7 +21,6 @@ namespace FR8Runtime.Train
 
         [Space]
         [SerializeField] protected float drag = 12.0f;
-
         [SerializeField] protected float referenceWeight;
         [SerializeField] protected float cornerLean = 0.6f;
 
@@ -312,7 +310,7 @@ namespace FR8Runtime.Train
         protected static float ToMps(float kmph) => kmph / 3.6f;
         protected static float ToKmpH(float mps) => mps * 3.6f;
 
-        private void OnDrawGizmosSelected()
+        protected virtual void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.magenta;
             Gizmos.DrawLine(HardAnchorPosition, SoftAnchorPosition);

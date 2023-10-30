@@ -13,6 +13,7 @@ namespace FR8Runtime.Train
     public class Locomotive : TrainCarriage
     {
         [FormerlySerializedAs("dynamicBrakeConstant")] [SerializeField] private float brakeConstant = 0.5f;
+        [SerializeField] private Bounds localCabinBounds;
 
         [Space]
         [Header("Testing")]
@@ -29,6 +30,7 @@ namespace FR8Runtime.Train
 
         public float Brake => DriverNetwork.GetValue(BrakeKey);
         public int Gear => Mathf.RoundToInt(DriverNetwork.GetValue(GearKey));
+        public Bounds LocalCabinBounds => localCabinBounds;
 
         protected override void Configure()
         {
@@ -71,7 +73,7 @@ namespace FR8Runtime.Train
 
             Body.AddForce(DriverDirection * velocityChange, ForceMode.VelocityChange);
         }
-
+        
         public void UpdateDriverGroups()
         {
             var fwdSpeed = Mathf.Abs(ToKmpH(GetForwardSpeed()));
@@ -79,5 +81,14 @@ namespace FR8Runtime.Train
         }
 
         protected override float GetBrakeLoad() => Mathf.Max(base.GetBrakeLoad(), brakeLoad);
+
+        protected override void OnDrawGizmosSelected()
+        {
+            Gizmos.matrix = transform.localToWorldMatrix;
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireCube(localCabinBounds.center, localCabinBounds.size);
+            Gizmos.color = Color.red.Alpha(0.2f);
+            Gizmos.DrawCube(localCabinBounds.center, localCabinBounds.size);
+        }
     }
 }
