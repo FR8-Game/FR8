@@ -30,7 +30,12 @@ namespace FR8Runtime.UI
                 FullScreenMode.Windowed,
             };
             resolutions = new List<Resolution>();
-            resolutions.Add(Screen.currentResolution);
+            resolutions.Add(new Resolution()
+            {
+                width = Screen.width,
+                height = Screen.height,
+                refreshRate = Screen.currentResolution.refreshRate,
+            });
             resolutions.AddRange(Screen.resolutions);
 
             var settings = SaveManager.PersistantSave.GetOrLoad();
