@@ -27,7 +27,7 @@ namespace FR8Runtime.Player.Submodules
         private bool cameraLocked;
         private bool wasCameraLocked;
 
-        private float fieldOfView = 70.0f;
+        private float FieldOfView => SaveManager.PersistantSave.GetOrLoad().fieldOfView;
         
         private Vector3 translationOffset;
         private Quaternion rotationalOffset = Quaternion.identity;
@@ -54,21 +54,11 @@ namespace FR8Runtime.Player.Submodules
 
             cameraLocked = true;
             wasCameraLocked = !cameraLocked;
-
-            SaveManager.PersistantSave.DataChangedEvent += OnPersistantSaveDataChanged;
-            OnPersistantSaveDataChanged();
         }
 
         private void OnEnable()
         {
             Yaw = Camera.transform.eulerAngles.x;
-        }
-
-        private void OnPersistantSaveDataChanged()
-        {
-            var data = SaveManager.PersistantSave.GetOrLoad();
-
-            fieldOfView = data.playerAvatarFov;
         }
 
         private void Update()
@@ -129,7 +119,7 @@ namespace FR8Runtime.Player.Submodules
 
             // Update additional camera variables.
             Camera.transform.position = Avatar.Head.position + Camera.transform.rotation * translationOffset;
-            Camera.fieldOfView = Mathf.SmoothDamp(Camera.fieldOfView, zoomCamera ? zoomFieldOfView : fieldOfView, ref fovVelocity, fovSmoothTime);
+            Camera.fieldOfView = Mathf.SmoothDamp(Camera.fieldOfView, zoomCamera ? zoomFieldOfView : FieldOfView, ref fovVelocity, fovSmoothTime);
             Camera.nearClipPlane = nearPlane;
             Camera.farClipPlane = farPlane;
         }
