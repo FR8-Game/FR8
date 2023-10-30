@@ -1,74 +1,11 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Content/UI/Style%20Sheets/Game%20UI%20Stylesheet.uss?fileID=7433441132597879392&amp;guid=acd50812ec1cbb044a0297b17ba892a4&amp;type=3#Game UI Stylesheet" />
     <ui:VisualElement name="background" class="background-transparent" style="flex-grow: 1;" />
-    <ui:VisualElement name="margin" style="padding-left: 30px; padding-right: 30px; padding-top: 30px; padding-bottom: 30px;">
-        <ui:VisualElement name="header">
+    <ui:VisualElement name="margin" style="padding-left: 30px; padding-right: 30px; padding-top: 30px; padding-bottom: 30px; position: absolute; left: 0; top: 0; right: 0; bottom: 0;">
+        <ui:VisualElement name="header" style="flex-shrink: 0;">
             <ui:Label text="&gt; SETTINGS_" display-tooltip-when-elided="true" name="title" style="font-size: 70px; -unity-text-align: middle-left;" />
         </ui:VisualElement>
-        <ui:ScrollView name="Content" style="margin-left: 60px; margin-top: 30px;">
-            <ui:VisualElement name="Graphics">
-                <ui:Label text="GRAPHICS" display-tooltip-when-elided="true" name="GraphicsTitle" class="h4" />
-                <ui:DropdownField label="RESOLUTION" index="-1" choices="System.Collections.Generic.List`1[System.String]" name="resolution" class="settings-entry" />
-                <ui:DropdownField label="AUDIO" index="-1" choices="System.Collections.Generic.List`1[System.String]" name="audio" />
-                <ui:DropdownField label="DISPLAY" index="-1" choices="System.Collections.Generic.List`1[System.String]" name="display" />
-            </ui:VisualElement>
-            <ui:VisualElement name="Audio">
-                <ui:Label text="Audio" display-tooltip-when-elided="true" name="AudioTitle" style="font-size: 50px;" />
-                <ui:VisualElement name="MasterVol" style="flex-direction: row;">
-                    <ui:VisualElement name="LeftOffSet" style="flex-grow: 0.2;" />
-                    <ui:Slider picking-mode="Ignore" label="Master Volume: " value="100" high-value="100" name="MasterVolSlider" style="font-size: 30px; flex-grow: 2;" />
-                    <ui:VisualElement name="RightOffSet" style="flex-grow: 1;" />
-                </ui:VisualElement>
-                <ui:VisualElement name="Spacer" style="flex-grow: 1; height: 10px; width: 1920px;" />
-                <ui:VisualElement name="SFXVol" style="flex-direction: row;">
-                    <ui:VisualElement name="LeftOffSet" style="flex-grow: 0.2;" />
-                    <ui:Slider picking-mode="Ignore" label="Sound Effects:                                 " value="100" high-value="100" name="SFXVolSlider" style="font-size: 30px; flex-grow: 2;" />
-                    <ui:VisualElement name="RightOffSet" style="flex-grow: 1;" />
-                </ui:VisualElement>
-                <ui:VisualElement name="Spacer" style="flex-grow: 1; height: 10px; width: 1920px;" />
-                <ui:VisualElement name="MusicVol" style="flex-direction: row;">
-                    <ui:VisualElement name="LeftOffSet" style="flex-grow: 0.2;" />
-                    <ui:Slider picking-mode="Ignore" label="Music Volume:                              " value="100" high-value="100" name="MusicVolSlider" style="font-size: 30px; flex-grow: 2;" />
-                    <ui:VisualElement name="RightOffSet" style="flex-grow: 1;" />
-                </ui:VisualElement>
-                <ui:VisualElement name="Spacer" style="flex-grow: 1; height: 10px; width: 1920px;" />
-            </ui:VisualElement>
-            <ui:VisualElement name="Accessibility">
-                <ui:Label text="Accessibility" display-tooltip-when-elided="true" name="AccessibilityTitle" style="font-size: 50px;" />
-                <ui:VisualElement name="Spacer" style="flex-grow: 1; height: 10px; width: 1920px;" />
-                <ui:VisualElement name="FOV" style="flex-direction: row;">
-                    <ui:VisualElement name="LeftOffSet" style="flex-grow: 0.2;" />
-                    <ui:Slider picking-mode="Ignore" label="Field Of View: " value="70" high-value="120" name="FOVSlider" low-value="60" style="font-size: 30px; flex-grow: 2;" />
-                    <ui:VisualElement name="RightOffSet" style="flex-grow: 1;" />
-                </ui:VisualElement>
-                <ui:VisualElement name="Spacer" style="flex-grow: 1; height: 10px; width: 1920px;" />
-                <ui:VisualElement name="WhiteNoise" style="flex-direction: row;">
-                    <ui:VisualElement name="LeftOffSet" style="flex-grow: 0.2;" />
-                    <ui:Slider picking-mode="Ignore" label="White Noise: " value="100" high-value="100" name="WhiteNoiseSlider" style="font-size: 30px; flex-grow: 2;" />
-                    <ui:VisualElement name="RightOffSet" style="flex-grow: 1;" />
-                </ui:VisualElement>
-                <ui:VisualElement name="Spacer" style="flex-grow: 1; height: 10px; width: 1920px;" />
-                <ui:VisualElement name="MouseSense" style="flex-direction: row;">
-                    <ui:VisualElement name="LeftOffSet" style="flex-grow: 0.2;" />
-                    <ui:Slider picking-mode="Ignore" label="Mouse Sensitivity: " value="70" high-value="120" name="MouseSensSlider" low-value="60" style="font-size: 30px; flex-grow: 2;" />
-                    <ui:VisualElement name="RightOffSet" style="flex-grow: 1;" />
-                </ui:VisualElement>
-                <ui:VisualElement name="Spacer" style="flex-grow: 1; height: 10px; width: 1920px;" />
-                <ui:VisualElement name="ConYSense" style="flex-direction: row;">
-                    <ui:VisualElement name="LeftOffSet" style="flex-grow: 0.2;" />
-                    <ui:Slider picking-mode="Ignore" label="Controller Y Sensitivity: " value="100" high-value="100" name="ConYSenseSlider" style="font-size: 30px; flex-grow: 2;" />
-                    <ui:VisualElement name="RightOffSet" style="flex-grow: 1;" />
-                </ui:VisualElement>
-                <ui:VisualElement name="Spacer" style="flex-grow: 1; height: 10px; width: 1920px;" />
-                <ui:VisualElement name="ConXSense" style="flex-direction: row;">
-                    <ui:VisualElement name="LeftOffSet" style="flex-grow: 0.2;" />
-                    <ui:Slider picking-mode="Ignore" label="Controller X Sensitivity: " value="100" high-value="100" name="ConXSenseSlider" style="font-size: 30px; flex-grow: 2;" />
-                    <ui:VisualElement name="RightOffSet" style="flex-grow: 1;" />
-                </ui:VisualElement>
-            </ui:VisualElement>
-        </ui:ScrollView>
-        <ui:VisualElement name="Footer" style="flex-direction: row-reverse;">
-            <ui:Button text="RETURN" display-tooltip-when-elided="true" name="Return" style="-unity-text-align: middle-center; padding-left: 50px; padding-right: 50px; flex-grow: 1;" />
-        </ui:VisualElement>
+        <ui:ScrollView name="content" style="margin-left: 60px; margin-top: 30px; flex-shrink: 1; flex-grow: 1; margin-right: 0; margin-bottom: 0;" />
+        <ui:VisualElement name="footer" style="flex-direction: row-reverse; flex-shrink: 0;" />
     </ui:VisualElement>
 </ui:UXML>

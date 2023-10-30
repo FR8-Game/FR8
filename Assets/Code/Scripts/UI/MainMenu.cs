@@ -56,7 +56,7 @@ namespace FR8Runtime.UI
         {
             SaveManager.PersistantSave.Load();
             var settings = SaveManager.PersistantSave.data;
-            Screen.SetResolution(settings.xResolution, settings.yResolution, (FullScreenMode)settings.fullscreenMode);
+            Screen.SetResolution(settings.xResolution, settings.yResolution, (FullScreenMode)settings.displayMode);
         }
 
         private void SetupLanding(VisualElement root)

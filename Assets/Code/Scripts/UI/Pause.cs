@@ -15,7 +15,8 @@ namespace FR8Runtime.UI
 
             Paused = state;
             Time.timeScale = state ? 0.0f : 1.0f;
-
+            if (Paused) Cursor.lockState = CursorLockMode.None;
+            
             FMODUnity.RuntimeManager.StudioSystem.setParameterByName("Paused", state ? 1.0f : 0.0f);
 
             PausedStateChangedEvent?.Invoke();
