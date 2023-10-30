@@ -15,6 +15,8 @@ namespace FR8Runtime.Train
     [RequireComponent(typeof(Rigidbody))]
     public class TrainCarriage : MonoBehaviour, INameplateProvider
     {
+        public const int TrainLayer = 10;
+    
         [Space]
         public string saveTypeReference = "TrainCarriage";
 
@@ -85,6 +87,12 @@ namespace FR8Runtime.Train
 
             CarriageConnectors = new List<CarriageConnector>(GetComponentsInChildren<CarriageConnector>());
             DriverNetwork = GetComponent<DriverNetwork>();
+
+            gameObject.layer = TrainLayer;
+            foreach (var e in GetComponentsInChildren<Transform>())
+            {
+                e.gameObject.layer = TrainLayer;
+            }
         }
 
         private void OnEnable()
