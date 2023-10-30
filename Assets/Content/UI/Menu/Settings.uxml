@@ -1,32 +1,16 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Content/UI/Style%20Sheets/Game%20UI%20Stylesheet.uss?fileID=7433441132597879392&amp;guid=acd50812ec1cbb044a0297b17ba892a4&amp;type=3#Game UI Stylesheet" />
-    <ui:VisualElement name="background" class="background-transparent" style="flex-grow: 1;">
-        <ui:VisualElement name="header" style="flex-grow: 1.7;">
-            <ui:Label text="&gt; SETTINGS_" display-tooltip-when-elided="true" name="title" style="font-size: 70px; flex-grow: 1;" />
+    <ui:VisualElement name="background" class="background-transparent" style="flex-grow: 1;" />
+    <ui:VisualElement name="margin" style="padding-left: 30px; padding-right: 30px; padding-top: 30px; padding-bottom: 30px;">
+        <ui:VisualElement name="header">
+            <ui:Label text="&gt; SETTINGS_" display-tooltip-when-elided="true" name="title" style="font-size: 70px; -unity-text-align: middle-left;" />
         </ui:VisualElement>
-        <ui:ScrollView name="Content" style="flex-grow: 4; height: 910px; width: 1918px;">
+        <ui:ScrollView name="Content" style="margin-left: 60px; margin-top: 30px;">
             <ui:VisualElement name="Graphics">
-                <ui:Label text="GRAPHICS" display-tooltip-when-elided="true" name="GraphicsTitle" style="font-size: 50px;" />
-                <ui:VisualElement name="Resolution" style="flex-direction: row; height: 52px; width: 1926px;">
-                    <ui:VisualElement name="LeftOffSet" style="flex-grow: 0.2;" />
-                    <ui:Label text="Resolution    &#10;" display-tooltip-when-elided="true" name="ResLabel" style="font-size: 30px; flex-grow: 0.2;" />
-                    <ui:DropdownField index="-1" choices="System.Collections.Generic.List`1[System.String]" name="ResDropDown" style="flex-grow: 1;" />
-                    <ui:VisualElement name="RightOffSet" style="flex-grow: 2;" />
-                </ui:VisualElement>
-                <ui:VisualElement name="Spacer" style="flex-grow: 1; height: 10px; width: 1920px;" />
-                <ui:VisualElement name="Quality" style="flex-direction: row; height: 52px; width: 1926px;">
-                    <ui:VisualElement name="LeftOffSet" style="flex-grow: 0.2;" />
-                    <ui:Label text="Quality" display-tooltip-when-elided="true" name="QualLabel" style="font-size: 30px; flex-grow: 0.329;" />
-                    <ui:DropdownField index="-1" choices="System.Collections.Generic.List`1[System.String]" name="QualDropDown" style="flex-grow: 1;" />
-                    <ui:VisualElement name="RightOffSet" style="flex-grow: 2;" />
-                </ui:VisualElement>
-                <ui:VisualElement name="Spacer" style="flex-grow: 1; height: 10px; width: 1920px;" />
-                <ui:VisualElement name="Fullscreen" style="flex-direction: row; height: 52px; width: 1926px;">
-                    <ui:VisualElement name="LeftOffSet" style="flex-grow: 0.2;" />
-                    <ui:Label text="Display" display-tooltip-when-elided="true" name="DisLabel" style="font-size: 30px; flex-grow: 0.3;" />
-                    <ui:DropdownField index="-1" choices="System.Collections.Generic.List`1[System.String]" name="DisDropDown" style="flex-grow: 1;" />
-                    <ui:VisualElement name="RightOffSet" style="flex-grow: 2;" />
-                </ui:VisualElement>
+                <ui:Label text="GRAPHICS" display-tooltip-when-elided="true" name="GraphicsTitle" class="h4" />
+                <ui:DropdownField label="RESOLUTION" index="-1" choices="System.Collections.Generic.List`1[System.String]" name="resolution" class="settings-entry" />
+                <ui:DropdownField label="AUDIO" index="-1" choices="System.Collections.Generic.List`1[System.String]" name="audio" />
+                <ui:DropdownField label="DISPLAY" index="-1" choices="System.Collections.Generic.List`1[System.String]" name="display" />
             </ui:VisualElement>
             <ui:VisualElement name="Audio">
                 <ui:Label text="Audio" display-tooltip-when-elided="true" name="AudioTitle" style="font-size: 50px;" />
@@ -83,8 +67,8 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:ScrollView>
-        <ui:VisualElement name="Footer" style="flex-grow: 1;">
-            <ui:Button text="Return" display-tooltip-when-elided="true" name="Return" style="font-size: 30px; height: 102px; width: 254px;" />
+        <ui:VisualElement name="Footer" style="flex-direction: row-reverse;">
+            <ui:Button text="RETURN" display-tooltip-when-elided="true" name="Return" style="-unity-text-align: middle-center; padding-left: 50px; padding-right: 50px; flex-grow: 1;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
