@@ -20,7 +20,8 @@ namespace FR8Runtime.UI
         private void Awake()
         {
             docs = GetComponent<UIDocument>();
-            titleMusic = SoundReference.TitleMusic.InstanceAndStart();
+            titleMusic = SoundReference.TitleMusic.Instance();
+            titleMusic.start();
         }
 
         private void Start()
