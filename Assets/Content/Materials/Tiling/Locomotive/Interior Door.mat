@@ -20,27 +20,22 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: MAT_Window
-  m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
-  m_ValidKeywords:
-  - _METALLICSPECGLOSSMAP
-  - _SURFACE_TYPE_TRANSPARENT
+  m_Name: Interior Door
+  m_Shader: {fileID: -6465566751694194690, guid: 954f7bd919a52b040b9085c83d11f0d9, type: 3}
+  m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 1
-  m_CustomRenderQueue: 3000
-  stringTagMap:
-    RenderType: Transparent
-  disabledShaderPasses:
-  - DepthOnly
-  - SHADOWCASTER
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
-        m_Texture: {fileID: 2800000, guid: 7aa9d65f48e9be940a9c0ea132e6e36a, type: 3}
-        m_Scale: {x: 0.5, y: 0.5}
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
         m_Texture: {fileID: 0}
@@ -62,13 +57,21 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Grunge_Sample:
+        m_Texture: {fileID: 2800000, guid: 1c43ad73e6c27104194f6e9fdd97c516, type: 3}
+        m_Scale: {x: 5, y: 2}
+        m_Offset: {x: 5, y: 3}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 7aa9d65f48e9be940a9c0ea132e6e36a, type: 3}
-        m_Scale: {x: 0.5, y: 0.5}
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
-        m_Texture: {fileID: 2800000, guid: 7aa9d65f48e9be940a9c0ea132e6e36a, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Normal_Map:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 6, y: 6}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
         m_Texture: {fileID: 0}
@@ -99,35 +102,47 @@ Material:
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
-    - _Burn: 0.2
+    - _Burn: 0.1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
-    - _Cull: 0
+    - _Cull: 2
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DstBlend: 10
+    - _DstBlend: 0
     - _EnvironmentReflections: 1
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _Grid_Size: 0.5
+    - _Grid_Size: 2
     - _Metallic: 0
+    - _Metalness: 0.05
+    - _Normal_Intensity: 1
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _Smoothness: 0.362
+    - _Rotation: 0
+    - _Smoothness: 0.2
     - _SmoothnessTextureChannel: 0
+    - _Smoothness_Brightness: 10
+    - _Smoothness_Contrast: 0.217
     - _SpecularHighlights: 1
-    - _SrcBlend: 5
-    - _Surface: 1
+    - _SrcBlend: 1
+    - _Surface: 0
+    - _Triplanar: 1
+    - _Triplanar_Blend: 1
+    - _Triplanar_Tiling: 1
     - _WorkflowMode: 1
-    - _ZWrite: 0
+    - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.14676042, g: 0.25157595, b: 0.3207547, a: 0.41568628}
-    - _Color: {r: 0.14676037, g: 0.25157592, b: 0.32075468, a: 0.41568628}
+    - _Albedo_High: {r: 0.41509432, g: 0.41509432, b: 0.41509432, a: 1}
+    - _Albedo_Low: {r: 0.6415094, g: 0.6415094, b: 0.6415094, a: 1}
+    - _BaseColor: {r: 0.2264151, g: 0.2264151, b: 0.2264151, a: 1}
+    - _Color: {r: 0.31132078, g: 0.31132078, b: 0.31132078, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _Offset: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+    - _Tiling: {r: 6, g: 6, b: 0, a: 0}
   m_BuildTextureStacks: []
