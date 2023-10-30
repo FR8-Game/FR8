@@ -74,7 +74,11 @@ namespace FR8Runtime.Player.Submodules
             avatar.UpdateEvent += Update;
             avatar.EnableEvent += OnEnable;
             avatar.DisableEvent += OnDisable;
+            avatar.StartEvent += Start;
+        }
 
+        private void Start()
+        {
             hud = avatar.transform.Find("HUD").GetComponent<UIDocument>();
             var root = hud.rootVisualElement;
 
