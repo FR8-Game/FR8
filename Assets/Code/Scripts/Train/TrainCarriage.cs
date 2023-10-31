@@ -15,33 +15,12 @@ namespace FR8Runtime.Train
     public class TrainCarriage : MonoBehaviour, INameplateProvider
     {
         public const int TrainLayer = 10;
-    
-        [Space]
-        public string saveTypeReference = "TrainCarriage";
 
-        [Space]
-        [SerializeField] protected float drag = 12.0f;
-        [SerializeField] protected float referenceWeight;
-        [SerializeField] protected float cornerLean = 0.6f;
+        public TrainCarriageSettings carriageSettings;
+        public float referenceWeight = 100000.0f;
+        [Range(0.0f, 1.0f)] public float handbrakeDefault = 1.0f;
+        public float trainLength = 10.0f;
 
-        [Space]
-        [SerializeField][Range(0.0f, 1.0f)] private float handbrakeDefault = 1.0f;
-        [SerializeField] private float handbrakeConstant;
-        [SerializeField] private AnimationCurve handbrakeEfficiencyCurve = new
-        (
-            new Keyframe(0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f),
-            new Keyframe(0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f),
-            new Keyframe(4.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f)
-        );
-
-        [Space]
-        [SerializeField] protected float retentionSpring = 2500.0f;
-
-        [SerializeField] protected float retentionDamping = 50.0f;
-        [SerializeField] protected float retentionTorqueConstant = 0.2f;
-
-        [SerializeField] protected float trainLength = 20.0f;
-        
         [Space]
         [ReadOnly][SerializeField] private float evaluatedBrakeLoad;
 
@@ -61,7 +40,6 @@ namespace FR8Runtime.Train
         public string Name => name;
         public Rigidbody Body { get; private set; }
         public Vector3 DriverDirection { get; private set; }
-        public float ReferenceWeight => referenceWeight;
         public Vector3 TangentialForce { get; private set; }
         public float PositionOnSpline { get; private set; }
         public float LastPositionOnSpline { get; private set; }
@@ -183,7 +161,7 @@ namespace FR8Runtime.Train
         private void ApplyHandbrake()
         {
             var speed = GetForwardSpeed();
-            var force = DriverDirection * -speed * Mathf.Clamp01(GetHandbrakeConstant() * DriverNetwork.GetValue(HandbrakeKey)) * handbrakeConstant;
+            var force = DriverDirection * -speed * Mathf.Clamp01(GetHandbrakeConstant() * DriverNetwork.GetValue(HandbrakeKey)) * carriageSettings.handbrakeConstant;
 
             handbrakeLoad = Mathf.Abs(Vector3.Dot(DriverDirection, force));
             
@@ -195,7 +173,7 @@ namespace FR8Runtime.Train
         public float GetHandbrakeConstant()
         {
             var speed = Mathf.Abs(GetForwardSpeed());
-            return handbrakeEfficiencyCurve.Evaluate(speed);
+            return carriageSettings.handbrakeEfficiencyCurve.Evaluate(speed);
         }
 
         private void FindConnectedCarriages(List<TrainCarriage> list)
@@ -226,7 +204,7 @@ namespace FR8Runtime.Train
         private void ApplyDrag()
         {
             var fwdSpeed = GetForwardSpeed();
-            var drag = -fwdSpeed * Mathf.Abs(fwdSpeed) * this.drag;
+            var drag = -fwdSpeed * Mathf.Abs(fwdSpeed) * carriageSettings.drag;
 
             var force = drag * referenceWeight / Body.mass;
 
@@ -259,11 +237,11 @@ namespace FR8Runtime.Train
         private void ApplyCorrectiveForce(Vector3 position, Vector3 direction)
         {
             // Calculate alignment delta as a force
-            var force = (position - Body.position) * retentionSpring;
+            var force = (position - Body.position) * carriageSettings.retentionSpring;
 
             // Calculate damping force
             var normalVelocity = Body.velocity;
-            force -= normalVelocity * retentionDamping;
+            force -= normalVelocity * carriageSettings.retentionDamping;
 
             // Apply Force
             force -= direction * Vector3.Dot(direction, force);
@@ -274,7 +252,7 @@ namespace FR8Runtime.Train
         private Quaternion CalculateOrientation(Vector3 direction)
         {
             var fwdSpeed = Mathf.Abs(GetForwardSpeed());
-            var lean = Mathf.Asin(Vector3.Dot(transform.right, direction)) * cornerLean * fwdSpeed;
+            var lean = Mathf.Asin(Vector3.Dot(transform.right, direction)) * carriageSettings.cornerLean * fwdSpeed;
 
             var rotation = Quaternion.LookRotation(direction, Vector3.up) * Quaternion.Euler(Vector3.forward * lean);
             return rotation;
@@ -284,7 +262,7 @@ namespace FR8Runtime.Train
         {
             var deltaRotation = CalculateDeltaRotation(rotation);
 
-            var torque = (deltaRotation * retentionSpring - Body.angularVelocity * retentionDamping) * retentionTorqueConstant;
+            var torque = (deltaRotation * carriageSettings.retentionSpring - Body.angularVelocity * carriageSettings.retentionDamping) * carriageSettings.retentionTorqueConstant;
             Body.AddTorque(torque, ForceMode.Acceleration);
         }
 

@@ -12,7 +12,7 @@ namespace FR8Runtime.Train
     [RequireComponent(typeof(DriverNetwork), typeof(TrainMonitor), typeof(LocomotiveAudio))]
     public class Locomotive : TrainCarriage
     {
-        [FormerlySerializedAs("dynamicBrakeConstant")] [SerializeField] private float brakeConstant = 0.5f;
+        public LocomotiveSettings locomotiveSettings;
         [SerializeField] private Bounds localCabinBounds;
 
         [Space]
@@ -31,13 +31,6 @@ namespace FR8Runtime.Train
         public float Brake => DriverNetwork.GetValue(BrakeKey);
         public int Gear => Mathf.RoundToInt(DriverNetwork.GetValue(GearKey));
         public Bounds LocalCabinBounds => localCabinBounds;
-
-        protected override void Configure()
-        {
-            base.Configure();
-
-            brakeConstant = Mathf.Max(0.0f, brakeConstant);
-        }
 
         protected override void Start()
         {
@@ -65,7 +58,7 @@ namespace FR8Runtime.Train
         {
             var fwdSpeed = GetForwardSpeed();
 
-            var force = brakeConstant * Brake * -fwdSpeed;
+            var force = locomotiveSettings.handbrakeConstant * Brake * -fwdSpeed;
             brakeLoad = force;
 
             var velocityChange = force * referenceWeight / Body.mass * Time.deltaTime;
