@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d030ce6e95374adca0d7ad29cfe6d9a0, type: 3}
+  m_Name: Locomotive Settings
+  m_EditorClassIdentifier: 
+  handbrakeConstant: 0.5
+  maxSpeedKmpH: 120
+  acceleration: 8
+  maxPowerConsumption: 75
+  throttleLoadPowerSplit: 0
+  throttleSmoothing: 0
+  loadScaling: 0.02
+  loadCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  baselineGeneration: 5
+  idleRpm: 1000
+  maxRpm: 10000
+  stallRpm: 700
+  rpmSmoothTime: 0.1
+  maxPowerProduction: 200
+  fuelCapacity: 20
