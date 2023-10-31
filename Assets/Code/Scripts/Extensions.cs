@@ -5,6 +5,7 @@ using FMODUnity;
 using FR8Runtime.Train.Signals;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.VFX;
 
 namespace FR8Runtime
 {
@@ -103,6 +104,45 @@ namespace FR8Runtime
             fmodEvent.set3DAttributes(gameObject.To3DAttributes());
             fmodEvent.start();
             fmodEvent.release();
+        }
+
+        public static Color Alpha (this Color c, float a) => new Color(c.r, c.g, c.b, c.a * a);
+
+        public static void SetTransform(this VisualEffect visualEffect, string propertyName, Transform transform)
+        {
+            visualEffect.SetTransform(propertyName, transform.position, transform.localRotation, transform.localScale);
+        }
+
+        public static bool HasTransform(this VisualEffect visualEffect, string propertyName)
+        {
+            const string vfxPositionPostfix = "_position";
+            const string vfxRotationPostfix = "_angles";
+            const string vfxScalePostfix = "_scale";
+            
+            var propPosition = propertyName + vfxPositionPostfix;
+            var propEulerAngles = propertyName + vfxRotationPostfix;
+            var propScale = propertyName + vfxScalePostfix;
+ 
+            if (!visualEffect.HasVector3(propPosition)) return false;
+            if (!visualEffect.HasVector3(propEulerAngles)) return false;
+            if (!visualEffect.HasVector3(propScale)) return false;
+            
+            return true;
+        }
+        
+        public static void SetTransform(this VisualEffect visualEffect, string propertyName, Vector3 position, Quaternion rotation, Vector3 scale)
+        {
+            const string vfxPositionPostfix = "_position";
+            const string vfxRotationPostfix = "_angles";
+            const string vfxScalePostfix = "_scale";
+            
+            var propPosition = propertyName + vfxPositionPostfix;
+            var propEulerAngles = propertyName + vfxRotationPostfix;
+            var propScale = propertyName + vfxScalePostfix;
+ 
+            visualEffect.SetVector3(propPosition, position);
+            visualEffect.SetVector3(propEulerAngles, rotation.eulerAngles);
+            visualEffect.SetVector3(propScale, scale);
         }
     }
 }
