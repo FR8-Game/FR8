@@ -9,20 +9,9 @@ namespace FR8Runtime.Train.Electrics
     [DisallowMultipleComponent]
     public sealed class TrainGasTurbine : MonoBehaviour, IElectricGenerator
     {
-        public float idleRpm = 1000.0f;
-        public float maxRpm = 10000.0f;
-        public float stallRpm = 700.0f;
-
-        [Space]
-        public float maxPowerProduction = 200.0f;
-
-        [Space]
-        public float fuelCapacity = 20.0f;
         [SerializeField] [Range(0.0f, 1.0f)] private float fuelLevel = 1.0f;
 
         [Space]
-        [SerializeField] private float smoothTime;
-
         [SerializeField] private CodeUtility.NoiseMachine engineNoise;
 
         [Space]
@@ -32,6 +21,7 @@ namespace FR8Runtime.Train.Electrics
         private const string FuelKey = "Fuel";
         private const string RpmKey = "RPM";
 
+        private Locomotive locomotive;
         private DriverNetwork driverNetwork;
         private EventInstance soundInstance;
 
@@ -41,12 +31,14 @@ namespace FR8Runtime.Train.Electrics
         private bool wasRunning;
         public bool running;
 
+        public LocomotiveSettings Settings => locomotive.locomotiveSettings;
         public float CurrentRpm => currentRpm;
-        public float MaximumPowerGeneration => running ? maxPowerProduction : 0.0f;
+        public float MaximumPowerGeneration => running ? Settings.maxPowerProduction : 0.0f;
         public float FuelLevel => fuelLevel;
 
         private void Awake()
         {
+            locomotive = GetComponent<Locomotive>();
             driverNetwork = GetComponentInParent<DriverNetwork>();
             soundInstance = RuntimeManager.CreateInstance(engineSounds);
         }
@@ -64,7 +56,7 @@ namespace FR8Runtime.Train.Electrics
             var connected = driverNetwork.GetValue(TrainElectricsController.MainFuse) > 0.5f;
             if (!connected) t = 0.0f;
 
-            running = fuelLevel > 0.0f && currentRpm > stallRpm;
+            running = fuelLevel > 0.0f && currentRpm > Settings.stallRpm;
             if (driverNetwork.GetValue(IgnitionKey) > 0.5f)
             {
                 running = true;
@@ -73,12 +65,12 @@ namespace FR8Runtime.Train.Electrics
             
             UpdateSounds();
 
-            currentRpm = Mathf.SmoothDamp(currentRpm, t, ref velocity, smoothTime);
+            currentRpm = Mathf.SmoothDamp(currentRpm, t, ref velocity, Settings.rpmSmoothTime);
             driverNetwork.SetValue(RpmKey, currentRpm);
             driverNetwork.SetValue(FuelKey, fuelLevel * 100.0f);
 
-            var fuelConsumption = currentRpm / maxRpm;
-            fuelLevel -= fuelConsumption / (fuelCapacity * 60.0f) * Time.deltaTime;
+            var fuelConsumption = currentRpm / Settings.maxRpm;
+            fuelLevel -= fuelConsumption / (Settings.fuelCapacity * 60.0f) * Time.deltaTime;
 
             wasRunning = running;
         }
@@ -110,12 +102,12 @@ namespace FR8Runtime.Train.Electrics
                 return;
             }
             
-            targetRpm = Mathf.Max(idleRpm, maxRpm * percent);
+            targetRpm = Mathf.Max(Settings.idleRpm, Settings.maxRpm * percent);
         }
 
         public void Refuel(float rate)
         {
-            fuelLevel += rate / fuelCapacity * Time.deltaTime;
+            fuelLevel += rate / Settings.fuelCapacity * Time.deltaTime;
             fuelLevel = Mathf.Clamp01(fuelLevel);
         }
     }
