@@ -38,6 +38,7 @@ namespace FR8Runtime.Train.Electrics
 
         private void Awake()
         {
+            locomotive = GetComponent<Locomotive>();
             driverNetwork = GetComponentInParent<DriverNetwork>();
             soundInstance = RuntimeManager.CreateInstance(engineSounds);
         }
