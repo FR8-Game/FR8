@@ -1,5 +1,8 @@
 using System;
 using FR8Runtime.CodeUtility;
+using FR8Runtime.References;
+using FMOD.Studio;
+using FMODUnity;
 using UnityEngine.UIElements;
 
 namespace FR8Runtime.UI
@@ -25,6 +28,11 @@ namespace FR8Runtime.UI
             var element = root.Q<Button>(q);
             if (element == null) return;
             element.clickable.clicked += callback;
+        }
+
+        public static void ClickSfx()
+        {
+            SoundUtility.PlayOneShot(SoundReference.MenuClick);
         }
     }
 }

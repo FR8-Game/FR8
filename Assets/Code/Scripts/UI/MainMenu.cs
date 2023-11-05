@@ -20,7 +20,8 @@ namespace FR8Runtime.UI
         private void Awake()
         {
             docs = GetComponent<UIDocument>();
-            titleMusic = SoundReference.TitleMusic.InstanceAndStart();
+            titleMusic = SoundReference.TitleMusic.Instance();
+            titleMusic.start();
         }
 
         private void Start()
@@ -56,13 +57,14 @@ namespace FR8Runtime.UI
         {
             SaveManager.PersistantSave.Load();
             var settings = SaveManager.PersistantSave.data;
-            Screen.SetResolution(settings.xResolution, settings.yResolution, (FullScreenMode)settings.fullscreenMode);
+            Screen.SetResolution(settings.xResolution, settings.yResolution, (FullScreenMode)settings.displayMode);
         }
 
         private void SetupLanding(VisualElement root)
         {
             root.Q<Button>("start").clickable.clicked += UIActions.Load(SceneUtility.Scene.Game);
             root.Q<Button>("exit").clickable.clicked += UIActions.QuitToDesktop;
+            root.Q<Button>().clickable.clicked += UIActions.ClickSfx;
         }
     }
 }

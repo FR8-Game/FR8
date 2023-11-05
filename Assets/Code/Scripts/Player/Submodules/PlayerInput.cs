@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FR8Runtime.Save;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace FR8Runtime.Player.Submodules
@@ -7,14 +8,17 @@ namespace FR8Runtime.Player.Submodules
     public class PlayerInput
     {
         [SerializeField] private InputActionAsset inputMap;
-        [Range(0.1f, 1.0f)]
-        [SerializeField] private float mouseSensitivity = 0.3f;
-        [Range(0.1f, 1.0f)]
-        [SerializeField] private float controllerSensitivity = 0.4f;
+
+        private float MouseSensitivity => SaveManager.PersistantSave.GetOrLoad().mouseSensitivity;
+        private Vector2 ControllerSensitivity => new()
+        {
+            x = SaveManager.PersistantSave.GetOrLoad().gamepadSensitivityX,
+            y = SaveManager.PersistantSave.GetOrLoad().gamepadSensitivityY,
+        };
 
         private Camera mainCamera;
         private PlayerAvatar avatar;
-        
+
         private InputActionReference moveInput;
         private InputActionReference jumpInput;
         private InputActionReference lookAction;
@@ -30,7 +34,7 @@ namespace FR8Runtime.Player.Submodules
         private InputActionReference[] hotbarActions;
         private InputActionReference hotbarNext;
         private InputActionReference hotbarLast;
-        
+
         public Vector3 Move
         {
             get
@@ -54,7 +58,7 @@ namespace FR8Runtime.Player.Submodules
         public bool Sprint => sprintAction.State();
         public bool Pee => peeAction.State();
         public bool Fly => flyAction.action?.WasPerformedThisFrame() ?? false;
-        
+
         public int SwitchHotbar
         {
             get
@@ -64,6 +68,7 @@ namespace FR8Runtime.Player.Submodules
                     var action = hotbarActions[i];
                     if (action.action?.WasPerformedThisFrame() ?? false) return i;
                 }
+
                 return -1;
             }
         }
@@ -76,7 +81,7 @@ namespace FR8Runtime.Player.Submodules
         {
             var fovSensitivity = GetFovSensitivity();
             var delta = Vector2.zero;
-            
+
             delta += GetAdditiveLookInput();
             delta += GetMouseLookInput();
 
@@ -88,14 +93,15 @@ namespace FR8Runtime.Player.Submodules
             var mouse = Mouse.current;
             if (mouse != null)
             {
-                return mouse.delta.ReadValue() * mouseSensitivity;
+                return mouse.delta.ReadValue() * MouseSensitivity;
             }
+
             return Vector2.zero;
         }
 
         private Vector2 GetAdditiveLookInput()
         {
-            return lookAction.action?.ReadValue<Vector2>() * controllerSensitivity * 1000.0f * Time.deltaTime ?? Vector2.zero;
+            return lookAction.action?.ReadValue<Vector2>() * ControllerSensitivity * 1000.0f * Time.deltaTime ?? Vector2.zero;
         }
 
         private float GetFovSensitivity() => Mathf.Tan(mainCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
@@ -103,7 +109,7 @@ namespace FR8Runtime.Player.Submodules
         public void Init(PlayerAvatar avatar)
         {
             this.avatar = avatar;
-            
+
             // Local Functions
             InputActionReference bind(string name) => InputActionReference.Create(inputMap.FindAction(name));
 
@@ -127,10 +133,10 @@ namespace FR8Runtime.Player.Submodules
             {
                 hotbarActions[i] = bind($"Hotbar.{i + 1}");
             }
-            
+
             hotbarNext = bind("Hotbar.Next");
             hotbarLast = bind("Hotbar.Last");
-            
+
             // Set Camera
             mainCamera = Camera.main;
 
