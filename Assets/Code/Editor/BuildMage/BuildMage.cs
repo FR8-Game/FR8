@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using UnityEditor;
+using UnityEditor.Build.Reporting;
 using UnityEngine;
 
 namespace FR8Editor.BuildMage
@@ -21,7 +23,32 @@ namespace FR8Editor.BuildMage
 
             if (rebuild)
             {
-                BuildPipeline.BuildPlayer(EditorBuildSettings.scenes, "Builds/Windows/FR8.exe", BuildTarget.StandaloneWindows, BuildOptions.None);
+                var report = BuildPipeline.BuildPlayer(EditorBuildSettings.scenes, "Builds/Windows/FR8.exe", BuildTarget.StandaloneWindows, BuildOptions.None);
+
+                Action<string> log;
+                var cancel = false;
+                switch (report.summary.result)
+                {
+                    case BuildResult.Unknown:
+                        log = Debug.LogWarning;
+                        cancel = true;
+                        break;
+                    case BuildResult.Succeeded:
+                        log = Debug.Log;
+                        break;
+                    case BuildResult.Failed:
+                        log = Debug.LogError;
+                        cancel = true;
+                        break;
+                    case BuildResult.Cancelled:
+                        log = Debug.Log;
+                        cancel = true;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                log($"Build finished with result {report.summary.result}");
+                if (cancel) return;
             }
 
             if (pushToItch)

@@ -12,7 +12,8 @@ namespace FR8Runtime.Train
     [RequireComponent(typeof(DriverNetwork), typeof(TrainMonitor), typeof(LocomotiveAudio))]
     public class Locomotive : TrainCarriage
     {
-        [FormerlySerializedAs("dynamicBrakeConstant")] [SerializeField] private float brakeConstant = 0.5f;
+        public LocomotiveSettings locomotiveSettings;
+        [SerializeField] private Bounds localCabinBounds;
 
         [Space]
         [Header("Testing")]
@@ -29,13 +30,7 @@ namespace FR8Runtime.Train
 
         public float Brake => DriverNetwork.GetValue(BrakeKey);
         public int Gear => Mathf.RoundToInt(DriverNetwork.GetValue(GearKey));
-
-        protected override void Configure()
-        {
-            base.Configure();
-
-            brakeConstant = Mathf.Max(0.0f, brakeConstant);
-        }
+        public Bounds LocalCabinBounds => localCabinBounds;
 
         protected override void Start()
         {
@@ -63,7 +58,7 @@ namespace FR8Runtime.Train
         {
             var fwdSpeed = GetForwardSpeed();
 
-            var force = brakeConstant * Brake * -fwdSpeed;
+            var force = locomotiveSettings.handbrakeConstant * Brake * -fwdSpeed;
             brakeLoad = force;
 
             var velocityChange = force * referenceWeight / Body.mass * Time.deltaTime;
@@ -71,7 +66,7 @@ namespace FR8Runtime.Train
 
             Body.AddForce(DriverDirection * velocityChange, ForceMode.VelocityChange);
         }
-
+        
         public void UpdateDriverGroups()
         {
             var fwdSpeed = Mathf.Abs(ToKmpH(GetForwardSpeed()));
@@ -79,5 +74,14 @@ namespace FR8Runtime.Train
         }
 
         protected override float GetBrakeLoad() => Mathf.Max(base.GetBrakeLoad(), brakeLoad);
+
+        protected override void OnDrawGizmosSelected()
+        {
+            Gizmos.matrix = transform.localToWorldMatrix;
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireCube(localCabinBounds.center, localCabinBounds.size);
+            Gizmos.color = Color.red.Alpha(0.2f);
+            Gizmos.DrawCube(localCabinBounds.center, localCabinBounds.size);
+        }
     }
 }

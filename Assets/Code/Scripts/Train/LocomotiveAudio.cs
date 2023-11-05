@@ -12,6 +12,7 @@ namespace FR8Runtime.Train
     {
         public EventReference loopAudio;
 
+        private Locomotive locomotive;
         private TrainGasTurbine engine;
         private ExternalTrainDoor[] doors;
         
@@ -22,6 +23,7 @@ namespace FR8Runtime.Train
 
         private void Awake()
         {
+            locomotive = GetComponent<Locomotive>();
             engine = GetComponent<TrainGasTurbine>();
             doors = GetComponentsInChildren<ExternalTrainDoor>();
         }
@@ -42,7 +44,7 @@ namespace FR8Runtime.Train
             loopEvent.setParameterByName("RPM", rpm);
             loopEvent.set3DAttributes(gameObject.To3DAttributes());
 
-            var isEngineActive = rpm > engine.stallRpm;
+            var isEngineActive = rpm > engine.Settings.stallRpm;
             if (isEngineActive != wasEngineActive)
             {
                 if (isEngineActive) loopEvent.start();

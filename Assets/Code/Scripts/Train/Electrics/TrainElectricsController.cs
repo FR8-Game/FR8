@@ -12,9 +12,9 @@ namespace FR8Runtime.Train.Electrics
     [DisallowMultipleComponent]
     public sealed class TrainElectricsController : MonoBehaviour
     {
-        [SerializeField] private float baselineGeneration = 5.0f;
         [SerializeField] private EventReference fuseBlownSound;
 
+        private Locomotive locomotive;
         private DriverNetwork driverNetwork;
         
         public const string MainFuse = "mainFuse";
@@ -23,6 +23,7 @@ namespace FR8Runtime.Train.Electrics
         private List<IElectricGenerator> generators;
         private List<IElectricDevice> devices;
 
+        public LocomotiveSettings Settings => locomotive.locomotiveSettings;
         public float PowerDraw { get; private set; }
         public float Capacity { get; private set; }
         public float Saturation { get; private set; }
@@ -31,6 +32,7 @@ namespace FR8Runtime.Train.Electrics
 
         private void Awake()
         {
+            locomotive = GetComponentInParent<Locomotive>();
             driverNetwork = GetComponentInParent<DriverNetwork>();
 
             generators = new List<IElectricGenerator>(GetComponentsInChildren<IElectricGenerator>());
@@ -52,7 +54,7 @@ namespace FR8Runtime.Train.Electrics
             var clockSpeed = 0.0f;
             var draw = 0.0f;
 
-            var capacity = baselineGeneration;
+            var capacity = Settings.baselineGeneration;
             foreach (var e in generators) capacity += e.MaximumPowerGeneration;
 
             var connected = driverNetwork.GetValue(MainFuse) > 0.5f;
@@ -66,7 +68,7 @@ namespace FR8Runtime.Train.Electrics
                 }
 
                 saturation = draw / capacity;
-                clockSpeed = draw / (capacity - baselineGeneration);
+                clockSpeed = draw / (capacity - Settings.baselineGeneration);
             }
 
             if (saturation > 1.01f)
