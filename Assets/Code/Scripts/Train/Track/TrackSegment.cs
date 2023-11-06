@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using FR8Runtime.CodeUtility;
 using FR8Runtime.Train.Splines;
 using UnityEngine;
+using UnityEngine.Serialization;
 using ColorUtility = HBCore.Utility.ColorUtility;
 
 #if UNITY_EDITOR
@@ -16,7 +17,7 @@ namespace FR8Runtime.Train.Track
     public class TrackSegment : MonoBehaviour, IEnumerable<Transform>
     {
         public const int TrackLayer = 12;
-        
+
         // --- Constants ---
         public const float ConnectionDistance = 3.0f;
         public static readonly Spline.SplineProfile SplineProfile = Spline.Cubic;
@@ -45,7 +46,12 @@ namespace FR8Runtime.Train.Track
         public Connection StartConnection => startConnection;
         public Connection EndConnection => endConnection;
         public int Resolution => resolution;
-        public int Count => KnotContainer().childCount;
+        public int Count => KnotContainer().childCount + (closedLoop ? 1 : 0);
+
+        public (List<Vector3>, List<Vector3>) GetBakeData()
+        {
+            return (new List<Vector3>(points), new List<Vector3>(velocities));
+        }
 
         private void Awake()
         {
@@ -56,14 +62,14 @@ namespace FR8Runtime.Train.Track
         {
             LookForConnections();
 
-            if (endConnection.connections.Count > 1)
+            if (startConnection.other)
             {
-                junctionPrefab.SpawnFromPrefab(this, this[0]);
+                junctionPrefab.SpawnFromPrefab(this, startConnection.other, TrackJunction.ConnectionEnd.Start);
             }
 
-            if (endConnection.connections.Count > 1)
+            if (endConnection.other)
             {
-                junctionPrefab.SpawnFromPrefab(this, this[FromEnd(1)]);
+                junctionPrefab.SpawnFromPrefab(this, endConnection.other, TrackJunction.ConnectionEnd.End);
             }
         }
 
@@ -71,6 +77,12 @@ namespace FR8Runtime.Train.Track
         {
             var col = new Color(0f, 0.84f, 1f);
             DrawGizmos(true, col, ColorUtility.Invert(col));
+        }
+
+        private void OnDrawGizmos()
+        {
+            var col = new Color(0f, 0.84f, 1f);
+            DrawGizmos(false, col, ColorUtility.Invert(col));
         }
 
         public void DrawGizmos(bool main, Color selectedColor, Color otherColor)
@@ -125,7 +137,7 @@ namespace FR8Runtime.Train.Track
             width *= 4.0f;
 
             Handles.color = color;
-            Handles.DrawPolyLine(points);
+            Handles.DrawAAPolyLine(width, points);
 #endif
         }
 
@@ -138,8 +150,8 @@ namespace FR8Runtime.Train.Track
             for (var i = 0; i < resolution; i++)
             {
                 var p = i / (resolution - 1.0f);
-                points.Add(SampleSpline(p, (spline, t) => spline.EvaluatePoint(t), i => (this[i].position, this[i].forward), Count));
-                velocities.Add(SampleSpline(p, (spline, t) => spline.EvaluateVelocity(t), i => (this[i].position, this[i].forward), Count));
+                points.Add(SampleSpline(p, (spline, t) => spline.EvaluatePoint(t), i => (this[i].position, this[i].forward * this[i].localScale.z), Count));
+                velocities.Add(SampleSpline(p, (spline, t) => spline.EvaluateVelocity(t), i => (this[i].position, this[i].forward * this[i].localScale.z), Count));
             }
 
             terrainList = new List<UnityEngine.Terrain>(FindObjectsOfType<UnityEngine.Terrain>());
@@ -292,7 +304,7 @@ namespace FR8Runtime.Train.Track
         public void LookForConnections()
         {
             if (!Valid(this)) return;
-            
+
             var segments = FindObjectsOfType<TrackSegment>();
 
             // Update start and end
@@ -302,35 +314,24 @@ namespace FR8Runtime.Train.Track
 
         private void CheckConnectionEnd(IEnumerable<TrackSegment> segments, Connection connection, int end)
         {
-            var direction = end == 1 ? 1.0f : -1.0f;
             var position = SamplePoint(end);
-            var normal = (SampleVelocity(end) * direction).normalized;
-            
+
             foreach (var other in segments)
             {
                 if (!Valid(other)) continue;
                 if (other == this) continue;
+                if (!CheckConnectionEnd(position, other)) continue;
 
-                if (CheckConnectionEnd(position, normal, other, 0) || CheckConnectionEnd(position, normal, other, 1))
-                {
-                    if (!connection.connections.Contains(other))
-                    {
-                        connection.connections.Add(other);
-                    }
-                }
+                connection.other = other;
             }
         }
 
-        private bool CheckConnectionEnd(Vector3 position, Vector3 normal, TrackSegment other, int end)
+        private bool CheckConnectionEnd(Vector3 position, TrackSegment other)
         {
-            var direction = end == 1 ? 1.0f : -1.0f;
-            var otherPosition = other.SamplePoint(end);
-            var otherNormal = (other.SampleVelocity(end) * direction).normalized;
-            
-            if ((position - otherPosition).magnitude > ConnectionDistance) return false;
+            var closest = other.GetClosestPoint(position, true);
+            var otherPosition = other.SamplePoint(closest);
 
-            var dot = Vector3.Dot(normal, otherNormal);
-            return dot < 0.0f;
+            return (position - otherPosition).magnitude < ConnectionDistance;
         }
 
         public bool IsOffStartOfTrack(Vector3 position)
@@ -341,8 +342,8 @@ namespace FR8Runtime.Train.Track
             return Vector3.Dot(position - point, normal) < 0.0f;
         }
 
-        public TrackSegment GetNextTrackStart() => startConnection.ActiveSegment;
-        
+        public TrackSegment GetNextTrackStart() => startConnection.other;
+
         public bool IsOffEndOfTrack(Vector3 position)
         {
             var point = SamplePoint(1.0f);
@@ -351,8 +352,8 @@ namespace FR8Runtime.Train.Track
             return Vector3.Dot(position - point, normal) > 0.0f;
         }
 
-        public TrackSegment GetNextTrackEnd() => endConnection.ActiveSegment;
-        
+        public TrackSegment GetNextTrackEnd() => endConnection.other;
+
         public Transform KnotContainer()
         {
             if (!knotContainer) knotContainer = transform.Find("Knots");
@@ -377,14 +378,12 @@ namespace FR8Runtime.Train.Track
                 knot.name = $"Knot.{knot.GetSiblingIndex() + 1}";
             }
         }
-        
+
         [Serializable]
         public class Connection
         {
-            public List<TrackSegment> connections = new();
-            public int activeIndex;
-
-            public TrackSegment ActiveSegment => activeIndex >= 0 && activeIndex < connections.Count ? connections[activeIndex] : null;
+            public TrackSegment other;
+            public bool active;
         }
 
         public struct TrackSample
@@ -415,7 +414,16 @@ namespace FR8Runtime.Train.Track
             UpdateKnotNames();
         }
 
-        public Transform this[int index] => KnotContainer().GetChild(index);
+        public Transform this[int index]
+        {
+            get
+            {
+                var container = KnotContainer();
+                var count = container.childCount;
+                index = (index % count + count)  % count;
+                return container.GetChild(index);
+            }
+        }
 
         public IEnumerator GetEnumerator() => KnotContainer().GetEnumerator();
         IEnumerator<Transform> IEnumerable<Transform>.GetEnumerator() => (IEnumerator<Transform>)KnotContainer().GetEnumerator();

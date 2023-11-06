@@ -2,26 +2,19 @@
 {
     Properties
     {
-        _MainTex ("Map Texture", 2D) = "white" {}
-        _Noise("Noise", 2D) = "white" {}
-        _Color("Line Color", Color) = (1.0, 1.0, 1.0, 1.0)
-        _Brightness("Color Emissivity", float) = 1.0
-        _LineWidth("Line Width", Range(0.0, 1.0)) = 0.1
-        _HeightScale("Height Scale", float) = 3.0
-
-        _Fill("Fill Brightness", Range(0.0, 1.0)) = 0.1
-        _NoiseColorS("Noise Strength Small", Range(0.0, 1.0)) = 0.2
-        _NoiseColorL("Noise Strength Large", Range(0.0, 1.0)) = 0.2
+        _MapTexture("MapTexture", 2D) = "black" {}
+        _MapColor("Base Color", Color) = (1, 1, 1, 1)
+        _LineColor("Line Color", Color) = (1, 1, 1, 1)
+        _Brightness("Brightness", float) = 0.0
+        _BandFreq("Band Frequency", float) = 1.0
+        _BandSize("Band Size", Range(0.0, 1.0)) = 0.2
     }
     SubShader
     {
         Tags
         {
-            "RenderType"="Transparent" "Queue"="Transparent"
+            "RenderType"="Opaque"
         }
-        ZWrite Off
-        Blend One One
-        Cull Off
 
         Pass
         {
@@ -30,109 +23,66 @@
             #pragma fragment frag
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/LitForwardPass.hlsl"
 
-            TEXTURE2D_X(_MainTex);
-            SAMPLER(sampler_MainTex);
-
-            TEXTURE2D(_Noise);
-            SAMPLER(sampler_Noise);
-            float4 _Noise_TexelSize;
-
-            float4 _Color;
+            TEXTURE2D_X(_MapTexture);
+            SAMPLER(sampler_MapTexture);
+            float4 _MapTexture_TexelSize;
+            float4 _MapColor;
+            float4 _LineColor;
             float _Brightness;
-            float _LineWidth;
+            float _BandFreq;
+            float _BandSize;
 
-            float _Fill;
-            float _NoiseColorS;
-            float _NoiseColorL;
-            
-            float _HeightScale;
-            
-            struct Attributes
-            {
-                float4 vertex : POSITION;
-            };
-
-            struct Varyings
-            {
-                float4 vertex : SV_POSITION;
-                float height : VAR_HEIGHT;
-                float2 uv : TEXCOORD0;
-                float warp : VAR_WARP;
-            };
-
-            float sqr(float v) { return v * v; }
-
-            bool sampleHeight(Varyings input, float2 uvOffset)
-            {
-                float2 uv = input.uv + uvOffset;
-                if (input.warp > 0.5) uv = floor(uv * 10.0 / input.warp) / (10 / input.warp);
-                
-                return (SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv).r * _HeightScale + 0.001 - input.height) > 0.0;
-            }
-
-            float rand(int i)
-            {
-                int w = _Noise_TexelSize.z;
-                i %= w * _Noise_TexelSize.w;
-                return SAMPLE_TEXTURE2D_LOD(_Noise, sampler_Noise, float2(i / w, i % w) / w, 0).x;
-            }
-            
-            float noiseColor(Varyings input, float scale)
-            {
-                int layer = floor(input.height * 2598.0) + 1;
-
-                float2 noiseUV = input.uv * _Noise_TexelSize.zw;
-                noiseUV += floor(float2(rand(layer), rand(layer + 10)) * _Noise_TexelSize.zw);
-                noiseUV *= _Noise_TexelSize.xy;
-                float noise = SAMPLE_TEXTURE2D(_Noise, sampler_Noise, noiseUV * scale).r;
-                noise = (noise + _Time.x) * 4.0 % 1.0;
-                noise = 1.0 - sqr(2.0 * noise - 1.0);
-                return noise * noise * noise;
-            }
-            
             Varyings vert(Attributes input)
             {
-                Varyings output;
-
-                float4 vertex = input.vertex;
-
-                output.vertex = TransformObjectToHClip(vertex.xyz);
-
-                float r = rand(_Time.x * 50 + rand(vertex.y * 1000.0) * 1000.0);
-                output.warp = floor(r * r * r * 2.0);
-                
-                output.height = vertex.y;
-                output.uv = vertex.xz * 0.5 + 0.5;
-                
-                return output;
+                return LitPassVertex(input);
             }
-            
+
+            half4 sampleMap(float2 uv)
+            {
+                half2 offsets[] =
+                {
+                    float2(-1.0, -1.0),
+                    float2( 0.0, -1.0),
+                    float2( 1.0, -1.0),
+                    
+                    float2(-1.0,  0.0),
+                    float2( 0.0,  0.0),
+                    float2( 1.0,  0.0),
+                    
+                    float2(-1.0,  1.0),
+                    float2( 0.0,  1.0),
+                    float2( 1.0,  1.0),
+                };
+
+                half4 res = 0.0;
+                for (int i = 0; i < 9; i++)
+                {
+                    res += SAMPLE_TEXTURE2D(_MapTexture, sampler_MapTexture, uv + offsets[i] * _MapTexture_TexelSize.xy * 4.0);
+                }
+                return res / 9.0;
+            }
+
             half4 frag(Varyings input) : SV_Target
             {
-                float sampleDistance = _LineWidth / 100.0;
-                bool height = sampleHeight(input, 0.0);
+                half4 base = LitPassFragment(input);
 
-                bool4 heights = float4
-                (
-                    sampleHeight(input, float2(-1.0, 1.0) * sampleDistance),
-                    sampleHeight(input, float2(-1.0, -1.0) * sampleDistance),
-                    sampleHeight(input, float2(1.0, 1.0) * sampleDistance),
-                    sampleHeight(input, float2(1.0, -1.0) * sampleDistance)
-                );
+                float2 uv = input.uv;
+                // uv = uv * 2.0 - 1.0;
+                // float t = _Time.z;
+                // uv *= 1 + sin(t) * 0.5;
+                // uv = uv * 0.5 + 0.5;
+                
+                float4 sample = sampleMap(uv);
+                float val = sin(sample.x * PI * _BandFreq / 100.0);
+                val = val > _BandSize;
 
-                float total = heights.r == heights.g && heights.r == heights.b && heights.r == heights.a;
+                float3 overlay = _MapColor.rgb * val * pow(2, _Brightness / 10.0);
+                overlay += SAMPLE_TEXTURE2D(_MapTexture, sampler_MapTexture, uv).g * _LineColor;
 
-                float val = 0.0;
-                val += (1.0 - total);
-                val += _Fill * height;
-                clip(val);
-
-                float noise = 1.0;
-                noise *= lerp(1.0, noiseColor(input, 1.0), _NoiseColorS);
-                noise *= lerp(1.0, noiseColor(input, 0.2), _NoiseColorL);
-
-                return _Color * noise * val * _Brightness;
+                return base + float4(overlay, 1.0);
             }
             ENDHLSL
         }
