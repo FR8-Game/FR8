@@ -17,7 +17,7 @@ namespace FR8Runtime.Train.Track
     public class TrackSegment : MonoBehaviour, IEnumerable<Transform>
     {
         public const int TrackLayer = 12;
-        
+
         // --- Constants ---
         public const float ConnectionDistance = 3.0f;
         public static readonly Spline.SplineProfile SplineProfile = Spline.Cubic;
@@ -46,7 +46,12 @@ namespace FR8Runtime.Train.Track
         public Connection StartConnection => startConnection;
         public Connection EndConnection => endConnection;
         public int Resolution => resolution;
-        public int Count => KnotContainer().childCount;
+        public int Count => KnotContainer().childCount + (closedLoop ? 1 : 0);
+
+        public (List<Vector3>, List<Vector3>) GetBakeData()
+        {
+            return (new List<Vector3>(points), new List<Vector3>(velocities));
+        }
 
         private void Awake()
         {
@@ -72,6 +77,12 @@ namespace FR8Runtime.Train.Track
         {
             var col = new Color(0f, 0.84f, 1f);
             DrawGizmos(true, col, ColorUtility.Invert(col));
+        }
+
+        private void OnDrawGizmos()
+        {
+            var col = new Color(0f, 0.84f, 1f);
+            DrawGizmos(false, col, ColorUtility.Invert(col));
         }
 
         public void DrawGizmos(bool main, Color selectedColor, Color otherColor)
@@ -126,7 +137,7 @@ namespace FR8Runtime.Train.Track
             width *= 4.0f;
 
             Handles.color = color;
-            Handles.DrawPolyLine(points);
+            Handles.DrawAAPolyLine(width, points);
 #endif
         }
 
@@ -139,8 +150,8 @@ namespace FR8Runtime.Train.Track
             for (var i = 0; i < resolution; i++)
             {
                 var p = i / (resolution - 1.0f);
-                points.Add(SampleSpline(p, (spline, t) => spline.EvaluatePoint(t), i => (this[i].position, this[i].forward), Count));
-                velocities.Add(SampleSpline(p, (spline, t) => spline.EvaluateVelocity(t), i => (this[i].position, this[i].forward), Count));
+                points.Add(SampleSpline(p, (spline, t) => spline.EvaluatePoint(t), i => (this[i].position, this[i].forward * this[i].localScale.z), Count));
+                velocities.Add(SampleSpline(p, (spline, t) => spline.EvaluateVelocity(t), i => (this[i].position, this[i].forward * this[i].localScale.z), Count));
             }
 
             terrainList = new List<UnityEngine.Terrain>(FindObjectsOfType<UnityEngine.Terrain>());
@@ -293,7 +304,7 @@ namespace FR8Runtime.Train.Track
         public void LookForConnections()
         {
             if (!Valid(this)) return;
-            
+
             var segments = FindObjectsOfType<TrackSegment>();
 
             // Update start and end
@@ -304,7 +315,7 @@ namespace FR8Runtime.Train.Track
         private void CheckConnectionEnd(IEnumerable<TrackSegment> segments, Connection connection, int end)
         {
             var position = SamplePoint(end);
-            
+
             foreach (var other in segments)
             {
                 if (!Valid(other)) continue;
@@ -319,7 +330,7 @@ namespace FR8Runtime.Train.Track
         {
             var closest = other.GetClosestPoint(position, true);
             var otherPosition = other.SamplePoint(closest);
-            
+
             return (position - otherPosition).magnitude < ConnectionDistance;
         }
 
@@ -332,7 +343,7 @@ namespace FR8Runtime.Train.Track
         }
 
         public TrackSegment GetNextTrackStart() => startConnection.other;
-        
+
         public bool IsOffEndOfTrack(Vector3 position)
         {
             var point = SamplePoint(1.0f);
@@ -342,7 +353,7 @@ namespace FR8Runtime.Train.Track
         }
 
         public TrackSegment GetNextTrackEnd() => endConnection.other;
-        
+
         public Transform KnotContainer()
         {
             if (!knotContainer) knotContainer = transform.Find("Knots");
@@ -367,7 +378,7 @@ namespace FR8Runtime.Train.Track
                 knot.name = $"Knot.{knot.GetSiblingIndex() + 1}";
             }
         }
-        
+
         [Serializable]
         public class Connection
         {
@@ -403,7 +414,16 @@ namespace FR8Runtime.Train.Track
             UpdateKnotNames();
         }
 
-        public Transform this[int index] => KnotContainer().GetChild(index);
+        public Transform this[int index]
+        {
+            get
+            {
+                var container = KnotContainer();
+                var count = container.childCount;
+                index = (index % count + count)  % count;
+                return container.GetChild(index);
+            }
+        }
 
         public IEnumerator GetEnumerator() => KnotContainer().GetEnumerator();
         IEnumerator<Transform> IEnumerable<Transform>.GetEnumerator() => (IEnumerator<Transform>)KnotContainer().GetEnumerator();
