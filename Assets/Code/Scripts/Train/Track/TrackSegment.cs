@@ -382,18 +382,6 @@ namespace FR8Runtime.Train.Track
             public bool active;
         }
 
-        public struct TrackSample
-        {
-            public Vector3 position;
-            public Vector3 normal;
-
-            public TrackSample Lerp(TrackSample a, TrackSample b, float t) => new()
-            {
-                position = Vector3.Lerp(a.position, b.position, t),
-                normal = Vector3.Lerp(a.normal, b.normal, t).normalized,
-            };
-        }
-
         public void AddKnot()
         {
             var container = KnotContainer();

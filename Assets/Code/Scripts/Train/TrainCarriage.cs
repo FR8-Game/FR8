@@ -23,10 +23,10 @@ namespace FR8Runtime.Train
 
         [Space]
         [ReadOnly][SerializeField] private float evaluatedBrakeLoad;
-
+        
         protected TrackSegment segment;
 
-        private float softAnchorPositionOnSpline;
+        private Vector2 softAnchorPosition;
         private EventInstance brakeSound;
         private float handbrakeLoad;
 
@@ -41,6 +41,7 @@ namespace FR8Runtime.Train
         public Rigidbody Body { get; private set; }
         public Vector3 DriverDirection { get; private set; }
         public Vector3 TangentialForce { get; private set; }
+
         public float PositionOnSpline { get; private set; }
         public float LastPositionOnSpline { get; private set; }
         public List<TrainCarriage> ConnectedCarriages { get; } = new();
@@ -48,8 +49,8 @@ namespace FR8Runtime.Train
 
         public bool Stationary { get; private set; }
 
-        public Vector3 HardAnchorPosition => (Body ? Body.position : transform.position) + transform.forward * trainLength * 0.5f;
-        public Vector3 SoftAnchorPosition => (Body ? Body.position : transform.position) - transform.forward * trainLength * 0.5f;
+        //public Vector3 HardAnchorPosition => (Body ? Body.position : transform.position) + transform.forward * trainLength * 0.5f;
+        //public Vector3 SoftAnchorPosition => (Body ? Body.position : transform.position) - transform.forward * trainLength * 0.5f;
 
         public static readonly List<TrainCarriage> All = new();
 
@@ -110,8 +111,7 @@ namespace FR8Runtime.Train
             FindConnectedCarriages(ConnectedCarriages);
             
             LastPositionOnSpline = PositionOnSpline;
-            PositionOnSpline = segment.GetClosestPoint(HardAnchorPosition, true);
-            softAnchorPositionOnSpline = segment.GetClosestPoint(SoftAnchorPosition, true);
+            PositionOnSpline = segment.GetClosestPoint(Body.position, true);
 
             ApplyDrag();
             ApplyHandbrake();
@@ -121,15 +121,30 @@ namespace FR8Runtime.Train
 
             if (segment.IsOffStartOfTrack(Body.position))
             {
-                segment = segment.GetNextTrackStart();
+                offEnd(segment.GetNextTrackStart());
             }
             else if (segment.IsOffEndOfTrack(Body.position))
             {
-                segment = segment.GetNextTrackEnd();
+                offEnd(segment.GetNextTrackEnd());
             }
             
             evaluatedBrakeLoad = GetBrakeLoad();
             brakeSound.setParameterByName("BrakeLoad", evaluatedBrakeLoad);
+
+            void offEnd(TrackSegment next)
+            {
+                if (next)
+                {
+                    segment = next;
+                    return;
+                }
+
+                var closest = segment.SamplePoint(segment.GetClosestPoint(Body.position, true));
+                var displacement = closest - Body.position;
+                var normal = displacement.normalized;
+                Body.position = closest;
+                Body.velocity += normal * Mathf.Max(0.0f, -Vector3.Dot(normal, Body.velocity));
+            }
         }
 
         public bool IsStationary(List<Locomotive> connectedLocomotives = null)
@@ -214,14 +229,9 @@ namespace FR8Runtime.Train
         private void ApplyCorrectiveForce()
         {
             // Calculate pose of front wheel assembly
-            var th = PositionOnSpline;
-            var hardTrackPosition = segment.SamplePoint(th);
-
-            var ts = softAnchorPositionOnSpline;
-            var softTrackPosition = segment.SamplePoint(ts);
-
-            var center = (hardTrackPosition + softTrackPosition) / 2.0f;
-            var normal = (hardTrackPosition - softTrackPosition).normalized;
+            
+            var center = segment.SamplePoint(PositionOnSpline);
+            var normal = segment.SampleTangent(PositionOnSpline);
 
             var alignmentDot = Vector3.Dot(normal, transform.forward);
             if (alignmentDot < 0.0f) normal = -normal;
@@ -237,15 +247,16 @@ namespace FR8Runtime.Train
         private void ApplyCorrectiveForce(Vector3 position, Vector3 direction)
         {
             // Calculate alignment delta as a force
-            var force = (position - Body.position) * carriageSettings.retentionSpring;
+            direction = direction.normalized;
+            var force = (position - Body.position) / Time.deltaTime;
 
             // Calculate damping force
             var normalVelocity = Body.velocity;
-            force -= normalVelocity * carriageSettings.retentionDamping;
+            force -= normalVelocity;
 
             // Apply Force
             force -= direction * Vector3.Dot(direction, force);
-            Body.AddForce(force, ForceMode.Acceleration);
+            Body.velocity += force;
             TangentialForce = transform.InverseTransformVector(force);
         }
 
@@ -260,21 +271,8 @@ namespace FR8Runtime.Train
 
         private void ApplyCorrectiveTorque(Quaternion rotation)
         {
-            var deltaRotation = CalculateDeltaRotation(rotation);
-
-            var torque = (deltaRotation * carriageSettings.retentionSpring - Body.angularVelocity * carriageSettings.retentionDamping) * carriageSettings.retentionTorqueConstant;
-            Body.AddTorque(torque, ForceMode.Acceleration);
-        }
-
-        private Vector3 CalculateDeltaRotation(Quaternion rotation)
-        {
-            (rotation * Quaternion.Inverse(Body.rotation)).ToAngleAxis(out var angle, out var axis);
-            if (angle > 180.0f) angle -= 360.0f;
-            axis.Normalize();
-            if (!float.IsFinite(axis.x) || !float.IsFinite(axis.y) || !float.IsFinite(axis.z)) axis = Vector3.zero;
-
-            var deltaRotation = axis * angle * Mathf.Deg2Rad;
-            return deltaRotation;
+            Body.rotation = rotation;
+            Body.angularVelocity = Vector3.zero;
         }
 
         public float GetForwardSpeed() => Vector3.Dot(DriverDirection, Body.velocity);
@@ -287,12 +285,6 @@ namespace FR8Runtime.Train
 
         protected static float ToMps(float kmph) => kmph / 3.6f;
         protected static float ToKmpH(float mps) => mps * 3.6f;
-
-        protected virtual void OnDrawGizmosSelected()
-        {
-            Gizmos.color = Color.magenta;
-            Gizmos.DrawLine(HardAnchorPosition, SoftAnchorPosition);
-        }
 
         public string GetDebugInfo()
         {

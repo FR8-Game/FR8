@@ -13,6 +13,8 @@ namespace FR8Runtime.Player.Submodules
     [Serializable]
     public class PlayerVitality
     {
+        public bool invulnerable;
+
         public int maxHealth = 100;
         public float shieldDuration = 100;
         public float shieldRegenRate = 3.0f;
@@ -22,6 +24,7 @@ namespace FR8Runtime.Player.Submodules
 
         [Space]
         [SerializeField] private EventReference shieldBreakSound;
+
         [SerializeField] private EventReference shieldRegenSound;
         [SerializeField] private EventReference damageSound;
 
@@ -41,6 +44,12 @@ namespace FR8Runtime.Player.Submodules
         public float LastDamageTime { get; private set; }
         public bool Exposed { get; private set; }
 
+#if UNITY_EDITOR
+        public bool Invulnerable => invulnerable;
+#else
+        public bool Invulnerable => false;
+#endif
+
         private float exposureTimer;
 
         private PlayerAvatar avatar;
@@ -59,7 +68,7 @@ namespace FR8Runtime.Player.Submodules
 
             LastDamageTime = float.MinValue;
             Revive();
-            
+
             shield = SoundReference.PlayerShields.InstanceAndStart();
         }
 
@@ -71,7 +80,7 @@ namespace FR8Runtime.Player.Submodules
             shield.set3DAttributes(avatar.gameObject.To3DAttributes());
             shield.setParameterByName("ShieldPercent", currentShields / shieldDuration);
             shield.setParameterByName("Exposed", exposed ? 1 : 0);
-            
+
             Exposed = exposed;
             if (Exposed)
             {
@@ -83,7 +92,7 @@ namespace FR8Runtime.Player.Submodules
                 else
                 {
                     currentShields = -1.0f;
-                    
+
                     exposureTimer += Time.deltaTime;
                     var exposureTime = 1.0f / exposureDamageFrequency;
                     while (exposureTimer > exposureTime)
@@ -136,6 +145,7 @@ namespace FR8Runtime.Player.Submodules
         public void Damage(DamageInstance damageInstance)
         {
             if (!IsAlive) return;
+            if (Invulnerable) return;
 
             var damage = CalculateDamage(damageInstance);
             LastDamageTime = Time.time;
@@ -147,7 +157,7 @@ namespace FR8Runtime.Player.Submodules
 
             DamageEvent?.Invoke(damageInstance);
             HealthChangeEvent?.Invoke();
-            
+
             SoundReference.PlayerDamage.PlayOneShot(avatar.gameObject);
 
             if (currentHealth == 0)
@@ -159,6 +169,7 @@ namespace FR8Runtime.Player.Submodules
         private void Die()
         {
             if (!IsAlive) return;
+            if (Invulnerable) return;
 
             IsAlive = false;
             Cursor.lockState = CursorLockMode.None;
