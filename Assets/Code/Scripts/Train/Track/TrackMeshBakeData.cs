@@ -11,14 +11,13 @@ namespace FR8Runtime.Train.Track
     public class TrackMeshBakeData
     {
         public List<MeshSegment> meshes = new();
+        public List<Vector3> points;
+        public List<Vector3> tangents;
 
-        private List<(float, float)> conversionGraph;
         private MeshSegment baseMeshData;
-        private float baseMeshLength;
         private float baseMeshZMin;
         private float baseMeshZMax;
         private Matrix4x4 matrix;
-        private TrackSegment segment;
 
         private Thread thread;
         private int taskID;
@@ -31,9 +30,7 @@ namespace FR8Runtime.Train.Track
         public TrackMeshBakeData(TrackMesh trackMesh, Mesh baseMesh, TrackSegment segment)
         {
             trackName = trackMesh.name;
-            conversionGraph = trackMesh.conversionGraph;
-            this.segment = segment;
-            
+
             baseMeshData = new MeshSegment();
             for (var i = 0; i < baseMesh.vertexCount; i++)
             {
@@ -47,7 +44,6 @@ namespace FR8Runtime.Train.Track
                 baseMeshData.indices.Add(t);
             }
 
-            baseMeshLength = baseMesh.bounds.size.z;
             baseMeshZMin = baseMesh.bounds.min.z;
             baseMeshZMax = baseMesh.bounds.max.z;
 
@@ -59,6 +55,8 @@ namespace FR8Runtime.Train.Track
             threadTimer = new Stopwatch();
             threadTimer.Start();
 
+            (points, tangents) = segment.GetBakeData();
+
             ThreadAction();
         }
 
@@ -66,44 +64,35 @@ namespace FR8Runtime.Train.Track
 
         // Runs on own thread
         private void ThreadAction()
-        {
-            var meshCount = 0;
-            var workingLength = 0.0f;
-            var totalLength = conversionGraph[^1].Item2;
-            var t0 = 0.0f;
-            var t1 = 0.0f;
-
-            var meshesPerFile = (ushort.MaxValue / baseMeshData.vertices.Count) - 1;
-
-            while (workingLength < totalLength)
+        {   
+            for (var i = 0; i < points.Count - 1; i++)
             {
-                t0 = t1;
-                t1 = samplePercentFromDistance(workingLength + baseMeshLength);
-                workingLength += baseMeshLength;
+                var p0 = points[i];
+                var p1 = points[i + 1];
 
-                meshCount++;
+                var t0 = tangents[i];
+                var t1 = tangents[i + 1];
+
+                var r0 = Quaternion.LookRotation(t0);
+                var r1 = Quaternion.LookRotation(t1);
+
                 var indexBase = Segment.vertices.Count;
-
-                for (var k = 0; k < baseMeshData.vertices.Count; k++)
+                for (var j = 0; j < baseMeshData.vertices.Count; j++)
                 {
-                    var vertex = baseMeshData.vertices[k];
-                    var normal = baseMeshData.normals[k];
+                    var vertex = baseMeshData.vertices[j];
+                    var normal = baseMeshData.normals[j];
 
-                    var p2 = Mathf.Lerp(t0, t1, Mathf.InverseLerp(baseMeshZMin, baseMeshZMax, vertex.z));
+                    var z = Mathf.InverseLerp(baseMeshZMin, baseMeshZMax, vertex.z);
                     vertex.z = 0.0f;
 
-                    //var splinePoint = TrackSegment.Sample(p2, (spline, t) => spline.EvaluatePoint(t), i => spline[i], spline.Count);
-                    var splinePoint = segment.SamplePoint(p2);
-                    var splineTangent = segment.SampleTangent(p2);
-                    var r = Quaternion.LookRotation(splineTangent);
-
-                    vertex = r * new Vector3(vertex.x, vertex.y, 0.0f) + splinePoint;
+                    var r = Quaternion.Slerp(r0, r1, z);
+                    vertex = r * vertex + Vector3.Lerp(p0, p1, z);
                     normal = r * normal;
 
                     Segment.vertices.Add(matrix.MultiplyPoint(vertex));
                     Segment.normals.Add(matrix.MultiplyVector(normal).normalized);
                 }
-
+                
                 foreach (var t in baseMeshData.indices)
                 {
                     Segment.indices.Add(indexBase + t);
@@ -114,28 +103,11 @@ namespace FR8Runtime.Train.Track
                     Segment.uvs.Add(uv);
                 }
 
-                if (meshCount % meshesPerFile == 0 && meshCount != 0)
+                if (Segment.vertices.Count + baseMeshData.vertices.Count > ushort.MaxValue)
                 {
                     Split();
-                    Report(workingLength / totalLength);
+                    Report(i / (float)points.Count);
                 }
-            }
-
-            float samplePercentFromDistance(float distance)
-            {
-                var i = 0;
-                for (; i < conversionGraph.Count - 1; i++)
-                {
-                    if (conversionGraph[i].Item2 > distance) break;
-                }
-
-                var j = i;
-                i--;
-
-                var a = conversionGraph[i];
-                var b = conversionGraph[j];
-
-                return Mathf.Lerp(a.Item1, b.Item1, Mathf.InverseLerp(a.Item2, b.Item2, distance));
             }
         }
 
