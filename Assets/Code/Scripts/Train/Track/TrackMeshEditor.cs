@@ -47,7 +47,13 @@ namespace FR8Runtime.Train.Track
             shapeMesh.hideFlags = HideFlags.HideAndDontSave;
 
             var bounds = new Bounds(Vector3.up * 0.5f, new Vector3(7.0f, 1.0f, 15.0f));
-            if (baseMesh) bounds = baseMesh.bounds;
+            if (baseMesh)
+            {
+                bounds = baseMesh.bounds;
+                var size = bounds.size;
+                size.z *= 5.0f;
+                bounds.size = size;
+            }
 
             shapeMesh.vertices = new[]
             {
@@ -148,19 +154,18 @@ namespace FR8Runtime.Train.Track
 
         private void BakeConversionGraph(TrackSegment segment)
         {
-            conversionGraph = new List<(float, float)>();
+            var (points, _) = segment.GetBakeData();
+            conversionGraph = new List<(float, float)>(points.Count);
 
             var distance = 0.0f;
-            var lastPoint = segment.SamplePoint(0.0f);
-            for (var i = 0; i < DistanceSamples; i++)
+            for (var i = 0; i < points.Count - 1; i++)
             {
-                var t = i / (DistanceSamples - 1.0f);
-                var point = segment.SamplePoint(t);
+                var t = i / (points.Count - 1.0f);
+                var a = points[i];
+                var b = points[i + 1];
 
-                distance += (point - lastPoint).magnitude;
+                distance += (b - a).magnitude;
                 conversionGraph.Add((t, distance));
-
-                lastPoint = point;
             }
         }
 

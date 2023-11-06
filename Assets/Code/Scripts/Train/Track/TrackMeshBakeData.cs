@@ -92,7 +92,6 @@ namespace FR8Runtime.Train.Track
                     var p2 = Mathf.Lerp(t0, t1, Mathf.InverseLerp(baseMeshZMin, baseMeshZMax, vertex.z));
                     vertex.z = 0.0f;
 
-                    //var splinePoint = TrackSegment.Sample(p2, (spline, t) => spline.EvaluatePoint(t), i => spline[i], spline.Count);
                     var splinePoint = segment.SamplePoint(p2);
                     var splineTangent = segment.SampleTangent(p2);
                     var r = Quaternion.LookRotation(splineTangent);
