@@ -144,7 +144,6 @@ namespace FR8Runtime.Train.Track
 
             if (train.Segment == main) train.Segment = other;
             else if (train.Segment == other) train.Segment = main;
-
         }
     }
 }
