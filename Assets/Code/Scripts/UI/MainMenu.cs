@@ -14,13 +14,14 @@ namespace FR8Runtime.UI
     public class MainMenu : MonoBehaviour
     {
         private UIDocument docs;
-        private EventInstance titleMusic;
+        [SerializeField] private FMOD.Studio.EventInstance titleMusic;
+        [SerializeField] private EventReference MenuMusic;
 
 
         private void Awake()
         {
             docs = GetComponent<UIDocument>();
-            titleMusic = SoundReference.TitleMusic.Instance();
+            titleMusic = RuntimeManager.CreateInstance(MenuMusic);
             titleMusic.start();
         }
 
@@ -33,6 +34,12 @@ namespace FR8Runtime.UI
             Cursor.visible = true;
             
             ReloadSettings();
+        }
+
+        private void OnDisable()
+        {
+            titleMusic.stop(STOP_MODE.ALLOWFADEOUT);
+            titleMusic.release();
         }
 
         private void Update()
