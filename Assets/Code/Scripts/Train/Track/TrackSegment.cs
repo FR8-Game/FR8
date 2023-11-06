@@ -336,20 +336,16 @@ namespace FR8Runtime.Train.Track
 
         public bool IsOffStartOfTrack(Vector3 position)
         {
-            var point = SamplePoint(0.0f);
-            var normal = SampleVelocity(0.0f);
-
-            return Vector3.Dot(position - point, normal) < 0.0f;
+            var closest = GetClosestPoint(position, false);
+            return closest < 0.0f;
         }
 
         public TrackSegment GetNextTrackStart() => startConnection.other;
 
         public bool IsOffEndOfTrack(Vector3 position)
         {
-            var point = SamplePoint(1.0f);
-            var normal = SampleVelocity(1.0f);
-
-            return Vector3.Dot(position - point, normal) > 0.0f;
+            var closest = GetClosestPoint(position, false);
+            return closest > 1.0f;
         }
 
         public TrackSegment GetNextTrackEnd() => endConnection.other;
