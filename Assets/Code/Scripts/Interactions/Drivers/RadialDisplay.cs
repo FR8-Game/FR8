@@ -12,9 +12,8 @@ namespace FR8Runtime.Interactions.Drivers
 
         [Space]
         [SerializeField] [ReadOnly] private TMP_Text valueText;
-
-        [SerializeField] [ReadOnly] private TMP_Text labelText;
         [SerializeField] [ReadOnly] private Transform needle;
+        [SerializeField] [ReadOnly] private TMP_Text labelText;
         [SerializeField] private float needleRotationMin = 80.0f;
         [SerializeField] private float needleRotationMax = -80.0f;
         [SerializeField] private float powerDrawWatts;
@@ -42,7 +41,7 @@ namespace FR8Runtime.Interactions.Drivers
             labelText = transform.Find("LabelText")?.GetComponent<TMP_Text>();
             valueText = transform.Find("ValueText")?.GetComponent<TMP_Text>();
 
-            needle = transform.Find("Gauge/GuageNeedle_Parent");
+            needle = transform.Find("Gauge/Gauge_Parent/GuageNeedle_Parent");
         }
 
         private void Start()
