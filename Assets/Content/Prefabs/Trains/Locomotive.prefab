@@ -613,7 +613,7 @@ Transform:
   m_Children:
   - {fileID: 7950070818606639848}
   m_Father: {fileID: 4496338053064106877}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3281092654553390267
 GameObject:
@@ -651,6 +651,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1649204630602748962}
   - {fileID: 2628296022104533743}
   - {fileID: 8263056737269295976}
   - {fileID: 868419444594146192}
@@ -688,51 +689,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d1b1c58fa6ab61439d1d93a376c3303, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  saveTypeReference: Locomotive
-  drag: 12
   referenceWeight: 100000
   cornerLean: 2.5
   handbrakeDefault: 1
-  handbrakeConstant: 50
-  handbrakeEfficiencyCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 69
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.5
-      value: 1
-      inSlope: -0
-      outSlope: -0.2857143
-      tangentMode: 69
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 4
-      value: 0
-      inSlope: -0.2857143
-      outSlope: 0
-      tangentMode: 69
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  retentionSpring: 800
-  retentionDamping: 60
-  retentionTorqueConstant: 0.1
   trainLength: 16
   evaluatedBrakeLoad: 0
-  brakeConstant: 0.5
+  locomotiveSettings: {fileID: 0}
+  localCabinBounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
   initialVelocity: 0
 --- !u!114 &8996021120495092236
 MonoBehaviour:
@@ -746,39 +711,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c432484cd7fb304fadf5d84ad799439, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeedKmpH: 120
-  acceleration: 0.4
-  maxPowerConsumption: 160
-  throttleLoadPowerSplit: 0.5
-  throttleSmoothing: 0.8
-  loadScaling: 0.05
-  load: 0
-  loadCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: -1
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: -1
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
   throttleAcceleration: 0
   actualAcceleration: 0
+  load: 0
 --- !u!114 &1215979245289000700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -791,7 +726,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b2a6bc294147454e99b307823142596, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baselineGeneration: 1
   fuseBlownSound:
     Guid:
       Data1: 0
@@ -811,13 +745,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11ca7cf131c6c9b45b46dfcf8eab592f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  idleRpm: 1000
-  maxRpm: 10000
-  stallRpm: 700
-  maxPowerProduction: 200
-  fuelCapacity: 15
   fuelLevel: 1
-  smoothTime: 0.1
   engineNoise:
     offset: -100
     amplitude: 200
@@ -907,7 +835,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4496338053064106877}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &762148754799828466
 MonoBehaviour:
@@ -1049,7 +977,7 @@ Transform:
   - {fileID: 5410070128431626686}
   - {fileID: 1892045617955464100}
   m_Father: {fileID: 4496338053064106877}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4092747792960767338
 GameObject:
@@ -1081,7 +1009,7 @@ Transform:
   m_Children:
   - {fileID: 2117997071251675142}
   m_Father: {fileID: 4496338053064106877}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4226234104586929154
 GameObject:
@@ -1148,7 +1076,7 @@ Transform:
   - {fileID: 4315103130904996904}
   - {fileID: 7163265653367256731}
   m_Father: {fileID: 4496338053064106877}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5633047435438613279
 GameObject:
@@ -1420,7 +1348,7 @@ Transform:
   - {fileID: 7941521924672236350}
   - {fileID: 6893172819529607332}
   m_Father: {fileID: 4496338053064106877}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6152811636537849919
 GameObject:
@@ -5525,6 +5453,68 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 8056394823840868781, guid: 88eeea266aa47a2488b9e469e8410ff0, type: 3}
   m_PrefabInstance: {fileID: 3487871061551481097}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3638652021901693546
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 4496338053064106877}
+    m_Modifications:
+    - target: {fileID: 2638036687312422472, guid: 7e45f67790792384d9895c9c1c758720, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2638036687312422472, guid: 7e45f67790792384d9895c9c1c758720, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2638036687312422472, guid: 7e45f67790792384d9895c9c1c758720, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2638036687312422472, guid: 7e45f67790792384d9895c9c1c758720, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2638036687312422472, guid: 7e45f67790792384d9895c9c1c758720, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2638036687312422472, guid: 7e45f67790792384d9895c9c1c758720, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2638036687312422472, guid: 7e45f67790792384d9895c9c1c758720, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2638036687312422472, guid: 7e45f67790792384d9895c9c1c758720, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2638036687312422472, guid: 7e45f67790792384d9895c9c1c758720, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2638036687312422472, guid: 7e45f67790792384d9895c9c1c758720, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2638036687312422472, guid: 7e45f67790792384d9895c9c1c758720, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448937782084273163, guid: 7e45f67790792384d9895c9c1c758720, type: 3}
+      propertyPath: m_Name
+      value: CabinLights
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 7e45f67790792384d9895c9c1c758720, type: 3}
+--- !u!4 &1649204630602748962 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2638036687312422472, guid: 7e45f67790792384d9895c9c1c758720, type: 3}
+  m_PrefabInstance: {fileID: 3638652021901693546}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &3760450561214736086
 PrefabInstance:
