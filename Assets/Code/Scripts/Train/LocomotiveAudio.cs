@@ -14,6 +14,7 @@ namespace FR8Runtime.Train
 
         private TrainGasTurbine engine;
         private ExternalTrainDoor[] doors;
+        private Locomotive locomotive;
         
         private bool wasEngineActive;
         private float engineRunningTime;
@@ -22,6 +23,7 @@ namespace FR8Runtime.Train
 
         private void Awake()
         {
+            locomotive = GetComponent<Locomotive>();
             engine = GetComponent<TrainGasTurbine>();
             doors = GetComponentsInChildren<ExternalTrainDoor>();
         }
