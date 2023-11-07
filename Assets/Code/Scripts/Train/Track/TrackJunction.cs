@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace FR8Runtime.Train.Track
 {
+    [SelectionBase, DisallowMultipleComponent]
     public class TrackJunction : MonoBehaviour, IInteractable
     {
         [SerializeField] private TrackSegment main;
@@ -20,6 +21,7 @@ namespace FR8Runtime.Train.Track
 
         private bool state;
         private Renderer[] visuals;
+        private float positionOnSpline;
 
         public bool CanInteract => true;
         public string DisplayName => "Train Signal";
@@ -32,7 +34,7 @@ namespace FR8Runtime.Train.Track
         {
             var t = end == ConnectionEnd.Start ? 0.0f : 1.0f;
             var s = end == ConnectionEnd.Start ? 1.0f : -1.0f;
-            
+
             var instance = Instantiate(this);
             instance.main = main;
             instance.other = other;
@@ -92,6 +94,31 @@ namespace FR8Runtime.Train.Track
             animationSpring.Target(state ? 1.0f : 0.0f).Iterate(Time.deltaTime);
 
             Animate(animationSpring.currentPosition);
+
+            if (GetState())
+            {
+                foreach (var t in TrainCarriage.All)
+                {
+                    if (t.Segment != other) continue;
+                    ProcessTrain(t);
+                }
+            }
+        }
+
+        private void ProcessTrain(TrainCarriage train)
+        {
+            var normal = transform.forward;
+
+            var next = train.Body.position;
+            var last = next - train.Body.velocity * Time.deltaTime;
+
+            var dotLast = Vector3.Dot(normal, last - transform.position);
+            var dotCurrent = Vector3.Dot(normal, next - transform.position);
+
+            if (dotCurrent >= 0.0f && dotLast < 0.0f)
+            {
+                train.Segment = main;
+            }
         }
 
         private void Animate(float t)
@@ -134,16 +161,6 @@ namespace FR8Runtime.Train.Track
         {
             if (highlight) SelectionOutlinePass.Add(visuals);
             else SelectionOutlinePass.Remove(visuals);
-        }
-
-        private void OnTriggerEnter(Collider c)
-        {
-            if (!GetState()) return;
-            var train = c.GetComponentInParent<TrainCarriage>();
-            if (!train) return;
-
-            if (train.Segment == main) train.Segment = other;
-            else if (train.Segment == other) train.Segment = main;
         }
     }
 }

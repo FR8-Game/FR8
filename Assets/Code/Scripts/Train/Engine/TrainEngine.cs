@@ -1,3 +1,4 @@
+using System;
 using FR8Runtime.Interactions.Drivers;
 using FR8Runtime.Train.Electrics;
 using UnityEngine;
@@ -12,6 +13,10 @@ namespace FR8Runtime.Train.Engine
         public float throttleAcceleration;
         public float actualAcceleration;
         [Range(0.0f, 1.0f)] public float load;
+
+        [Space]
+        public bool overrideThrottle;
+        [Range(-1.0f, 1.0f)] public float overrideThrottleValue;
 
         private const string ThrottleKey = "Throttle";
         private const string LoadKey = "Load";
@@ -44,6 +49,14 @@ namespace FR8Runtime.Train.Engine
 
         private void FixedUpdate()
         {
+            #if UNITY_EDITOR
+            if (overrideThrottle)
+            {
+                locomotive.Body.velocity = locomotive.DriverDirection * overrideThrottleValue * (Settings.maxSpeedKmpH / 3.6f);
+                return;
+            }
+            #endif
+            
             throttleActual += (ThrottleInput - throttleActual) * (1.0f - Settings.throttleSmoothing);
 
             var fwdSpeed = locomotive.GetForwardSpeed();
@@ -66,8 +79,8 @@ namespace FR8Runtime.Train.Engine
             newPowerDraw += throttleActual * Settings.maxPowerConsumption * (1.0f - Settings.throttleLoadPowerSplit);
             newPowerDraw += load * Settings.maxPowerConsumption * Settings.throttleLoadPowerSplit;
 
-            if (locomotive.Gear == 0) newPowerDraw = 0.0f; 
-            if (!connected) newPowerDraw = 0.0f; 
+            if (locomotive.Gear == 0) newPowerDraw = 0.0f;
+            if (!connected) newPowerDraw = 0.0f;
 
             powerDraw = (newPowerDraw + powerDraw) / 2.0f;
             driverNetwork.SetValue(PowerDrawKey, powerDraw);
@@ -85,7 +98,7 @@ namespace FR8Runtime.Train.Engine
         {
             var efficiency = Settings.loadCurve.Evaluate(load);
 
-            throttleAcceleration = GetThrottleForce(throttleActual);
+            throttleAcceleration = GetThrottleForce(throttleActual) * locomotive.Gear;
             locomotive.Body.AddForce(locomotive.DriverDirection * throttleAcceleration * efficiency * locomotive.referenceWeight);
         }
 
@@ -93,9 +106,17 @@ namespace FR8Runtime.Train.Engine
         {
             var fwdSpeed = locomotive.GetForwardSpeed();
             var maxSpeed = Settings.maxSpeedKmpH / 3.6f;
-            return (maxSpeed - Mathf.Abs(fwdSpeed)) * Settings.acceleration * throttle * locomotive.Gear;
+            return (maxSpeed - Mathf.Abs(fwdSpeed)) * Settings.acceleration * throttle;
         }
 
         public float CalculatePowerDraw() => powerDraw;
+
+        private void OnValidate()
+        {
+            if (Mathf.Abs(overrideThrottleValue) < 0.05f)
+            {
+                overrideThrottleValue = 0.0f;
+            }
+        }
     }
 }
