@@ -12,7 +12,6 @@ namespace FR8Runtime.Train
     {
         public EventReference loopAudio;
 
-        private Locomotive locomotive;
         private TrainGasTurbine engine;
         private ExternalTrainDoor[] doors;
         
@@ -23,7 +22,6 @@ namespace FR8Runtime.Train
 
         private void Awake()
         {
-            locomotive = GetComponent<Locomotive>();
             engine = GetComponent<TrainGasTurbine>();
             doors = GetComponentsInChildren<ExternalTrainDoor>();
         }
