@@ -7313,6 +7313,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1951930112384428395}
     m_Modifications:
+    - target: {fileID: 912317046203410665, guid: 88eeea266aa47a2488b9e469e8410ff0, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.85
+      objectReference: {fileID: 0}
     - target: {fileID: 1405318379159964826, guid: 88eeea266aa47a2488b9e469e8410ff0, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -7384,25 +7388,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2763b8e16e449d2b03233c6e61219dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testValue: 0
+  testValue: 1
   animator:
-    handle: {fileID: 0}
+    handle: {fileID: 5918876800050674113}
     valueRange: {x: 0, y: 1}
     animationSpring:
-      springConstant: 350
-      dampingConstant: 25
+      springConstant: 30
+      dampingConstant: 6
       clamped: 1
       range: {x: 0, y: 1}
-      bounce: 0.4
+      bounce: 0.2
       currentPosition: 0
       targetPosition: 0
       velocity: 0
-    animatePosition: 0
+    animatePosition: 1
     slidePoseAPosition: {x: 0, y: 0, z: 0}
-    slidePoseBPosition: {x: 0, y: 0, z: 0}
+    slidePoseBPosition: {x: 0, y: 0, z: -0.85}
     animateRotation: 0
     slidePoseARotation: {x: 0, y: 0, z: 0}
     slidePoseBRotation: {x: 0, y: 0, z: 0}
+--- !u!4 &5918876800050674113 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 912317046203410665, guid: 88eeea266aa47a2488b9e469e8410ff0, type: 3}
+  m_PrefabInstance: {fileID: 6813137622805696808}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6814871300212975664
 PrefabInstance:
   m_ObjectHideFlags: 0
