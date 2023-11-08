@@ -2,8 +2,7 @@ using UnityEngine;
 
 namespace FR8Runtime.Train.Track
 {
-    [DisallowMultipleComponent]
-    [RequireComponent(typeof(TrackSegment))]
+    [SelectionBase, DisallowMultipleComponent]
     public sealed partial class TrackMesh : MonoBehaviour
     {
         
