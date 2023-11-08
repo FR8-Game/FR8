@@ -12,6 +12,7 @@ namespace FR8Runtime.Train
     {
         public EventReference loopAudio;
 
+        private Locomotive locomotive;
         private TrainGasTurbine engine;
         private ExternalTrainDoor[] doors;
         private Locomotive locomotive;

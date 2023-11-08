@@ -7,6 +7,7 @@ using FR8Runtime.Rendering;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace FR8Runtime.Train.Track
 {
@@ -18,11 +19,25 @@ namespace FR8Runtime.Train.Track
         public Material material;
         public bool optimize;
         public float verticalOffset;
+        public bool limit;
+        public Vector3 osLimit0;
+        public Vector3 osLimit1;
 
         private TrackMeshBakeData bakeData;
         private static int trackMeshesBaking;
 
         public List<(float, float)> conversionGraph;
+        public Vector3 Limit0
+        {
+            get => transform.TransformPoint(osLimit0);
+            set => osLimit0 = transform.InverseTransformPoint(value);
+        }
+
+        public Vector3 Limit1
+        {
+            get => transform.TransformPoint(osLimit1);
+            set => osLimit1 = transform.InverseTransformPoint(value);
+        }
 
         public static void ExecuteAndRefreshAssets(Action callback)
         {
@@ -124,7 +139,7 @@ namespace FR8Runtime.Train.Track
         public void BakeMesh(Mesh baseMesh)
         {
             var rendererContainer = GetRendererContainer(true);
-            var segment = GetComponent<TrackSegment>();
+            var segment = GetComponentInParent<TrackSegment>();
             segment.BakeData();
 
             BakeConversionGraph(segment);
@@ -154,11 +169,17 @@ namespace FR8Runtime.Train.Track
 
         private void BakeConversionGraph(TrackSegment segment)
         {
+            var limit0 = limit ? segment.GetClosestPoint(Limit0, true) : 0.0f;
+            var limit1 = limit ? segment.GetClosestPoint(Limit1, true) : 1.0f;
+            
             var (points, _) = segment.GetBakeData();
-            conversionGraph = new List<(float, float)>(points.Count);
+            var start = Mathf.FloorToInt(limit0 * points.Count); 
+            var end = Mathf.CeilToInt(limit1 * points.Count);
+
+            conversionGraph = new List<(float, float)>(end - start);
 
             var distance = 0.0f;
-            for (var i = 0; i < points.Count - 1; i++)
+            for (var i = start; i < end - 1; i++)
             {
                 var t = i / (points.Count - 1.0f);
                 var a = points[i];
@@ -290,6 +311,30 @@ namespace FR8Runtime.Train.Track
             var rng = new System.Random(gameObject.GetInstanceID());
             var verticalOffset = this.verticalOffset + (float)rng.NextDouble() * 0.01f;
             container.localPosition = Vector3.up * verticalOffset;
+        }
+        
+        private void OnDrawGizmos()
+        {
+            if (!limit) return;
+
+            var segment = GetComponentInParent<TrackSegment>();
+            if (!segment) return;
+            
+            Gizmos.color = Color.magenta;
+            
+            draw(Limit0);
+            draw(Limit1);
+            
+            void draw(Vector3 origin)
+            {
+                var t = segment.GetClosestPoint(origin, true);
+                var p = segment.SamplePoint(t);
+
+                Gizmos.matrix = Matrix4x4.identity;
+                Gizmos.DrawLine(p, origin);
+                Gizmos.matrix = Matrix4x4.TRS(p, Quaternion.LookRotation(segment.SampleTangent(t)), Vector3.one);
+                Gizmos.DrawWireCube(Vector3.zero, new Vector3(5.0f, 5.0f, 0.0f));
+            }
         }
 
         public void FindTrackMeshes()
