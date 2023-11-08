@@ -15,7 +15,6 @@ namespace FR8Runtime.Train
         private Locomotive locomotive;
         private TrainGasTurbine engine;
         private ExternalTrainDoor[] doors;
-        private Locomotive locomotive;
         
         private bool wasEngineActive;
         private float engineRunningTime;
