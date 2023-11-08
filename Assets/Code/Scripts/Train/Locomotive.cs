@@ -15,10 +15,6 @@ namespace FR8Runtime.Train
         public LocomotiveSettings locomotiveSettings;
         [SerializeField] private Bounds localCabinBounds;
 
-        [Space]
-        [Header("Testing")]
-        [SerializeField] private float initialVelocity;
-        
         private float brakeLoad;
 
         private const string BrakeKey = "Brake";
@@ -38,12 +34,6 @@ namespace FR8Runtime.Train
             
             DriverNetwork.SetValue(BrakeKey, 1.0f);
             DriverNetwork.SetValue(GearKey, 0.0f);
-            
-#if UNITY_EDITOR
-            var t = segment.GetClosestPoint(Body.position, true);
-            var dir = segment.SampleTangent(t);
-            Body.AddForce(dir * initialVelocity / 3.6f, ForceMode.VelocityChange);
-#endif
         }
 
         protected override void FixedUpdate()
@@ -75,7 +65,7 @@ namespace FR8Runtime.Train
 
         protected override float GetBrakeLoad() => Mathf.Max(base.GetBrakeLoad(), brakeLoad);
 
-        protected override void OnDrawGizmosSelected()
+        private void OnDrawGizmosSelected()
         {
             Gizmos.matrix = transform.localToWorldMatrix;
             Gizmos.color = Color.red;

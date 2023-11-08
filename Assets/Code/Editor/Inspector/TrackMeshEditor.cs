@@ -74,6 +74,17 @@ namespace FR8Editor.Inspector
             }
         }
 
+        private void OnSceneGUI()
+        {
+            var target = this.target as TrackMesh;
+
+            if (!target.limit) return;
+            
+            Undo.RecordObject(target, "Moved Limits");
+            target.Limit0 = Handles.PositionHandle(target.Limit0, target.transform.rotation);
+            target.Limit1 = Handles.PositionHandle(target.Limit1, target.transform.rotation);
+        }
+
         private void ExecuteAll(Action<TrackMesh> segment)
         {
             foreach (var target in targets)
