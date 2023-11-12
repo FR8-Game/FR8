@@ -37,6 +37,7 @@ namespace FR8Runtime.Player.Submodules
         private float shieldRegenBuffer;
 
         private EventInstance shield;
+        private EventInstance ambiance;
 
         public int CurrentHealth => currentHealth;
         public float CurrentShields => currentShields;
@@ -70,6 +71,9 @@ namespace FR8Runtime.Player.Submodules
             Revive();
 
             shield = SoundReference.PlayerShields.InstanceAndStart();
+            ambiance = SoundReference.Ambiance.InstanceAndStart();
+
+            //put ambience here?
         }
 
         public void FixedUpdate()
