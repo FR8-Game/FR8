@@ -4447,38 +4447,6 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 5529194084646243110, guid: a86ca45e95b0c5e4fab8317f5ef8dd8f, type: 3}
---- !u!1 &6848858482821375328 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4868417472871508960, guid: a86ca45e95b0c5e4fab8317f5ef8dd8f, type: 3}
-  m_PrefabInstance: {fileID: 2061557248377917056}
-  m_PrefabAsset: {fileID: 0}
---- !u!65 &1645890929750352889
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6848858482821375328}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 2.1962292, y: 2.580699, z: 0.30856133}
-  m_Center: {x: -0.13409555, y: -0.0048930645, z: -7.870139}
---- !u!64 &3570009990729579847
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6848858482821375328}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 4
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -203741929176811230, guid: a86ca45e95b0c5e4fab8317f5ef8dd8f, type: 3}
 --- !u!1 &7173522072971670324 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 9156212992911932852, guid: a86ca45e95b0c5e4fab8317f5ef8dd8f, type: 3}
@@ -7827,14 +7795,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4661445699737426011}
     m_Modifications:
-    - target: {fileID: 305841226863381373, guid: 114b6cf8ac764cd49b14c970d94243af, type: 3}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 585989035273628919, guid: 114b6cf8ac764cd49b14c970d94243af, type: 3}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
     - target: {fileID: 1402523550476783764, guid: 114b6cf8ac764cd49b14c970d94243af, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -7883,57 +7843,9 @@ PrefabInstance:
       propertyPath: m_Name
       value: RPM
       objectReference: {fileID: 0}
-    - target: {fileID: 2099071477639602266, guid: 114b6cf8ac764cd49b14c970d94243af, type: 3}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 2163273395250888875, guid: 114b6cf8ac764cd49b14c970d94243af, type: 3}
-      propertyPath: m_text
-      value: 115
-      objectReference: {fileID: 0}
-    - target: {fileID: 3081478531367537951, guid: 114b6cf8ac764cd49b14c970d94243af, type: 3}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 3578449367243536999, guid: 114b6cf8ac764cd49b14c970d94243af, type: 3}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 5968728455476406953, guid: 114b6cf8ac764cd49b14c970d94243af, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.77288127
-      objectReference: {fileID: 0}
-    - target: {fileID: 5968728455476406953, guid: 114b6cf8ac764cd49b14c970d94243af, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0.63455063
-      objectReference: {fileID: 0}
-    - target: {fileID: 6090361172349593491, guid: 114b6cf8ac764cd49b14c970d94243af, type: 3}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 6551073718455633138, guid: 114b6cf8ac764cd49b14c970d94243af, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.77288127
-      objectReference: {fileID: 0}
-    - target: {fileID: 6551073718455633138, guid: 114b6cf8ac764cd49b14c970d94243af, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0.63455063
-      objectReference: {fileID: 0}
     - target: {fileID: 6916336392491487087, guid: 114b6cf8ac764cd49b14c970d94243af, type: 3}
       propertyPath: m_text
       value: RPM
-      objectReference: {fileID: 0}
-    - target: {fileID: 7916572093873567614, guid: 114b6cf8ac764cd49b14c970d94243af, type: 3}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 9214434404308308835, guid: 114b6cf8ac764cd49b14c970d94243af, type: 3}
-      propertyPath: key
-      value: rpm
-      objectReference: {fileID: 0}
-    - target: {fileID: 9214434404308308835, guid: 114b6cf8ac764cd49b14c970d94243af, type: 3}
-      propertyPath: valueMax
-      value: 15000
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 114b6cf8ac764cd49b14c970d94243af, type: 3}
