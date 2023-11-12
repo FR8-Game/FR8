@@ -71,7 +71,7 @@ namespace FR8Runtime.Train.Track
             var workingLength = 0.0f;
             var totalLength = conversionGraph[^1].Item2;
             var t0 = 0.0f;
-            var t1 = 0.0f;
+            var t1 = samplePercentFromDistance(0.0f);
 
             var meshesPerFile = (ushort.MaxValue / baseMeshData.vertices.Count) - 1;
 
@@ -92,7 +92,6 @@ namespace FR8Runtime.Train.Track
                     var p2 = Mathf.Lerp(t0, t1, Mathf.InverseLerp(baseMeshZMin, baseMeshZMax, vertex.z));
                     vertex.z = 0.0f;
 
-                    //var splinePoint = TrackSegment.Sample(p2, (spline, t) => spline.EvaluatePoint(t), i => spline[i], spline.Count);
                     var splinePoint = segment.SamplePoint(p2);
                     var splineTangent = segment.SampleTangent(p2);
                     var r = Quaternion.LookRotation(splineTangent);
@@ -129,8 +128,12 @@ namespace FR8Runtime.Train.Track
                     if (conversionGraph[i].Item2 > distance) break;
                 }
 
-                var j = i;
-                i--;
+                var j = i + 1;
+                if (j >= conversionGraph.Count)
+                {
+                    j = conversionGraph.Count - 1;
+                    i = j - 1;
+                }
 
                 var a = conversionGraph[i];
                 var b = conversionGraph[j];
