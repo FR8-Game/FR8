@@ -19,21 +19,21 @@ namespace FR8.Runtime.Player.Submodules
         private Camera mainCamera;
         private PlayerAvatar avatar;
 
-        private InputActionReference moveInput;
-        private InputActionReference jumpInput;
-        private InputActionReference lookAction;
-        private InputActionReference sprintAction;
-        private InputActionReference crouchAction;
-        private InputActionReference nudgeAction;
-        private InputActionReference pressAction;
-        private InputActionReference freeCamAction;
-        private InputActionReference grabCamAction;
-        private InputActionReference zoomCamAction;
-        private InputActionReference peeAction;
-        private InputActionReference flyAction;
-        private InputActionReference[] hotbarActions;
-        private InputActionReference hotbarNext;
-        private InputActionReference hotbarLast;
+        public InputActionReference moveInput;
+        public InputActionReference jumpInput;
+        public InputActionReference lookAction;
+        public InputActionReference sprintAction;
+        public InputActionReference crouchAction;
+        public InputActionReference nudgeAction;
+        public InputActionReference pressAction;
+        public InputActionReference freeCamAction;
+        public InputActionReference grabCamAction;
+        public InputActionReference zoomCamAction;
+        public InputActionReference peeAction;
+        public InputActionReference flyAction;
+        public InputActionReference[] hotbarActions;
+        public InputActionReference hotbarNext;
+        public InputActionReference hotbarLast;
 
         public Vector3 Move
         {

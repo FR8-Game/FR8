@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using FR8.Runtime.Player.Submodules;
+using UnityEditor.Graphs;
 using UnityEngine;
+using UnityEngine.WSA;
 
 namespace FR8.Runtime.Player
 {
@@ -99,6 +101,7 @@ namespace FR8.Runtime.Player
         public void SetMount(PlayerMount mount)
         {
             MountChangedEvent?.Invoke(mount);
+            if (mount) Toast.ShowToast($"Press {input.crouchAction.action.bindings[0].name} to leave {mount.DisplayName}", Color.white);
             CurrentMount = mount;
         }
     }

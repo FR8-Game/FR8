@@ -6,15 +6,21 @@ using FR8.Runtime.Editor;
 using FR8.Runtime.Gamemodes.Predicates;
 using FR8.Runtime.Save;
 using UnityEngine;
+using Application = UnityEngine.Application;
 
 namespace FR8.Runtime.Gamemodes
 {
     [AddComponentMenu("Contracts/Contract")]
     public class Contract : MonoBehaviour, IEnumerable<ContractPredicate>
     {
-        private const int divLength = 20;
+        private const int DivLength = 20;
 
-        public int doubloons = 5000;
+        public int completionDoubloons = 5000;
+        [ReadOnly] public int currentDoubloons = 5000;
+        public float maxContractTimeMinutes = 10;
+
+        [Space, ReadOnly]
+        public Violations violations;
         
         private string displayName;
         private List<ContractPredicate> predicateTree;
@@ -48,11 +54,15 @@ namespace FR8.Runtime.Gamemodes
         {
             ActiveContracts.Add(this);
             StartTime = Time.time;
+            
+            violations.OnEnable();
         }
 
         private void OnDisable()
         {
             ActiveContracts.Remove(this);
+            
+            violations.OnDisable();
         }
 
         public void Update()
@@ -81,12 +91,24 @@ namespace FR8.Runtime.Gamemodes
             {
                 CompleteContract();
             }
+
+            var time = Time.time - StartTime;
+            if (time > maxContractTimeMinutes * 60.0f)
+            {
+                violations.Overtime();
+                UpdateViolations();
+            }
+        }
+
+        private void UpdateViolations()
+        {
+            currentDoubloons = violations.ComputeReward(completionDoubloons);
         }
 
         private void CompleteContract()
         {
             var save = SaveManager.ProgressionSave.GetOrLoad();
-            save.doubloons += doubloons;
+            save.doubloons += completionDoubloons;
             SaveManager.ProgressionSave.Save();
 
             gameObject.SetActive(false);
@@ -95,8 +117,9 @@ namespace FR8.Runtime.Gamemodes
 
         public string BuildTitle()
         {
+            var time = TimeSpan.FromSeconds(Mathf.Max(0.0f, maxContractTimeMinutes * 60.0f - (Time.time - StartTime)));
             var name = !string.IsNullOrWhiteSpace(displayName) ? displayName : "Active Contract";
-            return $"{name} [{(PredicatesCompleted == predicateTree.Count ? "Done" : $"{PredicatesCompleted}/{PredicateTree.Count}")}]".ToUpper();
+            return $"{name}\nTime Left [{time:mm\\:ss}]\nCompletion Reward [{FormatCurrency(currentDoubloons)}]\nCompleted [{(PredicatesCompleted == predicateTree.Count ? "Done" : $"{PredicatesCompleted}/{PredicateTree.Count}")}]".ToUpper();
         }
 
         public override string ToString()
@@ -127,7 +150,7 @@ namespace FR8.Runtime.Gamemodes
             if (Done) sb.Append("</color>");
             return sb.ToString();
 
-            void div() => sb.AppendLine(new string('-', divLength));
+            void div() => sb.AppendLine(new string('-', DivLength));
             void buildPredicate(int i)
             {
                 if (i < 0) return;
@@ -150,5 +173,10 @@ namespace FR8.Runtime.Gamemodes
 
         public IEnumerator<ContractPredicate> GetEnumerator() => predicateTree.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public static string FormatCurrency(int value)
+        {
+            return $"<color=#FF{(value >= 0 ? "FFFF" : "0000")}>${value:N2}</color>";
+        }
     }
 }

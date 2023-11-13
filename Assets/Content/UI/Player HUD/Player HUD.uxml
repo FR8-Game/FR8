@@ -8,14 +8,14 @@
             <ui:Label text="[ ACTIVE | 30 s ]" display-tooltip-when-elided="true" name="shields-text" style="-unity-paragraph-spacing: -60px;" />
         </ui:VisualElement>
     </ui:VisualElement>
-    <ui:Label display-tooltip-when-elided="true" name="contracts" text="Label" style="position: absolute; left: 30px; top: 30px; font-size: 22px; max-width: 20%; white-space: normal;" />
+    <ui:Label display-tooltip-when-elided="true" name="contracts" text="Contract Infomation" style="position: absolute; left: 30px; top: 30px; font-size: 22px; white-space: normal;" />
     <ui:VisualElement name="spatial-info" style="position: absolute; top: 30px; right: 30%; left: 30%;">
         <ui:VisualElement name="long-lat" style="align-items: flex-start; flex-direction: row; justify-content: center;">
             <ui:Label text="LONG: 20.2341" display-tooltip-when-elided="true" name="long" style="flex-grow: 1; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;" />
             <ui:Label text="09.145 :LAT" display-tooltip-when-elided="true" name="lat" style="flex-grow: 1; -unity-text-align: upper-right; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;" />
         </ui:VisualElement>
         <ui:VisualElement name="divider" class="v-divider" />
-        <FR8Runtime.UI.CustomControls.Compass name="compass" FaceAngle="0" TickSpacing="2" style="height: 20px;" />
+        <FR8.Runtime.UI.CustomControls.Compass name="compass" FaceAngle="0" TickSpacing="2" style="height: 20px;" />
     </ui:VisualElement>
     <ui:VisualElement name="center-align" style="position: absolute; left: -1px; top: -4px; right: 1px; bottom: 4px; align-items: center; justify-content: center;">
         <ui:VisualElement name="looking-at" style="opacity: 0.4; top: 60%; position: absolute; flex-direction: row; align-items: center;">
@@ -23,4 +23,5 @@
             <ui:Label text="Thing you are looking at&#10;Seccond Line" display-tooltip-when-elided="true" name="looking-at-text" style="font-size: 24px; -unity-text-align: upper-left; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
         </ui:VisualElement>
     </ui:VisualElement>
+    <ui:Label text="Label" display-tooltip-when-elided="true" name="toast" style="left: 30%; top: 70%; right: 30%; bottom: auto; position: absolute; -unity-text-align: upper-center; font-size: 24px;" />
 </ui:UXML>

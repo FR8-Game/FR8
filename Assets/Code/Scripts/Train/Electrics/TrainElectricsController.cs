@@ -27,7 +27,7 @@ namespace FR8.Runtime.Train.Electrics
         public float Capacity { get; private set; }
         public float Saturation { get; private set; }
 
-        public event Action FuseBlown;
+        public static event Action<TrainElectricsController> FuseBlown;
 
         private void Awake()
         {
@@ -75,7 +75,7 @@ namespace FR8.Runtime.Train.Electrics
                 saturation = 0.0f;
                 clockSpeed = 0.0f;
                 SetConnected(false);
-                FuseBlown?.Invoke();
+                FuseBlown?.Invoke(this);
                 SoundReference.BlownFuse.PlayOneShot();
             }
 

@@ -63,17 +63,19 @@ namespace FR8.Runtime.Train
 
         private void OnEnable()
         {
-            trainElectrics.FuseBlown += OnFuseBlown;
+            TrainElectricsController.FuseBlown += OnFuseBlown;
             GetShapes();
         }
 
         private void OnDisable()
         {
-            trainElectrics.FuseBlown -= OnFuseBlown;
+            TrainElectricsController.FuseBlown -= OnFuseBlown;
         }
 
-        private void OnFuseBlown()
+        private void OnFuseBlown(TrainElectricsController train)
         {
+            if (trainElectrics != train) return;
+            
             var entry = new DialogueEntry()
             {
                 source = source,
