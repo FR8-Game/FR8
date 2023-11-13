@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using UnityEngine;
-#if UNITY_EDITOR
 using UnityEditor;
-#endif
+using UnityEngine;
 
-namespace FR8Runtime.Shapes
+namespace FR8.Runtime.Shapes
 {
     public class ShapeTester : MonoBehaviour
     {

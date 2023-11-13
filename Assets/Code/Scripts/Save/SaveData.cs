@@ -1,10 +1,10 @@
-﻿using System;
+﻿using UnityEngine;
 
-namespace FR8Runtime.Save
+namespace FR8.Runtime.Save
 {
-    [Serializable]
+    [System.Serializable]
     public class SaveData
     {
-        
+        public int doubloons;
     }
 }

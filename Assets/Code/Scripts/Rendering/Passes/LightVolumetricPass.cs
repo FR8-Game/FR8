@@ -1,9 +1,9 @@
-using FR8Runtime.Rendering.Volumetrics;
+using FR8.Runtime.Rendering.Volumetrics;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace FR8Runtime.Rendering.Passes
+namespace FR8.Runtime.Rendering.Passes
 {
     public class LightVolumetricPass : CustomRenderPass<VolumetricsSettings>
     {

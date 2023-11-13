@@ -1,6 +1,6 @@
-﻿using FR8Runtime.Player;
+﻿using FR8.Runtime.Player;
 
-namespace FR8Runtime
+namespace FR8.Runtime
 {
     public interface IVitalityBooster : IBehaviour
     {

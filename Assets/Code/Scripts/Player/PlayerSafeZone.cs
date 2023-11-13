@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using FR8Runtime.Shapes;
+using FR8.Runtime.Shapes;
 using UnityEngine;
 
-namespace FR8Runtime.Player
+namespace FR8.Runtime.Player
 {
     public class PlayerSafeZone : MonoBehaviour, IVitalityBooster
     {

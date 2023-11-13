@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 
-namespace FR8Runtime
+namespace FR8.Runtime.Train
 {
     [SelectionBase, DisallowMultipleComponent]
     public sealed class RearCamera : MonoBehaviour

@@ -1,14 +1,13 @@
-using FR8Runtime.CodeUtility;
-using FR8Runtime.Save;
-using FR8Runtime.References;
+using FMOD.Studio;
+using FMODUnity;
+using FR8.Runtime.CodeUtility;
+using FR8.Runtime.Save;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using Cursor = UnityEngine.Cursor;
-using FMODUnity;
-using FMOD.Studio;
 
-namespace FR8Runtime.UI
+namespace FR8.Runtime.UI
 {
     [RequireComponent(typeof(UIDocument))]
     public class MainMenu : MonoBehaviour
@@ -54,16 +53,16 @@ namespace FR8Runtime.UI
             
             if (kb.f3Key.isPressed && kb.gKey.wasPressedThisFrame)
             {
-                SaveManager.PersistantSave.data = new PersistantSaveData();
-                SaveManager.PersistantSave.Save();
+                SaveManager.SettingsSave.data = new PersistantSaveData();
+                SaveManager.SettingsSave.Save();
                 ReloadSettings();
             }
         }
 
         private void ReloadSettings()
         {
-            SaveManager.PersistantSave.Load();
-            var settings = SaveManager.PersistantSave.data;
+            SaveManager.SettingsSave.Load();
+            var settings = SaveManager.SettingsSave.data;
             Screen.SetResolution(settings.xResolution, settings.yResolution, (FullScreenMode)settings.displayMode);
         }
 

@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using FR8Runtime.Contracts;
-using FR8Runtime.Contracts.Predicates;
-using FR8Runtime.Interactions.Drivers.Submodules;
-using FR8Runtime.Rendering.Passes;
+using FR8.Runtime.Gamemodes;
+using FR8.Runtime.Gamemodes.Predicates;
+using FR8.Runtime.Interactions.Drivers.Submodules;
+using FR8.Runtime.Rendering.Passes;
 using UnityEngine;
 
-namespace FR8Runtime.Interactions.Drivers
+namespace FR8.Runtime.Interactions.Drivers
 {
     [SelectionBase, DisallowMultipleComponent]
     public abstract class Driver : MonoBehaviour, IDriver

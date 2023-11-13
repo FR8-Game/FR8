@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace FR8Runtime.Dialogue
+namespace FR8.Runtime.Dialogue
 {
     [CreateAssetMenu(menuName = "Dialogue/Dialogue Source")]
     public class DialogueSource: ScriptableObject

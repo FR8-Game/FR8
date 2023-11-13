@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using FR8Runtime.CodeUtility;
+using FR8.Runtime.CodeUtility;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace FR8Runtime.UI
+namespace FR8.Runtime.UI
 {
     [RequireComponent(typeof(UIDocument))]
     [SelectionBase, DisallowMultipleComponent]
