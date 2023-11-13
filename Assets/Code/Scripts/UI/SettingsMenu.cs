@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using FR8Runtime.Save;
+using FR8.Runtime.Save;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UIElements;
 
-namespace FR8Runtime.UI
+namespace FR8.Runtime.UI
 {
     [RequireComponent(typeof(UIDocument))]
     [SelectionBase, DisallowMultipleComponent]
@@ -38,7 +38,7 @@ namespace FR8Runtime.UI
             });
             resolutions.AddRange(Screen.resolutions);
 
-            var settings = SaveManager.PersistantSave.GetOrLoad();
+            var settings = SaveManager.SettingsSave.GetOrLoad();
 
             MakeCategory
             (
@@ -89,16 +89,16 @@ namespace FR8Runtime.UI
 
         private void ApplySettings()
         {
-            SaveManager.PersistantSave.Save();
+            SaveManager.SettingsSave.Save();
 
-            var settings = SaveManager.PersistantSave.GetOrLoad();
+            var settings = SaveManager.SettingsSave.GetOrLoad();
             Screen.SetResolution(settings.xResolution, settings.yResolution, (FullScreenMode)settings.displayMode, settings.refreshRate);
             Graphics.activeTier = (GraphicsTier)settings.quality;
         }
 
         private void RevertSettings()
         {
-            SaveManager.PersistantSave.Load();  
+            SaveManager.SettingsSave.Load();  
             Pop();
             Push(this);
         }

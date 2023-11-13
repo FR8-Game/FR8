@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
-namespace FR8Runtime.UI.Loading
+namespace FR8.Runtime.UI.Loading
 {
     [SelectionBase, DisallowMultipleComponent]
     [RequireComponent(typeof(UIDocument))]

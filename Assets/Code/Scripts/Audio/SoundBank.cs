@@ -1,5 +1,5 @@
 ﻿
-namespace FR8Runtime.Audio
+namespace FR8.Runtime.Audio
 {
     public class SoundBank
     {

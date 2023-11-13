@@ -1,19 +1,19 @@
-﻿using FR8Runtime.Save;
+﻿using FR8.Runtime.Save;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace FR8Runtime.Player.Submodules
+namespace FR8.Runtime.Player.Submodules
 {
     [System.Serializable]
     public class PlayerInput
     {
         [SerializeField] private InputActionAsset inputMap;
 
-        private float MouseSensitivity => SaveManager.PersistantSave.GetOrLoad().mouseSensitivity;
+        private float MouseSensitivity => SaveManager.SettingsSave.GetOrLoad().mouseSensitivity;
         private Vector2 ControllerSensitivity => new()
         {
-            x = SaveManager.PersistantSave.GetOrLoad().gamepadSensitivityX,
-            y = SaveManager.PersistantSave.GetOrLoad().gamepadSensitivityY,
+            x = SaveManager.SettingsSave.GetOrLoad().gamepadSensitivityX,
+            y = SaveManager.SettingsSave.GetOrLoad().gamepadSensitivityY,
         };
 
         private Camera mainCamera;

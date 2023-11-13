@@ -1,8 +1,8 @@
-using FR8Runtime.CodeUtility;
+using FR8.Runtime.CodeUtility;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace FR8Runtime.UI.CustomControls
+namespace FR8.Runtime.UI.CustomControls
 {
     public sealed class LoadBar : Label
     {

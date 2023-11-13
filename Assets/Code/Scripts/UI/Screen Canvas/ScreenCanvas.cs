@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 
-namespace FR8Runtime.UI.Screen_Canvas
+namespace FR8.Runtime.UI.Screen_Canvas
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Canvas))]

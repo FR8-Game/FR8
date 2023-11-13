@@ -1,7 +1,7 @@
-using FR8Runtime.Train.Electrics;
+using FR8.Runtime.Train.Electrics;
 using UnityEngine;
 
-namespace FR8Runtime.Interactions.Drivers
+namespace FR8.Runtime.Interactions.Drivers
 {
     [RequireComponent(typeof(MeshRenderer))]
     public class LightupWithPower : MonoBehaviour

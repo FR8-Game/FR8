@@ -1,11 +1,11 @@
 using FMOD.Studio;
 using FMODUnity;
-using FR8Runtime.Interactions.Drivers;
-using FR8Runtime.Level;
-using FR8Runtime.References;
+using FR8.Runtime.Interactions.Drivers;
+using FR8.Runtime.Level;
+using FR8.Runtime.References;
 using UnityEngine;
 
-namespace FR8Runtime.Train.Electrics
+namespace FR8.Runtime.Train.Electrics
 {
     public class TrainLight : LightDriver, IElectricDevice
     {

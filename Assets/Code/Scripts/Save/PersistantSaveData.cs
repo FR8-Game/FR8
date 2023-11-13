@@ -2,9 +2,9 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace FR8Runtime.Save
+namespace FR8.Runtime.Save
 {
-    [Serializable]
+    [System.Serializable]
     public class PersistantSaveData
     {
         // Graphics

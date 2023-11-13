@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using FR8Runtime.Player.Submodules;
+using FR8.Runtime.Player.Submodules;
 using UnityEngine;
 
-namespace FR8Runtime.Player
+namespace FR8.Runtime.Player
 {
     [SelectionBase, DisallowMultipleComponent]
     [DefaultExecutionOrder(-100)]

@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-using FR8Runtime.Dialogue;
-using FR8Runtime.Interactions.Drivers;
-using FR8Runtime.Player;
-using FR8Runtime.Shapes;
-using FR8Runtime.Train.Electrics;
+using FR8.Runtime.Dialogue;
+using FR8.Runtime.Interactions.Drivers;
+using FR8.Runtime.Player;
+using FR8.Runtime.Shapes;
+using FR8.Runtime.Train.Electrics;
 using UnityEngine;
 
-namespace FR8Runtime.Train
+namespace FR8.Runtime.Train
 {
     [SelectionBase, DisallowMultipleComponent]
     public class TrainMonitor : MonoBehaviour

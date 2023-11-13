@@ -1,10 +1,9 @@
-﻿
-using FMOD.Studio;
+﻿using FMOD.Studio;
 using FMODUnity;
-using FR8Runtime.CodeUtility;
+using FR8.Runtime.CodeUtility;
 using UnityEngine;
 
-namespace FR8Runtime.References
+namespace FR8.Runtime.References
 {
     public class SoundReference
     {

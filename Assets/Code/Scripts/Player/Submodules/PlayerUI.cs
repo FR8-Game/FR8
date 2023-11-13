@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using FR8Runtime.CodeUtility;
-using FR8Runtime.Contracts;
-using FR8Runtime.Interactions.Drivers.Submodules;
-using FR8Runtime.UI;
+using FR8.Runtime.CodeUtility;
+using FR8.Runtime.Gamemodes;
+using FR8.Runtime.Interactions.Drivers.Submodules;
+using FR8.Runtime.UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
-using Compass = FR8Runtime.UI.CustomControls.Compass;
+using Compass = FR8.Runtime.UI.CustomControls.Compass;
 using Cursor = UnityEngine.Cursor;
 using Object = UnityEngine.Object;
-using SceneUtility = FR8Runtime.CodeUtility.SceneUtility;
+using SceneUtility = FR8.Runtime.CodeUtility.SceneUtility;
 
-namespace FR8Runtime.Player.Submodules
+namespace FR8.Runtime.Player.Submodules
 {
     [Serializable]
     public class PlayerUI

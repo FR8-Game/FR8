@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FR8Runtime.Player
+namespace FR8.Runtime.Player
 {
     [DefaultExecutionOrder(200)]
     [SelectionBase, DisallowMultipleComponent]

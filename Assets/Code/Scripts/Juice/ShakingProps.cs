@@ -1,8 +1,7 @@
-using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace FR8Runtime.Juice
+namespace FR8.Runtime.Juice
 {
     public class ShakingProps : MonoBehaviour
     {

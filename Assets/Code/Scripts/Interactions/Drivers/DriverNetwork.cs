@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FR8Runtime.Interactions.Drivers
+namespace FR8.Runtime.Interactions.Drivers
 {
     [SelectionBase, DisallowMultipleComponent]
     public class DriverNetwork : MonoBehaviour

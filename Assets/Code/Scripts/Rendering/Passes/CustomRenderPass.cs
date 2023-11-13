@@ -2,7 +2,7 @@ using System;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace FR8Runtime.Rendering.Passes
+namespace FR8.Runtime.Rendering.Passes
 {
     public abstract class CustomRenderPass<T> : ScriptableRenderPass where T : VolumeComponent
     {

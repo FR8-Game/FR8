@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace FR8Runtime.UI
+namespace FR8.Runtime.UI
 {
     public static class Pause
     {   

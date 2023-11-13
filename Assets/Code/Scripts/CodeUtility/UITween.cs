@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace FR8Runtime.CodeUtility
+namespace FR8.Runtime.CodeUtility
 {
     public static class UITween
     {

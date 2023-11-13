@@ -1,4 +1,4 @@
-﻿using FR8Runtime.Train.Electrics;
+﻿using FR8.Runtime.Train.Electrics;
 using UnityEditor;
 using UnityEngine;
 
