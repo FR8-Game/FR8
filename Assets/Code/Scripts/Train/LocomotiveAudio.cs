@@ -11,6 +11,7 @@ namespace FR8.Runtime.Train
     public sealed class LocomotiveAudio : MonoBehaviour
     {
         public EventReference loopAudio;
+        public EventReference hornAudio;
 
         private Locomotive locomotive;
         private TrainGasTurbine engine;
@@ -20,6 +21,7 @@ namespace FR8.Runtime.Train
         private float engineRunningTime;
 
         private EventInstance loopEvent;
+        private EventInstance hornEvent;
 
         private void Awake()
         {
@@ -31,6 +33,7 @@ namespace FR8.Runtime.Train
         private void OnEnable()
         {
             if (!loopAudio.IsNull) loopEvent = RuntimeManager.CreateInstance(loopAudio);
+            if (!hornAudio.IsNull) hornEvent = RuntimeManager.CreateInstance(hornAudio);
         }
 
         private void OnDisable()
@@ -59,7 +62,11 @@ namespace FR8.Runtime.Train
                 break;
             }
             RuntimeManager.StudioSystem.setParameterByName("Inside", inside ? 1.0f : 0.0f);
-            
+
+            var hornState = locomotive.DriverNetwork.GetValue("Horn") > 0.5f;
+            if (hornState) hornEvent.start();
+            else hornEvent.stop(STOP_MODE.ALLOWFADEOUT);
+
             wasEngineActive = isEngineActive;
         }
     }

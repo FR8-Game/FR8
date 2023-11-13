@@ -25,5 +25,7 @@ namespace FR8.Runtime.Save
         public float mouseSensitivity = 0.3f;
         public float gamepadSensitivityX = 0.3f;
         public float gamepadSensitivityY = 0.3f;
+        
+        public bool togglePiss = false;
     }
 }

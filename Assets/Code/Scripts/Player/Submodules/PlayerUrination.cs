@@ -1,12 +1,18 @@
-﻿using UnityEngine;
+﻿using FR8.Runtime.Save;
+using UnityEngine;
+using UnityEngine.InputSystem.Processors;
 
 namespace FR8.Runtime.Player.Submodules
 {
     [System.Serializable]
     public class PlayerUrination
     {
+        public Gradient pissColor;
+        
         private PlayerAvatar avatar;
         private ParticleSystem fx;
+        
+        private bool pissing;
 
         public void Init(PlayerAvatar avatar)
         {
@@ -19,7 +25,22 @@ namespace FR8.Runtime.Player.Submodules
 
         private void Update()
         {
-            SyncParticleState(avatar.input.Pee);
+            var settings = SaveManager.SettingsSave.GetOrLoad();
+
+            if (settings.togglePiss)
+            {
+                if (avatar.input.peeAction.action.WasPressedThisFrame()) pissing = !pissing;
+            }
+            else
+            {
+                pissing = avatar.input.Pee;
+            }
+
+            var normalizedHealth = avatar.vitality.CurrentHealth / (float)avatar.vitality.maxHealth;
+            var main = fx.main;
+            main.startColor = pissColor.Evaluate(normalizedHealth);
+            
+            SyncParticleState(pissing);
             AimParticles();
         }
 
