@@ -2,7 +2,7 @@
 
 // ReSharper disable ArrangeObjectCreationWhenTypeEvident
 
-namespace FR8Runtime.Shapes
+namespace FR8.Runtime.Shapes
 {
     public static class ColorReference
     {

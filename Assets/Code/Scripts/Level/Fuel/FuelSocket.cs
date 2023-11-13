@@ -1,7 +1,7 @@
-﻿using FR8Runtime.Sockets;
-using FR8Runtime.Train.Electrics;
+﻿using FR8.Runtime.Sockets;
+using FR8.Runtime.Train.Electrics;
 
-namespace FR8Runtime.Level.Fuel
+namespace FR8.Runtime.Level.Fuel
 {
     public class FuelSocket : SocketManager
     {

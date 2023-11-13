@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-namespace FR8Runtime.Dialogue
+namespace FR8.Runtime.Dialogue
 {
     public class DialogueListener : MonoBehaviour
     {

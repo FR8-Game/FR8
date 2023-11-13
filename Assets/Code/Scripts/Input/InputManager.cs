@@ -1,9 +1,8 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 
-namespace FR8Runtime.Input
+namespace FR8.Runtime.Input
 {
     public static class InputManager
     {

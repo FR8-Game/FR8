@@ -1,8 +1,7 @@
-using System;
-using FR8Runtime.Train.Track;
+using FR8.Runtime.Train.Track;
 using UnityEngine;
 
-namespace FR8Runtime.Testing
+namespace FR8.Runtime.Testing
 {
     [RequireComponent(typeof(Rigidbody))]
     public class TestingKart : MonoBehaviour

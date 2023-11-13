@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FR8Runtime.Terrain
+namespace FR8.Runtime.Terrain
 {
     public partial class Terraininator : MonoBehaviour
     {

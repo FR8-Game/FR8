@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace FR8Runtime.Level
+namespace FR8.Runtime.Level
 {
     [ExecuteAlways]
     public class WindSettings : MonoBehaviour

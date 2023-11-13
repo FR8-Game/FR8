@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FR8Runtime.Interactions.Drivers.Submodules
+namespace FR8.Runtime.Interactions.Drivers.Submodules
 {
     [System.Serializable]
     public class EnumSteppedDriver

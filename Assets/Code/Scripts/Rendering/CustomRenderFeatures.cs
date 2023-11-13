@@ -1,7 +1,7 @@
-using FR8Runtime.Rendering.Passes;
+using FR8.Runtime.Rendering.Passes;
 using UnityEngine.Rendering.Universal;
 
-namespace FR8Runtime.Rendering
+namespace FR8.Runtime.Rendering
 {
     public sealed class CustomRenderFeatures : ScriptableRendererFeature
     {

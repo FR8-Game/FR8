@@ -1,9 +1,8 @@
-﻿
-using FR8Runtime.UI.Loading;
+﻿using FR8.Runtime.UI.Loading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace FR8Runtime.CodeUtility
+namespace FR8.Runtime.CodeUtility
 {
     public static class SceneUtility
     {

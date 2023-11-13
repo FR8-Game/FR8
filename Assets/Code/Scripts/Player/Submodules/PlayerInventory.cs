@@ -1,8 +1,8 @@
-﻿using FR8Runtime.CodeUtility;
-using FR8Runtime.Pickups;
-using FR8Runtime.UI;
+﻿using FR8.Runtime.CodeUtility;
+using FR8.Runtime.Pickups;
+using FR8.Runtime.UI;
 
-namespace FR8Runtime.Player.Submodules
+namespace FR8.Runtime.Player.Submodules
 {
     [System.Serializable]
     public class PlayerInventory

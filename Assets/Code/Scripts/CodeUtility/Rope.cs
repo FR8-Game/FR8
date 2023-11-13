@@ -1,7 +1,7 @@
-﻿using FR8Runtime.Level;
+﻿using FR8.Runtime.Level;
 using UnityEngine;
 
-namespace FR8Runtime.CodeUtility
+namespace FR8.Runtime.CodeUtility
 {
     [System.Serializable]
     public class Rope
