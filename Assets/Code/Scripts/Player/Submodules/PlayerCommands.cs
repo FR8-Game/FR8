@@ -1,10 +1,9 @@
-﻿
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 
-namespace FR8Runtime.Player.Submodules
+namespace FR8.Runtime.Player.Submodules
 {
     [SelectionBase, DisallowMultipleComponent]
     [RequireComponent(typeof(PlayerAvatar))]

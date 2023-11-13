@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.UIElements;
 
-namespace FR8Runtime.Rendering.UI
+namespace FR8.Runtime.Rendering.UI
 {
     [ExecuteAlways]
     [SelectionBase, DisallowMultipleComponent]

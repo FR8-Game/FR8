@@ -1,7 +1,7 @@
-using FR8Runtime.Player.Submodules;
+using FR8.Runtime.Player.Submodules;
 using UnityEngine;
 
-namespace FR8Runtime.Level
+namespace FR8.Runtime.Level
 {
     public class Ladder : MonoBehaviour
     {

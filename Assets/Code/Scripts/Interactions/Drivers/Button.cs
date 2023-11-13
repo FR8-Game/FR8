@@ -1,11 +1,8 @@
-﻿using FR8Runtime.Interactions.Drivables;
-using FR8Runtime.Interactions.Drivers.Submodules;
-using FR8Runtime.References;
+﻿using FR8.Runtime.Interactions.Drivables;
+using FR8.Runtime.References;
 using UnityEngine;
-using FMOD.Studio;
-using FMODUnity;
 
-namespace FR8Runtime.Interactions.Drivers
+namespace FR8.Runtime.Interactions.Drivers
 {
     public class Button : Driver
     {

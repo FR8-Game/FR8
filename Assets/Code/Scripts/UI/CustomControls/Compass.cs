@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace FR8Runtime.UI.CustomControls
+namespace FR8.Runtime.UI.CustomControls
 {
     public class Compass : VisualElement
     {

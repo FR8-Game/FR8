@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace FR8Runtime.Train.Track
+namespace FR8.Runtime.Train.Track
 {
     public class TrackMeshBakeData
     {

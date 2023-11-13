@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using FR8Runtime.Train;
+using FR8.Runtime.Train;
 using UnityEngine;
 
-namespace FR8Runtime.Contracts.Predicates
+namespace FR8.Runtime.Gamemodes.Predicates
 {
     [AddComponentMenu("Contracts/Predicates/Delivery Predicate")]
     public class DeliveryPredicate : ContractPredicate

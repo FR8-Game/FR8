@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
-using FR8Runtime.Pickups;
+using FR8.Runtime.Pickups;
 using UnityEditor;
 using UnityEngine;
 

@@ -1,9 +1,9 @@
-﻿using FR8Runtime.CodeUtility;
-using FR8Runtime.Pickups;
+﻿using FR8.Runtime.CodeUtility;
+using FR8.Runtime.Pickups;
 using TMPro;
 using UnityEngine;
 
-namespace FR8Runtime.UI
+namespace FR8.Runtime.UI
 {
     [SelectionBase, DisallowMultipleComponent]
     public class InventoryCell : MonoBehaviour

@@ -1,8 +1,8 @@
-﻿using FR8Runtime.Interactions.Drivables;
-using FR8Runtime.Interactions.Drivers.Submodules;
+﻿using FR8.Runtime.Interactions.Drivables;
+using FR8.Runtime.Interactions.Drivers.Submodules;
 using UnityEngine;
 
-namespace FR8Runtime.Interactions.Drivers
+namespace FR8.Runtime.Interactions.Drivers
 {
     public class Switch : Driver
     {

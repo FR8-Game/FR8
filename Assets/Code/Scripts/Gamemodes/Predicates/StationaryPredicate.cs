@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using FR8Runtime.Train;
-using UnityEngine;
+using FR8.Runtime.Train;
 
-namespace FR8Runtime.Contracts.Predicates
+namespace FR8.Runtime.Gamemodes.Predicates
 {
     public class StationaryPredicate : ContractPredicate
     {

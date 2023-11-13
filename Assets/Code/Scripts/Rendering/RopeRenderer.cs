@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FR8Runtime.Rendering
+namespace FR8.Runtime.Rendering
 {
     [ExecuteAlways]
     public class RopeRenderer : MonoBehaviour

@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using FR8Runtime.CodeUtility;
-using FR8Runtime.Contracts;
-using FR8Runtime.Interactions.Drivers.Submodules;
-using FR8Runtime.UI;
+using FR8.Runtime.CodeUtility;
+using FR8.Runtime.Gamemodes;
+using FR8.Runtime.Interactions.Drivers.Submodules;
+using FR8.Runtime.UI;
+using UnityEditor.Graphs;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
-using Compass = FR8Runtime.UI.CustomControls.Compass;
+using Compass = FR8.Runtime.UI.CustomControls.Compass;
 using Cursor = UnityEngine.Cursor;
 using Object = UnityEngine.Object;
-using SceneUtility = FR8Runtime.CodeUtility.SceneUtility;
+using SceneUtility = FR8.Runtime.CodeUtility.SceneUtility;
 
-namespace FR8Runtime.Player.Submodules
+namespace FR8.Runtime.Player.Submodules
 {
     [Serializable]
     public class PlayerUI
@@ -39,7 +40,6 @@ namespace FR8Runtime.Player.Submodules
 
         [Space]
         [SerializeField] private Texture2D scrollIcon;
-
         [SerializeField] private Texture2D pressIcon;
 
         private PlayerAvatar avatar;
@@ -59,6 +59,9 @@ namespace FR8Runtime.Player.Submodules
         private VisualElement lookingAtIcon;
         private Label lookingAtText;
         private Label contractText;
+        private Label toastLabel;
+        
+        private List<Toast> toasts = new();
 
         private float spawnTime;
 
@@ -91,6 +94,7 @@ namespace FR8Runtime.Player.Submodules
             lookingAtIcon = root.Q("looking-at-icon");
             lookingAtText = root.Q<Label>("looking-at-text");
             contractText = root.Q<Label>("contracts");
+            toastLabel = root.Q<Label>("toast");
 
             hudRenderer = avatar.transform.Find("Head/HUD Quad/Quad").GetComponent<Renderer>();
             hudRendererProperties = new MaterialPropertyBlock();
@@ -107,11 +111,13 @@ namespace FR8Runtime.Player.Submodules
         private void OnEnable()
         {
             Contract.ContractCompleteEvent += OnContractCompleted;
+            Toast.ShowToastEvent += toasts.Add;
         }
 
         private void OnDisable()
         {
             Contract.ContractCompleteEvent -= OnContractCompleted;
+            Toast.ShowToastEvent -= toasts.Add;
         }
 
         private void OnContractCompleted(Contract contract)
@@ -125,7 +131,7 @@ namespace FR8Runtime.Player.Submodules
             if (Keyboard.current.f2Key.wasPressedThisFrame) ShowEndgameUI();
             if (Keyboard.current.f3Key.wasPressedThisFrame) HideEndgameUI();
 
-            compass.FaceAngle = avatar.transform.eulerAngles.y;
+            if (compass != null) compass.FaceAngle = avatar.transform.eulerAngles.y;
 
             var lookingAt = avatar.interactionManager.HighlightedObject;
             if (lookingAt != null)
@@ -168,6 +174,21 @@ namespace FR8Runtime.Player.Submodules
             latitude.text = $"LAT: {avatar.transform.position.z / 80000.0f + 94.2f:N5}";
 
             BuildContractUI();
+            UpdateToasts();
+        }
+
+        private void UpdateToasts()
+        {
+            if (toastLabel == null) return;
+            
+            toasts.RemoveAll(e => e.Expired());
+            var toastText = string.Empty;
+            for (var i = toasts.Count; i > 0; i--)
+            {
+                var toast = toasts[i - 1];
+                toastText += $"{toast.Build()}\n";
+            }
+            toastLabel.text = toastText;
         }
 
         private float GetFlashTiming()

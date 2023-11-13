@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace FR8Runtime.Player
+namespace FR8.Runtime.Player
 {
     [RequireComponent(typeof(Animator))]
     public class FpAnimations : MonoBehaviour

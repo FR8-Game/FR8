@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using FR8Runtime.Interactions.Drivers.Submodules;
-using FR8Runtime.Rendering.Passes;
+using FR8.Runtime.Interactions.Drivers.Submodules;
+using FR8.Runtime.Rendering.Passes;
 using UnityEngine;
 
-namespace FR8Runtime.Player
+namespace FR8.Runtime.Player
 {
     [SelectionBase]
     [DisallowMultipleComponent]
