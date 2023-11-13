@@ -1,7 +1,7 @@
 ﻿
 using UnityEngine;
 
-namespace FR8Runtime.Train
+namespace FR8.Runtime.Train
 {
     [CreateAssetMenu(menuName = "Config/Train/Locomotive Settings")]
     public class LocomotiveSettings : ScriptableObject

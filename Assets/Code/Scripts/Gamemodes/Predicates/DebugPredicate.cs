@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace FR8Runtime.Contracts.Predicates
+namespace FR8.Runtime.Gamemodes.Predicates
 {
     [SelectionBase, DisallowMultipleComponent]
     public class DebugPredicate : ContractPredicate

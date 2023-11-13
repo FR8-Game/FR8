@@ -2,13 +2,12 @@ using System;
 using System.Collections.Generic;
 using FMOD.Studio;
 using FMODUnity;
-using FR8Runtime.CodeUtility;
-using FR8Runtime.References;
-using FR8Runtime.UI;
+using FR8.Runtime.References;
+using FR8.Runtime.UI;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace FR8Runtime.Player.Submodules
+namespace FR8.Runtime.Player.Submodules
 {
     [Serializable]
     public class PlayerVitality

@@ -1,11 +1,9 @@
 using System;
-using FR8Runtime.CodeUtility;
-using FR8Runtime.References;
-using FMOD.Studio;
-using FMODUnity;
+using FR8.Runtime.CodeUtility;
+using FR8.Runtime.References;
 using UnityEngine.UIElements;
 
-namespace FR8Runtime.UI
+namespace FR8.Runtime.UI
 {
     public static class UIActions
     {

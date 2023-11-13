@@ -1,10 +1,9 @@
-using System;
-using FR8Runtime.Train;
-using FR8Runtime.Train.Engine;
+using FR8.Runtime.Train;
+using FR8.Runtime.Train.Engine;
 using UnityEngine;
 using UnityEngine.VFX;
 
-namespace FR8Runtime.VFX
+namespace FR8.Runtime.VFX
 {
     [RequireComponent(typeof(VisualEffect))]
     public class VFXCabinDriver : MonoBehaviour

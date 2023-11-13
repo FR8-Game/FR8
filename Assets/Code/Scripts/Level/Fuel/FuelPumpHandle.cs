@@ -1,10 +1,10 @@
-﻿using FR8Runtime.Pickups;
-using FR8Runtime.Player;
-using FR8Runtime.Sockets;
-using FR8Runtime.Train.Electrics;
+﻿using FR8.Runtime.Pickups;
+using FR8.Runtime.Player;
+using FR8.Runtime.Sockets;
+using FR8.Runtime.Train.Electrics;
 using UnityEngine;
 
-namespace FR8Runtime.Level.Fuel
+namespace FR8.Runtime.Level.Fuel
 {
     [SelectionBase, DisallowMultipleComponent]
     public class FuelPumpHandle : PickupObject, ISocketable

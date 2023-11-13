@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FR8Runtime.Rendering
+namespace FR8.Runtime.Rendering
 {
     [ExecuteAlways]
     [RequireComponent(typeof(MeshFilter))]

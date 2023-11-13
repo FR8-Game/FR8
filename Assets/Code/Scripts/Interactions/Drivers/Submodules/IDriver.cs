@@ -1,4 +1,4 @@
-namespace FR8Runtime.Interactions.Drivers.Submodules
+namespace FR8.Runtime.Interactions.Drivers.Submodules
 {
     public interface IDriver : IInteractable
     {

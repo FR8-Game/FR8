@@ -1,9 +1,9 @@
 ﻿using System;
-using FR8Runtime.Interactions.Drivers;
-using FR8Runtime.Train;
+using FR8.Runtime.Interactions.Drivers;
+using FR8.Runtime.Train;
 using UnityEngine;
 
-namespace FR8Runtime.Contracts.Predicates
+namespace FR8.Runtime.Gamemodes.Predicates
 {
     [SelectionBase, DisallowMultipleComponent]
     public class DriverNetworkPredicate : ContractPredicate

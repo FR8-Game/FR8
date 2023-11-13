@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace FR8Runtime.Level
+namespace FR8.Runtime.Level
 {
     [SelectionBase, DisallowMultipleComponent]
     public class LightDriver : MonoBehaviour

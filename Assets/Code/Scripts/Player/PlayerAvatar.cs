@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
-using FR8Runtime.Player.Submodules;
+using FR8.Runtime.Player.Submodules;
+using UnityEditor.Graphs;
 using UnityEngine;
+using UnityEngine.WSA;
 
-namespace FR8Runtime.Player
+namespace FR8.Runtime.Player
 {
     [SelectionBase, DisallowMultipleComponent]
     [DefaultExecutionOrder(-100)]
@@ -99,6 +101,7 @@ namespace FR8Runtime.Player
         public void SetMount(PlayerMount mount)
         {
             MountChangedEvent?.Invoke(mount);
+            if (mount) Toast.ShowToast($"Press {input.crouchAction.action.bindings[0].name} to leave {mount.DisplayName}", Color.white);
             CurrentMount = mount;
         }
     }
