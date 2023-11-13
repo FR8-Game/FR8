@@ -1,5 +1,5 @@
 ﻿
-namespace FR8Runtime.Sockets
+namespace FR8.Runtime.Sockets
 {
     public interface ISocketable
     {

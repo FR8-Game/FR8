@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Text;
-using FR8Runtime.CodeUtility;
+using FR8.Runtime.CodeUtility;
 using UnityEngine;
 
-namespace FR8Runtime.Contracts.Predicates
+namespace FR8.Runtime.Gamemodes.Predicates
 {
     public abstract class ContractPredicate : MonoBehaviour
     {

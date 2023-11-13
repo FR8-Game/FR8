@@ -1,8 +1,8 @@
-using FR8Runtime.Train;
-using FR8Runtime.Train.Track;
+using FR8.Runtime.Train;
+using FR8.Runtime.Train.Track;
 using UnityEngine;
 
-namespace FR8Runtime.Contracts
+namespace FR8.Runtime.Gamemodes
 {
     public class TrackSection : MonoBehaviour, INameplateProvider
     {

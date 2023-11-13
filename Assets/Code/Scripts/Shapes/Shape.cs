@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
-#if UNITY_EDITOR
 using UnityEditor;
-#endif
+using UnityEngine;
 
-namespace FR8Runtime.Shapes
+namespace FR8.Runtime.Shapes
 {
     public abstract class Shape : MonoBehaviour
     {

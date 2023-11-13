@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace FR8Runtime.Train.Signals
+namespace FR8.Runtime.Train.Signals
 {
     [CreateAssetMenu(menuName = "Signal")]
     public class Signal : ScriptableObject

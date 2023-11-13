@@ -6,7 +6,7 @@ using UnityEngine;
 using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
 
-namespace FR8Runtime.CodeUtility
+namespace FR8.Runtime.CodeUtility
 {
     public static class SoundUtility
     {

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace FR8Runtime.Rendering.Passes
+namespace FR8.Runtime.Rendering.Passes
 {
     [VolumeComponentMenu("Custom/Fog")]
     public class FogSettings : VolumeComponent

@@ -1,5 +1,5 @@
 ﻿
-namespace FR8Runtime.CodeUtility
+namespace FR8.Runtime.CodeUtility
 {
     public static class StringUtility
     {

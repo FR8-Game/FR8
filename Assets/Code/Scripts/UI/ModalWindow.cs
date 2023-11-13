@@ -1,11 +1,11 @@
 using System.Collections;
-using FR8Runtime.CodeUtility;
+using FR8.Runtime.CodeUtility;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace FR8Runtime.UI
+namespace FR8.Runtime.UI
 {
     [SelectionBase]
     [DisallowMultipleComponent]

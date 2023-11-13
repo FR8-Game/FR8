@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace FR8Runtime.CodeUtility
+namespace FR8.Runtime.CodeUtility
 {
     public static class UIUtility
     {

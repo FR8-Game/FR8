@@ -1,12 +1,11 @@
 using System;
-using FR8Runtime.Interactions.Drivers.Submodules;
-using FR8Runtime.Pickups;
-using FR8Runtime.Rendering.Passes;
+using FR8.Runtime.Interactions.Drivers.Submodules;
+using FR8.Runtime.Pickups;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Object = UnityEngine.Object;
 
-namespace FR8Runtime.Player.Submodules
+namespace FR8.Runtime.Player.Submodules
 {
     [Serializable]
     public class PlayerInteractionManager

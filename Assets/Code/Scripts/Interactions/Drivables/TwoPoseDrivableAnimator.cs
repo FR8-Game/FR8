@@ -1,7 +1,7 @@
-﻿using FR8Runtime.CodeUtility;
+﻿using FR8.Runtime.CodeUtility;
 using UnityEngine;
 
-namespace FR8Runtime.Interactions.Drivables
+namespace FR8.Runtime.Interactions.Drivables
 {
     [System.Serializable]
     public class TwoPoseDrivableAnimator

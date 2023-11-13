@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using FR8Runtime.Train.Signals;
+using FR8.Runtime.Train.Signals;
 using UnityEngine;
 
-namespace FR8Runtime.Dialogue
+namespace FR8.Runtime.Dialogue
 {
     [CreateAssetMenu(menuName = "Dialogue/Dialogue Chain")]
     public class DialogueChain : ScriptableObject

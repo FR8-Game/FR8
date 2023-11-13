@@ -1,13 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using FR8Runtime.Interactions.Drivers.Submodules;
-using FR8Runtime.Player;
-using FR8Runtime.Rendering.Passes;
+using FR8.Runtime.Interactions.Drivers.Submodules;
+using FR8.Runtime.Player;
+using FR8.Runtime.Rendering.Passes;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace FR8Runtime.Sockets
+namespace FR8.Runtime.Sockets
 {
     [System.Serializable]
     public class SocketManager : MonoBehaviour, IInteractable

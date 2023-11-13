@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using FR8Runtime.Rendering.Passes;
+using FR8.Runtime.Rendering.Passes;
 using UnityEngine;
 
-namespace FR8Runtime.Rendering
+namespace FR8.Runtime.Rendering
 {
     [ExecuteAlways]
     [DisallowMultipleComponent]

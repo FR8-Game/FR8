@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace FR8Runtime.CodeUtility
+namespace FR8.Runtime.CodeUtility
 {
     public class HierarchyUtility
     {

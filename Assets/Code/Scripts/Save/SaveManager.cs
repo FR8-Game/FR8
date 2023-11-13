@@ -1,28 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
-using FR8Runtime.CodeUtility;
+using FR8.Runtime.CodeUtility;
 using UnityEngine;
 
-namespace FR8Runtime.Save
+namespace FR8.Runtime.Save
 {
     public static class SaveManager
     {
-        public static string saveName = "New Save";
         public static string SaveLocation => $"{Application.dataPath}/.Saves";
         public const string SaveFileExtension = ".sav";
 
-        public static string SaveFilename => $"{SaveLocation}/{saveName}.sav";
-
-        public static readonly SaveHelper<SaveData> SlotSave = new
+        public static readonly SaveHelper<SaveData> ProgressionSave = new
         (
-            () => SaveFilename,
-            XMLSerialize<SaveData>(),
-            XMLDeserialize<SaveData>()
+            () => $"{SaveLocation}/game.sav",
+            BinarySerialize<SaveData>(),
+            BinaryDeserialize<SaveData>()
         );
 
-        public static readonly SaveHelper<PersistantSaveData> PersistantSave = new
+        public static readonly SaveHelper<PersistantSaveData> SettingsSave = new
         (
             () => $"{SaveLocation}/settings.xml",
             XMLSerialize<PersistantSaveData>(),
@@ -37,6 +35,16 @@ namespace FR8Runtime.Save
         private static Func<Stream, T> XMLDeserialize<T>()
         {
             return (s) => (T)new XmlSerializer(typeof(T)).Deserialize(s);
+        }
+        
+        private static Action<Stream, T> BinarySerialize<T>()
+        {
+            return (s, d) => new BinaryFormatter().Serialize(s, d);
+        }
+
+        private static Func<Stream, T> BinaryDeserialize<T>()
+        {
+            return s => (T)new BinaryFormatter().Deserialize(s);
         }
 
         public static List<SaveGroup> GetAllSaveGroups()
@@ -78,14 +86,14 @@ namespace FR8Runtime.Save
         public static void LoadSave()
         {
             SceneUtility.LoadScene(SceneUtility.Scene.Game);
-            SlotSave.Load();
+            ProgressionSave.Load();
 
-            Debug.Log($"Loading \"{saveName}\"");
+            Debug.Log($"Loading Save...");
         }
 
         public static void SaveGame()
         {
-            SlotSave.Save();
+            ProgressionSave.Save();
         }
 
         public class SaveGroup

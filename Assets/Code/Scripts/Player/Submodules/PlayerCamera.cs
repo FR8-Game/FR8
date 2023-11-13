@@ -1,13 +1,11 @@
 using System;
-using FR8Runtime.Save;
-using FR8Runtime.UI;
+using FR8.Runtime.Save;
+using FR8.Runtime.UI;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
-namespace FR8Runtime.Player.Submodules
+namespace FR8.Runtime.Player.Submodules
 {
     [Serializable]
     public class PlayerCamera
@@ -27,7 +25,7 @@ namespace FR8Runtime.Player.Submodules
         private bool cameraLocked;
         private bool wasCameraLocked;
 
-        private float FieldOfView => SaveManager.PersistantSave.GetOrLoad().fieldOfView;
+        private float FieldOfView => SaveManager.SettingsSave.GetOrLoad().fieldOfView;
         
         private Vector3 translationOffset;
         private Quaternion rotationalOffset = Quaternion.identity;

@@ -1,9 +1,9 @@
-﻿using FR8Runtime.Editor;
-using FR8Runtime.Train.Electrics;
+﻿using FR8.Runtime.Editor;
+using FR8.Runtime.Train.Electrics;
 using TMPro;
 using UnityEngine;
 
-namespace FR8Runtime.Interactions.Drivers
+namespace FR8.Runtime.Interactions.Drivers
 {
     [SelectionBase, DisallowMultipleComponent]
     public sealed class RadialDisplay : MonoBehaviour, IElectricDevice
