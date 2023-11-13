@@ -6,12 +6,12 @@
             <ui:Label text="&gt; CONTRACT SELECT_" display-tooltip-when-elided="true" name="Title" style="font-size: 50px;" />
         </ui:GroupBox>
         <ui:GroupBox name="Level_And_Info" style="flex-grow: 1; flex-direction: row;">
-            <ui:ScrollView name="Levels" style="flex-grow: 1; flex-shrink: 0;">
-                <ui:Button text="Contract 1" display-tooltip-when-elided="true" name="Button" class="level-button" />
-                <ui:Button text="Contract 2" display-tooltip-when-elided="true" name="Button" class="level-button" />
+            <ui:ScrollView name="Levels" style="flex-grow: 1; flex-shrink: 0; width: 30px;">
+                <ui:Button text="Valadian Mining Complex" display-tooltip-when-elided="true" name="Button" class="level-button" style="flex-grow: 1;" />
+                <ui:Button text="Dune Haven Delivery" display-tooltip-when-elided="true" name="Button" class="level-button" style="flex-grow: 1;" />
             </ui:ScrollView>
             <ui:GroupBox name="Information" style="flex-grow: 1;">
-                <ui:Instance template="LevelInformationEntry" name="LevelInformationEntry" style="flex-grow: 1; flex-shrink: 0;" />
+                <ui:Instance template="LevelInformationEntry" name="LevelInformationEntry" style="flex-grow: 2; flex-shrink: 0;" />
             </ui:GroupBox>
         </ui:GroupBox>
         <ui:GroupBox name="Footer" style="height: 106px; width: 1910px;">
