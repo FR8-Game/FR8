@@ -292,8 +292,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   input:
     inputMap: {fileID: -944628639613478452, guid: badd88ac4cdc31941ad634977f07e0fd, type: 3}
-    mouseSensitivity: 0.3
-    controllerSensitivity: 0.4
+    moveInput: {fileID: 0}
+    jumpInput: {fileID: 0}
+    lookAction: {fileID: 0}
+    sprintAction: {fileID: 0}
+    crouchAction: {fileID: 0}
+    nudgeAction: {fileID: 0}
+    pressAction: {fileID: 0}
+    freeCamAction: {fileID: 0}
+    grabCamAction: {fileID: 0}
+    zoomCamAction: {fileID: 0}
+    peeAction: {fileID: 0}
+    flyAction: {fileID: 0}
+    hotbarActions: []
+    hotbarNext: {fileID: 0}
+    hotbarLast: {fileID: 0}
   interactionManager:
     interactionDistance: 2.5
   cameraController:
@@ -309,6 +322,7 @@ MonoBehaviour:
       frequency: 1.8
       slope: 0.2
   vitality:
+    invulnerable: 0
     maxHealth: 100
     shieldDuration: 15
     shieldRegenRate: 1
@@ -5282,7 +5296,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4d07f9147eb66ad4ebdc9e678fbdf4af, type: 2}
+  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -10271,7 +10285,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4d07f9147eb66ad4ebdc9e678fbdf4af, type: 2}
+  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

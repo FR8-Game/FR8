@@ -1,5 +1,5 @@
-using FR8Runtime.Contracts;
-using FR8Runtime.Contracts.Predicates;
+using FR8.Runtime.Gamemodes;
+using FR8.Runtime.Gamemodes.Predicates;
 using UnityEditor;
 using UnityEngine;
 

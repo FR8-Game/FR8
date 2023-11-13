@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
+using UnityEditor;
 using UnityEngine;
 
-namespace FR8Runtime.Save
+namespace FR8.Runtime.Save
 {
     public class SaveHelper<T> where T : class, new()
     {

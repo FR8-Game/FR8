@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace FR8Runtime.Train
+namespace FR8.Runtime.Train
 {
     public class Nameplate : MonoBehaviour
     {

@@ -1,7 +1,6 @@
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace FR8Runtime.Interactions.Drivers.Submodules
+namespace FR8.Runtime.Interactions.Drivers.Submodules
 {
     public interface IInteractable : IBehaviour
     {

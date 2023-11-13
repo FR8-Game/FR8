@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Text;
 using FMOD.Studio;
-using FR8Runtime.Interactions.Drivers;
-using FR8Runtime.References;
-using FR8Runtime.Train.Track;
+using FR8.Runtime.Interactions.Drivers;
+using FR8.Runtime.References;
+using FR8.Runtime.Train.Track;
 using Unity.Collections;
 using UnityEngine;
 
-namespace FR8Runtime.Train
+namespace FR8.Runtime.Train
 {
     [SelectionBase]
     [DisallowMultipleComponent]

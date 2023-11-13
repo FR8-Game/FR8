@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace FR8Runtime.Shapes
+namespace FR8.Runtime.Shapes
 {
     public class BoxShape : Shape
     {

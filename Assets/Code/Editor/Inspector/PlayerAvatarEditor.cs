@@ -1,5 +1,5 @@
 ﻿using System;
-using FR8Runtime.Player;
+using FR8.Runtime.Player;
 using UnityEditor;
 using UnityEngine;
 

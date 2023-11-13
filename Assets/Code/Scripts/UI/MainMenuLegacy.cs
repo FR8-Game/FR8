@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace FR8Runtime.UI
+namespace FR8.Runtime.UI
 {
     public class MainMenuLegacy : MonoBehaviour
     {

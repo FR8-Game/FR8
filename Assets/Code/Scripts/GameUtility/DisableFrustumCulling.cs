@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FR8Runtime.GameUtility
+namespace FR8.Runtime.GameUtility
 {
     [ExecuteAlways]
     [RequireComponent(typeof(MeshFilter))]

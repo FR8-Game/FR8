@@ -1,13 +1,10 @@
-﻿using System.Collections.Generic;
-using FMODUnity;
-using FR8Runtime.CodeUtility;
-using FR8Runtime.Interactions.Drivables;
-using FR8Runtime.Interactions.Drivers.Submodules;
-using FR8Runtime.References;
-using FR8Runtime.Rendering.Passes;
+﻿using FR8.Runtime.Interactions.Drivables;
+using FR8.Runtime.Interactions.Drivers.Submodules;
+using FR8.Runtime.References;
+using FR8.Runtime.Rendering.Passes;
 using UnityEngine;
 
-namespace FR8Runtime.Interactions.Drivers
+namespace FR8.Runtime.Interactions.Drivers
 {
     [SelectionBase, DisallowMultipleComponent]
     public class Door : MonoBehaviour, IDriver

@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using FR8Runtime.CodeUtility;
-using FR8Runtime.Train.Splines;
+using FR8.Runtime.CodeUtility;
+using FR8.Runtime.Train.Splines;
+using UnityEditor;
 using UnityEngine;
-using UnityEngine.Serialization;
 using ColorUtility = HBCore.Utility.ColorUtility;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
-namespace FR8Runtime.Train.Track
+namespace FR8.Runtime.Train.Track
 {
     [SelectionBase, DisallowMultipleComponent]
     public class TrackSegment : MonoBehaviour, IEnumerable<Transform>
