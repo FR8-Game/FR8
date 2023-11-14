@@ -26,6 +26,8 @@ namespace FR8.Runtime.References
         public static readonly SoundReference MenuClick = "{2ba267b2-f7a1-467c-956d-ca3191fa2679}";
         public static readonly SoundReference Wind = "";
         public static readonly SoundReference WindowWipers = "";
+        public static readonly SoundReference FuzeDoor = "{9a6df018-805a-4ee8-ab6d-7efd96814aee}";
+        public static readonly SoundReference PlayerSit = "{5b14c251-b25e-442c-8366-78a2ab6dcef2}";
 
         private string guid;
 
