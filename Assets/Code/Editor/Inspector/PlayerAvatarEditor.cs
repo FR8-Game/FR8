@@ -1,5 +1,6 @@
 ﻿using System;
 using FR8.Runtime.Player;
+using FR8.Runtime.Player.Submodules;
 using UnityEditor;
 using UnityEngine;
 
@@ -15,17 +16,28 @@ namespace FR8Editor.Inspector
         private const float ElementPadding = 10.0f;
         private const float Indent = 18.0f;
 
+        private int damage;
+
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
 
             EditorGUILayout.Space();
-            
+
             var health = (float)Player.vitality.CurrentHealth / Player.vitality.maxHealth;
 
             Box("Info", true,
                 r => EditorGUI.Slider(r, "Current Health", health, 0.0f, 1.0f)
             );
+
+            if (Application.isPlaying)
+            {
+                damage = EditorGUILayout.IntField("Damage", damage);
+                if (GUILayout.Button("Damage Player"))
+                {
+                    ((PlayerAvatar)target).vitality.Damage(new PlayerVitality.DamageInstance(damage));
+                }
+            }
         }
 
         public void Box(string title, bool enabled, params Action<Rect>[] callbacks)
@@ -51,11 +63,11 @@ namespace FR8Editor.Inspector
             rect.xMin += 15;
             foldoutState = EditorGUI.Foldout(rect, foldoutState, title, true);
             rect.xMin -= 15;
-            
+
             EditorPrefs.SetBool(prefKey, foldoutState);
 
             if (!foldoutState) return;
-            
+
             next();
             rect.xMin += Indent;
 
