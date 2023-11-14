@@ -221,8 +221,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fuseGroup: Dash
   valueText: {fileID: 2163273395250888875}
+  needle: {fileID: 6551073718455633138}
   labelText: {fileID: 6916336392491487087}
-  needle: {fileID: 0}
   needleRotationMin: 80
   needleRotationMax: -80
   powerDrawWatts: 0
@@ -454,6 +454,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7676007535811887072, guid: 4077a4a4a0dacd1479aeec2b4ac5b49a, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: c647d786939e577479f09f5aea18a6ab, type: 2}
     - target: {fileID: -2954171162045065471, guid: 4077a4a4a0dacd1479aeec2b4ac5b49a, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -478,10 +482,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -222678170353486660, guid: 4077a4a4a0dacd1479aeec2b4ac5b49a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7660445
+      objectReference: {fileID: 0}
+    - target: {fileID: -222678170353486660, guid: 4077a4a4a0dacd1479aeec2b4ac5b49a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.64278764
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4077a4a4a0dacd1479aeec2b4ac5b49a, type: 3}
       propertyPath: m_Name
       value: Gauge
       objectReference: {fileID: 0}
+    - target: {fileID: 2908165224825978957, guid: 4077a4a4a0dacd1479aeec2b4ac5b49a, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 2d0f31bfff1468e449a39ec511c86249, type: 2}
     - target: {fileID: 8396378743792990473, guid: 4077a4a4a0dacd1479aeec2b4ac5b49a, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -491,5 +507,10 @@ PrefabInstance:
 --- !u!4 &2416265627457542053 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 4077a4a4a0dacd1479aeec2b4ac5b49a, type: 3}
+  m_PrefabInstance: {fileID: 2739021677796700238}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6551073718455633138 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -222678170353486660, guid: 4077a4a4a0dacd1479aeec2b4ac5b49a, type: 3}
   m_PrefabInstance: {fileID: 2739021677796700238}
   m_PrefabAsset: {fileID: 0}

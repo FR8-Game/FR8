@@ -77,6 +77,12 @@ namespace FR8.Runtime.Player.Submodules
 
         public bool Crouch => crouchAction.State();
 
+        public void EnableInput(bool state)
+        {
+            if (state) inputMap.Enable();
+            else inputMap.Disable();
+        }
+        
         public Vector2 GetLookFrameDelta()
         {
             var fovSensitivity = GetFovSensitivity();
@@ -110,11 +116,12 @@ namespace FR8.Runtime.Player.Submodules
         {
             this.avatar = avatar;
 
+            inputMap = Object.Instantiate(inputMap);
+            
             // Local Functions
             InputActionReference bind(string name) => InputActionReference.Create(inputMap.FindAction(name));
 
             // Setup input
-            inputMap.Enable();
             moveInput = bind("Move");
             jumpInput = bind("Jump");
             lookAction = bind("Look");
@@ -141,6 +148,8 @@ namespace FR8.Runtime.Player.Submodules
             mainCamera = Camera.main;
 
             avatar.vitality.IsAliveChangedEvent += IsAliveChanged;
+
+            EnableInput(true);
         }
 
         private void IsAliveChanged()
