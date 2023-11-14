@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace FR8.Runtime.Save
+﻿namespace FR8.Runtime.Save
 {
     [System.Serializable]
     public class SaveData
