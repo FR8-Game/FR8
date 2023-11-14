@@ -505,7 +505,9 @@ namespace FR8.Runtime.Player.Submodules
             Gizmos.color = Color.yellow;
             Gizmos.matrix = transform.localToWorldMatrix;
 
+#if UNITY_EDITOR
             GizmoUtility.DrawCapsule(Vector3.up * collisionHeight / 2.0f, Quaternion.identity, collisionHeight, collisionRadius);
+#endif
         }
     }
 }
