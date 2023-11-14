@@ -1,7 +1,10 @@
 using System.Collections.Generic;
 using FR8.Runtime.Interactions.Drivers.Submodules;
 using FR8.Runtime.Rendering.Passes;
+using FR8.Runtime.References;
 using UnityEngine;
+using FMODUnity;
+using FMOD.Studio;
 
 namespace FR8.Runtime.Player
 {
@@ -57,6 +60,7 @@ namespace FR8.Runtime.Player
         {
             if (interactingObject.TryGetComponent(out PlayerAvatar avatar))
             {
+                SoundReference.PlayerSit.PlayOneShot();
                 avatar.SetMount(this);
             }
         }
