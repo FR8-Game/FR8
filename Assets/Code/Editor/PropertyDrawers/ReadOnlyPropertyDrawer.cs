@@ -1,4 +1,4 @@
-﻿using FR8Runtime.Editor;
+﻿using FR8.Runtime.Editor;
 using UnityEditor;
 using UnityEngine;
 

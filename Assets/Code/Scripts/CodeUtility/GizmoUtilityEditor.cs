@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace FR8Runtime.CodeUtility
+namespace FR8.Runtime.CodeUtility
 {
     public static partial class GizmoUtility
     {

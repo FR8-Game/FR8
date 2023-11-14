@@ -4,7 +4,7 @@ using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace FR8Runtime.Rendering.Passes
+namespace FR8.Runtime.Rendering.Passes
 {
     public sealed class SelectionOutlinePass : CustomRenderPass<SelectionOutlineSettings>
     {

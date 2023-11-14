@@ -292,8 +292,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   input:
     inputMap: {fileID: -944628639613478452, guid: badd88ac4cdc31941ad634977f07e0fd, type: 3}
-    mouseSensitivity: 0.3
-    controllerSensitivity: 0.4
+    moveInput: {fileID: 0}
+    jumpInput: {fileID: 0}
+    lookAction: {fileID: 0}
+    sprintAction: {fileID: 0}
+    crouchAction: {fileID: 0}
+    nudgeAction: {fileID: 0}
+    pressAction: {fileID: 0}
+    freeCamAction: {fileID: 0}
+    grabCamAction: {fileID: 0}
+    zoomCamAction: {fileID: 0}
+    peeAction: {fileID: 0}
+    flyAction: {fileID: 0}
+    hotbarActions: []
+    hotbarNext: {fileID: 0}
+    hotbarLast: {fileID: 0}
   interactionManager:
     interactionDistance: 2.5
   cameraController:
@@ -309,6 +322,7 @@ MonoBehaviour:
       frequency: 1.8
       slope: 0.2
   vitality:
+    invulnerable: 0
     maxHealth: 100
     shieldDuration: 15
     shieldRegenRate: 1
@@ -396,6 +410,36 @@ MonoBehaviour:
     flashSplit: 0.5
     scrollIcon: {fileID: 2800000, guid: 4ca7a551d835dd54c8fb6313ae1ff347, type: 3}
     pressIcon: {fileID: 2800000, guid: 5714439d96eec4546b5a6b874caecfc9, type: 3}
+  urination:
+    pissColor:
+      serializedVersion: 2
+      key0: {r: 0.6320754, g: 0.056648254, b: 0.056648254, a: 1}
+      key1: {r: 0.9716981, g: 0.7317031, b: 0.22459061, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 16577
+      ctime1: 21974
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
 --- !u!114 &6340694338387009680
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -686,7 +730,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 1, g: 1, b: 0, a: 1}
+      maxColor: {r: 1, g: 1, b: 1, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -5282,7 +5326,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4d07f9147eb66ad4ebdc9e678fbdf4af, type: 2}
+  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -9319,7 +9363,7 @@ ParticleSystem:
     - serializedVersion: 3
       emitter: {fileID: 5673471436696323531}
       type: 1
-      properties: 2
+      properties: 3
       emitProbability: 1
   LightsModule:
     enabled: 0
@@ -10271,7 +10315,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4d07f9147eb66ad4ebdc9e678fbdf4af, type: 2}
+  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

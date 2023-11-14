@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FR8Runtime.Train.Track
+namespace FR8.Runtime.Train.Track
 {
     public class TrackDebugger : MonoBehaviour
     {

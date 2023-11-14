@@ -1,9 +1,9 @@
 ﻿using FMODUnity;
-using FR8Runtime.CodeUtility;
-using FR8Runtime.Level;
+using FR8.Runtime.CodeUtility;
+using FR8.Runtime.Level;
 using UnityEngine;
 
-namespace FR8Runtime.Player.Submodules
+namespace FR8.Runtime.Player.Submodules
 {
     [SelectionBase]
     [DisallowMultipleComponent]

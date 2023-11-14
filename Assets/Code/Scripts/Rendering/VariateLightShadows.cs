@@ -1,11 +1,8 @@
+using UnityEditor;
 using UnityEngine;
 using ColorUtility = HBCore.Utility.ColorUtility;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
-namespace FR8Runtime.Rendering
+namespace FR8.Runtime.Rendering
 {
     [RequireComponent(typeof(Light))]
     public class VariateLightShadows : MonoBehaviour

@@ -2,9 +2,9 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace FR8Runtime.Save
+namespace FR8.Runtime.Save
 {
-    [Serializable]
+    [System.Serializable]
     public class PersistantSaveData
     {
         // Graphics
@@ -25,5 +25,7 @@ namespace FR8Runtime.Save
         public float mouseSensitivity = 0.3f;
         public float gamepadSensitivityX = 0.3f;
         public float gamepadSensitivityY = 0.3f;
+        
+        public bool togglePiss = false;
     }
 }

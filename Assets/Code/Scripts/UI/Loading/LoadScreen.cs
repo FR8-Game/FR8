@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
-namespace FR8Runtime.UI.Loading
+namespace FR8.Runtime.UI.Loading
 {
     [SelectionBase, DisallowMultipleComponent]
     [RequireComponent(typeof(UIDocument))]
@@ -22,7 +22,6 @@ namespace FR8Runtime.UI.Loading
         private VisualElement root;
         private TextElement content;
         private static string lastText;
-        private static bool firstLoad = true;
 
         private bool loadingNewLevel;
 
@@ -37,12 +36,6 @@ namespace FR8Runtime.UI.Loading
 
         private IEnumerator Start()
         {
-            if (firstLoad)
-            {
-                firstLoad = false;
-                yield return StartCoroutine(DisplayLoadVisuals(0, FakeLoadScene));
-            }
-            
             content.text = $"{lastText}\n--- Loading Complete ---";
             yield return new WaitForSeconds(0.5f);
 
