@@ -96,8 +96,11 @@ namespace FR8.Runtime.Train.Track
 
             foreach (var e in points)
             {
-                Gizmos.color = new Color(1.0f, 0.6f, 0.0f, 1.0f);
-                Gizmos.DrawSphere(e, 1.0f);
+                #if UNITY_EDITOR
+                Handles.color = new Color(1.0f, 0.6f, 0.0f, 1.0f);
+                Handles.matrix = Matrix4x4.identity;
+                Handles.DrawWireArc(e, Vector3.up, Vector3.forward, 360.0f, 1.0f);
+                #endif
             }
             
             if (closedLoop) linePoints.Add(points[0]);
