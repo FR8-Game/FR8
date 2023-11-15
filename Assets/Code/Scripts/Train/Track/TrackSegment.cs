@@ -93,6 +93,13 @@ namespace FR8.Runtime.Train.Track
             BakeData();
             var linePoints = new List<Vector3>();
             linePoints.AddRange(points);
+
+            foreach (var e in points)
+            {
+                Gizmos.color = new Color(1.0f, 0.6f, 0.0f, 1.0f);
+                Gizmos.DrawSphere(e, 1.0f);
+            }
+            
             if (closedLoop) linePoints.Add(points[0]);
 
             GizmosDrawLine(main ? selectedColor : otherColor, 1.0f, linePoints.ToArray());
