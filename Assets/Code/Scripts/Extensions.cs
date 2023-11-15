@@ -144,5 +144,29 @@ namespace FR8.Runtime
             visualEffect.SetVector3(propEulerAngles, rotation.eulerAngles);
             visualEffect.SetVector3(propScale, scale);
         }
+
+        public static T Find<T>(this Transform transform, string path) => TryGetComponent<T>(transform.Find(path));
+        public static T GetChild<T>(this Transform transform, int index) => TryGetComponent<T>(transform.GetChild(index));
+
+        public static T Traverse<T>(this Transform transform, params int[] indices)
+        {
+            var head = transform;
+            foreach (var i in indices)
+            {
+                if (i < 0 || i >= head.childCount)
+                {
+                    head = null;
+                    break;
+                }
+
+                head = transform.GetChild(i);
+            }
+            return head ? head.GetComponent<T>() : default;
+        }
+        
+        private static T TryGetComponent<T>(Transform transform)
+        {
+            return transform ? transform.GetComponent<T>() : default;
+        }
     }
 }

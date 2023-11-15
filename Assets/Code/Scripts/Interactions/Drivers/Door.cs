@@ -9,11 +9,13 @@ namespace FR8.Runtime.Interactions.Drivers
     [SelectionBase, DisallowMultipleComponent]
     public class Door : MonoBehaviour, IDriver
     {
+        public bool isFuzeDoor;
+
         [SerializeField] private bool testValue;
         [SerializeField] private TwoPoseDrivableAnimator animator;
 
         private Renderer[] visuals;
-        
+
         public string Key => string.Empty;
         public virtual bool CanInteract => true;
         public string DisplayName => "Door";
@@ -46,14 +48,16 @@ namespace FR8.Runtime.Interactions.Drivers
         public void Nudge(int direction)
         {
             SetValue(direction);
-            SoundReference.DoorOpen.PlayOneShot();
+            if (isFuzeDoor) SoundReference.FuzeDoor.PlayOneShot();
+            else SoundReference.DoorOpen.PlayOneShot();
 
         }
 
         public void BeginInteract(GameObject interactingObject)
         {
-            SoundReference.DoorOpen.PlayOneShot();
             SetValue(Open ? 0.0f : 1.0f);
+            if (isFuzeDoor) SoundReference.FuzeDoor.PlayOneShot();
+            else SoundReference.DoorOpen.PlayOneShot();
         }
 
         public void ContinueInteract(GameObject interactingObject)
