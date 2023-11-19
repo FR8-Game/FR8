@@ -6,11 +6,10 @@ namespace FR8.Runtime.CodeUtility
 {
     public static class SceneUtility
     {
-        public static void LoadScene(Scene scene)
+        public static void LoadScene(Scene scene) => LoadScene(scene == Scene.Reload ? SceneManager.GetActiveScene().buildIndex : (int)scene);
+        public static void LoadScene(int index)
         {
             var loadScreen = Object.FindObjectOfType<LoadScreen>();
-
-            var index = scene == Scene.Reload ? SceneManager.GetActiveScene().buildIndex : (int)scene;
 
             if (loadScreen)
             {

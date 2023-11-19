@@ -67,6 +67,13 @@ namespace FR8.Runtime.Train.Track
             {
                 junctionPrefab.SpawnFromPrefab(this, endConnection.other, TrackJunction.ConnectionEnd.End);
             }
+            
+            var tree = transform.GetComponentsInChildren<Transform>();
+            gameObject.layer = TrackLayer;
+            foreach (var child in tree)
+            {
+                child.gameObject.layer = TrackLayer;
+            }
         }
 
         private void OnDrawGizmosSelected()
@@ -86,6 +93,16 @@ namespace FR8.Runtime.Train.Track
             BakeData();
             var linePoints = new List<Vector3>();
             linePoints.AddRange(points);
+
+            foreach (var e in points)
+            {
+                #if UNITY_EDITOR
+                Handles.color = new Color(1.0f, 0.6f, 0.0f, 1.0f);
+                Handles.matrix = Matrix4x4.identity;
+                Handles.DrawWireArc(e, Vector3.up, Vector3.forward, 360.0f, 1.0f);
+                #endif
+            }
+            
             if (closedLoop) linePoints.Add(points[0]);
 
             GizmosDrawLine(main ? selectedColor : otherColor, 1.0f, linePoints.ToArray());
@@ -227,13 +244,6 @@ namespace FR8.Runtime.Train.Track
 
             var childCount = KnotContainer().childCount;
             resolution = Mathf.Max(resolution, childCount);
-
-            var tree = transform.GetComponentsInChildren<Transform>();
-            gameObject.layer = TrackLayer;
-            foreach (var child in tree)
-            {
-                child.gameObject.layer = TrackLayer;
-            }
         }
 
         public float GetClosestPoint(Vector3 point, bool clamp)
