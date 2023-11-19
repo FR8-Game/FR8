@@ -22,6 +22,11 @@ namespace FR8Editor.Inspector
             TrackSegmentTool.handleScale = EditorGUILayout.Slider("Handle Scale", TrackSegmentTool.handleScale, 0.0f, 1.0f);
             
             Div();
+
+            if (Button("Force Bake Data"))
+            {
+                ExecuteAll(s => s.BakeData());
+            }
             
             if (Button(Count("Zero Track Origin{0}")))
             {
