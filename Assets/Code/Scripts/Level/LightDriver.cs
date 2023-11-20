@@ -7,8 +7,7 @@ namespace FR8.Runtime.Level
     public class LightDriver : MonoBehaviour
     {
         public bool state;
-        [Range(500.0f, 15000.0f)] public float temperature = 5600.0f;
-        public Color color;
+        public Color color = Color.white;
         public float lightIntensity = 20.0f;
         public float materialIntensity = 2.0f;
         public float warmUpTime = 0.5f;
@@ -24,7 +23,7 @@ namespace FR8.Runtime.Level
         private Material material;
         private new Light light;
 
-        public Color EvaluatedColor => Mathf.CorrelatedColorTemperatureToRGB(temperature);
+        public Color EvaluatedColor => color;
 
         protected virtual void Awake()
         {
@@ -66,7 +65,6 @@ namespace FR8.Runtime.Level
 
         private void OnValidate()
         {
-            color = EvaluatedColor;
             var light = GetLight();
             
             if (!light) return;
