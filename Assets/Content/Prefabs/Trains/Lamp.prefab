@@ -46,9 +46,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state: 1
-  temperature: 6983
-  color: {r: 0.91351056, g: 0.90190434, b: 1, a: 1}
-  lightIntensity: 5
+  color: {r: 0.46666667, g: 0.7921569, b: 1, a: 1}
+  lightIntensity: 0.18
   materialIntensity: 50
   warmUpTime: 0.04
   cooldownTime: 0.04
@@ -127,8 +126,8 @@ Light:
   serializedVersion: 10
   m_Type: 2
   m_Shape: 0
-  m_Color: {r: 0.91351056, g: 0.90190434, b: 1, a: 1}
-  m_Intensity: 5
+  m_Color: {r: 0.46666667, g: 0.7921569, b: 1, a: 1}
+  m_Intensity: 0.18
   m_Range: 3
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -273,6 +272,18 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 44f610f4af67ef84b9b37098418afebc, type: 2}
+    - target: {fileID: -2506405117923303981, guid: 9855dbf481693984c9f9351db6247bf4, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 67c1d1b8d9bfd2645a5c94d0c23d27d0, type: 2}
+    - target: {fileID: -1766519429676235362, guid: 9855dbf481693984c9f9351db6247bf4, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 98cecd1dc7e324b4ca2253d13c01c1c1, type: 2}
+    - target: {fileID: -1292530194198350487, guid: 9855dbf481693984c9f9351db6247bf4, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 4a1190d8c4fe9fb4699bddcf2c54a3a6, type: 2}
     - target: {fileID: 919132149155446097, guid: 9855dbf481693984c9f9351db6247bf4, type: 3}
       propertyPath: m_Name
       value: Lamp
@@ -281,6 +292,10 @@ PrefabInstance:
       propertyPath: m_RootOrder
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 3764730037094890756, guid: 9855dbf481693984c9f9351db6247bf4, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 2d0f31bfff1468e449a39ec511c86249, type: 2}
     - target: {fileID: 6273327824631609595, guid: 9855dbf481693984c9f9351db6247bf4, type: 3}
       propertyPath: m_RootOrder
       value: 4
