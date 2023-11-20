@@ -1,18 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-8362150453164673308
-MonoBehaviour:
-  m_ObjectHideFlags: 11
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 5
 --- !u!21 &2100000
 Material:
   serializedVersion: 8
@@ -20,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: MAT_PaintedMetalWhite
+  m_Name: MAT_PaintedMetalRed
   m_Shader: {fileID: -6465566751694194690, guid: 954f7bd919a52b040b9085c83d11f0d9, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
@@ -59,7 +46,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _Grunge_Sample:
         m_Texture: {fileID: 2800000, guid: 2a12c9d20a8a89548b94cf3ef9d33c51, type: 3}
-        m_Scale: {x: 3, y: 3}
+        m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
@@ -99,7 +86,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Albedo_Balance: 0
+    - _Albedo_Balance: 2.12
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
@@ -117,33 +104,42 @@ Material:
     - _GlossyReflections: 0
     - _Metallic: 0
     - _Metalness: 0
-    - _Normal_Intensity: 1
+    - _Normal_Intensity: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _Rotation: 0
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
-    - _Smoothness_Brightness: 0.43
-    - _Smoothness_Contrast: 0.117
     - _Smoothness_Max: 0.6
     - _Smoothness_Min: 0.4
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0
-    - _Triplanar: 0
     - _Triplanar_Blend: 1
-    - _Triplanar_Tiling: 0.2
+    - _Triplanar_Tiling: 0.27
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - _Albedo_High: {r: 0.8196079, g: 0.87843144, b: 0.9058824, a: 0}
-    - _Albedo_Low: {r: 0.8152813, g: 0.85760665, b: 0.8773585, a: 0}
+    - _Albedo_High: {r: 0.7254902, g: 0.30688235, b: 0.31002975, a: 1}
+    - _Albedo_Low: {r: 0.6627451, g: 0.31016472, b: 0.32084894, a: 1}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Emission: {r: 0, g: 0, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
+--- !u!114 &457766105463495000
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 5
