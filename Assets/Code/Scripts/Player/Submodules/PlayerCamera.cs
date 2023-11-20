@@ -48,15 +48,9 @@ namespace FR8.Runtime.Player.Submodules
 
             Avatar.UpdateEvent += Update;
             Avatar.FixedUpdateEvent += FixedUpdate;
-            Avatar.EnableEvent += OnEnable;
 
             cameraLocked = true;
             wasCameraLocked = !cameraLocked;
-        }
-
-        private void OnEnable()
-        {
-            Yaw = Camera.transform.eulerAngles.x;
         }
 
         private void Update()
@@ -110,13 +104,15 @@ namespace FR8.Runtime.Player.Submodules
             }
 
             Yaw = Mathf.Clamp(Yaw + delta.y, -90.0f, 90.0f);
-            Camera.transform.rotation = Quaternion.Euler(-Yaw, Camera.transform.eulerAngles.y + delta.x, 0.0f) * rotationalOffset;
-            Avatar.Head.rotation = Camera.transform.rotation;
-            
+            Avatar.transform.rotation = Quaternion.Euler(0.0f, delta.x, 0.0f) * Avatar.transform.rotation;
+            Avatar.Head.transform.localRotation = Quaternion.Euler(-Yaw, 0.0f, 0.0f);
+
+            Camera.transform.position = Avatar.Head.transform.position;
+            Camera.transform.rotation = Avatar.Head.transform.rotation;
+
             zoomCamera = Avatar.input.ZoomCam;
 
             // Update additional camera variables.
-            Camera.transform.position = Avatar.Head.position + Camera.transform.rotation * translationOffset;
             Camera.fieldOfView = Mathf.SmoothDamp(Camera.fieldOfView, zoomCamera ? zoomFieldOfView : FieldOfView, ref fovVelocity, fovSmoothTime);
             Camera.nearClipPlane = nearPlane;
             Camera.farClipPlane = farPlane;
