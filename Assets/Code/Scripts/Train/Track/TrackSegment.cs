@@ -80,17 +80,16 @@ namespace FR8.Runtime.Train.Track
         {
             var col = new Color(0f, 0.84f, 1f);
             DrawGizmos(true, col, ColorUtility.Invert(col));
-        }
 
-        private void OnDrawGizmos()
-        {
-            var col = new Color(0f, 0.84f, 1f);
-            DrawGizmos(false, col, ColorUtility.Invert(col));
+            var others = FindObjectsOfType<TrackSegment>();
+            foreach (var e in others)
+            {
+                e.DrawGizmos(false, col, ColorUtility.Invert(col));
+            }
         }
 
         public void DrawGizmos(bool main, Color selectedColor, Color otherColor)
         {
-            BakeData();
             var linePoints = new List<Vector3>();
             linePoints.AddRange(points);
 
