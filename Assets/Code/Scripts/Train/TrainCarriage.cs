@@ -33,7 +33,12 @@ namespace FR8.Runtime.Train
         public TrackSegment Segment
         {
             get => segment;
-            set => segment = value;
+            set
+            {
+                if (segment == value) return;
+                Debug.Log($"{this} Jumped from {segment} to {value}");
+                segment = value;
+            }
         }
 
         public DriverNetwork DriverNetwork { get; private set; }
@@ -91,10 +96,10 @@ namespace FR8.Runtime.Train
         public void FindClosestSegment()
         {
             float t;
-            (segment, t) = TrackUtility.FindClosestSegment(transform.position);
+            (Segment, t) = TrackUtility.FindClosestSegment(transform.position);
 
-            transform.position = segment.SamplePoint(t);
-            transform.rotation = Quaternion.LookRotation(segment.SampleTangent(t), Vector3.up);
+            transform.position = Segment.SamplePoint(t);
+            transform.rotation = Quaternion.LookRotation(Segment.SampleTangent(t), Vector3.up);
         }
 
         protected virtual void Configure()
@@ -111,7 +116,7 @@ namespace FR8.Runtime.Train
             FindConnectedCarriages(ConnectedCarriages);
             
             LastPositionOnSpline = PositionOnSpline;
-            PositionOnSpline = segment.GetClosestPoint(Body.position, true);
+            PositionOnSpline = Segment.GetClosestPoint(Body.position, true);
 
             ApplyDrag();
             ApplyHandbrake();
@@ -119,13 +124,13 @@ namespace FR8.Runtime.Train
 
             Stationary = IsStationary();
 
-            if (segment.IsOffStartOfTrack(Body.position))
+            if (Segment.IsOffStartOfTrack(Body.position))
             {
-                offEnd(segment.GetNextTrackStart());
+                offEnd(Segment.GetNextTrackStart());
             }
-            else if (segment.IsOffEndOfTrack(Body.position))
+            else if (Segment.IsOffEndOfTrack(Body.position))
             {
-                offEnd(segment.GetNextTrackEnd());
+                offEnd(Segment.GetNextTrackEnd());
             }
             
             evaluatedBrakeLoad = GetBrakeLoad();
@@ -135,11 +140,11 @@ namespace FR8.Runtime.Train
             {
                 if (next)
                 {
-                    segment = next;
+                    Segment = next;
                     return;
                 }
 
-                var closest = segment.SamplePoint(segment.GetClosestPoint(Body.position, true));
+                var closest = Segment.SamplePoint(Segment.GetClosestPoint(Body.position, true));
                 var displacement = closest - Body.position;
                 var normal = displacement.normalized;
                 Body.position = closest;
@@ -230,8 +235,8 @@ namespace FR8.Runtime.Train
         {
             // Calculate pose of front wheel assembly
             
-            var center = segment.SamplePoint(PositionOnSpline);
-            var normal = segment.SampleTangent(PositionOnSpline);
+            var center = Segment.SamplePoint(PositionOnSpline);
+            var normal = Segment.SampleTangent(PositionOnSpline);
 
             var alignmentDot = Vector3.Dot(normal, transform.forward);
             if (alignmentDot < 0.0f) normal = -normal;

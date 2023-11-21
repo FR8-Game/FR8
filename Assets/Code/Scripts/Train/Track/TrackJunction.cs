@@ -107,13 +107,19 @@ namespace FR8.Runtime.Train.Track
 
         private void ProcessTrain(TrainCarriage train)
         {
+            var position = connectionEnd switch
+            {
+                ConnectionEnd.Start => main[0].position,
+                ConnectionEnd.End => main[^1].position,
+                _ => throw new ArgumentOutOfRangeException()
+            };
             var normal = transform.forward;
 
             var next = train.Body.position;
             var last = next - train.Body.velocity * Time.deltaTime;
 
-            var dotLast = Vector3.Dot(normal, last - transform.position);
-            var dotCurrent = Vector3.Dot(normal, next - transform.position);
+            var dotLast = Vector3.Dot(normal, last - position);
+            var dotCurrent = Vector3.Dot(normal, next - position);
 
             if (dotCurrent >= 0.0f && dotLast < 0.0f)
             {
