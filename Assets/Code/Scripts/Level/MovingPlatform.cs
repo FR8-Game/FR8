@@ -34,9 +34,6 @@ namespace FR8.Runtime.Level
             platform.isKinematic = true;
             platform.useGravity = false;
             
-            platform.transform.localPosition = Vector3.zero;
-            platform.transform.localRotation = Quaternion.identity;
-            
             path = transform.GetChild(1);
             path.name = "Path";
             path.transform.localPosition = Vector3.zero;
@@ -45,6 +42,13 @@ namespace FR8.Runtime.Level
             for (var i = 0; i < path.childCount; i++)
             {
                 path.GetChild(i).name = $"Path Point {i}";
+            }
+
+            if (path.childCount > 0)
+            {
+                var first = path.GetChild(0);
+                platform.transform.position = first.position;
+                platform.transform.rotation = first.rotation;
             }
         }
 
@@ -93,10 +97,11 @@ namespace FR8.Runtime.Level
 
             for (var i = 0; i < path.childCount; i++)
             {
-                var a = PathPoint(i);
-                var b = PathPoint(i + 1);
-                
-                Gizmos.DrawLine(a.position, b.position);
+                var a = PathPoint(i).position;
+                var b = PathPoint(i + 1).position;
+                var r = 0.25f;
+                Gizmos.DrawLine(a + (b - a).normalized * r, b + (a - b).normalized * r);
+                Gizmos.DrawWireSphere(a, r);
             }
         }
     }
