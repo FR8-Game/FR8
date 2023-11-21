@@ -58,6 +58,14 @@ namespace FR8Editor.Tools
             }
             
             if (GUILayout.Button("Find")) Find();
+            
+            if (GUILayout.Button("Enable GPU Instancing"))
+            {
+                foreach (var e in materials)
+                {
+                    e.enableInstancing = true;
+                }
+            }
         }
     }
 }
