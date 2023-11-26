@@ -15,7 +15,7 @@ namespace FR8.Runtime.Train.Track
         public const int TrackLayer = 12;
 
         // --- Constants ---
-        public const float ConnectionDistance = 3.0f;
+        public const float ConnectionDistance = 10.0f;
         public static readonly Spline.SplineProfile SplineProfile = Spline.Cubic;
 
         // --- Properties ---
