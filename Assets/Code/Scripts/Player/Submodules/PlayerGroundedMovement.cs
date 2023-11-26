@@ -21,23 +21,26 @@ namespace FR8.Runtime.Player.Submodules
 
         [Header("Movement")]
         public float maxGroundedSpeed = 4.0f;
+
         public float accelerationTime = 0.12f;
         public float sprintSpeedScalar = 2.0f;
 
         [Range(0.0f, 1.0f)]
         public float airMovePenalty = 0.8f;
+
         public float jumpHeight = 2.5f;
 
         [Range(90.0f, 0.0f)]
         public float maxWalkableSlope = 40.0f;
-        public float groundCastExtension = 0.3f;
 
         [Space]
         public float groundSpring = 500.0f;
+
         public float groundDamping = 25.0f;
 
         [Space]
         public float downGravityScale = 3.0f;
+
         public float upGravityScale = 2.0f;
 
         [Space]
@@ -60,6 +63,9 @@ namespace FR8.Runtime.Player.Submodules
         private float lastJumpTime;
 
         private float crouchPercentRaw;
+
+        private Rigidbody lastGroundObject;
+        private Vector3 lastGroundVelocity;
         private bool wasOnGround;
 
         private float targetLadderPosition;
@@ -88,12 +94,11 @@ namespace FR8.Runtime.Player.Submodules
         public float CollisionHeight => collisionHeight;
         public float StepHeight => stepHeight;
 
-        public Rigidbody Body => avatar.Body;
         public bool IsOnGround { get; private set; }
         public float CrouchPercent => CurvesUtility.SmootherStep(crouchPercentRaw);
         public RaycastHit GroundHit { get; private set; }
         public Ladder Ladder { get; private set; }
-        public Vector3 Velocity => Body.velocity;
+        public Vector3 Velocity => IsOnGround && GroundHit.rigidbody ? avatar.Body.velocity - GroundHit.rigidbody.GetPointVelocity(avatar.Body.position) : avatar.Body.velocity;
         public Vector3 Gravity => new Vector3(0.0f, -9.81f, 0.0f) * (Velocity.y > 0.0f && Input.Jump ? upGravityScale : downGravityScale);
         public bool Enabled { get; set; }
 
@@ -234,7 +239,12 @@ namespace FR8.Runtime.Player.Submodules
             if (avatar.CurrentMount)
             {
                 avatar.Head.rotation = avatar.CurrentMount.ConstrainRotation(avatar.Head.rotation);
+                return;
             }
+
+            var rotation = avatar.Head.rotation;
+            transform.rotation = Quaternion.Euler(0.0f, rotation.eulerAngles.y, 0.0f);
+            avatar.Head.rotation = rotation;
         }
 
         private void Crouch()
@@ -339,13 +349,12 @@ namespace FR8.Runtime.Player.Submodules
 
         private void CheckForGround()
         {
-            var castDistance = GroundCheckRayLength - GroundCheckRadius;
-            var castExtension = wasOnGround ? groundCastExtension : 0.0f;
+            var distance = GroundCheckRayLength - GroundCheckRadius;
             IsOnGround = false;
 
             var ray = new Ray(transform.position + Vector3.up * (1.0f - GroundCheckHeightOffset), Vector3.down);
 
-            var res = Physics.SphereCastAll(ray, GroundCheckRadius, castDistance + castExtension, ~0, QueryTriggerInteraction.Ignore);
+            var res = Physics.SphereCastAll(ray, GroundCheckRadius, distance, ~0, QueryTriggerInteraction.Ignore);
             if (res.Length == 0) return;
 
             if (!GetValidGroundHit(res, out var bestHit)) return;
@@ -353,7 +362,7 @@ namespace FR8.Runtime.Player.Submodules
             GroundHit = bestHit;
             IsOnGround = true;
 
-            ApplyGroundSpring(castDistance);
+            ApplyGroundSpring(distance);
         }
 
         private bool GetValidGroundHit(RaycastHit[] hits, out RaycastHit bestHit)
@@ -463,16 +472,26 @@ namespace FR8.Runtime.Player.Submodules
 
         private void MoveWithGround()
         {
-            if (!IsOnGround) return;
             var groundObject = GroundHit.rigidbody;
-            if (!groundObject) return;
 
-            var velocity = groundObject.GetPointVelocity(Body.position);
-            Body.position += velocity * Time.deltaTime;
+            if (groundObject)
+            {
+                var velocity = groundObject.GetPointVelocity(avatar.Body.position);
+                if (groundObject == lastGroundObject)
+                {
+                    var deltaVelocity = velocity - lastGroundVelocity;
+                    var deltaRotation = groundObject.angularVelocity * Mathf.Rad2Deg * Time.deltaTime;
 
-            var angularVelocity = groundObject.angularVelocity;
-            var rotation = Quaternion.Euler(angularVelocity * Mathf.Rad2Deg * Time.deltaTime) * Body.rotation;
-            Body.rotation = Quaternion.Euler(0.0f, rotation.eulerAngles.y, 0.0f);
+                    var force = deltaVelocity / Time.deltaTime;
+
+                    avatar.Body.AddForce(force, ForceMode.Acceleration);
+                    avatar.Body.MoveRotation(avatar.Body.rotation * Quaternion.Euler(deltaRotation));
+                }
+
+                lastGroundVelocity = velocity;
+            }
+
+            lastGroundObject = groundObject;
         }
 
         public void SetLadder(Ladder ladder)
