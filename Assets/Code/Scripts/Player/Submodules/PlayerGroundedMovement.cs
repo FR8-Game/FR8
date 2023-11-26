@@ -63,6 +63,9 @@ namespace FR8.Runtime.Player.Submodules
         private float lastJumpTime;
 
         private float crouchPercentRaw;
+
+        private Rigidbody lastGroundObject;
+        private Vector3 lastGroundVelocity;
         private bool wasOnGround;
 
         private float targetLadderPosition;
@@ -91,12 +94,11 @@ namespace FR8.Runtime.Player.Submodules
         public float CollisionHeight => collisionHeight;
         public float StepHeight => stepHeight;
 
-        public Rigidbody Body => avatar.Body;
         public bool IsOnGround { get; private set; }
         public float CrouchPercent => CurvesUtility.SmootherStep(crouchPercentRaw);
         public RaycastHit GroundHit { get; private set; }
         public Ladder Ladder { get; private set; }
-        public Vector3 Velocity => Body.velocity;
+        public Vector3 Velocity => IsOnGround && GroundHit.rigidbody ? avatar.Body.velocity - GroundHit.rigidbody.GetPointVelocity(avatar.Body.position) : avatar.Body.velocity;
         public Vector3 Gravity => new Vector3(0.0f, -9.81f, 0.0f) * (Velocity.y > 0.0f && Input.Jump ? upGravityScale : downGravityScale);
         public bool Enabled { get; set; }
 
@@ -237,7 +239,12 @@ namespace FR8.Runtime.Player.Submodules
             if (avatar.CurrentMount)
             {
                 avatar.Head.rotation = avatar.CurrentMount.ConstrainRotation(avatar.Head.rotation);
+                return;
             }
+
+            var rotation = avatar.Head.rotation;
+            transform.rotation = Quaternion.Euler(0.0f, rotation.eulerAngles.y, 0.0f);
+            avatar.Head.rotation = rotation;
         }
 
         private void Crouch()
@@ -465,15 +472,26 @@ namespace FR8.Runtime.Player.Submodules
 
         private void MoveWithGround()
         {
-            if (!IsOnGround) return;
             var groundObject = GroundHit.rigidbody;
-            if (!groundObject) return;
 
-            var velocity = groundObject.GetPointVelocity(Body.position);
-            Body.position += velocity * Time.deltaTime;
+            if (groundObject)
+            {
+                var velocity = groundObject.GetPointVelocity(avatar.Body.position);
+                if (groundObject == lastGroundObject)
+                {
+                    var deltaVelocity = velocity - lastGroundVelocity;
+                    var deltaRotation = groundObject.angularVelocity * Mathf.Rad2Deg * Time.deltaTime;
 
-            var angularVelocity = groundObject.angularVelocity;
-            Body.rotation = Quaternion.Euler(angularVelocity * Mathf.Rad2Deg * Time.deltaTime) * Body.rotation;
+                    var force = deltaVelocity / Time.deltaTime;
+
+                    avatar.Body.AddForce(force, ForceMode.Acceleration);
+                    avatar.Body.MoveRotation(avatar.Body.rotation * Quaternion.Euler(deltaRotation));
+                }
+
+                lastGroundVelocity = velocity;
+            }
+
+            lastGroundObject = groundObject;
         }
 
         public void SetLadder(Ladder ladder)
