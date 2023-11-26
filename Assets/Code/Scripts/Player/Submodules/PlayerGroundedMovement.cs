@@ -21,26 +21,23 @@ namespace FR8.Runtime.Player.Submodules
 
         [Header("Movement")]
         public float maxGroundedSpeed = 4.0f;
-
         public float accelerationTime = 0.12f;
         public float sprintSpeedScalar = 2.0f;
 
         [Range(0.0f, 1.0f)]
         public float airMovePenalty = 0.8f;
-
         public float jumpHeight = 2.5f;
 
         [Range(90.0f, 0.0f)]
         public float maxWalkableSlope = 40.0f;
+        public float groundCastExtension = 0.3f;
 
         [Space]
         public float groundSpring = 500.0f;
-
         public float groundDamping = 25.0f;
 
         [Space]
         public float downGravityScale = 3.0f;
-
         public float upGravityScale = 2.0f;
 
         [Space]
@@ -342,12 +339,13 @@ namespace FR8.Runtime.Player.Submodules
 
         private void CheckForGround()
         {
-            var distance = GroundCheckRayLength - GroundCheckRadius;
+            var castDistance = GroundCheckRayLength - GroundCheckRadius;
+            var castExtension = wasOnGround ? groundCastExtension : 0.0f;
             IsOnGround = false;
 
             var ray = new Ray(transform.position + Vector3.up * (1.0f - GroundCheckHeightOffset), Vector3.down);
 
-            var res = Physics.SphereCastAll(ray, GroundCheckRadius, distance, ~0, QueryTriggerInteraction.Ignore);
+            var res = Physics.SphereCastAll(ray, GroundCheckRadius, castDistance + castExtension, ~0, QueryTriggerInteraction.Ignore);
             if (res.Length == 0) return;
 
             if (!GetValidGroundHit(res, out var bestHit)) return;
@@ -355,7 +353,7 @@ namespace FR8.Runtime.Player.Submodules
             GroundHit = bestHit;
             IsOnGround = true;
 
-            ApplyGroundSpring(distance);
+            ApplyGroundSpring(castDistance);
         }
 
         private bool GetValidGroundHit(RaycastHit[] hits, out RaycastHit bestHit)
@@ -473,7 +471,8 @@ namespace FR8.Runtime.Player.Submodules
             Body.position += velocity * Time.deltaTime;
 
             var angularVelocity = groundObject.angularVelocity;
-            Body.rotation = Quaternion.Euler(angularVelocity * Mathf.Rad2Deg * Time.deltaTime) * Body.rotation;
+            var rotation = Quaternion.Euler(angularVelocity * Mathf.Rad2Deg * Time.deltaTime) * Body.rotation;
+            Body.rotation = Quaternion.Euler(0.0f, rotation.eulerAngles.y, 0.0f);
         }
 
         public void SetLadder(Ladder ladder)
