@@ -19,6 +19,12 @@ namespace FR8.Runtime.Player
             Pause.PausedStateChangedEvent += OnPauseStateChanged;
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            Pause.PausedStateChangedEvent -= OnPauseStateChanged;
+        }
+
         private void OnPauseStateChanged()
         {
             enabled = !Pause.Paused;
