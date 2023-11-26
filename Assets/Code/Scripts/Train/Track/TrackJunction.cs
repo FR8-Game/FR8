@@ -151,15 +151,24 @@ namespace FR8.Runtime.Train.Track
             SetState(!GetState());
         }
 
-        public TrackSegment.Connection GetConnection() => connectionEnd switch
+        public TrackSegment.Connection GetConnection()
         {
-            ConnectionEnd.Start => main.StartConnection,
-            ConnectionEnd.End => main.EndConnection,
-            _ => throw new ArgumentOutOfRangeException()
-        };
+            if (!main) return null;
+            return connectionEnd switch
+            {
+                ConnectionEnd.Start => main.StartConnection,
+                ConnectionEnd.End => main.EndConnection,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+        }
 
-        public bool GetState() => GetConnection().active;
-        public void SetState(bool state) => GetConnection().active = state;
+        public bool GetState() => GetConnection()?.active ?? false;
+        public void SetState(bool state)
+        {
+            var c = GetConnection();
+            if (c == null) return;
+            c.active = state;
+        }
 
         public void ContinueInteract(GameObject interactingObject) { }
 
