@@ -1,4 +1,5 @@
 using System;
+using FR8.Runtime.Editor;
 using FR8.Runtime.Interactions.Drivers.Submodules;
 using FR8.Runtime.Rendering.Passes;
 using UnityEngine;
@@ -8,20 +9,23 @@ namespace FR8.Runtime.Train.Track
     [SelectionBase, DisallowMultipleComponent]
     public class TrackJunction : MonoBehaviour, IInteractable
     {
-        [SerializeField] private TrackSegment main;
-        [SerializeField] private TrackSegment other;
-        [SerializeField] private Transform primaryIndicator;
-        [SerializeField] private Transform secondaryIndicator;
-        [SerializeField] private CodeUtility.DampedSpring animationSpring;
-        [SerializeField] private bool flip;
-        [SerializeField] private bool testActive;
+        [SerializeField] private bool stateOverride;
+        [SerializeField] private MeshRenderer target;
+        [SerializeField] private int materialIndex = 2;
+        [SerializeField] private string materialProperty = "_Light_Intensity";
+        [Range(0.0f, 1.0f)]
+        [SerializeField] private float valueSmoothing = 0.3f;
 
         [Space]
         [SerializeField] private ConnectionEnd connectionEnd;
+        [SerializeField] [ReadOnly] private TrackSegment main;
+        [SerializeField] [ReadOnly] private TrackSegment other;
 
         private bool state;
         private Renderer[] visuals;
         private float positionOnSpline;
+        private MaterialPropertyBlock propertyBlock;
+        private float smoothedValue;
 
         public bool CanInteract => true;
         public string DisplayName => "Train Signal";
@@ -50,26 +54,21 @@ namespace FR8.Runtime.Train.Track
 
             if (Application.isPlaying)
             {
-                SetState(testActive);
-            }
-            else
-            {
-                Animate(testActive ? 1.0f : 0.0f);
+                SetState(stateOverride);
             }
         }
 
-        private void Awake()
-        {
-            visuals = GetComponentsInChildren<Renderer>();
-        }
+        private void Awake() { visuals = GetComponentsInChildren<Renderer>(); }
 
         private void Start()
         {
-            if (!main)
+            if (!main || !other)
             {
-                gameObject.SetActive(false);
+                enabled = false;
                 return;
             }
+
+            propertyBlock = new MaterialPropertyBlock();
 
             FindConnectionEnd();
             SetState(GetState());
@@ -91,11 +90,15 @@ namespace FR8.Runtime.Train.Track
         private void FixedUpdate()
         {
             state = GetState();
-            animationSpring.Target(state ? 1.0f : 0.0f).Iterate(Time.deltaTime);
+            smoothedValue = Mathf.Lerp(state ? 1.0f : 0.0f, smoothedValue, valueSmoothing);
 
-            Animate(animationSpring.currentPosition);
+            propertyBlock.SetFloat(materialProperty, smoothedValue);
+            if (target)
+            {
+                target.SetPropertyBlock(propertyBlock);
+            }
 
-            if (GetState())
+            if (state)
             {
                 foreach (var t in TrainCarriage.All)
                 {
@@ -127,29 +130,15 @@ namespace FR8.Runtime.Train.Track
             }
         }
 
-        private void Animate(float t)
-        {
-            if (flip) t = 1.0f - t;
-
-            if (primaryIndicator) primaryIndicator.transform.localRotation = Quaternion.Euler(0.0f, t * 90.0f, 0.0f);
-            if (secondaryIndicator) secondaryIndicator.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, t * -180.0f);
-        }
-
         public enum ConnectionEnd
         {
             Start,
             End
         }
 
-        public void Nudge(int direction)
-        {
-            SetState(direction == 1);
-        }
+        public void Nudge(int direction) { SetState(direction == 1); }
 
-        public void BeginInteract(GameObject interactingObject)
-        {
-            SetState(!GetState());
-        }
+        public void BeginInteract(GameObject interactingObject) { SetState(!GetState()); }
 
         public TrackSegment.Connection GetConnection()
         {
@@ -163,6 +152,7 @@ namespace FR8.Runtime.Train.Track
         }
 
         public bool GetState() => GetConnection()?.active ?? false;
+
         public void SetState(bool state)
         {
             var c = GetConnection();
@@ -177,5 +167,7 @@ namespace FR8.Runtime.Train.Track
             if (highlight) SelectionOutlinePass.Add(visuals);
             else SelectionOutlinePass.Remove(visuals);
         }
+
+        private void Reset() { target = transform.Find<MeshRenderer>("SignalPostJunction/JunctionSignalLight/JunctionSignalLight_GEO"); }
     }
 }
