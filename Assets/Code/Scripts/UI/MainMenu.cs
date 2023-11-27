@@ -1,3 +1,4 @@
+using System;
 using FMOD.Studio;
 using FMODUnity;
 using FR8.Runtime.CodeUtility;
@@ -9,30 +10,34 @@ using Cursor = UnityEngine.Cursor;
 
 namespace FR8.Runtime.UI
 {
-    [RequireComponent(typeof(UIDocument))]
     public class MainMenu : MonoBehaviour
     {
-        private UIDocument docs;
+        private UIDocument mainMenu;
+        private UIDocument credits;
         [SerializeField] private FMOD.Studio.EventInstance titleMusic;
         [SerializeField] private EventReference MenuMusic;
 
-
         private void Awake()
         {
-            docs = GetComponent<UIDocument>();
+            mainMenu = transform.Find<UIDocument>("MainMenu");
+            credits = transform.Find<UIDocument>("Credits");
             titleMusic = RuntimeManager.CreateInstance(MenuMusic);
             titleMusic.start();
         }
 
         private void Start()
         {
-            var root = docs.rootVisualElement;
+            var root = mainMenu.rootVisualElement;
             SetupLanding(root.Q("landing"));
+
+            credits.rootVisualElement.Q<Button>("return").clickable.clicked += OpenCredits(false);
 
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
-            
+
             ReloadSettings();
+
+            OpenCredits(false)();
         }
 
         private void OnDisable()
@@ -50,7 +55,7 @@ namespace FR8.Runtime.UI
             {
                 ReloadSettings();
             }
-            
+
             if (kb.f3Key.isPressed && kb.gKey.wasPressedThisFrame)
             {
                 SaveManager.SettingsSave.data = new PersistantSaveData();
@@ -69,8 +74,15 @@ namespace FR8.Runtime.UI
         private void SetupLanding(VisualElement root)
         {
             root.Q<Button>("start").clickable.clicked += UIActions.Load(SceneUtility.Scene.Game);
+            root.Q<Button>("credits").clickable.clicked += OpenCredits(true);
             root.Q<Button>("exit").clickable.clicked += UIActions.QuitToDesktop;
             root.Q<Button>().clickable.clicked += UIActions.ClickSfx;
         }
+
+        private Action OpenCredits(bool open) => () =>
+        {
+            mainMenu.rootVisualElement.visible = !open;
+            credits.rootVisualElement.visible = open;
+        };
     }
 }
