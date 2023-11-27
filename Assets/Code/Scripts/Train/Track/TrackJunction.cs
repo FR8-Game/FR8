@@ -58,10 +58,7 @@ namespace FR8.Runtime.Train.Track
             }
         }
 
-        private void Awake()
-        {
-            visuals = GetComponentsInChildren<Renderer>();
-        }
+        private void Awake() { visuals = GetComponentsInChildren<Renderer>(); }
 
         private void Start()
         {
@@ -72,7 +69,7 @@ namespace FR8.Runtime.Train.Track
             }
 
             propertyBlock = new MaterialPropertyBlock();
-            
+
             FindConnectionEnd();
             SetState(GetState());
         }
@@ -94,17 +91,20 @@ namespace FR8.Runtime.Train.Track
         {
             state = GetState();
             smoothedValue = Mathf.Lerp(state ? 1.0f : 0.0f, smoothedValue, valueSmoothing);
-            
+
             propertyBlock.SetFloat(materialProperty, smoothedValue);
             if (target)
             {
                 target.SetPropertyBlock(propertyBlock);
             }
-            
-            foreach (var t in TrainCarriage.All)
+
+            if (state)
             {
-                if (t.Segment != other) continue;
-                ProcessTrain(t);
+                foreach (var t in TrainCarriage.All)
+                {
+                    if (t.Segment != other) continue;
+                    ProcessTrain(t);
+                }
             }
         }
 
@@ -136,15 +136,9 @@ namespace FR8.Runtime.Train.Track
             End
         }
 
-        public void Nudge(int direction)
-        {
-            SetState(direction == 1);
-        }
+        public void Nudge(int direction) { SetState(direction == 1); }
 
-        public void BeginInteract(GameObject interactingObject)
-        {
-            SetState(!GetState());
-        }
+        public void BeginInteract(GameObject interactingObject) { SetState(!GetState()); }
 
         public TrackSegment.Connection GetConnection()
         {
@@ -158,6 +152,7 @@ namespace FR8.Runtime.Train.Track
         }
 
         public bool GetState() => GetConnection()?.active ?? false;
+
         public void SetState(bool state)
         {
             var c = GetConnection();
@@ -173,9 +168,6 @@ namespace FR8.Runtime.Train.Track
             else SelectionOutlinePass.Remove(visuals);
         }
 
-        private void Reset()
-        {
-            target = transform.Find<MeshRenderer>("SignalPostJunction/JunctionSignalLight/JunctionSignalLight_GEO");
-        }
+        private void Reset() { target = transform.Find<MeshRenderer>("SignalPostJunction/JunctionSignalLight/JunctionSignalLight_GEO"); }
     }
 }
