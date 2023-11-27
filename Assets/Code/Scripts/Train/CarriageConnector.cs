@@ -159,8 +159,8 @@ namespace FR8.Runtime.Train
             var otherMass = Connection.rigidbody.mass;
             var totalMass = mass + otherMass;
 
-            var force = displacement / (Time.deltaTime * Time.deltaTime);
-            force -= rigidbody.velocity / Time.deltaTime;
+            var force = displacement * settings.connectionForce;
+            force += (Connection.rigidbody.velocity - rigidbody.velocity) * settings.connectionDamping;
             force *= mass * (mass / totalMass);
 
             force = transform.forward * Vector3.Dot(transform.forward, force);
