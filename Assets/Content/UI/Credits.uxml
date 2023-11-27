@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Content/UI/Style%20Sheets/Game%20UI%20Stylesheet.uss?fileID=7433441132597879392&amp;guid=acd50812ec1cbb044a0297b17ba892a4&amp;type=3#Game UI Stylesheet" />
+    <ui:VisualElement name="background" class="background-transparent" style="flex-grow: 1;" />
+    <ui:VisualElement name="margin" style="padding-left: 30px; padding-right: 30px; padding-top: 30px; padding-bottom: 30px; position: absolute; left: 0; top: 0; right: 0; bottom: 0;">
+        <ui:VisualElement name="header" style="flex-shrink: 0;">
+            <ui:Label text="&gt; CREDITS_" display-tooltip-when-elided="true" name="title" style="font-size: 70px; -unity-text-align: middle-left;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="Content" style="flex-grow: 1; align-items: stretch; justify-content: space-between; flex-direction: row;">
+            <ui:VisualElement name="LeftContent" style="flex-grow: 0.5; flex-shrink: 0; flex-direction: row; align-items: flex-start; justify-content: center; height: 785px; width: 613px;">
+                <ui:Label text="Programmer&#10;Harry Bosch&#10;&#10;Producer/Level Designer&#10;Marshall Pettit&#10;&#10;Game Designer/Sound Designer&#10;Henry Breust&#10;" display-tooltip-when-elided="true" name="Left" style="-unity-text-align: upper-center; white-space: nowrap; font-size: 40px; align-items: center;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="RightContent" style="flex-grow: 1; flex-direction: column; flex-shrink: 0; flex-wrap: nowrap; align-items: center; height: 797px; width: 575px;">
+                <ui:Label text="Lead Artists&#10;Luca Bradley&#10;William Stone&#10;&#10;Game Artists&#10;Kai Carns-Williams&#10;Catherine (Charles) Joore&#10;Ewan Hoad&#10;Kiara Draper" display-tooltip-when-elided="true" name="Right" style="font-size: 40px; align-items: stretch; -unity-text-align: upper-center;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Label text="Audio &amp; SFX&#10;Iqbal Singh Honjan&#10;Isaac Underwood" display-tooltip-when-elided="true" name="Centre" style="-unity-text-align: upper-center; white-space: nowrap; font-size: 40px; align-items: stretch; flex-direction: column-reverse; justify-content: flex-start;" />
+        <ui:Button text="Return" display-tooltip-when-elided="true" style="height: 89px; width: 350px;" />
+        <ui:VisualElement name="footer" style="flex-direction: row-reverse; flex-shrink: 0; flex-grow: 1;" />
+    </ui:VisualElement>
+</ui:UXML>

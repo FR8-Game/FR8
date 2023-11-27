@@ -285,7 +285,7 @@ MonoBehaviour:
   displayMode: 0
   persistant: 1
   carriages:
-  - {fileID: 0}
+  - {fileID: 321450035}
   deliveryLocation: {fileID: 54182372}
 --- !u!1 &35162467
 GameObject:
@@ -1691,6 +1691,28 @@ Transform:
   m_Father: {fileID: 1833219154}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!114 &321450035 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7226083242354055772, guid: fc02edd25eaf41d4a830498a1737077f, type: 3}
+  m_PrefabInstance: {fileID: 2094629173}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 374324b53db19734286f046e766d6e64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &321450036 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1136068366891471882, guid: fc02edd25eaf41d4a830498a1737077f, type: 3}
+  m_PrefabInstance: {fileID: 2094629173}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70c332c448ab4a6e8f06b356d84c2beb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &330703985
 GameObject:
   m_ObjectHideFlags: 0
@@ -2177,8 +2199,20 @@ MonoBehaviour:
   displayMode: 0
   persistant: 0
   carriages:
-  - {fileID: 0}
-  highlighted: []
+  - {fileID: 321450035}
+  highlighted:
+  - {fileID: 438690924}
+--- !u!114 &438690924 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5345025056541631273, guid: df023db71131261459473c41586b351c, type: 3}
+  m_PrefabInstance: {fileID: 112859239}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec82d84e2f30255438c24fa453fa663c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &472239765
 GameObject:
   m_ObjectHideFlags: 0
@@ -3914,7 +3948,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 732632195}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.0023308897, z: 0}
+  m_LocalPosition: {x: 0, y: 0.0076418263, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4313,7 +4347,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 797235119}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.008477116, z: 0}
+  m_LocalPosition: {x: 0, y: 0.0037880524, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4495,7 +4529,7 @@ MonoBehaviour:
     the Hand Brake on the side of the Well Car behind the train.
   displayMode: 0
   persistant: 0
-  driverNetwork: {fileID: 0}
+  driverNetwork: {fileID: 321450036}
   key: handbrake
   comparison: 0
   targetValue: 0
@@ -4528,7 +4562,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 838652287}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.0045235003, z: 0}
+  m_LocalPosition: {x: 0, y: 0.009834437, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5429,7 +5463,7 @@ MonoBehaviour:
   persistant: 0
   driverNetwork: {fileID: 1100998597}
   key: speed
-  comparison: 0
+  comparison: 2
   targetValue: 80
   bias: 0.1
   targetValueDisplayMode: 0
@@ -6564,7 +6598,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1529736942}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.002496771, z: 0}
+  m_LocalPosition: {x: 0, y: 0.0073592016, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -9111,6 +9145,14 @@ PrefabInstance:
     - target: {fileID: 3288210903154621789, guid: fc02edd25eaf41d4a830498a1737077f, type: 3}
       propertyPath: m_LocalRotation.x
       value: -0.000000112286216
+      objectReference: {fileID: 0}
+    - target: {fileID: 3288210903154621789, guid: fc02edd25eaf41d4a830498a1737077f, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.70989037
+      objectReference: {fileID: 0}
+    - target: {fileID: 3288210903154621789, guid: fc02edd25eaf41d4a830498a1737077f, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.70431226
       objectReference: {fileID: 0}
     - target: {fileID: 3613022052801977541, guid: fc02edd25eaf41d4a830498a1737077f, type: 3}
       propertyPath: m_LocalRotation.w
