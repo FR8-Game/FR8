@@ -54,7 +54,7 @@ namespace FR8Editor.BuildMage
             if (pushToItch)
             { 
                 var butlerCommand = $"C:/Butler/butler.exe push --ignore *DoNotShip* \"Builds/Windows\" boschingmachine/FR8:win --userversion {Application.version}";
-                System.Diagnostics.Process.Start("cmd.exe", $"/C {butlerCommand}");
+                System.Diagnostics.Process.Start("cmd.exe", $"/K {butlerCommand}");
             }
 
             if (notifyDiscord)

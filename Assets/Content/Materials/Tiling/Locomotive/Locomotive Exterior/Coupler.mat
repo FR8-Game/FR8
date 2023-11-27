@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-5167573179520245014
+--- !u!114 &-527469403091401732
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
@@ -20,12 +20,20 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+<<<<<<<< HEAD:Assets/Content/Materials/Tiling/Base Materials/MAT_Black_Plastic.mat
+  m_Name: MAT_Black_Plastic
+========
   m_Name: Coupler
+>>>>>>>> dev:Assets/Content/Materials/Tiling/Locomotive/Locomotive Exterior/Coupler.mat
   m_Shader: {fileID: -6465566751694194690, guid: 954f7bd919a52b040b9085c83d11f0d9, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
+<<<<<<<< HEAD:Assets/Content/Materials/Tiling/Base Materials/MAT_Black_Plastic.mat
+  m_EnableInstancingVariants: 0
+========
   m_EnableInstancingVariants: 1
+>>>>>>>> dev:Assets/Content/Materials/Tiling/Locomotive/Locomotive Exterior/Coupler.mat
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
@@ -42,7 +50,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: f808110bc2d2b4947a66ec05b80dada5, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailMask:
@@ -58,9 +66,15 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Grunge_Sample:
+<<<<<<<< HEAD:Assets/Content/Materials/Tiling/Base Materials/MAT_Black_Plastic.mat
+        m_Texture: {fileID: 2800000, guid: f808110bc2d2b4947a66ec05b80dada5, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+========
         m_Texture: {fileID: 2800000, guid: 1c43ad73e6c27104194f6e9fdd97c516, type: 3}
         m_Scale: {x: 5, y: 2}
         m_Offset: {x: 5, y: 3}
+>>>>>>>> dev:Assets/Content/Materials/Tiling/Locomotive/Locomotive Exterior/Coupler.mat
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -71,7 +85,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _Normal_Map:
         m_Texture: {fileID: 0}
+<<<<<<<< HEAD:Assets/Content/Materials/Tiling/Base Materials/MAT_Black_Plastic.mat
+        m_Scale: {x: 1, y: 1}
+========
         m_Scale: {x: 6, y: 6}
+>>>>>>>> dev:Assets/Content/Materials/Tiling/Locomotive/Locomotive Exterior/Coupler.mat
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
         m_Texture: {fileID: 0}
@@ -99,30 +117,46 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _Albedo_Balance: 0
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
-    - _Burn: 0.1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
-    - _DetailAlbedoMapScale: 1
+    - _DetailAlbedoMapScale: 0.54
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
+    - _EmissionBrightness: 1
     - _EnvironmentReflections: 1
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
+<<<<<<<< HEAD:Assets/Content/Materials/Tiling/Base Materials/MAT_Black_Plastic.mat
+    - _Metallic: 1
+    - _Metalness: 0
+    - _Normal_Intensity: 0
+========
     - _Grid_Size: 2
     - _Metallic: 0
     - _Metalness: 0.075
     - _Normal_Intensity: 1
+>>>>>>>> dev:Assets/Content/Materials/Tiling/Locomotive/Locomotive Exterior/Coupler.mat
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+<<<<<<<< HEAD:Assets/Content/Materials/Tiling/Base Materials/MAT_Black_Plastic.mat
+    - _Smoothness: 1
+    - _SmoothnessTextureChannel: 0
+    - _Smoothness_Max: 0.373
+    - _Smoothness_Min: 0.338
+    - _SpecularHighlights: 1
+    - _SrcBlend: 1
+    - _Surface: 0
+========
     - _Rotation: 0
     - _Smoothness: 0.2
     - _SmoothnessTextureChannel: 0
@@ -132,17 +166,27 @@ Material:
     - _SrcBlend: 1
     - _Surface: 0
     - _Triplanar: 1
+>>>>>>>> dev:Assets/Content/Materials/Tiling/Locomotive/Locomotive Exterior/Coupler.mat
     - _Triplanar_Blend: 1
     - _Triplanar_Tiling: 1
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
+<<<<<<<< HEAD:Assets/Content/Materials/Tiling/Base Materials/MAT_Black_Plastic.mat
+    - _Albedo_High: {r: 0.03773582, g: 0.03773582, b: 0.03773582, a: 1}
+    - _Albedo_Low: {r: 0.039215688, g: 0.019607844, b: 0.043137256, a: 1}
+    - _BaseColor: {r: 1, g: 0, b: 0.86307716, a: 1}
+    - _Color: {r: 1, g: 0, b: 0.86307716, a: 1}
+    - _Emission: {r: 0, g: 0, b: 0, a: 1}
+    - _EmissionColor: {r: 1, g: 0, b: 0.6060066, a: 1}
+========
     - _Albedo_High: {r: 0.14117648, g: 0.1137255, b: 0.121568635, a: 1}
     - _Albedo_Low: {r: 0.1137255, g: 0.08627451, b: 0.098039225, a: 1}
     - _BaseColor: {r: 0.2264151, g: 0.2264151, b: 0.2264151, a: 1}
     - _Color: {r: 0.31132078, g: 0.31132078, b: 0.31132078, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _Offset: {r: 0, g: 0, b: 0, a: 0}
+>>>>>>>> dev:Assets/Content/Materials/Tiling/Locomotive/Locomotive Exterior/Coupler.mat
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _Tiling: {r: 6, g: 6, b: 0, a: 0}
   m_BuildTextureStacks: []
