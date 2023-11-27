@@ -100,6 +100,12 @@ namespace FR8.Runtime.Train.Track
             {
                 target.SetPropertyBlock(propertyBlock);
             }
+            
+            foreach (var t in TrainCarriage.All)
+            {
+                if (t.Segment != other) continue;
+                ProcessTrain(t);
+            }
         }
 
         private void ProcessTrain(TrainCarriage train)
