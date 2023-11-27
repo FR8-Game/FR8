@@ -276,8 +276,9 @@ namespace FR8.Runtime.Train
 
         private void ApplyCorrectiveTorque(Quaternion rotation)
         {
-            Body.rotation = rotation;
-            Body.angularVelocity = Vector3.zero;
+            var delta = rotation * Quaternion.Inverse(Body.rotation);
+            delta.ToAngleAxis(out var angle, out var axis);
+            Body.angularVelocity = axis * angle * Mathf.Deg2Rad / Time.deltaTime;
         }
 
         public float GetForwardSpeed() => Vector3.Dot(DriverDirection, Body.velocity);
