@@ -120,12 +120,7 @@ namespace FR8.Runtime.Player.Submodules
 
             avatar.getCenter = () => collider.transform.TransformPoint(collider.center);
             avatar.MountChangedEvent += OnMountChanged;
-
-            var camera = Camera.main;
-            transform.position = camera.transform.position - cameraOffset;
-            transform.rotation = Quaternion.Euler(0.0f, camera.transform.eulerAngles.y, 0.0f);
         }
-
 
         private void OnDisable()
         {

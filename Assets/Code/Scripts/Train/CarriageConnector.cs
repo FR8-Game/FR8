@@ -161,12 +161,12 @@ namespace FR8.Runtime.Train
 
             var force = displacement * settings.connectionForce;
             force += (Connection.rigidbody.velocity - rigidbody.velocity) * settings.connectionDamping;
-            force *= mass * (mass / totalMass);
+            force *= mass / totalMass;
 
             force = transform.forward * Vector3.Dot(transform.forward, force);
 
-            rigidbody.AddForce(force / 2.0f);
-            Connection.rigidbody.AddForce(-force / 2.0f);
+            rigidbody.velocity += force / 2.0f * Time.deltaTime;
+            Connection.rigidbody.velocity += -force / 2.0f * Time.deltaTime;
         }
 
         private void UpdateFX(bool engaged)
