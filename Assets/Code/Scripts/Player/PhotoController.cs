@@ -69,7 +69,7 @@ namespace FR8.Runtime.Player
                 });
             }
 
-            mainCamera.cullingMask = cullingMask;
+            if (mainCamera) mainCamera.cullingMask = cullingMask;
             
             PhotoControllerPersistantData.SetPosition(transform.position);
             PhotoControllerPersistantData.SetRotation(transform.rotation);
