@@ -278,7 +278,6 @@ namespace FR8.Runtime.Train
         {
             var delta = rotation * Quaternion.Inverse(Body.rotation);
             delta.ToAngleAxis(out var angle, out var axis);
-            Debug.Log($"{angle} | {axis}");
             if (!(float.IsFinite(axis.x) && float.IsFinite(axis.y) && float.IsFinite(axis.z)))
             {
                 axis = Vector3.up;
