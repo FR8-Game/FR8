@@ -5,21 +5,27 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Debug = UnityEngine.Debug;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace FR8.Runtime.Player
 {
     [SelectionBase, DisallowMultipleComponent]
     public class PhotoController : MonoBehaviour
     {
-        public float panSpeed;
-        public float accelerationTime;
+#if UNITY_EDITOR
+        public float panSpeed = 25.0f;
+        public float accelerationTime = 0.1f;
         public float sensitivity = 0.3f;
-        public float fovMin = 30.0f;
+        public float fovMin = 5.0f;
         public float fovMax = 160.0f;
 
         [Range(0.0f, 1.0f)]
         public float fovCurrent = 0.5f;
-
-        public float fovSens = 1.0f;
+        public float fovSens = 0.02f;
+        
+        [Range(1, 4)]
         public int resolutionScale = 1;
 
         private Vector3 moveTarget;
@@ -28,6 +34,8 @@ namespace FR8.Runtime.Player
         private Camera mainCamera;
         private bool screenshotTaken;
         private int cullingMask;
+        private float lastScreenshotTime = float.MinValue;
+        private string lastScreenshotName;
 
         private static string FileLocation => Path.Combine(Application.dataPath, ".Screenshots");
 
@@ -41,6 +49,12 @@ namespace FR8.Runtime.Player
             screenshotTaken = false;
             cullingMask = mainCamera.cullingMask;
             mainCamera.cullingMask &= ~(1 << 5);
+            
+            transform.position = PhotoControllerPersistantData.GetPosition();
+            transform.rotation = PhotoControllerPersistantData.GetRotation();
+            fovCurrent = Mathf.InverseLerp(fovMin, fovMax, PhotoControllerPersistantData.GetFov());
+            
+            cameraRotation = new Vector2(transform.eulerAngles.y, -transform.eulerAngles.x);
         }
 
         private void OnDisable()
@@ -55,7 +69,11 @@ namespace FR8.Runtime.Player
                 });
             }
 
-            mainCamera.cullingMask = cullingMask;
+            if (mainCamera) mainCamera.cullingMask = cullingMask;
+            
+            PhotoControllerPersistantData.SetPosition(transform.position);
+            PhotoControllerPersistantData.SetRotation(transform.rotation);
+            PhotoControllerPersistantData.SetFov(Mathf.Lerp(fovMin, fovMax, fovCurrent));
         }
 
         private void Update()
@@ -76,6 +94,9 @@ namespace FR8.Runtime.Player
                 ScreenCapture.CaptureScreenshot(filename, resolutionScale);
                 Debug.Log($"Saved Screenshot to \"{filename}\"");
                 screenshotTaken = true;
+
+                lastScreenshotTime = Time.unscaledTime;
+                lastScreenshotName = filename;
             }
         }
 
@@ -104,9 +125,18 @@ namespace FR8.Runtime.Player
             Cursor.visible = !grabbed;
             if (!grabbed) return;
 
+            var fovRad = Mathf.Lerp(fovMin, fovMax, fovCurrent) * Mathf.Deg2Rad;
+            var sensitivity = this.sensitivity * Mathf.Tan(fovRad * 0.5f) * 2.0f;
             cameraRotation += Mouse.current.delta.ReadValue() * sensitivity;
 
             var kb = Keyboard.current;
+            var panSpeed = this.panSpeed;
+
+            if (kb.leftShiftKey.isPressed) panSpeed *= 2.0f;
+            if (kb.leftCtrlKey.isPressed) panSpeed *= 2.0f;
+            
+            if (kb.leftAltKey.isPressed) panSpeed *= 0.5f;
+            
             moveTarget = Vector3.ClampMagnitude(transform.TransformVector
             (
                 kb.dKey.ReadValue() - kb.aKey.ReadValue(),
@@ -118,10 +148,7 @@ namespace FR8.Runtime.Player
             fovCurrent = Mathf.Clamp01(fovCurrent);
         }
 
-        private void LateUpdate()
-        {
-            BindToCamera();
-        }
+        private void LateUpdate() { BindToCamera(); }
 
         private void BindToCamera()
         {
@@ -129,5 +156,25 @@ namespace FR8.Runtime.Player
             mainCamera.transform.rotation = transform.rotation;
             mainCamera.fieldOfView = Mathf.Lerp(fovMin, fovMax, fovCurrent);
         }
+
+        private void OnGUI()
+        {
+            var t = Time.unscaledTime - lastScreenshotTime;
+            if (t < 5.0f)
+            {
+                GUI.Label(new Rect(15.0f, 15.0f, 500.0f, 100.0f), $"Screenshot Taken at \"{lastScreenshotName}\"");
+            }
+
+            GUI.color = new Color(1.0f, 1.0f, 1.0f, Mathf.Clamp01(1.0f - t * 5.0f));
+            GUI.DrawTexture(new Rect(0.0f, 0.0f, Screen.width, Screen.height), Texture2D.whiteTexture, ScaleMode.StretchToFill);
+        }
+
+        private void OnValidate()
+        {
+            var mainCamera = Camera.main.transform;
+            
+            name = "PhotoController";
+        }
+#endif
     }
 }
