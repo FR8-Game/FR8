@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2398640511836451229}
   - component: {fileID: 308098229587804129}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -45,8 +45,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0723fe3c44e341f8ac64f5cd038f5ac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  key: 
-  displayName: 
   defaultValue: 0
   animator:
     handle: {fileID: 7329044123161991173}
@@ -67,14 +65,6 @@ MonoBehaviour:
     slidePoseARotation: {x: 0, y: 0, z: 0}
     slidePoseBRotation: {x: 0, y: 0, z: 0}
   testValue: 0
-  sounds:
-    clickReference:
-      Guid:
-        Data1: -189193412
-        Data2: 1073779592
-        Data3: 1416596370
-        Data4: 1730725417
-      Path: event:/Interactions/Button Press
 --- !u!1001 &3579330941955229517
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -134,14 +124,30 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: b948ed61018be564fbfd1386c9bf4678, type: 2}
+    - target: {fileID: 398887012323858809, guid: 92327f2e0b507544fb6612e4c0beace4, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 92327f2e0b507544fb6612e4c0beace4, type: 3}
       propertyPath: m_Name
       value: Button
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 92327f2e0b507544fb6612e4c0beace4, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 1972610378599201671, guid: 92327f2e0b507544fb6612e4c0beace4, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 04da59adad2195b4e85ef88bf4302213, type: 2}
+      objectReference: {fileID: 2100000, guid: a4efee65d1a844c4bb26463074fad4e4, type: 2}
+    - target: {fileID: 3912952296436605670, guid: 92327f2e0b507544fb6612e4c0beace4, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5394831699547436688, guid: 92327f2e0b507544fb6612e4c0beace4, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 92327f2e0b507544fb6612e4c0beace4, type: 3}
 --- !u!1 &567963618346886571 stripped
