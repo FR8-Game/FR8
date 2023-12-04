@@ -45,39 +45,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b00a66c668671fa429e39507ea842827, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  state: 1
-  color: {r: 0.46666667, g: 0.7921569, b: 1, a: 1}
-  lightIntensity: 0.18
-  materialIntensity: 50
-  warmUpTime: 0.04
-  cooldownTime: 0.04
-  smoothingCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  renderer: {fileID: 0}
+  state: 0
+  settings: {fileID: 11400000, guid: d59f099d733f7a646901135901cc3f77, type: 2}
+  emergencyLight: 1
+  renderer: {fileID: 8169075276293581441}
+  light: {fileID: 6908402539985806903}
   materialIndex: 0
-  materialEmissionPropertyName: _EmissionColor
+  materialEmissionPropertyName: _Emission
   fuseGroup: Lights
   powerDrawWatts: 40
   threshold: 0.5
@@ -126,7 +100,7 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 0.46666667, g: 0.7921569, b: 1, a: 1}
-  m_Intensity: 0.18
+  m_Intensity: 1
   m_Range: 3
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -288,5 +262,10 @@ PrefabInstance:
 --- !u!4 &1272500145632069876 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 9855dbf481693984c9f9351db6247bf4, type: 3}
+  m_PrefabInstance: {fileID: 1594957470880837407}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &8169075276293581441 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -1766519429676235362, guid: 9855dbf481693984c9f9351db6247bf4, type: 3}
   m_PrefabInstance: {fileID: 1594957470880837407}
   m_PrefabAsset: {fileID: 0}

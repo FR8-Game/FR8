@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UnityEngine.Rendering;
+﻿using FR8.Runtime.Train.Electrics;
+using UnityEngine;
 
 namespace FR8.Runtime.Level
 {
@@ -7,71 +7,88 @@ namespace FR8.Runtime.Level
     public class LightDriver : MonoBehaviour
     {
         public bool state;
-        public Color color = Color.white;
-        public float lightIntensity = 20.0f;
-        public float materialIntensity = 2.0f;
-        public float warmUpTime = 0.5f;
-        public float cooldownTime = 1.0f;
-        public AnimationCurve smoothingCurve = AnimationCurve.EaseInOut(0.0f, 0.0f, 1.0f, 1.0f);
+        public LightDriverSettings settings;
+        public bool emergencyLight;
 
         [Space]
         [SerializeField] private new Renderer renderer;
+        [SerializeField] private new Light light;
         [SerializeField] private int materialIndex = 1;
-        [SerializeField] private string materialEmissionPropertyName = "_EmissionColor";
+        [SerializeField] private string materialEmissionPropertyName = "_Emission";
 
         private float percent;
         private Material material;
-        private new Light light;
-
-        public Color EvaluatedColor => color;
+        private MaterialPropertyBlock propertyBlock;
+        private Color materialColor;
+        private Color lightColor;
+        
+        private float stateTime;
 
         protected virtual void Awake()
         {
+            propertyBlock = new MaterialPropertyBlock();
+
             if (renderer && renderer.sharedMaterials.Length > materialIndex)
             {
                 var materials = renderer.sharedMaterials;
                 material = Instantiate(materials[materialIndex]);
                 materials[materialIndex] = material;
                 renderer.sharedMaterials = materials;
-                
+
                 material.hideFlags = HideFlags.HideAndDontSave;
-            }
-
-            light = GetLight();
-        }
-
-        protected virtual void FixedUpdate()
-        {
-            percent = Mathf.Clamp01(percent + Time.deltaTime / (state ? warmUpTime : -cooldownTime));
-            var smoothedPercent = smoothingCurve.Evaluate(percent);
-
-            if (material)
-            {
-                material.SetKeyword(new LocalKeyword(material.shader, "_EMISSION"), true);
-                material.SetColor(materialEmissionPropertyName, EvaluatedColor * smoothedPercent * materialIntensity);
             }
 
             if (light)
             {
-                light.color = EvaluatedColor;
-                light.intensity = smoothedPercent * lightIntensity;
+                lightColor = light.color;
             }
+
+            if (material) materialColor = material.GetColor(materialEmissionPropertyName);
+        }
+
+        private void OnEnable()
+        {
+            if (!settings)
+            {
+                Debug.LogWarning("LightDriver is missing a Settings Object, please add one", this);
+                settings = FindObjectOfType<LightDriverSettings>();
+                if (!settings) enabled = false;
+            }
+        }
+
+        protected virtual void FixedUpdate()
+        {
+            percent = Mathf.Clamp01(percent + Time.deltaTime / (state ? settings.warmUpTime : -settings.cooldownTime));
+            var smoothedPercent = settings.smoothingCurve.Evaluate(percent);
+
+            var attenuation = CalculateAttenuation();
+            
+            if (renderer && renderer.sharedMaterials.Length > materialIndex)
+            {
+                propertyBlock.SetColor(materialEmissionPropertyName, BlendColor(materialColor, smoothedPercent, attenuation));
+                renderer.SetPropertyBlock(propertyBlock, materialIndex);
+            }
+
+            if (light)
+            {
+                light.color = BlendColor(lightColor, smoothedPercent, attenuation);
+            }
+        }
+
+        protected virtual float CalculateAttenuation() => 1.0f;
+
+        private Color BlendColor(Color baseColor, float p, float attenuation)
+        {
+            var color = Color.Lerp(emergencyLight ? settings.emergencyLightColor : Color.black, baseColor, p) * attenuation;
+            color.Alpha(1.0f);
+            return color;
         }
 
         private void Reset()
         {
-            renderer = GetComponentInChildren<Renderer>();
+            if (!renderer) renderer = GetComponentInChildren<Renderer>();
+            if (!light) light = GetComponentInChildren<Light>();
+            if (!settings) settings = FindObjectOfType<LightDriverSettings>();
         }
-
-        private void OnValidate()
-        {
-            var light = GetLight();
-            
-            if (!light) return;
-            light.color = EvaluatedColor;
-            light.intensity = lightIntensity;
-        }
-
-        private Light GetLight() => GetComponentInChildren<Light>();
     }
 }
