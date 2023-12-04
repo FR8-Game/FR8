@@ -278,6 +278,7 @@ namespace FR8.Runtime.Train
         {
             var delta = rotation * Quaternion.Inverse(Body.rotation);
             delta.ToAngleAxis(out var angle, out var axis);
+            axis.Normalize();
             if (!(float.IsFinite(axis.x) && float.IsFinite(axis.y) && float.IsFinite(axis.z)))
             {
                 axis = Vector3.up;
@@ -285,7 +286,8 @@ namespace FR8.Runtime.Train
             }
             if (angle > 180.0f) angle -= 360.0f;
             if (angle < -180.0f) angle += 360.0f;
-            Body.angularVelocity = axis * angle * Mathf.Deg2Rad / Time.deltaTime;
+            Body.angularVelocity += (axis * angle * Mathf.Deg2Rad / Time.deltaTime - Body.angularVelocity) * 0.25f;
+            Debug.Log($"{angle} | {axis}");
         }
 
         public float GetForwardSpeed() => Vector3.Dot(DriverDirection, Body.velocity);
