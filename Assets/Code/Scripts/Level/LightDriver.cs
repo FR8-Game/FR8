@@ -6,7 +6,7 @@ namespace FR8.Runtime.Level
     [SelectionBase, DisallowMultipleComponent]
     public class LightDriver : MonoBehaviour
     {
-        public bool state;
+        [SerializeField] private bool state;
         public LightDriverSettings settings;
         public bool emergencyLight;
 
@@ -21,8 +21,22 @@ namespace FR8.Runtime.Level
         private MaterialPropertyBlock propertyBlock;
         private Color materialColor;
         private Color lightColor;
-        
-        private float stateTime;
+
+        private bool targetState;
+        private float stateChangeTime;
+        private float stateChangeDelay;
+
+        public bool State
+        {
+            get => state;
+            set
+            {
+                if (targetState == value) return;
+                targetState = value;
+                stateChangeTime = Time.time;
+                stateChangeDelay = value ? Random.Range(settings.delayMin, settings.delayMax) : 0.0f;
+            }
+        }
 
         protected virtual void Awake()
         {
@@ -58,11 +72,16 @@ namespace FR8.Runtime.Level
 
         protected virtual void FixedUpdate()
         {
+            if (Time.time - stateChangeTime > stateChangeDelay)
+            {
+                state = targetState;
+            }
+
             percent = Mathf.Clamp01(percent + Time.deltaTime / (state ? settings.warmUpTime : -settings.cooldownTime));
             var smoothedPercent = settings.smoothingCurve.Evaluate(percent);
 
             var attenuation = CalculateAttenuation();
-            
+
             if (renderer && renderer.sharedMaterials.Length > materialIndex)
             {
                 propertyBlock.SetColor(materialEmissionPropertyName, BlendColor(materialColor, smoothedPercent, attenuation));

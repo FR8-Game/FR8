@@ -39,16 +39,16 @@ namespace FR8.Runtime.Train.Electrics
             var switchState = driverNetwork.GetValue(fuseGroup) > driverValueThreshold;
             var fuseState = driverNetwork.GetValue(TrainElectricsController.MainFuse) > 0.5f;
 
-            wasOn = state;
-            state = fuseState && switchState;
+            wasOn = State;
+            State = fuseState && switchState;
 
-            if (state != wasOn)
+            if (State != wasOn)
             {
-                if (state) soundInstance.start();
+                if (State) soundInstance.start();
                 else soundInstance.stop(STOP_MODE.ALLOWFADEOUT);
             }
 
-            if (state) soundInstance.set3DAttributes(gameObject.To3DAttributes());
+            if (State) soundInstance.set3DAttributes(gameObject.To3DAttributes());
 
             base.FixedUpdate();
         }
@@ -63,6 +63,6 @@ namespace FR8.Runtime.Train.Electrics
             return Mathf.Lerp(base.CalculateAttenuation(), flicker, loadFlickerCurve.Evaluate(load));
         }
 
-        public float CalculatePowerDraw() => state ? powerDrawWatts / 1000.0f : 0.0f;
+        public float CalculatePowerDraw() => State ? powerDrawWatts / 1000.0f : 0.0f;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using FMODUnity;
 using FR8.Runtime.Interactions.Drivers;
+using TMPro;
 using UnityEngine;
 
 namespace FR8.Runtime.Train
@@ -11,8 +12,12 @@ namespace FR8.Runtime.Train
         public EventReference warningBuzz;
         public StatTracker loadTracker;
 
+        private Locomotive locomotive;
         private DriverNetwork driverNetwork;
+        
         private Canvas canvas;
+        private TMP_Text defaultText;
+        private string defaultTextText;
         private GameObject[] panels;
         
         private event Action UpdateEvent;
@@ -21,6 +26,7 @@ namespace FR8.Runtime.Train
         {
             canvas = GetComponent<Canvas>();
             driverNetwork = GetComponentInParent<DriverNetwork>();
+            locomotive = GetComponentInParent<Locomotive>();
 
             var parent = transform.Find("Mask");
             panels = new GameObject[parent.childCount];
@@ -31,6 +37,9 @@ namespace FR8.Runtime.Train
             }
             
             loadTracker.Init(() => driverNetwork.GetValue("load"), ref UpdateEvent, ShowPanel(1));
+
+            defaultText = panels[0].GetComponentInChildren<TMP_Text>();
+            defaultTextText = defaultText.text;
         }
 
         private void OnEnable()
@@ -65,6 +74,9 @@ namespace FR8.Runtime.Train
         private void Update()
         {
             UpdateEvent?.Invoke();
+
+            var carriagesConnected = locomotive.ConnectedCarriages.Count - 1;
+            defaultText.text = string.Format(defaultTextText, carriagesConnected);
         }
 
         [Serializable] 
