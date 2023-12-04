@@ -87,6 +87,11 @@ namespace FR8.Runtime.Train.Engine
 
         private void CalculateLoad(float fwdSpeed)
         {
+            if (locomotive.Gear == 0)
+            {
+                load = 0.0f;
+            }
+            
             actualAcceleration = (fwdSpeed - lastForwardSpeed) / Time.deltaTime;
             load = locomotive.Gear != 0 ? Mathf.Abs(throttleAcceleration - actualAcceleration) * Settings.loadScaling : 0.0f;
             load = Mathf.Clamp01(load);
@@ -97,7 +102,7 @@ namespace FR8.Runtime.Train.Engine
         {
             var efficiency = Settings.loadCurve.Evaluate(load);
 
-            throttleAcceleration = GetThrottleForce(throttleActual) * locomotive.Gear;
+            throttleAcceleration = GetThrottleForce(throttleActual) * locomotive.Gear * efficiency;
             locomotive.Body.AddForce(locomotive.DriverDirection * throttleAcceleration * efficiency * locomotive.referenceWeight);
         }
 

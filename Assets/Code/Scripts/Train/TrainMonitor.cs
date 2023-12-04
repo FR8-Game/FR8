@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using FR8.Runtime.Dialogue;
+﻿using System;
+using FMODUnity;
 using FR8.Runtime.Interactions.Drivers;
-using FR8.Runtime.Player;
-using FR8.Runtime.Shapes;
-using FR8.Runtime.Train.Electrics;
+using TMPro;
 using UnityEngine;
 
 namespace FR8.Runtime.Train
@@ -11,93 +9,111 @@ namespace FR8.Runtime.Train
     [SelectionBase, DisallowMultipleComponent]
     public class TrainMonitor : MonoBehaviour
     {
-        public const float MaxTrainSafeSpeed = 10.0f / 3.6f;
-        
-        [SerializeField] private DialogueSource source;
+        public EventReference warningBuzz;
+        public StatTracker loadTracker;
 
-        private TrainCarriage carriage;
-        private TrainElectricsController trainElectrics;
+        private Locomotive locomotive;
         private DriverNetwork driverNetwork;
-
-        private List<Shape> shapes = new();
+        
+        private Canvas canvas;
+        private TMP_Text defaultText;
+        private string defaultTextText;
+        private GameObject[] panels;
+        
+        private event Action UpdateEvent;
 
         private void Awake()
         {
-            carriage = GetComponent<TrainCarriage>();
-            driverNetwork = GetComponent<DriverNetwork>();
-            trainElectrics = GetComponent<TrainElectricsController>();
-        }
+            canvas = GetComponent<Canvas>();
+            driverNetwork = GetComponentInParent<DriverNetwork>();
+            locomotive = GetComponentInParent<Locomotive>();
 
-        private void FixedUpdate()
-        {
-            //CheckForDriver();
-        }
-
-        private void CheckForDriver()
-        {
-            var fwdSpeed = carriage.GetForwardSpeed();
-            if (Mathf.Abs(fwdSpeed) < MaxTrainSafeSpeed) return;
-            
-            var players = FindObjectsOfType<PlayerAvatar>();
-            foreach (var p in players)
+            var parent = transform.Find("Mask");
+            panels = new GameObject[parent.childCount];
+            for (var i = 0; i < panels.Length; i++)
             {
-                foreach (var s in shapes)
-                {
-                    if (s.ContainsPoint(p.getCenter())) return;
-                }
+                panels[i] = parent.GetChild(i).gameObject;
+                panels[i].SetActive(i == 0);
             }
+            
+            loadTracker.Init(() => driverNetwork.GetValue("load"), ref UpdateEvent, ShowPanel(1));
 
-            if (!trainElectrics.GetConnected()) return;
-            
-            trainElectrics.SetConnected(false);
-            driverNetwork.SetValue("Brake", 1.0f);
-            
-            var entry = new DialogueEntry()
-            {
-                source = source,
-                body = "Train does not contain a driver.\nStopping Train."
-            };
-            
-            DialogueListener.QueueDialogue(entry);
+            defaultText = panels[0].GetComponentInChildren<TMP_Text>();
+            defaultTextText = defaultText.text;
         }
 
         private void OnEnable()
         {
-            TrainElectricsController.FuseBlown += OnFuseBlown;
-            GetShapes();
+            driverNetwork.ValueChangedEvent += OnValueChanged;
+            canvas.enabled = driverNetwork.GetValue("mainfuse") > 0.5f;
         }
 
         private void OnDisable()
         {
-            TrainElectricsController.FuseBlown -= OnFuseBlown;
+            driverNetwork.ValueChangedEvent -= OnValueChanged;
         }
 
-        private void OnFuseBlown(TrainElectricsController train)
+        private void OnValueChanged(string key, float value)
         {
-            if (trainElectrics != train) return;
-            
-            var entry = new DialogueEntry()
+            if (key != "mainfuse") return;
+            canvas.enabled = value > 0.5f;
+        }
+
+        private Action<bool> ShowPanel(int index)
+        {
+            return state =>
             {
-                source = source,
-                body = "Your Train has Tripped the Main Fuse.\nThe Main Fuse can be reset from the Fuze Box in the Trains Cockpit."
+                for (var i = 0; i < panels.Length; i++)
+                {
+                    var panel = panels[i];
+                    panel.SetActive(i == (state ? index : 0));
+                }
             };
+        }
+
+        private void Update()
+        {
+            UpdateEvent?.Invoke();
+
+            var carriagesConnected = locomotive.ConnectedCarriages.Count - 1;
+            defaultText.text = string.Format(defaultTextText, carriagesConnected);
+        }
+
+        [Serializable] 
+        public class StatTracker
+        {
+            [SerializeField] private float threshold;
+            [SerializeField] private float delay;
             
-            DialogueListener.QueueDialogue(entry);
-        }
+            private Func<float> value;
+            private float counter;
+            private bool state;
 
-        private void OnDrawGizmosSelected()
-        {
-            GetShapes();
-
-            foreach (var e in shapes)
+            private Action<bool> changeStateCallback;
+            
+            public bool State => state;
+            
+            public void Init(Func<float> getValue, ref Action update, Action<bool> changeStateCallback)
             {
-                e.DrawGizmos();
+                update += Update;
+                value = getValue;
+                this.changeStateCallback = changeStateCallback;
             }
-        }
 
-        private void GetShapes()
-        {
-            Shape.FindShapes(shapes, transform, "Shapes/Cockpit", true, true);
+            private void Update()
+            {
+                counter += (value() > threshold ? 1.0f : -1.0f) * Time.deltaTime / delay;
+                if (!state && counter >= 1.0f) ChangeState(true);
+                if (state && counter <= 0.0f) ChangeState(false);
+                counter = Mathf.Clamp01(counter);
+            }
+
+            private void ChangeState(bool state)
+            {
+                if (this.state == state) return;
+                this.state = state;
+                changeStateCallback?.Invoke(state);
+            }
         }
     }
 }
