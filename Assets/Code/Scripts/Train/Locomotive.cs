@@ -8,7 +8,7 @@ namespace FR8.Runtime.Train
     [SelectionBase]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(TrainEngine), typeof(TrainElectricsController), typeof(TrainGasTurbine))]
-    [RequireComponent(typeof(DriverNetwork), typeof(TrainMonitor), typeof(LocomotiveAudio))]
+    [RequireComponent(typeof(DriverNetwork), typeof(LocomotiveAudio))]
     public class Locomotive : TrainCarriage
     {
         public LocomotiveSettings locomotiveSettings;
