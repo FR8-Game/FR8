@@ -4,6 +4,7 @@ using FR8.Runtime.Interactions.Drivers;
 using FR8.Runtime.Level;
 using FR8.Runtime.References;
 using UnityEngine;
+using STOP_MODE = FMOD.Studio.STOP_MODE;
 
 namespace FR8.Runtime.Train.Electrics
 {
