@@ -1,5 +1,4 @@
 using System;
-using FMOD.Studio;
 using FMODUnity;
 using FR8.Runtime.CodeUtility;
 using FR8.Runtime.Save;
@@ -7,6 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using Cursor = UnityEngine.Cursor;
+using STOP_MODE = FMOD.Studio.STOP_MODE;
 
 namespace FR8.Runtime.UI
 {
