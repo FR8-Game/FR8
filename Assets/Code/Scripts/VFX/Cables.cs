@@ -32,15 +32,15 @@ namespace FR8.Runtime.VFX
 
         private void FixedUpdate()
         {
-            var targetVelocity = body ? body.velocity : Vector3.zero;
-            var force = (transform.position - position) * spring + (targetVelocity - velocity) * damper;
+            var targetVelocity = body ? body.GetPointVelocity(transform.position) : Vector3.zero;
+            var force = -position * spring - velocity * damper;
 
             velocity += Random.insideUnitSphere * targetVelocity.magnitude * velocityShake * Time.deltaTime;
 
             position += velocity * Time.deltaTime;
             velocity += force * Time.deltaTime;
             
-            propertyBlock.SetVector("_Offset", (position - transform.position) * response);
+            propertyBlock.SetVector("_Offset", position * response);
             renderer.SetPropertyBlock(propertyBlock);
         }
     }
