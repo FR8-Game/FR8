@@ -27,7 +27,8 @@ namespace FR8.Runtime.VFX
 
         private void OnEnable()
         {
-            position = transform.position;
+            position = Vector3.zero;
+            velocity = Vector3.zero;
         }
 
         private void FixedUpdate()
